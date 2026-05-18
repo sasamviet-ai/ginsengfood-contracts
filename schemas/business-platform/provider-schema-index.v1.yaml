@@ -1,0 +1,100 @@
+version: v1
+name: business-platform-provider-schema-index
+title: Business Platform Provider Schema Index
+description: Provider-level index mapping ginsengfood-business-platform responsibility areas to existing v1 domain schemas. This file does not define new schemas or duplicate domain schema contracts.
+provider: business-platform
+source_documents:
+  - docs/source-map.md
+  - MASTER-01
+  - MASTER-02
+  - PACK-05
+  - PACK-06
+  - PACK-07
+  - PACK-08
+  - PACK-09
+  - TECH-04
+  - TECH-05
+  - TECH-06
+  - TECH-07
+  - TECH-08
+  - TECH-09
+  - TECH-10
+schema_roots:
+  common:
+    path: ../common
+    purpose: Shared envelope, audit, correlation, idempotency, evidence, source reference, money, quantity, and pagination contracts.
+  commerce:
+    path: ../commerce
+    purpose: Availability check, QuoteSnapshot, cart, order draft, customer confirmation, official order, payment, shipping, customer, and verified revenue contracts.
+  channel:
+    path: ../channel
+    purpose: Channel context, Facebook comment, Messenger thread, public/private handoff, human takeover, and channel delivery contracts.
+  ai:
+    path: ../ai
+    purpose: AI intent, response instruction, claim guard, product recommendation, customer memory reference, and order draft handoff contracts.
+  ads:
+    path: ../ads
+    purpose: Attribution, funnel event, verified revenue link, ROAS measurement, scale gate, and data quality contracts.
+  live:
+    path: ../live
+    purpose: Live plan, host cue, risk cue, live measurement, and private handoff cue contracts.
+  ivr:
+    path: ../ivr
+    purpose: IVR call job, attempt, result, and cancellation notice contracts.
+provider_surfaces:
+  - area: commerce-runtime
+    owner_system: business-platform
+    domain_schema_paths:
+      - ../commerce/availability-check.schema.json
+      - ../commerce/quote-snapshot.schema.json
+      - ../commerce/cart.schema.json
+      - ../commerce/order-draft.schema.json
+      - ../commerce/customer-confirmation.schema.json
+      - ../commerce/order.schema.json
+      - ../commerce/payment.schema.json
+      - ../commerce/shipping.schema.json
+      - ../commerce/verified-revenue.schema.json
+    notes: Quote, cart, and order draft are not official order. Customer confirmation is required for official order.
+  - area: customer-and-benefit
+    owner_system: business-platform
+    domain_schema_paths:
+      - ../commerce/customer.schema.json
+      - ../commerce/member-benefit.schema.json
+      - ../commerce/company-bank-account.schema.json
+      - ../commerce/accounting-review.schema.json
+    notes: Payment and bank account contracts must avoid hardcoded registry data and sensitive details.
+  - area: channel-ai
+    owner_system: business-platform
+    domain_schema_paths:
+      - ../channel/channel-context.schema.json
+      - ../channel/facebook-comment.schema.json
+      - ../channel/messenger-thread.schema.json
+      - ../channel/comment-to-messenger-handoff.schema.json
+      - ../channel/human-takeover.schema.json
+      - ../channel/channel-delivery.schema.json
+      - ../ai/ai-intent.schema.json
+      - ../ai/ai-response-instruction.schema.json
+      - ../ai/product-recommendation.schema.json
+      - ../ai/claim-guard-result.schema.json
+      - ../ai/order-draft-handoff.schema.json
+    notes: AI and channel contracts produce instructions/handoffs only; they must not create source-of-truth for price, stock, claim, payment, or order.
+  - area: ads-live-ivr
+    owner_system: business-platform
+    domain_schema_paths:
+      - ../ads/attribution.schema.json
+      - ../ads/funnel-event.schema.json
+      - ../ads/verified-revenue-link.schema.json
+      - ../ads/roas-measurement.schema.json
+      - ../ads/scale-gate.schema.json
+      - ../live/live-plan.schema.json
+      - ../live/host-cue.schema.json
+      - ../live/live-risk-cue.schema.json
+      - ../ivr/ivr-call-job.schema.json
+      - ../ivr/ivr-call-attempt.schema.json
+      - ../ivr/ivr-call-result.schema.json
+    notes: Verified revenue is business-platform-owned; IVR result is input signal only.
+compatibility:
+  breaking_change: Moving official order, payment confirmation, verified revenue, AI/channel instruction, Ads measurement, Live cue, or IVR signal ownership away from business-platform is breaking.
+todos:
+  - Keep this index synchronized with domain schemas and OpenAPI/AsyncAPI v1 contracts.
+  - Add exact source section references when the source-map uses stable section identifiers.

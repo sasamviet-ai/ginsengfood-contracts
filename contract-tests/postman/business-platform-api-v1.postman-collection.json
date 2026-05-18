@@ -1,0 +1,85 @@
+{
+  "info": {
+    "name": "Ginsengfood Business Platform API v1 Contract Smoke",
+    "description": "Contract-only Postman collection for selected business-platform v1 APIs. Uses placeholder baseUrl and no secrets.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Create Quote",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/v1/quotes",
+        "description": "QuoteSnapshot contract. Quote is not an official order.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"quote_snapshot_id\": \"quote-20260518-001\",\n  \"version\": \"v1\",\n  \"status\": \"QUOTE_ACTIVE\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Create Official Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/v1/orders",
+        "description": "Official Order contract. Customer confirmation is required before official order creation.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_id\": \"order-20260518-001\",\n  \"version\": \"v1\",\n  \"order_code\": \"GF-20260518-0001\",\n  \"customer_confirmation_id\": \"customer-confirmation-20260518-001\",\n  \"quote_snapshot_id\": \"quote-20260518-001\",\n  \"status\": \"ORDER_CREATED\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Create Payment Reference",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/v1/payments",
+        "description": "Payment reference is not paid. Payment requires valid confirmation source.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"payment_id\": \"payment-20260518-001\",\n  \"version\": \"v1\",\n  \"order_id\": \"order-20260518-001\",\n  \"status\": \"PAYMENT_PENDING\",\n  \"paid_requires_confirmation\": true\n}"
+        }
+      }
+    },
+    {
+      "name": "Create AI Response Instruction",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/v1/ai-advisor/response-instructions",
+        "description": "AI response instruction only; AI does not create product, stock, price, order, payment, or claim truth.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"response_instruction_id\": \"ai-response-20260518-001\",\n  \"version\": \"v1\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Request IVR Confirmation",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/v1/ivr/order-confirmation/call-jobs",
+        "description": "IVR applies only to eligible official orders and emits input signals only.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"ivr_call_job_id\": \"ivr-call-job-20260518-001\",\n  \"version\": \"v1\",\n  \"official_order_id\": \"order-20260518-001\"\n}"
+        }
+      }
+    }
+  ]
+}

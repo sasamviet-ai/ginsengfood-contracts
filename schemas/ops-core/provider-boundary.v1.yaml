@@ -1,0 +1,64 @@
+version: v1
+name: ops-core-provider-boundary
+title: Ops Core Provider Boundary
+description: Contract boundary statement for ginsengfood-ops-core provider-owned schemas and consumer-facing data shapes.
+provider: ops-core
+source_documents:
+  - docs/source-map.md
+  - MASTER-01
+  - MASTER-02
+  - PACK-01
+  - PACK-02
+  - PACK-03
+  - PACK-04
+  - TECH-02
+  - TECH-03
+  - TECH-10
+owns:
+  - product-master
+  - sku-canonical
+  - ingredient-canonical
+  - recipe
+  - formula-version
+  - bom
+  - product-activation
+  - demand-mrp-operational-input
+  - production-order
+  - production-execution
+  - qc-inspection
+  - batch-release
+  - warehouse
+  - warehouse-receipt
+  - inventory-ledger
+  - stock-balance
+  - sellable-status
+  - trace-chain
+  - public-trace
+  - recall-case
+  - sale-lock
+  - operational-evidence
+  - operational-form
+  - misa-handoff-checkpoint
+does_not_own:
+  - quote
+  - cart
+  - official-order-creation
+  - customer-confirmation
+  - payment-confirmation
+  - verified-revenue
+  - facebook-channel-delivery
+  - ai-response-instruction
+  - ads-attribution
+  - live-host-cue
+  - ivr-result
+consumer_rules:
+  - business-platform may read product, public SKU, sellable, stock balance, trace, recall, and sale-lock contracts but must not mutate ops-core truth.
+  - Inventory ledger is append/checkpoint truth and must not be edited through consumer-facing contracts.
+  - Product Activation is not Sellable Status.
+  - QC_PASS is not RELEASED.
+  - MISA sync status does not rewrite Operational Truth.
+compatibility:
+  breaking_change: Weakening sale-lock, recall, inventory, release, traceability, or MISA checkpoint boundaries is breaking.
+todos:
+  - Source documents do not define every filter/projection for public product and operational status reads.
+  - Source documents do not finalize all transition taxonomies for production, QC, recall, and sale lock.

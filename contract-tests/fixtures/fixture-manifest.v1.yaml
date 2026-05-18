@@ -1,0 +1,72 @@
+version: v1
+name: contract-test-fixture-manifest
+title: Contract Test Fixture Manifest
+description: Manifest for source-backed v1 fixtures used by provider/consumer contract tests. Fixtures reuse existing examples, schemas, and event payload contracts without adding new fields.
+source_documents:
+  - docs/source-map.md
+  - docs/domain-contract-map.md
+  - docs/generation-plan.md
+  - PACK-01
+  - PACK-05
+  - PACK-07
+  - PACK-09
+  - TECH-03
+  - TECH-04
+  - TECH-07
+  - TECH-09
+fixtures:
+  - file: availability-check.v1.fixture.json
+    contract_area: availability
+    provider: ops-core
+    consumers:
+      - business-platform
+    source_example: ../../examples/api/availability-check.response.json
+    validates_against:
+      - ../../schemas/common/envelope.schema.json
+      - ../../schemas/commerce/availability-check.schema.json
+  - file: sale-lock-activated.v1.fixture.json
+    contract_area: sale-lock
+    provider: ops-core
+    consumers:
+      - business-platform
+    source_example: ../../examples/events/sale-lock-activated.v1.example.json
+    validates_against:
+      - ../../events/ops-core/recall/sale-lock-activated.v1.json
+  - file: order-confirmed.v1.fixture.json
+    contract_area: order
+    provider: business-platform
+    consumers:
+      - ops-core
+    source_example: ../../examples/events/order-confirmed.v1.example.json
+    validates_against:
+      - ../../events/business-platform/order/order-confirmed.v1.json
+  - file: payment-confirmed.v1.fixture.json
+    contract_area: payment
+    provider: business-platform
+    consumers:
+      - ads
+      - ops-core
+    source_example: ../../examples/events/payment-confirmed.v1.example.json
+    validates_against:
+      - ../../events/business-platform/payment/payment-confirmed.v1.json
+  - file: verified-revenue-created.v1.fixture.json
+    contract_area: verified-revenue
+    provider: business-platform
+    consumers:
+      - ads
+      - analytics
+    source_example: ../../examples/events/verified-revenue-created.v1.example.json
+    validates_against:
+      - ../../events/business-platform/ads/verified-revenue-created.v1.json
+  - file: ivr-confirmed.v1.fixture.json
+    contract_area: ivr
+    provider: business-platform
+    consumers:
+      - order-runtime
+    source_example: ../../examples/events/ivr-confirmed.v1.example.json
+    validates_against:
+      - ../../events/business-platform/ivr/ivr-confirmed.v1.json
+compatibility:
+  breaking_change: Changing fixture fields without changing the underlying v1 schema or event contract is not allowed.
+todos:
+  - Add automated schema validation after the repository chooses a JSON Schema validator.

@@ -1,0 +1,31 @@
+version: v1
+name: contract-script-manifest
+title: Contract Script Manifest
+status: manifest-only
+description: Manifest for future contract lifecycle scripts. No executable scripts are added until a toolchain is approved.
+future_scripts:
+  - name: validate-openapi
+    purpose: Validate OpenAPI 3.1.0 files and required v1 path/error response conventions.
+  - name: validate-asyncapi
+    purpose: Validate AsyncAPI v1 files and event payload references.
+  - name: validate-json-schema
+    purpose: Validate JSON Schema draft 2020-12 syntax and local references.
+  - name: lint-contracts
+    purpose: Check filename policy, placeholder files, README coverage, and contract folder hygiene.
+  - name: check-breaking-changes
+    purpose: Compare contract changes against compatibility policy.
+  - name: generate-dotnet-client
+    purpose: Generate .NET clients only after generated-client policy is approved.
+  - name: generate-java-client
+    purpose: Generate Java clients only after generated-client policy is approved.
+  - name: generate-typescript-client
+    purpose: Generate TypeScript clients only after generated-client policy is approved.
+disallowed_content:
+  - executable-script-before-toolchain-approval
+  - business-logic
+  - service-logic
+  - database-migration
+  - production-config
+  - secrets
+todos:
+  - Choose toolchain, package manager, CI entrypoint, and generator versions.

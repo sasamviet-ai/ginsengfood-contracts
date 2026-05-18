@@ -1,0 +1,84 @@
+version: v1
+name: ops-core-provider-schema-index
+title: Ops Core Provider Schema Index
+description: Provider-level index mapping ginsengfood-ops-core responsibility areas to existing v1 domain schemas. This file does not define new schemas or duplicate domain schema contracts.
+provider: ops-core
+source_documents:
+  - docs/source-map.md
+  - MASTER-01
+  - MASTER-02
+  - PACK-01
+  - PACK-02
+  - PACK-03
+  - PACK-04
+  - TECH-02
+  - TECH-03
+  - TECH-10
+schema_roots:
+  common:
+    path: ../common
+    purpose: Shared envelope, audit, correlation, idempotency, evidence, source reference, money, quantity, and pagination contracts.
+  product:
+    path: ../product
+    purpose: Product Master, SKU, ingredient, recipe, formula, BOM, and activation contracts owned by ops-core.
+  ops:
+    path: ../ops
+    purpose: Operational Core production, QC, release, warehouse, inventory, traceability, recall, sale lock, forms, evidence, and MISA handoff contracts.
+provider_surfaces:
+  - area: product-master
+    owner_system: ops-core
+    domain_schema_paths:
+      - ../product/product.schema.json
+      - ../product/sku.schema.json
+      - ../product/ingredient.schema.json
+      - ../product/product-activation.schema.json
+    notes: Product activation is not sellable status.
+  - area: recipe-formula-bom
+    owner_system: ops-core
+    domain_schema_paths:
+      - ../product/recipe.schema.json
+      - ../product/formula-version.schema.json
+      - ../product/bom.schema.json
+      - ../product/bom-line.schema.json
+      - ../ops/production-bom-snapshot.schema.json
+    notes: G0, G1, formula version, anchor rice, ratio_to_rice, and BOM snapshot boundaries remain separate.
+  - area: production-qc-release
+    owner_system: ops-core
+    domain_schema_paths:
+      - ../ops/production-order.schema.json
+      - ../ops/production-execution.schema.json
+      - ../ops/qc-inspection.schema.json
+      - ../ops/batch.schema.json
+      - ../ops/batch-release.schema.json
+    notes: QC pass is not batch release.
+  - area: warehouse-inventory-sellable
+    owner_system: ops-core
+    domain_schema_paths:
+      - ../ops/warehouse.schema.json
+      - ../ops/warehouse-location.schema.json
+      - ../ops/warehouse-receipt.schema.json
+      - ../ops/inventory-ledger.schema.json
+      - ../ops/stock-balance.schema.json
+      - ../ops/stock-alert.schema.json
+      - ../ops/sellable-status.schema.json
+    notes: Inventory balance is derived from ledger and checkpoints; consumers must not mutate inventory ledger truth.
+  - area: traceability-recall-sale-lock
+    owner_system: ops-core
+    domain_schema_paths:
+      - ../ops/trace-chain.schema.json
+      - ../ops/public-trace.schema.json
+      - ../ops/recall-case.schema.json
+      - ../ops/sale-lock.schema.json
+    notes: Active sale lock or stop-sale must suppress commerce, AI, CRM, Ads, and Live selling flows.
+  - area: evidence-forms-misa
+    owner_system: ops-core
+    domain_schema_paths:
+      - ../ops/operational-evidence.schema.json
+      - ../ops/operational-form.schema.json
+      - ../ops/misa-handoff.schema.json
+    notes: MISA handoff records integration checkpoints and must not rewrite Operational Truth.
+compatibility:
+  breaking_change: Moving ops-core ownership for product, operational truth, inventory, traceability, recall, sale lock, or MISA checkpoint contracts is breaking.
+todos:
+  - Keep this index synchronized with domain schemas and OpenAPI/AsyncAPI v1 contracts.
+  - Add exact source section references when the source-map uses stable section identifiers.

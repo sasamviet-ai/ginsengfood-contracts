@@ -1,0 +1,70 @@
+version: v1
+name: business-platform-provider-boundary
+title: Business Platform Provider Boundary
+description: Contract boundary statement for ginsengfood-business-platform provider-owned schemas and consumer-facing data shapes.
+provider: business-platform
+source_documents:
+  - docs/source-map.md
+  - MASTER-01
+  - MASTER-02
+  - PACK-05
+  - PACK-06
+  - PACK-07
+  - PACK-08
+  - PACK-09
+  - TECH-04
+  - TECH-05
+  - TECH-06
+  - TECH-07
+  - TECH-08
+  - TECH-09
+  - TECH-10
+owns:
+  - availability-consumer-context
+  - quote-snapshot
+  - cart
+  - order-draft
+  - customer-confirmation
+  - official-order
+  - payment
+  - bank-transfer
+  - accounting-review
+  - shipping
+  - customer
+  - verified-revenue
+  - channel-context
+  - facebook-gateway
+  - messenger-handoff
+  - human-takeover
+  - ai-response-instruction
+  - product-recommendation-instruction
+  - ads-attribution
+  - ads-scale-gate
+  - live-plan
+  - host-cue
+  - live-risk-cue
+  - ivr-order-confirmation-signal
+does_not_own:
+  - product-master-truth
+  - recipe
+  - formula-version
+  - bom
+  - batch-release
+  - warehouse-receipt
+  - inventory-ledger
+  - stock-balance-truth
+  - sellable-status-truth
+  - trace-chain
+  - recall-case
+  - sale-lock
+  - misa-operational-checkpoint
+consumer_rules:
+  - business-platform must consume ops-core sellable, stock, recall, sale-lock, and trace truth before quote/order/AI/channel/live selling flows.
+  - QuoteSnapshot is pricing contract input; quote, cart, and order draft are not official order.
+  - Payment must not be marked paid without a valid confirmation source.
+  - Verified revenue must not be produced from raw funnel, quote, cart, draft, unpaid, pending, cancelled, or refunded states.
+  - IVR result is input signal only; the core order state machine decides cancellation or human review.
+compatibility:
+  breaking_change: Treating business-platform runtime signals as ops-core operational truth, or bypassing ops-core sale-lock/recall/sellable truth, is breaking.
+todos:
+  - Source documents do not finalize all payment provider, shipping, customer PII, AI taxonomy, channel delivery, live, Ads, or IVR retry details.

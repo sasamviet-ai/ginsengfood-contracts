@@ -1,0 +1,53 @@
+version: v1
+name: pact-interaction-map
+title: Pact Interaction Map
+description: Planning map for future Pact provider/consumer verification. This is not a generated Pact contract and does not require a Pact broker.
+source_documents:
+  - docs/source-map.md
+  - docs/domain-contract-map.md
+  - docs/generation-plan.md
+  - MASTER-01
+  - MASTER-02
+  - TECH-03
+  - TECH-04
+  - TECH-09
+interactions:
+  - name: business-platform-checks-ops-core-availability
+    provider: ops-core
+    consumer: business-platform
+    contract:
+      openapi: ../../openapi/ops-core/availability-sellable.v1.yaml
+      fixture: ../fixtures/availability-check.v1.fixture.json
+    expected_boundary: Consumer may check sellable status but must not mutate ops-core truth.
+  - name: business-platform-consumes-sale-lock
+    provider: ops-core
+    consumer: business-platform
+    contract:
+      event: ../../events/ops-core/recall/sale-lock-activated.v1.json
+      fixture: ../fixtures/sale-lock-activated.v1.fixture.json
+    expected_boundary: Active sale lock suppresses quote, order, AI, CRM, Ads, and Live flows.
+  - name: ops-core-consumes-official-order
+    provider: business-platform
+    consumer: ops-core
+    contract:
+      event: ../../events/business-platform/order/order-confirmed.v1.json
+      fixture: ../fixtures/order-confirmed.v1.fixture.json
+    expected_boundary: Official order requires customer confirmation and does not mutate ops-core truth directly.
+  - name: ads-consumes-verified-revenue
+    provider: business-platform
+    consumer: ads-measurement
+    contract:
+      event: ../../events/business-platform/ads/verified-revenue-created.v1.json
+      fixture: ../fixtures/verified-revenue-created.v1.fixture.json
+    expected_boundary: Verified revenue comes from business-platform, not ops-core or raw funnel signals.
+  - name: order-runtime-consumes-ivr-result
+    provider: business-platform
+    consumer: order-runtime
+    contract:
+      event: ../../events/business-platform/ivr/ivr-confirmed.v1.json
+      fixture: ../fixtures/ivr-confirmed.v1.fixture.json
+    expected_boundary: IVR result is input signal only.
+compatibility:
+  breaking_change: Changing provider ownership or treating a fixture as implementation behavior requires compatibility review.
+todos:
+  - Select Pact toolchain and provider registry before adding real pact files.

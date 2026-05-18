@@ -1,0 +1,22 @@
+version: v1
+name: typescript-generated-client-manifest
+title: TypeScript Generated Client Manifest
+status: manifest-only
+description: Manifest for future TypeScript generated clients. No generated client code is committed by this file.
+consumer_target: nextjs-frontend-and-contract-tooling
+allowed_source_contracts:
+  - ../../openapi/**/*.v1.yaml
+  - ../../asyncapi/*.v1.yaml
+  - ../../schemas/**/*.schema.json
+  - ../../events/**/*.v1.json
+disallowed_content:
+  - generated-client-code
+  - handwritten-implementation
+  - npm-package
+  - build-output
+  - secrets
+  - service-logic
+compatibility:
+  breaking_change: Generated TypeScript clients must not be committed or published until generator and compatibility policy are approved.
+todos:
+  - Choose generator, package name, module format, publishing flow, and regeneration command.

@@ -1,0 +1,67 @@
+{
+  "info": {
+    "name": "Ginsengfood Ops Core API v1 Contract Smoke",
+    "description": "Contract-only Postman collection for selected ops-core v1 APIs. Uses placeholder baseUrl and no secrets.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Check Availability",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/v1/availability/check",
+        "description": "Expected contract response: common v1 envelope with sellable or availability data; standard error envelope for 400/401/403/404/409/422/500.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sku_id\": \"sku-gf-rice-001\",\n  \"requested_quantity\": {\n    \"value\": 2,\n    \"unit\": \"pack\"\n  }\n}"
+        }
+      }
+    },
+    {
+      "name": "Get Public SKU",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/v1/skus/sku-gf-rice-001/public",
+        "description": "Expected contract response: public-safe SKU projection only."
+      }
+    },
+    {
+      "name": "List Stock Balances",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/v1/inventory/stock-balances",
+        "description": "Expected contract response: stock balance read model; inventory ledger must not be mutated by this request."
+      }
+    },
+    {
+      "name": "Get Public Trace",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/v1/trace/public/qr-sample-001",
+        "description": "Expected contract response: public trace only, excluding internal operational data."
+      }
+    },
+    {
+      "name": "Create Sale Lock",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/v1/sale-locks",
+        "description": "High-risk command contract. Requires owner/evidence/audit in real provider implementation.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sale_lock_id\": \"sale-lock-20260518-001\",\n  \"scope_type\": \"SKU\",\n  \"scope_id\": \"sku-gf-rice-001\",\n  \"status\": \"ACTIVE\",\n  \"active\": true,\n  \"reason\": \"Recall review requires stop-sale until owner release decision.\"\n}"
+        }
+      }
+    }
+  ]
+}
