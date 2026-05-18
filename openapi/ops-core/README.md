@@ -22,6 +22,27 @@ API groups:
 - Operational Evidence / Forms: `operational-evidence.v1.yaml`
 - MISA Handoff: `misa-handoff.v1.yaml`
 
+## Ops-core External Boundary With ginsengfood-business-platform
+
+Ops-core expose API:
+
+| API | Contract file | Boundary lock |
+|---|---|---|
+| Product Public API | `product-master.v1.yaml`, `sku.v1.yaml` | Public-safe projection only. |
+| SKU Detail API | `sku.v1.yaml` | SKU Active không đồng nghĩa có hàng bán. |
+| Product Activation Status API | `product-activation.v1.yaml` | Product Active không đồng nghĩa Sellable. |
+| Availability / Sellable Check API | `availability-sellable.v1.yaml` | Read/check only; no reservation or mutation. |
+| Stock Balance API | `inventory.v1.yaml` | Derived stock balance only; ledger remains ops-core truth. |
+| Trace Public API | `traceability.v1.yaml` | Whitelist-only public fields. |
+| Recall Status API | `recall-sale-lock.v1.yaml` | Recall blocks downstream flow where applicable. |
+| Sale Lock Status API | `recall-sale-lock.v1.yaml` | Sale Lock wins every downstream selling flow. |
+
+Boundary locks:
+
+- `ginsengfood-business-platform` chỉ consume/check contract, không mutate ops-core truth.
+- Ops-core không sở hữu customer, CRM, quote/cart/order final commerce, payment, shipping, ads, AI advisor, customer memory hoặc member/diamond benefit.
+- Ops-core chỉ lưu reference key nếu cần: `order_id`, `order_item_id`, `customer_id`, `shipment_id`.
+
 API phuc vu business-platform:
 - `POST /v1/availability/check`
 - `GET /v1/skus/{skuId}/public`

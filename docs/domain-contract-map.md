@@ -21,3 +21,15 @@ Every future contract output must be versioned `v1` and must cite the source doc
 | ivr-order-confirmation | PACK-09, TECH-09, TECH-04 | business-platform | commerce, customer notification, ops-core | schemas, enums, openapi, asyncapi, events, examples, state-machines, error-codes | Phase 3, Phase 5, Phase 6, Phase 7 | IVR state machine must be derived from explicit source states; no mass-calling behavior or unsupported call-result values. |
 | evidence-release-readiness | MASTER-05, MASTER-07, PACK-10, TECH-10 | contracts | ops-core, business-platform | schemas, enums, openapi, asyncapi, events, examples, state-machines, error-codes | Phase 1, Phase 7 | Release readiness contracts must distinguish evidence, smoke, UAT, sign-off, production-ready, release-approved, and go-live decisions only where source is explicit. Compatibility notes belong in Phase 7. |
 | compatibility-and-future-integration | MASTER-02, MASTER-06, PACK-01/PACK-02/PACK-03 cross-annotation, existing docs/compatibility-policy.md | contracts | ops-core, business-platform | examples | Phase 7 | Future integrations are reserved until source docs activate them; add TODOs instead of inventing inactive APIs/events. Compatibility is documented as notes, not a contract output value in this table. |
+
+## Ops-core External Boundary With ginsengfood-business-platform
+
+| Boundary area | Provider/source owner | Consumer | Contract output | Lock |
+|---|---|---|---|---|
+| Product Public API, SKU Detail API, Product Activation Status API | ops-core | business-platform and authorized consumers | `openapi/ops-core/product-master.v1.yaml`, `sku.v1.yaml`, `product-activation.v1.yaml` | Product Active không đồng nghĩa Sellable; SKU Active không đồng nghĩa có hàng bán. |
+| Availability / Sellable Check API, Stock Balance API | ops-core | business-platform selling guard | `availability-sellable.v1.yaml`, `inventory.v1.yaml` | Read/check only; consumer cannot mutate inventory ledger, reserve stock, or clear guard status. |
+| Trace Public API, Recall Status API, Sale Lock Status API | ops-core | business-platform downstream blocking flow | `traceability.v1.yaml`, `recall-sale-lock.v1.yaml` | Sale Lock / Recall / Not Sellable thắng mọi downstream selling flow. |
+| Ops-core publish events | ops-core | business-platform and contract tests | `events/ops-core/product`, `inventory`, `sellable`, `recall`, `misa` | Publish only versioned facts; no external system mutates ops-core truth through event payload. |
+| Ops-core consume boundary events | business-platform | ops-core | `events/business-platform/order`, `events/business-platform/demand` | Ops-core uses order/demand events as references or planning inputs only; no customer/CRM/commerce/payment/shipping ownership. |
+
+Full boundary list is maintained in `ops-core-business-platform-boundary.md`.
