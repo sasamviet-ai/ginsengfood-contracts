@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+.idea/
+.vscode/
+.DS_Store
+*.log
+logs/
+tmp/
+temp/
+generated/tmp/
+generated/temp/
+.codex-doc-memory/
