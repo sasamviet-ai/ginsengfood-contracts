@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-05-18T01:30:53.494Z",
+  "root": "C:\\Users\\Administrator\\Desktop\\DOCUMENTS\\.artifacts\\markdown-doc-reader",
+  "files": [
+    {
+      "path": "SKILL.md",
+      "title": "Markdown Doc Reader",
+      "frontmatter": {
+        "name": "markdown-doc-reader",
+        "description": "Read, map, remember, and review Markdown documentation sets. Use when Codex needs to work across many .md files, build a durable documentation memory or index, trace how Markdown files link to each other, summarize a docs corpus, audit broken links, duplicate docs, encoding-name anomalies, inconsistencies, evidence gaps, or review release-readiness packs and specs stored as Markdown."
+      },
+      "headings": [
+        {
+          "depth": 1,
+          "text": "Markdown Doc Reader",
+          "line": 6,
+          "slug": "markdown-doc-reader"
+        },
+        {
+          "depth": 2,
+          "text": "Core Workflow",
+          "line": 10,
+          "slug": "core-workflow"
+        },
+        {
+          "depth": 2,
+          "text": "Review Modes",
+          "line": 36,
+          "slug": "review-modes"
+        },
+        {
+          "depth": 2,
+          "text": "Relationship Mapping Rules",
+          "line": 49,
+          "slug": "relationship-mapping-rules"
+        },
+        {
+          "depth": 2,
+          "text": "Reading Strategy",
+          "line": 62,
+          "slug": "reading-strategy"
+        },
+        {
+          "depth": 2,
+          "text": "Useful Commands",
+          "line": 73,
+          "slug": "useful-commands"
+        }
+      ],
+      "links": [],
+      "lines": 92,
+      "words": 574,
+      "encodingNameAnomaly": false,
+      "resolvedLinks": [],
+      "unresolvedLinks": [],
+      "incomingLinks": []
+    }
+  ],
+  "edges": [],
+  "issues": {
+    "unresolvedLinks": [],
+    "duplicateTitles": [],
+    "encodingNameAnomalies": [],
+    "orphanCandidates": [
+      "SKILL.md"
+    ]
+  }
+}
