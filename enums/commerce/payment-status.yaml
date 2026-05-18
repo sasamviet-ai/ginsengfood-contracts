@@ -1,0 +1,98 @@
+version: v1
+name: payment-status
+title: Payment Status
+description: Commerce v1 payment method, payment confirmation, and COD collection state values from TECH-04.
+source_documents:
+  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
+values:
+  - value: PAYMENT_METHOD_NOT_SELECTED
+    description: Payment method has not been selected.
+    category: payment_method
+  - value: PAYMENT_METHOD_CHECKING
+    description: Payment method availability is being checked.
+    category: payment_method
+  - value: PAYMENT_METHOD_AVAILABLE
+    description: Payment method is available.
+    category: payment_method
+  - value: PAYMENT_METHOD_SELECTED
+    description: Payment method was selected.
+    category: payment_method
+  - value: PAYMENT_METHOD_BLOCKED
+    description: Payment method is blocked.
+    category: payment_method
+  - value: PAYMENT_METHOD_UNAVAILABLE
+    description: Payment method is unavailable.
+    category: payment_method
+  - value: PAYMENT_INSTRUCTION_CREATED
+    description: Payment instruction was created.
+    category: payment_method
+  - value: PAYMENT_METHOD_CLOSED
+    description: Payment method lifecycle is closed.
+    category: payment_method
+  - value: PAYMENT_NOT_STARTED
+    description: Payment has not started.
+    category: payment_confirmation
+  - value: PAYMENT_PENDING
+    description: Payment is pending.
+    category: payment_confirmation
+  - value: PAYMENT_REVIEW
+    description: Payment is under review; customer transfer proof alone belongs here, not PAID.
+    category: payment_confirmation
+  - value: PAYMENT_CONFIRMED
+    description: Payment was confirmed by allowed source.
+    category: payment_confirmation
+  - value: PAYMENT_FAILED
+    description: Payment failed.
+    category: payment_confirmation
+  - value: PAYMENT_REJECTED
+    description: Payment was rejected.
+    category: payment_confirmation
+  - value: PAYMENT_AMOUNT_MISMATCH
+    description: Payment amount mismatch requires review or block.
+    category: payment_confirmation
+  - value: PAYMENT_REFERENCE_MISMATCH
+    description: Payment reference mismatch requires review or block.
+    category: payment_confirmation
+  - value: PAYMENT_REFUND_PENDING
+    description: Refund is pending.
+    category: payment_confirmation
+  - value: PAYMENT_REFUNDED
+    description: Payment was refunded.
+    category: payment_confirmation
+  - value: PAYMENT_CLOSED
+    description: Payment lifecycle is closed.
+    category: payment_confirmation
+  - value: COD_NOT_SELECTED
+    description: COD has not been selected.
+    category: cod
+  - value: COD_ELIGIBILITY_CHECKING
+    description: COD eligibility is being checked.
+    category: cod
+  - value: COD_ELIGIBLE
+    description: COD is eligible.
+    category: cod
+  - value: COD_NOT_ELIGIBLE
+    description: COD is not eligible.
+    category: cod
+  - value: COD_SELECTED
+    description: COD was selected.
+    category: cod
+  - value: COD_PAYMENT_PENDING
+    description: COD payment/collection is pending.
+    category: cod
+  - value: COD_COLLECTION_CONFIRMED
+    description: COD collection was confirmed.
+    category: cod
+  - value: COD_COLLECTION_FAILED
+    description: COD collection failed and is not verified revenue.
+    category: cod
+  - value: COD_CANCELLED
+    description: COD was cancelled.
+    category: cod
+  - value: COD_CLOSED
+    description: COD lifecycle is closed.
+    category: cod
+compatibility:
+  breaking_change: Marking PAID without allowed confirmation source is breaking.
+todos:
+  - Source documents do not define an official payment method enum.

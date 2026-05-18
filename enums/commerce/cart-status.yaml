@@ -1,0 +1,30 @@
+version: v1
+name: cart-status
+title: Cart Status
+description: Commerce v1 cart state values from TECH-04.
+source_documents:
+  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
+values:
+  - value: CART_EMPTY
+    description: Cart has no active line.
+  - value: CART_ACTIVE
+    description: Cart is active.
+  - value: CART_VALIDATING
+    description: Cart validation is in progress.
+  - value: CART_VALID
+    description: Cart is valid for the next step.
+  - value: CART_INVALID
+    description: Cart is invalid.
+  - value: CART_NEEDS_QUOTE_REFRESH
+    description: Cart needs a refreshed QuoteSnapshot.
+  - value: CART_BLOCKED
+    description: Cart is blocked.
+  - value: CART_CONVERTED_TO_DRAFT
+    description: Cart was converted to Order Draft.
+  - value: CART_ABANDONED
+    description: Cart was abandoned.
+  - value: CART_CLOSED
+    description: Cart lifecycle is closed.
+compatibility:
+  breaking_change: Treating cart as revenue or official order is breaking.
+todos: []

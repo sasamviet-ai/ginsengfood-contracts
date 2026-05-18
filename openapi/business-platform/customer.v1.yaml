@@ -1,0 +1,144 @@
+openapi: 3.1.0
+info:
+  title: GinsengFood Business Platform Customer API
+  version: 1.0.0
+  description: >
+    v1 contract for customer and member benefit reads used by commerce flows.
+    This contract does not define CRM automation, private channel history, or
+    customer memory mutation rules.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+tags:
+  - name: Customers
+  - name: Member Benefits
+paths:
+  /v1/customers/{customerId}:
+    get:
+      tags:
+        - Customers
+      summary: Get customer profile contract
+      description: >
+        Returns the business-platform customer contract. TODO: Finalize PII,
+        consent, customer memory, and retention fields when source documents
+        define those data boundaries.
+      operationId: getCustomerV1
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Customer contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/commerce/customer.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/customers/{customerId}/member-benefits:
+    get:
+      tags:
+        - Member Benefits
+      summary: List member benefits for customer
+      description: >
+        Returns member benefit contracts available to commerce quote/order
+        flows. QuoteSnapshot remains the final price source.
+      operationId: listCustomerMemberBenefitsV1
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Member benefit contracts.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: ../../schemas/commerce/member-benefit.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    BadRequest:
+      description: Invalid request syntax or parameters.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Unauthorized:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Forbidden:
+      description: Caller is not allowed to perform this operation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    NotFound:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Conflict:
+      description: Request conflicts with current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    UnprocessableEntity:
+      description: Request is syntactically valid but violates contract validation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json

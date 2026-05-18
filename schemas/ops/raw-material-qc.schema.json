@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/raw-material-qc.schema.json",
+  "title": "Raw Material QC",
+  "description": "Raw Material QC v1 contract for incoming material quality checks before lot readiness.",
+  "$comment": "Sources: PACK-01 QC threshold registry and raw material intake flow. TODO: full QC criteria beyond moisture threshold are not specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "raw_material_qc_id": { "type": "string", "minLength": 1, "description": "Raw material QC identifier." },
+    "raw_material_lot_id": { "type": "string", "minLength": 1, "description": "Lot being inspected." },
+    "inspection_at": { "type": "string", "format": "date-time", "description": "Inspection timestamp." },
+    "moisture_percent": { "type": "string", "description": "Moisture percent if measured. PACK-01 uses below 2% PASS, 2%-4% HOLD/REVIEW, above 4% FAIL." },
+    "qc_status": { "type": "string", "description": "QC result status. Prefer enums/ops/qc-status.yaml." },
+    "review_required": { "type": "boolean", "description": "True for HOLD/REVIEW outcomes." },
+    "inspector": { "$ref": "../common/actor.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["raw_material_qc_id"]
+}

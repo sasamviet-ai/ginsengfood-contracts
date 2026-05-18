@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ads/v1/funnel-event.schema.json",
+  "title": "Funnel Event",
+  "description": "Ads v1 funnel event contract for raw and cleaned measurement signals before verified revenue linkage.",
+  "$comment": "Sources: PACK-07 and TECH-07. Funnel events may represent click/comment/inbox/quote/cart/order signals but are not revenue by themselves.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "funnel_event_id": { "type": "string", "minLength": 1, "description": "Funnel event identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "event_source": { "type": "string", "description": "Event source such as ads platform, Facebook Gateway, Commerce Runtime, or verified revenue link. TODO: define official source enum." },
+    "raw_event_id": { "type": "string", "description": "Raw source event identifier." },
+    "clean_event_id": { "type": "string", "description": "Cleaned event identifier after data quality checks." },
+    "event_stage": { "type": "string", "description": "Funnel stage. TODO: define official funnel stage enum." },
+    "channel_context_id": { "type": "string", "description": "Channel context linked to the event." },
+    "customer_id": { "type": "string", "description": "Customer reference if resolved." },
+    "quote_snapshot_id": { "type": "string", "description": "QuoteSnapshot reference; not revenue by itself." },
+    "cart_id": { "type": "string", "description": "Cart reference; not revenue by itself." },
+    "order_id": { "type": "string", "description": "Official order reference; not verified revenue unless verified." },
+    "data_quality_status_id": { "type": "string", "description": "Data quality status reference." },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["funnel_event_id", "version"]
+}

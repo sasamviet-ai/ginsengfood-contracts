@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/trace-chain.schema.json",
+  "title": "Trace Chain",
+  "description": "Trace Chain v1 contract for backward, forward, internal, and public trace readiness. Recall must use this chain and cannot build a separate chain.",
+  "$comment": "Sources: PACK-01 traceability chain. TODO: full trace node/event schema will be refined in later phases.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "trace_chain_id": { "type": "string", "minLength": 1, "description": "Trace chain identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU context." },
+    "batch_id": { "type": "string", "minLength": 1, "description": "Batch context." },
+    "raw_material_lot_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Raw material lots in the chain." },
+    "material_issue_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Material issues in the chain." },
+    "production_execution_id": { "type": "string", "minLength": 1, "description": "Production execution in the chain." },
+    "packaging_job_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Packaging jobs in the chain." },
+    "print_job_id": { "type": "string", "minLength": 1, "description": "Print job in the chain." },
+    "qr_registry_id": { "type": "string", "minLength": 1, "description": "QR registry link." },
+    "warehouse_receipt_id": { "type": "string", "minLength": 1, "description": "Warehouse receipt in the chain." },
+    "trace_ready": { "type": "boolean", "description": "True when the required chain is complete." },
+    "missing_links": { "type": "array", "items": { "type": "string" }, "description": "Missing trace links when not ready." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["trace_chain_id"]
+}

@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/ops-core/sellable/sku-became-sellable.v1.json",
+  "title": "Sku Became Sellable Event v1",
+  "description": "Published when SKU/batch becomes sellable after release, receipt, ledger, stock, HSD, QC, trace, recall, and sale-lock checks pass.",
+  "$comment": "Sources: PACK-01 Sellable Gate.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique event identifier."
+    },
+    "eventType": {
+      "type": "string",
+      "const": "ops-core.sellable.sku-became-sellable.v1",
+      "description": "Stable event type including source, domain, name, and v1 suffix."
+    },
+    "eventVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Event contract version."
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the domain event occurred."
+    },
+    "source": {
+      "type": "string",
+      "const": "ops-core",
+      "description": "System that owns and emits this event."
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Cross-system correlation identifier."
+    },
+    "causationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional parent command, event, or workflow identifier."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required when emitted from retryable or high-risk command; optional for derived read-model notifications."
+    },
+    "data": {
+      "allOf": [
+        {
+          "$ref": "../../../schemas/ops/sellable-status.schema.json"
+        },
+        {
+          "type": "object",
+          "required": [
+            "sellable_status_id",
+            "sku_id",
+            "decision",
+            "stock_available",
+            "trace_ready",
+            "quality_hold",
+            "recall_hold",
+            "sale_lock"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "occurredAt",
+    "source",
+    "correlationId",
+    "data"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/formula-version.schema.json",
+  "title": "Formula Version",
+  "description": "Formula Version v1 contract. G0 is research/history reference; G1 is the current operational formula; every change after G1 must create a new version instead of overwriting used formulas.",
+  "$comment": "Sources: PACK-02 G0/G1 boundary and PACK-03 rice-anchor formula scaling. TODO: exact post-G1 version naming policy is not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "formula_version_id": { "type": "string", "minLength": 1, "description": "Formula Version identifier." },
+    "formula_code": { "type": "string", "minLength": 1, "description": "Formula code such as FML-A1-G1 from the 20 SKU catalog." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU governed by this formula version." },
+    "generation": { "type": "string", "enum": ["G0", "G1", "POST_G1"], "description": "G0 research/history, G1 operational, POST_G1 for later versions. TODO: define exact post-G1 labels." },
+    "version_label": { "type": "string", "minLength": 1, "description": "Human-readable version label." },
+    "status": { "type": "string", "description": "Formula Version lifecycle status. Prefer enums/product/formula-version-status.yaml." },
+    "anchor_ingredient_id": { "type": "string", "minLength": 1, "description": "Anchor ingredient, usually rice according to PACK-03." },
+    "anchor_rice_quantity": { "$ref": "../common/quantity.schema.json" },
+    "ratio_to_rice_basis": { "type": "string", "description": "Formula ratio basis: standardized ingredient quantity / standardized rice quantity * 100%." },
+    "unit_policy": { "type": "string", "description": "Unit policy retained from pilot-to-approved formula conversion. TODO: define allowed unit policy values." },
+    "rounding_policy": { "type": "string", "description": "Rounding policy retained for calculation snapshots. TODO: define allowed rounding policy values." },
+    "effective_date": { "type": "string", "format": "date", "description": "Effective date for G1 or later version." },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "source_ref": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["formula_version_id", "generation"]
+}

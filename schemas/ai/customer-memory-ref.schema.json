@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ai/v1/customer-memory-ref.schema.json",
+  "title": "Customer Memory Reference",
+  "description": "AI v1 reference to privacy-safe customer memory used only as contextual input, not as a source of truth for order, payment, or price.",
+  "$comment": "Sources: PACK-05 and TECH-05 customer memory boundary. TODO: source documents do not define full memory consent/status taxonomy.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customer_memory_ref_id": { "type": "string", "minLength": 1, "description": "Customer memory reference identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "customer_id": { "type": "string", "description": "Customer reference." },
+    "memory_scope": { "type": "string", "description": "Scope of memory permitted for AI context. TODO: define official scope values." },
+    "consent_status": { "type": "string", "description": "Consent or privacy status. TODO: define official privacy status enum." },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "allowed_for_response": { "type": "boolean", "description": "Whether this memory can be used for the current response." },
+    "redaction_required": { "type": "boolean", "description": "Whether memory requires redaction before response." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["customer_memory_ref_id", "version"]
+}

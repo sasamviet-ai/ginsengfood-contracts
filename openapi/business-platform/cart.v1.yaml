@@ -1,0 +1,87 @@
+openapi: 3.1.0
+info:
+  title: Business Platform Cart API
+  version: 1.0.0
+  description: Cart v1 API contract. Cart is not order and is not revenue.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+paths:
+  /v1/carts:
+    post:
+      summary: Create cart
+      description: Creates a cart contract record before order draft.
+      operationId: createCartV1
+      tags: [cart]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../../schemas/commerce/cart.schema.json"
+      responses:
+        "201":
+          description: Cart created and wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/commerce/cart.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/carts/{cartId}:
+    get:
+      summary: Get cart
+      description: Returns one cart. Consumers must use QuoteSnapshot and Order Draft APIs before official order.
+      operationId: getCartV1
+      tags: [cart]
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        "200":
+          description: Cart wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/commerce/cart.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+components:
+  schemas:
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error:
+              $ref: "../../schemas/common/error.schema.json"
+  responses:
+    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

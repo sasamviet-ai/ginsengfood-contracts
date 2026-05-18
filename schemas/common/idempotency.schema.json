@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/idempotency.schema.json",
+  "title": "Idempotency Context",
+  "description": "Common v1 idempotency context for risky commands and retry-safe flows.",
+  "$comment": "Source: TECH-01 requires idempotency for risky commands and defines result values NEW_ACCEPTED, DUPLICATE_RETURNED, CONFLICT_REJECTED, EXPIRED_KEY_REJECTED, MISSING_KEY_REJECTED, IN_PROGRESS_RETURNED, FAILED_RETRY_ALLOWED, and FAILED_RETRY_BLOCKED.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Idempotency key used to prevent duplicate or incorrect results on retry."
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Scope in which the key is valid."
+    },
+    "payloadFingerprint": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Safe hash or fingerprint used to detect same-key different-payload conflicts."
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "NEW_ACCEPTED",
+        "DUPLICATE_RETURNED",
+        "CONFLICT_REJECTED",
+        "EXPIRED_KEY_REJECTED",
+        "MISSING_KEY_REJECTED",
+        "IN_PROGRESS_RETURNED",
+        "FAILED_RETRY_ALLOWED",
+        "FAILED_RETRY_BLOCKED"
+      ],
+      "description": "Idempotency result from TECH-01."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional key expiry time when the contract defines TTL."
+    },
+    "auditId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Audit record for the idempotent command."
+    }
+  },
+  "required": [
+    "idempotencyKey"
+  ]
+}

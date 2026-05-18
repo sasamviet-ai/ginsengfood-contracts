@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: Ops Core Recipe Formula BOM API
+  version: 1.0.0
+  description: Recipe, Formula Version, and BOM v1 API contract. Formula data is contract/reference data only, not production formula logic.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+paths:
+  /v1/recipes/{recipeId}:
+    get:
+      summary: Get recipe
+      description: "Returns one recipe. TODO: source documents do not define public/internal projections for recipe details."
+      operationId: getRecipeV1
+      tags: [recipe-formula-bom]
+      parameters:
+        - name: recipeId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        "200":
+          description: Recipe wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/product/recipe.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/formula-versions/{formulaVersionId}:
+    get:
+      summary: Get formula version
+      description: Returns G0/G1/versioned formula contract data, including anchor rice and ratio references when present in schema.
+      operationId: getFormulaVersionV1
+      tags: [recipe-formula-bom]
+      parameters:
+        - name: formulaVersionId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        "200":
+          description: Formula version wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/product/formula-version.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/boms/{bomId}:
+    get:
+      summary: Get BOM
+      description: Returns BOM contract data. Production must snapshot BOM separately; this endpoint does not mutate production snapshots.
+      operationId: getBomV1
+      tags: [recipe-formula-bom]
+      parameters:
+        - name: bomId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        "200":
+          description: BOM wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/product/bom.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+components:
+  schemas:
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error:
+              $ref: "../../schemas/common/error.schema.json"
+  responses:
+    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/stock-balance.schema.json",
+  "title": "Stock Balance",
+  "description": "Stock Balance v1 contract derived from Inventory Ledger. It resolves stock available while excluding holds, sale locks, recall holds, disposal, and other unavailable stock.",
+  "$comment": "Sources: PACK-01 stock available and PACK-03 suppression threshold available_stock rules. TODO: exact derived calculation is service logic and intentionally excluded.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "stock_balance_id": { "type": "string", "minLength": 1, "description": "Stock balance identifier." },
+    "item_type": { "type": "string", "enum": ["MATERIAL", "PACKAGING", "FINISHED_GOOD"], "description": "Inventory item type." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU for finished goods." },
+    "material_id": { "type": "string", "minLength": 1, "description": "Material/packaging identifier." },
+    "batch_id": { "type": "string", "minLength": 1, "description": "Batch identifier when applicable." },
+    "raw_material_lot_id": { "type": "string", "minLength": 1, "description": "Raw material lot identifier when applicable." },
+    "warehouse_id": { "type": "string", "minLength": 1, "description": "Warehouse context." },
+    "warehouse_location_id": { "type": "string", "minLength": 1, "description": "Location context." },
+    "on_hand_quantity": { "$ref": "../common/quantity.schema.json" },
+    "available_quantity": { "$ref": "../common/quantity.schema.json" },
+    "reserved_quantity": { "$ref": "../common/quantity.schema.json" },
+    "quality_hold_quantity": { "$ref": "../common/quantity.schema.json" },
+    "recall_hold_quantity": { "$ref": "../common/quantity.schema.json" },
+    "sale_lock_quantity": { "$ref": "../common/quantity.schema.json" },
+    "disposal_quantity": { "$ref": "../common/quantity.schema.json" },
+    "last_ledger_entry_id": { "type": "string", "minLength": 1, "description": "Latest ledger entry included in the balance." }
+  },
+  "required": ["stock_balance_id"]
+}

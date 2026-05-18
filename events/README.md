@@ -1,7 +1,14 @@
 # events
 
-Thư mục này chứa event payload contracts theo provider giữa `ginsengfood-ops-core` và `ginsengfood-business-platform`.
+Thu muc nay chua JSON Schema payload contracts cho domain events v1.
 
-Người dùng chính là backend producer/consumer, QA và contract test. Không đặt queue worker, handler implementation, broker config production, secret hoặc event log thật vào đây.
+Moi event payload co envelope chung: `eventId`, `eventType`, `eventVersion`, `occurredAt`, `source`, `correlationId`, optional `causationId`, optional `idempotencyKey`, va `data`.
 
-`events/ops-core/` là event phát ra từ ops-core. `events/business-platform/` là event phát ra từ business-platform. Event không được dùng để sửa dữ liệu nguồn của hệ thống khác nếu contract không cho phép. Mọi event payload phải versioned.
+## Rules
+
+- `source` chi duoc la `ops-core` hoac `business-platform` theo owner event.
+- `eventVersion` phai la `1.0`.
+- `data` phai ref den schema domain da tao trong `schemas/` hoac chi siet required field tu schema do.
+- Khong dua PII/payment raw/private channel/raw SIM payload vao event neu schema domain khong can.
+- Event khong duoc dung de mutate source-of-truth cua he thong khac neu contract khong cho phep.
+- TODO: Source documents chua khoa outbox-specific fields nhu outbox id, partition key, retry count, broker topic, hoac dead-letter metadata; cac field nay khong duoc tu them vao payload cho den khi co source.

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/stock-alert.schema.json",
+  "title": "Stock Alert",
+  "description": "Stock Alert v1 contract for SKU stock warning levels and Production Demand trigger.",
+  "$comment": "Sources: Muc canh bao ton kho san pham and PACK-03 Stock Alert.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "stock_alert_id": { "type": "string", "minLength": 1, "description": "Stock alert identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU being monitored." },
+    "status": { "type": "string", "description": "Stock alert status. Prefer enums/ops/stock-alert-status.yaml." },
+    "available_stock": { "$ref": "../common/quantity.schema.json" },
+    "yellow_threshold": { "$ref": "../common/quantity.schema.json" },
+    "red_threshold": { "$ref": "../common/quantity.schema.json" },
+    "stockout_risk_threshold": { "$ref": "../common/quantity.schema.json" },
+    "recommended_action": { "type": "string", "description": "Recommended action from stock alert policy, e.g. create warning, create Production Demand, or activate Stock/Sellable Guard." },
+    "demand_id": { "type": "string", "minLength": 1, "description": "Production Demand created from the alert when applicable." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["stock_alert_id"]
+}

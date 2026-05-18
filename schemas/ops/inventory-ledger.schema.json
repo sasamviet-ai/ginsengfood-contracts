@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/inventory-ledger.schema.json",
+  "title": "Inventory Ledger",
+  "description": "Inventory Ledger v1 contract. Ledger is source-of-truth for stock movements and must be append-only; old ledger rows must not be edited or deleted.",
+  "$comment": "Sources: PACK-01 and TECH-03 Inventory Ledger append-only rule.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ledger_entry_id": { "type": "string", "minLength": 1, "description": "Inventory ledger entry identifier." },
+    "append_only": { "type": "boolean", "const": true, "description": "Must be true to signal append-only ledger semantics." },
+    "movement_type": { "type": "string", "description": "Inventory movement type. Prefer enums/ops/inventory-movement-type.yaml." },
+    "item_type": { "type": "string", "enum": ["MATERIAL", "PACKAGING", "FINISHED_GOOD"], "description": "Inventory item type." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU when the ledger item is finished goods." },
+    "material_id": { "type": "string", "minLength": 1, "description": "Material/packaging when the ledger item is not finished goods." },
+    "batch_id": { "type": "string", "minLength": 1, "description": "Batch identifier when applicable." },
+    "raw_material_lot_id": { "type": "string", "minLength": 1, "description": "Raw material lot identifier when applicable." },
+    "warehouse_id": { "type": "string", "minLength": 1, "description": "Warehouse context." },
+    "warehouse_location_id": { "type": "string", "minLength": 1, "description": "Warehouse location context." },
+    "quantity_delta": { "$ref": "../common/quantity.schema.json" },
+    "source_object": { "$ref": "../common/source-ref.schema.json" },
+    "occurred_at": { "type": "string", "format": "date-time", "description": "Movement timestamp." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["ledger_entry_id", "append_only"]
+}

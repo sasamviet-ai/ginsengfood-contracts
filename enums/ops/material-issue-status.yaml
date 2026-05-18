@@ -1,0 +1,30 @@
+version: v1
+name: material-issue-status
+title: Material Issue Status
+description: Material Issue v1 status values for issuing only QC_PASS and READY_FOR_PRODUCTION lots.
+source_documents:
+  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+  - docs/documents/2_pack/extra/HE THONG PHIEU - OPERATIONAL FORMS AUTO-GENERATED FORMS MISA ACCOUNTING HANDOFF PACK.md
+values:
+  - value: DRAFT
+    description: Draft material issue form/request.
+    source: Operational forms draft behavior.
+  - value: REQUESTED
+    description: Material issue requested.
+    source: Operational Forms FRM-12.
+  - value: LOT_READY_CHECKING
+    description: Lot readiness guard is being checked.
+    source: PACK-01 requires QC_PASS plus READY_FOR_PRODUCTION.
+  - value: CONFIRMED
+    description: Material issue confirmed.
+    source: PACK-04 material issue confirmed checkpoint.
+  - value: ISSUED
+    description: Materials have been issued into production.
+    source: PACK-01 Material Issue.
+  - value: BLOCKED
+    description: Material issue blocked, for example lot not QC_PASS or not READY_FOR_PRODUCTION.
+    source: PACK-01 negative smoke.
+compatibility:
+  breaking_change: Treating QC_PASS alone as issuable is breaking.
+todos:
+  - Define whether CONFIRMED and ISSUED are separate states or separate checkpoint flags.

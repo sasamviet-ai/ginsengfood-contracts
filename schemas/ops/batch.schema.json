@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/batch.schema.json",
+  "title": "Batch",
+  "description": "Batch v1 contract. QC_PASS does not mean RELEASED; only RELEASED batch can be warehouse received.",
+  "$comment": "Sources: PACK-01/TECH-03 batch QC and release boundary. TODO: final batch lifecycle is not fully specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "batch_id": { "type": "string", "minLength": 1, "description": "Batch identifier." },
+    "production_order_id": { "type": "string", "minLength": 1, "description": "Production order that created this batch." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU produced by the batch." },
+    "production_bom_snapshot_id": { "type": "string", "minLength": 1, "description": "BOM snapshot used for the batch." },
+    "batch_status": { "type": "string", "description": "Batch status. Prefer enums/ops/batch-status.yaml." },
+    "qc_status": { "type": "string", "description": "QC status. QC_PASS is not release." },
+    "batch_release_status": { "type": "string", "description": "Release status. Prefer enums/ops/batch-release-status.yaml." },
+    "produced_quantity": { "$ref": "../common/quantity.schema.json" },
+    "manufactured_at": { "type": "string", "format": "date-time", "description": "Manufacturing timestamp." },
+    "shelf_life_config_id": { "type": "string", "minLength": 1, "description": "Shelf-life config used for HSD." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["batch_id"]
+}

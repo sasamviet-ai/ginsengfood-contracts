@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/company-bank-account.schema.json",
+  "title": "Company Bank Account",
+  "description": "Commerce v1 reference to a company bank account registry entry used for direct bank transfer instructions.",
+  "$comment": "Sources: TECH-04 states bank account information must come from registry/runtime source and must not be hardcoded. TODO: source documents do not define bank account registry fields or masking policy.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "company_bank_account_id": { "type": "string", "minLength": 1, "description": "Registry identifier for company bank account." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "bank_name": { "type": "string", "description": "Bank name from registry." },
+    "account_name": { "type": "string", "description": "Account holder name from registry." },
+    "account_number_masked": { "type": "string", "description": "Masked account number for safe display." },
+    "registry_source": { "$ref": "../common/source-ref.schema.json" },
+    "status": { "type": "string", "description": "Registry account status. TODO: define official bank account status enum." },
+    "no_hardcode": { "type": "boolean", "const": true, "description": "Invariant: account data is sourced from registry/runtime source." },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["company_bank_account_id", "version"]
+}

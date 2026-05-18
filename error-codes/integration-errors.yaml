@@ -1,0 +1,38 @@
+version: v1
+namespace: INTEGRATION
+title: Integration Errors
+description: Common integration boundary errors for resolver, source, handoff, callback, and sync contracts.
+source_documents:
+  - docs/error-code-standard.md
+  - docs/documents/1_master/MASTER-01 - GLOBAL SOURCE-OF-TRUTH REGISTRY.md
+  - docs/documents/1_master/MASTER-04 - RUNTIME RESOLUTION & GUARD CONTROL STANDARD.md
+codes:
+  - code: INTEGRATION.SOURCE_UNAVAILABLE
+    httpStatus: 503
+    message: Required Source-of-Truth is unavailable.
+    description: Use when a required source cannot be reached or used and the action must block, fallback, handoff, or review.
+    retryable: true
+  - code: INTEGRATION.RESOLVER_ERROR
+    httpStatus: 502
+    message: Runtime resolver failed.
+    description: MASTER-04 defines ERROR when a resolver fails technically or cannot complete.
+    retryable: true
+  - code: INTEGRATION.RESOLVER_CONFLICT
+    httpStatus: 409
+    message: Runtime resolver returned conflicting data.
+    description: MASTER-04 requires CONFLICT to go through guard priority or review, not consumer guessing.
+    retryable: false
+  - code: INTEGRATION.HANDOFF_REQUIRED
+    httpStatus: 409
+    message: Handoff is required before the action can continue.
+    description: MASTER-04 defines HANDOFF/HANDOFF_REQUIRED for flows that must move to another channel, person, or authority.
+    retryable: false
+  - code: INTEGRATION.FALLBACK_REQUIRED
+    httpStatus: 409
+    message: Safe fallback is required.
+    description: MASTER-04 defines FALLBACK/FALLBACK_REQUIRED when the primary action is not allowed but a safe alternative exists.
+    retryable: false
+compatibility:
+  breaking_change: Removing or changing code semantics is breaking.
+todos:
+  - Later MISA, channel, ads, live, and IVR phases should add provider-specific integration errors in domain namespaces.

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/error.schema.json",
+  "title": "Common Error",
+  "description": "Common v1 error object for stable error codes, safe messages, and trace references.",
+  "$comment": "Source: docs/error-code-standard.md requires stable namespaced error codes, descriptions, optional HTTP status, and examples before production use.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "code": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable namespaced error code from error-codes/*.yaml."
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Safe human-readable message. Do not include secrets, stack traces, or sensitive data."
+    },
+    "httpStatus": {
+      "type": "integer",
+      "minimum": 100,
+      "maximum": 599,
+      "description": "HTTP status when the error is returned by an HTTP API."
+    },
+    "details": {
+      "type": "array",
+      "description": "Optional safe validation or blocking details.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      }
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Correlation ID used to trace the failed flow."
+    },
+    "auditId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Audit ID when the failed or denied action must be audited."
+    }
+  },
+  "required": [
+    "code",
+    "message"
+  ]
+}

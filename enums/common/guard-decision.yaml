@@ -1,0 +1,34 @@
+version: v1
+name: guard-decision
+title: Guard Decision
+description: Common guard decision values used after runtime resolver output is evaluated.
+source_documents:
+  - docs/documents/1_master/MASTER-04 - RUNTIME RESOLUTION & GUARD CONTROL STANDARD.md
+values:
+  - value: PASS
+    description: Guard allows the action to continue.
+    source: MASTER-04 standard guard decision set.
+  - value: BLOCK
+    description: Action is not allowed.
+    source: MASTER-04 standard guard decision set.
+  - value: SUPPRESS
+    description: Action is suppressed by priority, conflict, or policy.
+    source: MASTER-04 standard guard decision set.
+  - value: FALLBACK
+    description: Primary action is not allowed; safe fallback is required.
+    source: MASTER-04 standard guard decision set.
+  - value: HANDOFF
+    description: Flow must be handed off to an appropriate channel, person, or authority.
+    source: MASTER-04 standard guard decision set.
+  - value: REVIEW_REQUIRED
+    description: Review is required before deciding or acting; this is not PASS.
+    source: MASTER-04 standard guard decision set.
+  - value: ESCALATE
+    description: Escalation is required.
+    source: MASTER-04 standard guard decision set.
+  - value: NO_ACTION
+    description: No action should be taken.
+    source: MASTER-04 standard guard decision set.
+compatibility:
+  breaking_change: Renaming, removing, or reinterpreting a guard decision is breaking.
+todos: []

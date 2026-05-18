@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/money.schema.json",
+  "title": "Money",
+  "description": "Common v1 monetary value placeholder for future API and event contracts.",
+  "$comment": "TODO: Phase 1 source documents do not define currency policy, rounding, precision, or minor-unit rules. Fields are intentionally optional until a source document defines the concrete money contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "amount": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Decimal monetary amount represented as a string to avoid binary floating point issues. TODO: define precision and scale from a source document."
+    },
+    "currencyCode": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "ISO-like three-letter currency code. TODO: source documents have not defined the allowed currency set."
+    }
+  }
+}

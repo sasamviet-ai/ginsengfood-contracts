@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/business-platform/order/order-cancelled.v1.json",
+  "title": "Order Cancelled Event v1",
+  "description": "Published when the Core Order State Machine has cancelled the official order. IVR alone must not publish this state.",
+  "$comment": "Sources: TECH-04 Order State Machine; PACK-09 Core Order State Machine boundary.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique event identifier."
+    },
+    "eventType": {
+      "type": "string",
+      "const": "business-platform.order.order-cancelled.v1",
+      "description": "Stable event type including source, domain, name, and v1 suffix."
+    },
+    "eventVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Event contract version."
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the domain event occurred."
+    },
+    "source": {
+      "type": "string",
+      "const": "business-platform",
+      "description": "System that owns and emits this event."
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Cross-system correlation identifier."
+    },
+    "causationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional parent command, event, or workflow identifier."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required when emitted from retryable or high-risk command; optional for derived read-model notifications."
+    },
+    "data": {
+      "allOf": [
+        {
+          "$ref": "../../../schemas/commerce/order.schema.json"
+        },
+        {
+          "type": "object",
+          "required": [
+            "order_id",
+            "version",
+            "status"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "occurredAt",
+    "source",
+    "correlationId",
+    "data"
+  ]
+}

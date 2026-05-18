@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/evidence-ref.schema.json",
+  "title": "Evidence Reference",
+  "description": "Common v1 reference to an evidence record used by smoke, completion, release, audit, and owner sign-off flows.",
+  "$comment": "Source: TECH-01 Evidence Record Standard and MASTER-05 require each evidence item to have ID, owner, scope, status, audit, source rule, and references; only ACCEPTED evidence can be used to PASS.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "evidenceId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Evidence identifier."
+    },
+    "evidenceStatus": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PENDING",
+        "SUBMITTED",
+        "UNDER_REVIEW",
+        "ACCEPTED",
+        "REJECTED",
+        "NEEDS_RETEST",
+        "OWNER_REVIEW_REQUIRED",
+        "SUPERSEDED",
+        "EXPIRED",
+        "VOID"
+      ],
+      "description": "Evidence status from TECH-01, MASTER-03, and MASTER-05."
+    },
+    "sourceDocument": {
+      "type": "string",
+      "minLength": 1,
+      "description": "MASTER, PACK, TECH, or contract document that the evidence supports."
+    },
+    "sourceRule": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Specific source rule or requirement being proven."
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Scope proven by this evidence."
+    },
+    "auditId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Linked audit record."
+    },
+    "referenceUri": {
+      "type": "string",
+      "minLength": 1,
+      "description": "File, log, report, or evidence registry reference. Do not expose internal evidence publicly unless a source policy allows it."
+    }
+  },
+  "required": [
+    "evidenceId"
+  ]
+}

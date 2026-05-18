@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/ops-core/inventory/inventory-available-changed.v1.json",
+  "title": "Inventory Available Changed Event v1",
+  "description": "Published when derived available stock changes from Inventory Ledger. Consumers must not mutate ledger through this event.",
+  "$comment": "Sources: PACK-01 Stock Availability Model; TECH-03 Inventory Ledger.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique event identifier."
+    },
+    "eventType": {
+      "type": "string",
+      "const": "ops-core.inventory.inventory-available-changed.v1",
+      "description": "Stable event type including source, domain, name, and v1 suffix."
+    },
+    "eventVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Event contract version."
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the domain event occurred."
+    },
+    "source": {
+      "type": "string",
+      "const": "ops-core",
+      "description": "System that owns and emits this event."
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Cross-system correlation identifier."
+    },
+    "causationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional parent command, event, or workflow identifier."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required when emitted from retryable or high-risk command; optional for derived read-model notifications."
+    },
+    "data": {
+      "allOf": [
+        {
+          "$ref": "../../../schemas/ops/stock-balance.schema.json"
+        },
+        {
+          "type": "object",
+          "required": [
+            "stock_balance_id",
+            "available_quantity",
+            "last_ledger_entry_id"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "occurredAt",
+    "source",
+    "correlationId",
+    "data"
+  ]
+}

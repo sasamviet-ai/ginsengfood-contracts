@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/order.schema.json",
+  "title": "Official Order",
+  "description": "Commerce v1 official order contract created only after valid QuoteSnapshot, complete Order Draft, Customer Confirmation, payment method, and shipping information checks.",
+  "$comment": "Sources: TECH-04 Official Order state model. Official Order is not verified revenue until order verification and payment/collection confirmation rules pass.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "order_id": { "type": "string", "minLength": 1, "description": "Official order identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "order_code": { "type": "string", "description": "Official order code issued only after confirmation." },
+    "order_draft_id": { "type": "string", "description": "Source order draft." },
+    "customer_confirmation_id": { "type": "string", "description": "Customer confirmation used to create the order." },
+    "quote_snapshot_id": { "type": "string", "description": "QuoteSnapshot used for final total." },
+    "customer_id": { "type": "string", "description": "Customer reference." },
+    "status": { "type": "string", "description": "Official order status. Prefer enums/commerce/order-status.yaml values prefixed ORDER_." },
+    "payment_status": { "type": "string", "description": "Payment status. Prefer enums/commerce/payment-status.yaml." },
+    "shipping_status": { "type": "string", "description": "Shipping status. Prefer enums/commerce/shipping-status.yaml." },
+    "verified_revenue_status": { "type": "string", "description": "Verified revenue status. Prefer enums/commerce/verified-revenue-status.yaml." },
+    "final_total": { "$ref": "../common/money.schema.json" },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["order_id", "version"]
+}

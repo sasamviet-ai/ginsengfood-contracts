@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ivr/v1/ivr-call-job.schema.json",
+  "title": "IVR Call Job",
+  "description": "IVR v1 call job contract for order confirmation only. IVR is not sales, CRM, marketing, payment, delivery, warehouse, MISA, or ROAS.",
+  "$comment": "Sources: PACK-09 and TECH-09. IVR applies only to Official Order confirmation, not Quote, Cart, or Order Draft. TODO: PACK-09 describes program-based attempts, while TECH-09 V1.0 locks MAX_ATTEMPT_PER_ORDER = 2; keep policy fields explicit until owner resolves final contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ivr_call_job_id": { "type": "string", "minLength": 1, "description": "IVR call job identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "official_order_id": { "type": "string", "description": "Official Order identifier. Quote, Cart, and Order Draft are not eligible." },
+    "order_code": { "type": "string", "description": "Official order code, if available." },
+    "program_type": { "type": "string", "description": "IVR program type. Prefer enums/ivr/ivr-program-type.yaml." },
+    "call_purpose": { "type": "string", "const": "ORDER_CONFIRMATION_ONLY", "description": "Invariant: IVR is only for order confirmation." },
+    "max_attempts": { "type": "integer", "minimum": 1, "description": "Max attempts resolved by policy. TODO: resolve PACK-09 program-based attempts vs TECH-09 V1.0 max 2." },
+    "attempt_spacing_seconds": { "type": "integer", "minimum": 0, "description": "Attempt spacing resolved by policy." },
+    "confirmation_window_seconds": { "type": "integer", "minimum": 0, "description": "Confirmation/call window in seconds." },
+    "eligible": { "type": "boolean", "description": "Whether order is eligible for IVR order confirmation." },
+    "status": { "type": "string", "description": "Call job status. TODO: define official IVR job status enum." },
+    "not_for_quote_cart_draft": { "type": "boolean", "const": true, "description": "Invariant: IVR does not run for Quote, Cart, or Order Draft." },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "idempotency": { "$ref": "../common/idempotency.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["ivr_call_job_id", "version"]
+}

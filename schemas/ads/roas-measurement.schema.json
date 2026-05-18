@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ads/v1/roas-measurement.schema.json",
+  "title": "ROAS Measurement",
+  "description": "Ads v1 ROAS/CPA/AOV measurement contract based on verified revenue, not pending revenue.",
+  "$comment": "Sources: PACK-07, TECH-07, and PACK-10. ROAS official reporting is blocked without Verified Revenue, Data Quality PASS, and clear attribution. TODO: exact calculation output fields are not locked by source docs.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "roas_measurement_id": { "type": "string", "minLength": 1, "description": "ROAS measurement identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "campaign_id": { "type": "string", "description": "Campaign identifier." },
+    "adset_id": { "type": "string", "description": "Ad set identifier." },
+    "ad_id": { "type": "string", "description": "Ad identifier." },
+    "measurement_window": { "$ref": "../common/date-range.schema.json" },
+    "spend": { "$ref": "../common/money.schema.json" },
+    "verified_revenue": { "$ref": "../common/money.schema.json" },
+    "roas": { "type": "string", "description": "ROAS value represented as decimal string. TODO: define precision/rounding." },
+    "cpa": { "$ref": "../common/money.schema.json" },
+    "aov": { "$ref": "../common/money.schema.json" },
+    "data_quality_status_id": { "type": "string", "description": "Data quality status reference." },
+    "attribution_conflict_status": { "type": "string", "description": "Attribution conflict status. TODO: define official conflict enum." },
+    "official_reporting_allowed": { "type": "boolean", "description": "Whether this measurement can be used as official reporting." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["roas_measurement_id", "version"]
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/live/v1/live-risk-cue.schema.json",
+  "title": "Live Risk Cue",
+  "description": "Live v1 risk cue contract for suppressing or escalating live sales cues when risk conditions appear.",
+  "$comment": "Sources: PACK-08, TECH-08, and PACK-10. Complaint, health-sensitive issue, recall, sale lock, privacy risk, and P0 risk must win over sales cues. TODO: official risk type/severity enum is not locked.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "live_risk_cue_id": { "type": "string", "minLength": 1, "description": "Live risk cue identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "live_session_id": { "type": "string", "description": "Live session identifier." },
+    "channel_context_id": { "type": "string", "description": "Channel context that triggered risk." },
+    "risk_type": { "type": "string", "description": "Risk type. TODO: define official live risk taxonomy." },
+    "severity": { "type": "string", "description": "Risk severity. TODO: define official severity enum." },
+    "host_action": { "type": "string", "description": "Recommended host action. TODO: define official host action enum." },
+    "suppress_sales": { "type": "boolean", "description": "Whether sales cues must be suppressed." },
+    "handoff_required": { "type": "boolean", "description": "Whether private or human handoff is required." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["live_risk_cue_id", "version"]
+}

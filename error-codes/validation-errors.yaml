@@ -1,0 +1,32 @@
+version: v1
+namespace: VALIDATION
+title: Validation Errors
+description: Common validation errors for contract payloads.
+source_documents:
+  - docs/error-code-standard.md
+  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
+codes:
+  - code: VALIDATION.REQUIRED_FIELD_MISSING
+    httpStatus: 400
+    message: A required field is missing.
+    description: Use when a contract-required field is absent.
+    retryable: true
+  - code: VALIDATION.INVALID_FIELD_VALUE
+    httpStatus: 400
+    message: A field value is invalid.
+    description: Use when a field violates the published contract or enum.
+    retryable: true
+  - code: VALIDATION.UNSUPPORTED_ENUM_VALUE
+    httpStatus: 400
+    message: Enum value is not supported by this contract version.
+    description: Removing or changing enum values is a breaking change under docs/compatibility-policy.md.
+    retryable: true
+  - code: VALIDATION.SENSITIVE_DATA_NOT_ALLOWED
+    httpStatus: 400
+    message: Payload contains sensitive data that is not allowed in this contract.
+    description: TECH-01 audit/evidence standards prohibit unnecessary secrets, payment credentials, and sensitive data in common records.
+    retryable: true
+compatibility:
+  breaking_change: Removing or changing code semantics is breaking.
+todos:
+  - Later domain phases should add domain-specific validation errors only in their own namespaces.

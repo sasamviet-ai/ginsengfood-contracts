@@ -1,0 +1,86 @@
+openapi: 3.1.0
+info:
+  title: Ops Core Product Master API
+  version: 1.0.0
+  description: "Product Master v1 API contract for product records owned by ginsengfood-ops-core. TODO: source documents do not define a full product search/filter contract."
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+paths:
+  /v1/products:
+    get:
+      summary: List products
+      description: Lists Product Master records for ops-core frontend and approved consumers. This is a read contract, not a product-rule implementation.
+      operationId: listProductsV1
+      tags: [product-master]
+      responses:
+        "200":
+          description: Product list wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "../../schemas/product/product.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/products/{productId}:
+    get:
+      summary: Get product
+      description: "Returns one Product Master record by id. TODO: source documents do not define field-level public/internal projections for this API."
+      operationId: getProductV1
+      tags: [product-master]
+      parameters:
+        - $ref: "#/components/parameters/ProductId"
+      responses:
+        "200":
+          description: Product wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/product/product.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+components:
+  parameters:
+    ProductId:
+      name: productId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1 }
+  schemas:
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error:
+              $ref: "../../schemas/common/error.schema.json"
+  responses:
+    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

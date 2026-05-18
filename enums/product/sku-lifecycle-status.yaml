@@ -1,0 +1,32 @@
+version: v1
+name: sku-lifecycle-status
+title: SKU Lifecycle Status
+description: SKU lifecycle values for Product Master v1. Product status does not mean sellable status.
+source_documents:
+  - docs/documents/2_pack/PACK-02 - PRODUCT MASTER SKU INGREDIENT RECIPE FORMULA VERSION PRODUCT ACTIVATION.md
+values:
+  - value: DRAFT
+    description: SKU is being prepared.
+    source: Conservative contract value; source documents do not lock the full lifecycle.
+  - value: PENDING_CONFIG
+    description: SKU has placeholders or missing configuration and must not be READY/ACTIVE/SELLABLE.
+    source: PACK-02 placeholder rule.
+  - value: PENDING_EVIDENCE
+    description: SKU is waiting for required evidence.
+    source: PACK-02 evidence gate.
+  - value: READY
+    description: SKU product data is ready, but not necessarily active or sellable.
+    source: PACK-02 distinguishes READY/ACTIVE from sellable.
+  - value: ACTIVE
+    description: SKU is active at Product Master level.
+    source: PACK-02 Product Activation boundary.
+  - value: INACTIVE
+    description: SKU is inactive.
+    source: TODO: source documents do not define inactive semantics.
+  - value: BLOCKED
+    description: SKU is blocked by missing config, evidence, owner review, or guard condition.
+    source: PACK-02 guard behavior.
+compatibility:
+  breaking_change: Removing or renaming lifecycle values is breaking for product consumers.
+todos:
+  - Confirm authoritative SKU lifecycle state machine in a future Product Master state-machine phase.

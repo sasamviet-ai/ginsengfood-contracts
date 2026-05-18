@@ -1,0 +1,36 @@
+version: v1
+name: sellable-status
+title: Sellable Status
+description: Sellable Gate decision values. Product Activation is not sellable.
+source_documents:
+  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+  - docs/documents/2_pack/PACK-02 - PRODUCT MASTER SKU INGREDIENT RECIPE FORMULA VERSION PRODUCT ACTIVATION.md
+values:
+  - value: SELLABLE
+    description: Batch/SKU passes released, warehouse, ledger, stock, HSD, QC, trace, recall, and sale-lock checks.
+    source: PACK-01 Sellable Gate PASS.
+  - value: NOT_SELLABLE
+    description: Generic not-sellable decision.
+    source: PACK-01 Sellable Gate BLOCK.
+  - value: BLOCKED_QUALITY_HOLD
+    description: Not sellable due to quality hold.
+    source: PACK-01 Hold/QC rules.
+  - value: BLOCKED_RECALL_HOLD
+    description: Not sellable due to recall hold.
+    source: PACK-01 Recall/Hold.
+  - value: BLOCKED_SALE_LOCK
+    description: Not sellable due to active sale lock/stop sale.
+    source: PACK-01 Sale Lock.
+  - value: BLOCKED_STOCK_UNAVAILABLE
+    description: Not sellable due to unavailable stock.
+    source: PACK-01 Stock Available requirement.
+  - value: BLOCKED_TRACE_NOT_READY
+    description: Not sellable because trace is not ready.
+    source: PACK-01 Trace Ready requirement.
+  - value: REVIEW_REQUIRED
+    description: Sellable decision needs owner/reviewer action.
+    source: PACK-01 REVIEW_REQUIRED negative path.
+compatibility:
+  breaking_change: Allowing sellable without all gate conditions is breaking.
+todos:
+  - Confirm official sellable decision taxonomy in Phase 7.

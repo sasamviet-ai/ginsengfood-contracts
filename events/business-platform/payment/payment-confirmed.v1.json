@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/business-platform/payment/payment-confirmed.v1.json",
+  "title": "Payment Confirmed Event v1",
+  "description": "Published when payment or collection is confirmed by the payment/accounting owner. This can feed verified revenue review but does not create ops-core truth.",
+  "$comment": "Sources: TECH-04 Payment Confirmation; PACK-07 Verified Revenue dependency.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique event identifier."
+    },
+    "eventType": {
+      "type": "string",
+      "const": "business-platform.payment.payment-confirmed.v1",
+      "description": "Stable event type including source, domain, name, and v1 suffix."
+    },
+    "eventVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Event contract version."
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the domain event occurred."
+    },
+    "source": {
+      "type": "string",
+      "const": "business-platform",
+      "description": "System that owns and emits this event."
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Cross-system correlation identifier."
+    },
+    "causationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional parent command, event, or workflow identifier."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required when emitted from retryable or high-risk command; optional for derived read-model notifications."
+    },
+    "data": {
+      "allOf": [
+        {
+          "$ref": "../../../schemas/commerce/payment.schema.json"
+        },
+        {
+          "type": "object",
+          "required": [
+            "payment_id",
+            "version",
+            "order_id",
+            "status",
+            "confirmed_at",
+            "confirmation_source",
+            "paid_requires_confirmation"
+          ],
+          "properties": {
+            "paid_requires_confirmation": {
+              "const": true
+            }
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "occurredAt",
+    "source",
+    "correlationId",
+    "data"
+  ]
+}

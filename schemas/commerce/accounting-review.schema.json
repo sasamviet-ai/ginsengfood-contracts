@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/accounting-review.schema.json",
+  "title": "Accounting Review",
+  "description": "Commerce v1 accounting review contract used to confirm or reject payment/reference matches for bank transfer and revenue verification boundaries.",
+  "$comment": "Sources: TECH-04 requires Accounting Review for direct bank transfer confirmation and mismatch handling. TODO: source documents do not define reviewer workflow states in detail.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "accounting_review_id": { "type": "string", "minLength": 1, "description": "Accounting review identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "payment_id": { "type": "string", "description": "Payment under review." },
+    "bank_transfer_id": { "type": "string", "description": "Bank transfer under review, if applicable." },
+    "review_status": { "type": "string", "description": "Review status. Prefer enums/commerce/payment-status.yaml values such as PAYMENT_REVIEW, PAYMENT_CONFIRMED, PAYMENT_AMOUNT_MISMATCH, PAYMENT_REFERENCE_MISMATCH." },
+    "amount_matched": { "type": "boolean", "description": "Whether amount matches expected payment." },
+    "reference_matched": { "type": "boolean", "description": "Whether payment reference matches expected reference." },
+    "reviewer": { "$ref": "../common/actor.schema.json" },
+    "reviewed_at": { "type": "string", "format": "date-time", "description": "Accounting review timestamp." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["accounting_review_id", "version"]
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/availability-check.schema.json",
+  "title": "Availability Check",
+  "description": "Commerce v1 availability check contract for resolving whether an SKU can enter quote/cart/order flows.",
+  "$comment": "Sources: TECH-04 Commerce Runtime sellable gate, TECH-03 sellable status, PACK-04 runtime chain. TODO: source documents do not lock a complete availability taxonomy beyond sellable, stock, recall hold, sale lock, and trace readiness.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "availability_check_id": { "type": "string", "minLength": 1, "description": "Availability check identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU being checked." },
+    "channel_context_id": { "type": "string", "description": "Optional channel context that requested the check." },
+    "status": { "type": "string", "description": "Availability status. Prefer enums/commerce/availability-status.yaml." },
+    "stock_available": { "type": "boolean", "description": "Whether stock is available for sale according to the runtime source." },
+    "quality_hold": { "type": "boolean", "description": "Whether quality hold blocks sale." },
+    "recall_hold": { "type": "boolean", "description": "Whether recall hold blocks sale." },
+    "sale_lock": { "type": "boolean", "description": "Whether sale lock blocks sale." },
+    "trace_ready": { "type": "boolean", "description": "Whether trace/public trace readiness permits sale." },
+    "block_reasons": { "type": "array", "items": { "type": "string" }, "description": "Source-backed reasons that block availability." },
+    "sellable_status_ref": { "$ref": "../common/source-ref.schema.json" },
+    "stock_balance_ref": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["availability_check_id", "sku_id"]
+}

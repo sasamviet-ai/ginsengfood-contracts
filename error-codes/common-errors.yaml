@@ -1,0 +1,38 @@
+version: v1
+namespace: COMMON
+title: Common Errors
+description: Common foundation errors shared by ops-core and business-platform.
+source_documents:
+  - docs/error-code-standard.md
+  - docs/documents/1_master/MASTER-01 - GLOBAL SOURCE-OF-TRUTH REGISTRY.md
+  - docs/documents/1_master/MASTER-03 - TRACEABILITY ID STANDARD.md
+  - docs/documents/1_master/MASTER-04 - RUNTIME RESOLUTION & GUARD CONTROL STANDARD.md
+codes:
+  - code: COMMON.BLOCKED
+    httpStatus: 409
+    message: Action is blocked by a required source, resolver, guard, evidence, or release condition.
+    description: Use when a common foundation gate blocks continuation and a more specific namespace is not available.
+    retryable: false
+  - code: COMMON.MISSING_CORRELATION_ID
+    httpStatus: 400
+    message: Correlation ID is required for this flow.
+    description: MASTER-03 requires correlation for flows that cross packs.
+    retryable: true
+  - code: COMMON.MISSING_AUDIT_TRACE
+    httpStatus: 409
+    message: Required audit trace is missing.
+    description: TECH-01 and MASTER-03 require audit for risky actions, evidence, gates, and release decisions.
+    retryable: false
+  - code: COMMON.MISSING_SOURCE_REF
+    httpStatus: 409
+    message: Required Source-of-Truth reference is missing.
+    description: MASTER-01 requires source, owner, and authority before runtime decisions.
+    retryable: false
+  - code: COMMON.UNRESOLVED_RUNTIME_CONTEXT
+    httpStatus: 409
+    message: Runtime context could not be resolved.
+    description: MASTER-04 requires resolver output with source reference, owner reference, status, and guard decision before action.
+    retryable: false
+compatibility:
+  breaking_change: Removing or changing code semantics is breaking.
+todos: []

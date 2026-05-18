@@ -1,0 +1,30 @@
+{
+  "eventId": "evt-verified-revenue-created-20260518-001",
+  "eventType": "business-platform.ads.verified-revenue-created.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-18T09:45:00+07:00",
+  "source": "business-platform",
+  "correlationId": "corr-revenue-20260518-001",
+  "causationId": "payment-20260518-001",
+  "idempotencyKey": "verified-revenue-order-20260518-001",
+  "data": {
+    "verified_revenue_id": "verified-revenue-20260518-001",
+    "version": "v1",
+    "order_id": "order-20260518-001",
+    "payment_id": "payment-20260518-001",
+    "status": "REVENUE_VERIFIED",
+    "revenue_amount": {
+      "amount": 275000,
+      "currencyCode": "VND"
+    },
+    "order_verified": true,
+    "payment_or_collection_confirmed": true,
+    "excluded": false,
+    "verified_at": "2026-05-18T09:45:00+07:00",
+    "source": {
+      "sourceId": "payment-20260518-001",
+      "sourceType": "payment-confirmation",
+      "ownerCore": "business-platform"
+    }
+  }
+}

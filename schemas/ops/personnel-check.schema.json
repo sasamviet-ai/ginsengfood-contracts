@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/personnel-check.schema.json",
+  "title": "Personnel Check",
+  "description": "Personnel Check v1 contract for production check-in/check-out and labor traceability.",
+  "$comment": "Sources: Operational Forms FRM-15 and PACK-01 personnel trace. TODO: personnel role/status taxonomy is not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "personnel_check_id": { "type": "string", "minLength": 1, "description": "Personnel check identifier." },
+    "production_order_id": { "type": "string", "minLength": 1, "description": "Production order context." },
+    "batch_id": { "type": "string", "minLength": 1, "description": "Batch context when applicable." },
+    "actor": { "$ref": "../common/actor.schema.json" },
+    "check_in_at": { "type": "string", "format": "date-time", "description": "Check-in timestamp." },
+    "check_out_at": { "type": "string", "format": "date-time", "description": "Check-out timestamp." },
+    "status": { "type": "string", "description": "Personnel check status. TODO: define official values." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["personnel_check_id"]
+}

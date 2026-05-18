@@ -1,0 +1,22 @@
+version: v1
+name: verified-revenue-status
+title: Verified Revenue Status
+description: Commerce v1 verified revenue state values from TECH-04.
+source_documents:
+  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
+values:
+  - value: ORDER_VERIFIED
+    description: Order verification passed.
+  - value: ORDER_VERIFICATION_FAILED
+    description: Order verification failed.
+  - value: REVENUE_VERIFICATION_PENDING
+    description: Revenue verification is pending.
+  - value: REVENUE_VERIFIED
+    description: Revenue is verified and can feed official measurement.
+  - value: REVENUE_EXCLUDED
+    description: Revenue is excluded by cancellation, refund, failure, or policy.
+  - value: REVENUE_REVERSED
+    description: Previously verified revenue was reversed.
+compatibility:
+  breaking_change: Treating pending, unpaid, cancelled, refunded, COD failed, or quote/cart/draft states as verified revenue is breaking.
+todos: []

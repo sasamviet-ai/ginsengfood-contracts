@@ -1,0 +1,31 @@
+version: v1
+name: visibility-state
+title: Visibility State
+description: Channel v1 public/private/internal visibility and redaction guard states.
+source_documents:
+  - docs/documents/3_tech/TECH-06 - FACEBOOK GATEWAY META LIVE & MESSENGER CHANNEL DELIVERY COMMENT-TO-MESSENGER.md
+values:
+  - value: VIEW_NOT_SELECTED
+    description: Visibility view has not been selected.
+  - value: VIEW_SELECTING
+    description: Visibility view selection is in progress.
+  - value: PUBLIC_SAFE_VIEW_SELECTED
+    description: Public-safe view selected.
+  - value: PRIVATE_SAFE_VIEW_SELECTED
+    description: Private-safe view selected.
+  - value: INTERNAL_VIEW_SELECTED
+    description: Internal-only view selected.
+  - value: REDACTION_CHECKING
+    description: Redaction check is in progress.
+  - value: REDACTION_APPLIED
+    description: Redaction was applied.
+  - value: VIEW_GUARD_PASS
+    description: Visibility guard passed.
+  - value: VIEW_GUARD_FAIL
+    description: Visibility guard failed.
+  - value: VIEW_BLOCKED
+    description: Visibility view is blocked.
+compatibility:
+  breaking_change: Exposing private or internal fields through public-safe view is breaking.
+todos:
+  - Source documents mention public/private/internal boundaries; keep this enum aligned if a separate visibility taxonomy is later locked.

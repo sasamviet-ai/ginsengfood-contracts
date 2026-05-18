@@ -1,0 +1,19 @@
+version: v1
+name: actor-type
+title: Actor Type
+description: Common actor type values for audit, permission, evidence, and owner-decision records.
+source_documents:
+  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
+values:
+  - value: HUMAN
+    description: Human user or reviewer.
+    source: "TECH-01 Audit Record Standard: Actor Type = Human."
+  - value: SERVICE_ACCOUNT
+    description: Service account actor.
+    source: "TECH-01 Audit Record Standard: Actor Type = Service Account."
+  - value: SYSTEM
+    description: System actor.
+    source: "TECH-01 Audit Record Standard: Actor Type = System."
+compatibility:
+  breaking_change: Renaming, removing, or changing the meaning of an actor type is breaking.
+todos: []

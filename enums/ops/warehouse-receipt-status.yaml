@@ -1,0 +1,26 @@
+version: v1
+name: warehouse-receipt-status
+title: Warehouse Receipt Status
+description: Warehouse Receipt v1 status values. Receipt confirmed is the boundary that can create finished goods inventory ledger entries.
+source_documents:
+  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+values:
+  - value: DRAFT
+    description: Draft warehouse receipt.
+    source: Operational Forms FRM-22 draft behavior.
+  - value: PENDING_CONFIRMATION
+    description: Receipt is waiting for confirmation.
+    source: PACK-01 Warehouse Receipt Confirmed boundary.
+  - value: CONFIRMED
+    description: Receipt confirmed; inventory ledger can be created.
+    source: PACK-01 Warehouse Receipt Confirmed.
+  - value: BLOCKED
+    description: Receipt is blocked, for example batch not RELEASED.
+    source: PACK-01 negative smoke.
+  - value: REJECTED
+    description: Receipt rejected.
+    source: TODO: rejection semantics are not specified.
+compatibility:
+  breaking_change: Confirming receipt for a non-RELEASED batch is breaking.
+todos:
+  - Confirm whether rejected/cancelled statuses are needed separately.

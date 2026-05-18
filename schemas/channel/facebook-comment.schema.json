@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/channel/v1/facebook-comment.schema.json",
+  "title": "Facebook Comment",
+  "description": "Channel v1 Facebook comment contract for public comment or live comment intake before private handoff or safe public reply.",
+  "$comment": "Sources: PACK-06 and TECH-06. Public comments must not expose private quote/order/payment/delivery data and must route private data collection to Messenger/private channel.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "facebook_comment_id": { "type": "string", "minLength": 1, "description": "Contract identifier for the Facebook comment." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "channel_context_id": { "type": "string", "description": "Linked channel context." },
+    "comment_id": { "type": "string", "description": "Facebook comment id." },
+    "parent_comment_id": { "type": "string", "description": "Parent comment id, if any." },
+    "page_id": { "type": "string", "description": "Facebook page id." },
+    "post_id": { "type": "string", "description": "Facebook post id." },
+    "live_session_id": { "type": "string", "description": "Live session id when comment is from Meta Live." },
+    "visibility_state": { "type": "string", "description": "Visibility/public-safe state. Prefer enums/channel/visibility-state.yaml." },
+    "contains_private_data": { "type": "boolean", "description": "Whether the comment contains private data that cannot be handled publicly." },
+    "requires_private_handoff": { "type": "boolean", "description": "Whether comment must be handed to Messenger/private channel." },
+    "requires_human_takeover": { "type": "boolean", "description": "Whether comment requires human takeover." },
+    "safe_public_reply_allowed": { "type": "boolean", "description": "Whether a public reply is allowed after policy/guard checks." },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["facebook_comment_id", "version"]
+}

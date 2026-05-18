@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/supplier.schema.json",
+  "title": "Supplier",
+  "description": "Supplier v1 contract for material and packaging supply. Supplier does not create production truth without intake, QC, and readiness.",
+  "$comment": "Sources: PACK-03 material catalog and procurement requirement notes. TODO: supplier approval lifecycle is not fully specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "supplier_id": { "type": "string", "minLength": 1, "description": "Supplier identifier." },
+    "supplier_code": { "type": "string", "minLength": 1, "description": "Supplier code." },
+    "supplier_name": { "type": "string", "minLength": 1, "description": "Supplier name." },
+    "material_groups": { "type": "array", "items": { "type": "string", "enum": ["A1", "A2", "A3", "B1", "B2", "B3"] }, "description": "Material groups supplied by this supplier." },
+    "source_origin_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Registered source origins for this supplier." },
+    "status": { "type": "string", "description": "Supplier status. TODO: source documents do not define a supplier status enum." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["supplier_id"]
+}

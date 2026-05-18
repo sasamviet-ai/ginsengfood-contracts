@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/packaging-config.schema.json",
+  "title": "Packaging Config",
+  "description": "Packaging Config v1 contract for B1/B2/B3 material planning and packaging outputs per batch.",
+  "$comment": "Sources: PACK-02 Operational Config requirement and PACK-03 B1/B2/B3 rules. TODO: package size and pack/box/carton conversion lists are not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "packaging_config_id": { "type": "string", "minLength": 1, "description": "Packaging config identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "Configured SKU." },
+    "status": { "type": "string", "description": "Config status. Prefer enums/product/config-status.yaml." },
+    "pack_output_per_batch": { "$ref": "../common/quantity.schema.json" },
+    "box_output_per_batch": { "$ref": "../common/quantity.schema.json" },
+    "carton_output_per_batch": { "$ref": "../common/quantity.schema.json" },
+    "b1_buffer_rate": { "type": "string", "description": "B1 planning buffer rate, initially 7% by PACK-03 but configurable by owner." },
+    "b2_buffer_rate": { "type": "string", "description": "B2 planning buffer rate, initially 7% by PACK-03 but configurable by owner." },
+    "b3_policy": { "type": "string", "description": "B3 stock policy or consumption-per-batch policy. B3 does not automatically use the 7% buffer." },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["packaging_config_id"]
+}

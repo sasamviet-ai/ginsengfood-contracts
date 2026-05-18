@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: Ops Core Recall Sale Lock API
+  version: 1.0.0
+  description: Recall and Sale Lock v1 API contract. Recall and Sale Lock are high-risk commands and win over product activation, channel, quote, order, and field actions.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+paths:
+  /v1/recall-cases:
+    post:
+      summary: Create recall case
+      description: "Creates a Recall Case contract record. This is a high-risk command and requires permission, owner/evidence/audit, and idempotency where applicable. TODO: source documents do not lock the full recall severity and transition model."
+      operationId: createRecallCaseV1
+      tags: [recall-sale-lock]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../../schemas/ops/recall-case.schema.json"
+      responses:
+        "201":
+          description: Recall case created and wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/recall-case.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/recall-cases/{recallCaseId}:
+    get:
+      summary: Get recall case
+      description: Returns one Recall Case record.
+      operationId: getRecallCaseV1
+      tags: [recall-sale-lock]
+      parameters:
+        - name: recallCaseId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        "200":
+          description: Recall case wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/recall-case.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/sale-locks:
+    post:
+      summary: Create sale lock
+      description: Creates Sale Lock / Stop Sale contract record. This is a high-risk command; business-platform must consume its effect through availability/sellable checks and must not mutate it.
+      operationId: createSaleLockV1
+      tags: [recall-sale-lock]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../../schemas/ops/sale-lock.schema.json"
+      responses:
+        "201":
+          description: Sale lock created and wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/sale-lock.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/sale-locks/{saleLockId}:
+    get:
+      summary: Get sale lock
+      description: Returns one Sale Lock record.
+      operationId: getSaleLockV1
+      tags: [recall-sale-lock]
+      parameters:
+        - name: saleLockId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        "200":
+          description: Sale lock wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/sale-lock.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+components:
+  schemas:
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error:
+              $ref: "../../schemas/common/error.schema.json"
+  responses:
+    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

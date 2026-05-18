@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ai/v1/ai-response-instruction.schema.json",
+  "title": "AI Response Instruction",
+  "description": "AI v1 response instruction contract that states what the channel may send after claim, privacy, quote, and handoff guards.",
+  "$comment": "Sources: PACK-05 and TECH-05. AI response must be public-safe, cannot invent claims, cannot expose internal formula/cost/supplier/QC/MISA/private data, and cannot state final price without QuoteSnapshot.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "response_instruction_id": { "type": "string", "minLength": 1, "description": "Response instruction identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "ai_intent_id": { "type": "string", "description": "Source AI intent." },
+    "channel_context_id": { "type": "string", "description": "Channel context for delivery." },
+    "instruction_type": { "type": "string", "description": "Instruction type such as respond, ask_for_private_handoff, recommend, or human_handoff. TODO: define official values." },
+    "allowed_to_send": { "type": "boolean", "description": "Whether instruction is allowed to be delivered." },
+    "public_safe": { "type": "boolean", "description": "Whether content is safe for public channel." },
+    "quote_snapshot_id": { "type": "string", "description": "QuoteSnapshot reference required for final price." },
+    "order_draft_id": { "type": "string", "description": "Order Draft reference if AI is handing off to Commerce." },
+    "claim_guard_result_id": { "type": "string", "description": "Claim guard result reference." },
+    "handoff_id": { "type": "string", "description": "Human or private handoff reference." },
+    "prohibited_content_flags": { "type": "array", "items": { "type": "string" }, "description": "Blocked content categories. TODO: define official taxonomy." },
+    "delivery_visibility_state": { "type": "string", "description": "Visibility state required for delivery." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["response_instruction_id", "version"]
+}

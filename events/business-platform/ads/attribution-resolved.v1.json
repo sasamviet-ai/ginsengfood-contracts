@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/business-platform/ads/attribution-resolved.v1.json",
+  "title": "Attribution Resolved Event v1",
+  "description": "Published when attribution conflict is resolved or an owner-approved attribution rule is applied. Unresolved conflicts must not feed official ROAS.",
+  "$comment": "Sources: PACK-07 Attribution conflict; TECH-07 Attribution lifecycle.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique event identifier."
+    },
+    "eventType": {
+      "type": "string",
+      "const": "business-platform.ads.attribution-resolved.v1",
+      "description": "Stable event type including source, domain, name, and v1 suffix."
+    },
+    "eventVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Event contract version."
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the domain event occurred."
+    },
+    "source": {
+      "type": "string",
+      "const": "business-platform",
+      "description": "System that owns and emits this event."
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Cross-system correlation identifier."
+    },
+    "causationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional parent command, event, or workflow identifier."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required when emitted from retryable or high-risk command; optional for derived read-model notifications."
+    },
+    "data": {
+      "allOf": [
+        {
+          "$ref": "../../../schemas/ads/attribution.schema.json"
+        },
+        {
+          "type": "object",
+          "required": [
+            "attribution_id",
+            "version",
+            "verified_revenue_id",
+            "attribution_rule_id",
+            "conflict_status"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "occurredAt",
+    "source",
+    "correlationId",
+    "data"
+  ]
+}

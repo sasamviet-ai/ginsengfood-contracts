@@ -1,0 +1,32 @@
+{
+  "eventId": "evt-sku-became-sellable-20260518-001",
+  "eventType": "ops-core.sellable.sku-became-sellable.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-18T11:05:00+07:00",
+  "source": "ops-core",
+  "correlationId": "corr-sellable-20260518-001",
+  "causationId": "warehouse-receipt-20260518-001",
+  "idempotencyKey": "sellable-sku-gf-rice-001-20260518",
+  "data": {
+    "sellable_status_id": "sellable-status-20260518-001",
+    "sku_id": "sku-gf-rice-001",
+    "decision": "ALLOW",
+    "batch_released": true,
+    "warehouse_receipt_confirmed": true,
+    "inventory_ledger_pass": true,
+    "stock_available": true,
+    "hsd_valid": true,
+    "quality_hold": false,
+    "recall_hold": false,
+    "sale_lock": false,
+    "trace_ready": true,
+    "block_reasons": [],
+    "evidence_refs": [
+      {
+        "evidenceId": "evidence-release-20260518-001",
+        "evidenceStatus": "APPROVED",
+        "scope": "sellable-gate"
+      }
+    ]
+  }
+}

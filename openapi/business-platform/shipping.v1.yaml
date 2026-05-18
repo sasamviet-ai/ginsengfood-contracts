@@ -1,0 +1,142 @@
+openapi: 3.1.0
+info:
+  title: GinsengFood Business Platform Shipping API
+  version: 1.0.0
+  description: >
+    v1 contract for shipping eligibility, COD, ETA, and tracking references.
+    Shipping contracts must not override customer confirmation, payment review,
+    or ops-core sellable and stock boundaries.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+tags:
+  - name: Shipping
+paths:
+  /v1/shipping/eligibility:
+    post:
+      tags:
+        - Shipping
+      summary: Evaluate shipping eligibility
+      description: >
+        Evaluates shipping eligibility and returns the shipping contract state,
+        including COD, ETA, and tracking placeholders when available. TODO:
+        Finalize carrier-specific request and response fields when source
+        documents define the shipping integration contract.
+      operationId: checkShippingEligibilityV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/commerce/shipping.schema.json
+      responses:
+        "200":
+          description: Shipping eligibility result.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/commerce/shipping.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/shippings/{shippingId}:
+    get:
+      tags:
+        - Shipping
+      summary: Get shipping contract
+      description: >
+        Returns shipping eligibility, COD, ETA, and tracking state for a
+        business-platform shipping record.
+      operationId: getShippingV1
+      parameters:
+        - name: shippingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Shipping contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/commerce/shipping.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    BadRequest:
+      description: Invalid request syntax or parameters.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Unauthorized:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Forbidden:
+      description: Caller is not allowed to perform this operation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    NotFound:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Conflict:
+      description: Request conflicts with current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    UnprocessableEntity:
+      description: Request is syntactically valid but violates contract validation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json

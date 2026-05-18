@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ads/v1/verified-revenue-link.schema.json",
+  "title": "Verified Revenue Link",
+  "description": "Ads v1 link from Ads measurement to Commerce Verified Revenue, explicitly separating raw, clean, and verified revenue amounts.",
+  "$comment": "Sources: PACK-07, TECH-07, and TECH-04. Official ROAS must use verified revenue only. Pending revenue, unpaid orders, comments, inbox, quote, cart, and order draft must not be treated as verified revenue.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "verified_revenue_link_id": { "type": "string", "minLength": 1, "description": "Verified revenue link identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "verified_revenue_id": { "type": "string", "description": "Commerce Verified Revenue identifier." },
+    "order_id": { "type": "string", "description": "Official order reference." },
+    "payment_id": { "type": "string", "description": "Payment confirmation reference." },
+    "attribution_id": { "type": "string", "description": "Attribution record linked to this revenue." },
+    "raw_revenue_amount": { "$ref": "../common/money.schema.json" },
+    "clean_revenue_amount": { "$ref": "../common/money.schema.json" },
+    "verified_revenue_amount": { "$ref": "../common/money.schema.json" },
+    "link_status": { "type": "string", "description": "Link status. TODO: define official verified revenue link status enum." },
+    "raw_clean_verified_boundary_checked": { "type": "boolean", "description": "Whether raw/clean/verified revenue boundaries were checked." },
+    "not_revenue_if_unpaid": { "type": "boolean", "const": true, "description": "Invariant: unpaid or pending orders are not verified revenue." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["verified_revenue_link_id", "version"]
+}

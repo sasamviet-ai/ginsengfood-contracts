@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-error-sale-lock-001",
+    "sourceSystem": "ops-core",
+    "timestamp": "2026-05-18T10:15:00+07:00"
+  },
+  "error": {
+    "code": "COMMON.BLOCKED",
+    "message": "The SKU is blocked by an active sale lock.",
+    "httpStatus": 409,
+    "details": [
+      {
+        "field": "data.sku_id",
+        "reason": "Sale Lock / Stop Sale takes precedence over quote, order, AI, CRM, Ads, and Live flows."
+      }
+    ],
+    "correlationId": "corr-error-sale-lock-001",
+    "auditId": "audit-error-sale-lock-001"
+  }
+}

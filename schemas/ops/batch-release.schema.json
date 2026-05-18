@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/batch-release.schema.json",
+  "title": "Batch Release",
+  "description": "Batch Release v1 contract. Batch RELEASED is a separate decision after QC; QC_PASS cannot auto-release a batch.",
+  "$comment": "Sources: PACK-01/TECH-03 QC_PASS vs RELEASED boundary and Operational Forms FRM-21.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "batch_release_id": { "type": "string", "minLength": 1, "description": "Batch release identifier." },
+    "batch_id": { "type": "string", "minLength": 1, "description": "Batch being released." },
+    "qc_inspection_id": { "type": "string", "minLength": 1, "description": "Finished product QC inspection used for release decision." },
+    "qc_status": { "type": "string", "description": "QC status used for release review." },
+    "release_status": { "type": "string", "description": "Batch release status. Prefer enums/ops/batch-release-status.yaml." },
+    "release_decision_at": { "type": "string", "format": "date-time", "description": "Release decision timestamp." },
+    "warehouse_receipt_allowed": { "type": "boolean", "description": "True only when release permits warehouse receipt." },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["batch_release_id"]
+}

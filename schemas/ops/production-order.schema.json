@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/production-order.schema.json",
+  "title": "Production Order",
+  "description": "Production Order v1 contract. A production order must use Formula Version and Production BOM Snapshot; it must not use a live recipe directly.",
+  "$comment": "Sources: PACK-01/TECH-03 production order guard and PACK-02 snapshot control. TODO: exact Production Order status lifecycle is not fully specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "production_order_id": { "type": "string", "minLength": 1, "description": "Production order identifier." },
+    "demand_id": { "type": "string", "minLength": 1, "description": "Approved demand that led to this order." },
+    "mrp_run_id": { "type": "string", "minLength": 1, "description": "MRP run supporting this order." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU to produce." },
+    "formula_version_id": { "type": "string", "minLength": 1, "description": "Resolved Formula Version, typically G1." },
+    "production_bom_snapshot_id": { "type": "string", "minLength": 1, "description": "Required BOM snapshot for production." },
+    "planned_quantity": { "$ref": "../common/quantity.schema.json" },
+    "anchor_rice_quantity": { "$ref": "../common/quantity.schema.json" },
+    "status": { "type": "string", "description": "Production order status. Prefer enums/ops/production-order-status.yaml." },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["production_order_id"]
+}

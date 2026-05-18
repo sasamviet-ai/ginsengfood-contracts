@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/warehouse-receipt.schema.json",
+  "title": "Warehouse Receipt",
+  "description": "Warehouse Receipt v1 contract. Inventory increases only at Warehouse Receipt Confirmed and only for RELEASED batches.",
+  "$comment": "Sources: PACK-01 warehouse receipt and inventory boundary; Operational Forms FRM-22.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "warehouse_receipt_id": { "type": "string", "minLength": 1, "description": "Warehouse receipt identifier." },
+    "batch_id": { "type": "string", "minLength": 1, "description": "Released batch being received." },
+    "warehouse_id": { "type": "string", "minLength": 1, "description": "Receiving warehouse." },
+    "warehouse_location_id": { "type": "string", "minLength": 1, "description": "Receiving location." },
+    "status": { "type": "string", "description": "Warehouse receipt status. Prefer enums/ops/warehouse-receipt-status.yaml." },
+    "receipt_confirmed": { "type": "boolean", "description": "True when receipt has been confirmed." },
+    "received_quantity": { "$ref": "../common/quantity.schema.json" },
+    "inventory_ledger_entry_id": { "type": "string", "minLength": 1, "description": "Ledger entry created by confirmed receipt." },
+    "misa_checkpoint_eligible": { "type": "boolean", "description": "Whether confirmed receipt can create a MISA handoff checkpoint." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["warehouse_receipt_id"]
+}

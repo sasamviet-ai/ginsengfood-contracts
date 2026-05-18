@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/owner-decision-ref.schema.json",
+  "title": "Owner Decision Reference",
+  "description": "Common v1 reference to an owner decision, owner review, or owner sign-off.",
+  "$comment": "Source: MASTER-01, MASTER-05, MASTER-07, and TECH-10 require owner decisions/sign-off to have scope, evidence, audit, time, approver or authority, and trace to gate/release decisions.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ownerDecisionId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Owner decision or sign-off identifier."
+    },
+    "owner": {
+      "$ref": "actor.schema.json",
+      "description": "Owner, reviewer, or approving authority."
+    },
+    "decision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Decision value or conclusion. Use a domain-specific enum only when a later source document defines one."
+    },
+    "decisionReason": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reason for the decision."
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Decision scope. Owner sign-off must not be used outside its scope."
+    },
+    "evidenceId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Evidence package or evidence item supporting the decision."
+    },
+    "auditId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Audit record for the decision."
+    },
+    "decidedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Decision timestamp."
+    }
+  },
+  "required": [
+    "ownerDecisionId"
+  ]
+}

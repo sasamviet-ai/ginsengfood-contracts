@@ -1,0 +1,32 @@
+version: v1
+name: human-takeover-status
+title: Human Takeover Status
+description: Channel v1 human takeover status values for conversations that must pause AI.
+source_documents:
+  - docs/documents/2_pack/PACK-05 - AI ADVISOR CHANNEL CUSTOMER CONSULTING SALES RUNTIME CUSTOMER MEMORY QUOTE-ORDER HANDOFF PACK.md
+  - docs/documents/2_pack/PACK-06 - FACEBOOK CHANNEL GATEWAY META LIVE & MESSENGER COMMENT-MESSENGER ROUTING APP REVIEW CHANNEL SMOKE RELEASE CONTROL PACK.md
+values:
+  - value: TAKEOVER_NOT_REQUIRED
+    description: Human takeover is not required.
+  - value: TAKEOVER_REQUIRED
+    description: Human takeover is required.
+  - value: TAKEOVER_REQUESTED
+    description: Human takeover has been requested.
+  - value: ASSIGNED
+    description: Human owner or agent has been assigned.
+  - value: ACTIVE
+    description: Human takeover is active and AI should not continue.
+  - value: RESOLVED
+    description: Human takeover was resolved.
+  - value: RETURN_TO_AI_ALLOWED
+    description: Policy allows returning to AI after human handling.
+  - value: TAKEOVER_FAILED
+    description: Takeover request failed.
+  - value: TAKEOVER_UNAVAILABLE
+    description: Human takeover is unavailable.
+  - value: TAKEOVER_CLOSED
+    description: Human takeover lifecycle is closed.
+compatibility:
+  breaking_change: Allowing AI to continue during active human takeover is breaking.
+todos:
+  - Source docs show human takeover requirements and ASSIGNED/RESOLVED states, but the complete locked state list needs Phase 7 confirmation.

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/material-receipt.schema.json",
+  "title": "Material Receipt",
+  "description": "Material Receipt v1 contract for production-side material receipt/return events before production execution and costing.",
+  "$comment": "Sources: PACK-01 production material chain. TODO: source documents do not define a dedicated material receipt lifecycle.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "material_receipt_id": { "type": "string", "minLength": 1, "description": "Material receipt identifier." },
+    "production_order_id": { "type": "string", "minLength": 1, "description": "Production order receiving or returning material." },
+    "material_issue_id": { "type": "string", "minLength": 1, "description": "Related material issue when applicable." },
+    "status": { "type": "string", "description": "Material receipt status. TODO: define official values." },
+    "receipt_lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "material_id": { "type": "string", "minLength": 1 },
+          "raw_material_lot_id": { "type": "string", "minLength": 1 },
+          "received_quantity": { "$ref": "../common/quantity.schema.json" }
+        }
+      }
+    },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["material_receipt_id"]
+}

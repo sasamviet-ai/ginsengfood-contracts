@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-trace-20260518-001",
+    "sourceSystem": "ops-core",
+    "timestamp": "2026-05-18T10:00:00+07:00"
+  },
+  "data": {
+    "public_trace_id": "public-trace-qr-001",
+    "trace_chain_id": "trace-chain-batch-001",
+    "sku_id": "sku-gf-rice-001",
+    "batch_id": "batch-20260518-001",
+    "status": "TRACE_READY",
+    "public_payload": {
+      "product_name": "Ginseng Food Sample SKU",
+      "batch_code": "BATCH-20260518-001",
+      "production_date": "2026-05-18",
+      "best_before": "2027-05-18",
+      "release_status": "RELEASED"
+    },
+    "internal_data_excluded": true,
+    "evidence_refs": [
+      {
+        "evidenceId": "evidence-release-20260518-001",
+        "evidenceStatus": "APPROVED",
+        "scope": "batch-release"
+      }
+    ]
+  }
+}

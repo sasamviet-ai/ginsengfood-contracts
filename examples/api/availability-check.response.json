@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-availability-20260518-001",
+    "sourceSystem": "ops-core",
+    "timestamp": "2026-05-18T09:00:01+07:00"
+  },
+  "data": {
+    "availability_check_id": "avail-20260518-001",
+    "sku_id": "sku-gf-rice-001",
+    "channel_context_id": "channel-facebook-page-001",
+    "status": "AVAILABLE",
+    "stock_available": true,
+    "quality_hold": false,
+    "recall_hold": false,
+    "sale_lock": false,
+    "trace_ready": true,
+    "block_reasons": [],
+    "sellable_status_ref": {
+      "sourceId": "sellable-status-20260518-001",
+      "sourceType": "sellable-status",
+      "ownerCore": "ops-core"
+    },
+    "stock_balance_ref": {
+      "sourceId": "stock-balance-20260518-001",
+      "sourceType": "stock-balance",
+      "ownerCore": "ops-core"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ai/v1/order-draft-handoff.schema.json",
+  "title": "Order Draft Handoff",
+  "description": "AI v1 handoff contract from AI Advisor to Commerce Runtime for quote/cart/order draft creation or continuation.",
+  "$comment": "Sources: PACK-05, TECH-05, and TECH-04. AI cannot create Official Order and must use Commerce Runtime for QuoteSnapshot, Order Draft, Customer Confirmation, payment, and order creation.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "order_draft_handoff_id": { "type": "string", "minLength": 1, "description": "Order draft handoff identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "ai_intent_id": { "type": "string", "description": "Source AI intent." },
+    "channel_context_id": { "type": "string", "description": "Channel context for the handoff." },
+    "cart_id": { "type": "string", "description": "Cart reference if already created by Commerce." },
+    "quote_snapshot_id": { "type": "string", "description": "QuoteSnapshot reference for final price." },
+    "order_draft_id": { "type": "string", "description": "Order Draft created or returned by Commerce." },
+    "commerce_handoff_status": { "type": "string", "description": "Handoff status. Prefer enums/channel/handoff-status.yaml or TODO define AI-Commerce handoff enum." },
+    "customer_confirmation_required": { "type": "boolean", "const": true, "description": "Invariant: customer confirmation is required before official order." },
+    "ai_may_create_official_order": { "type": "boolean", "const": false, "description": "Invariant: AI must not create Official Order." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["order_draft_handoff_id", "version"]
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/material-requirement.schema.json",
+  "title": "Material Requirement",
+  "description": "Material Requirement v1 contract emitted by MRP before procurement suppression checks and procurement requirement creation.",
+  "$comment": "Sources: PACK-03 MRP/Dynamic Threshold/Material Requirement Board. TODO: official requirement status enum is not separately specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "material_requirement_id": { "type": "string", "minLength": 1, "description": "Material requirement identifier." },
+    "mrp_run_id": { "type": "string", "minLength": 1, "description": "MRP run that produced this requirement." },
+    "material_id": { "type": "string", "minLength": 1, "description": "Required material/packaging identifier." },
+    "material_group": { "type": "string", "enum": ["A1", "A2", "A3", "B1", "B2", "B3"], "description": "Material group from PACK-03." },
+    "required_quantity": { "$ref": "../common/quantity.schema.json" },
+    "available_stock": { "$ref": "../common/quantity.schema.json" },
+    "approved_incoming": { "$ref": "../common/quantity.schema.json" },
+    "dynamic_suppression_threshold": { "$ref": "../common/quantity.schema.json" },
+    "suppression_status": { "type": "string", "description": "Suppression result, e.g. PROCUREMENT_SUPPRESSED or DIRECTOR_APPROVAL_REQUIRED when applicable." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["material_requirement_id"]
+}

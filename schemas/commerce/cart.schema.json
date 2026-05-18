@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/cart.schema.json",
+  "title": "Cart",
+  "description": "Commerce v1 cart contract for customer-selected items before order draft creation.",
+  "$comment": "Sources: TECH-04 Cart state model. Cart is not revenue and must be validated against quote/sellable state before order draft.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "cart_id": { "type": "string", "minLength": 1, "description": "Cart identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "customer_id": { "type": "string", "description": "Customer reference if known." },
+    "status": { "type": "string", "description": "Cart status. Prefer enums/commerce/cart-status.yaml." },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sku_id": { "type": "string" },
+          "quantity": { "$ref": "../common/quantity.schema.json" },
+          "availability_check_id": { "type": "string" }
+        }
+      },
+      "description": "Cart lines before quote snapshot."
+    },
+    "quote_snapshot_id": { "type": "string", "description": "Active or latest QuoteSnapshot for the cart." },
+    "needs_quote_refresh": { "type": "boolean", "description": "Whether cart needs a refreshed QuoteSnapshot before draft/order." },
+    "validation_errors": { "type": "array", "items": { "type": "string" }, "description": "Validation blockers from runtime checks." },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["cart_id", "version"]
+}

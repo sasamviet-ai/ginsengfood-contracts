@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-availability-20260518-001",
+    "sourceSystem": "business-platform",
+    "timestamp": "2026-05-18T09:00:00+07:00"
+  },
+  "data": {
+    "sku_id": "sku-gf-rice-001",
+    "channel_context_id": "channel-facebook-page-001",
+    "requested_quantity": {
+      "value": 2,
+      "unit": "pack"
+    }
+  }
+}

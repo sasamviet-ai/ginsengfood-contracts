@@ -1,7 +1,19 @@
 # asyncapi
 
-Thư mục này chứa event bus contracts ở mức AsyncAPI cho các event liên hệ giữa `ginsengfood-ops-core` và `ginsengfood-business-platform`.
+Thu muc nay chua AsyncAPI v1 contracts cho event bus boundary giua `ginsengfood-ops-core`, `ginsengfood-business-platform`, va cac integration consumer hop le.
 
-Người dùng chính là hai team backend, QA, DevOps và reviewer contract. Không đặt queue worker, broker config production, retry implementation, secret hoặc event payload schema chi tiết không thuộc AsyncAPI vào đây.
+Cac file trong thu muc nay chi la contract. Khong dat queue worker, handler implementation, broker config production, retry policy implementation, secret, hay deployment config vao day.
 
-Ví dụ event sau này: `SkuBecameSellable`, `InventoryAvailableChanged`, `SaleLockActivated`, `OrderConfirmed`, `PaymentConfirmed`. Mỗi event phải có version rõ ràng như `eventVersion`; breaking change phải tăng major version và có migration note.
+## Files
+
+- `ops-core-events.v1.yaml`: events published by ops-core.
+- `business-platform-events.v1.yaml`: events published by business-platform.
+- `integration-events.v1.yaml`: high-risk cross-system event subset for sale lock, order, payment, MISA, verified revenue, and IVR boundaries.
+
+## Boundary
+
+- Placeholder server in AsyncAPI is not real broker configuration.
+- TODO: Source documents do not define real broker, topic, partition, retry, or outbox publication metadata. These AsyncAPI files use `eventType` as placeholder channel address only.
+- Event payload schema lives under `events/`.
+- Every event uses `eventVersion: "1.0"` and an `eventType` ending with `.v1`.
+- Breaking changes require a new major event version or compatibility note.

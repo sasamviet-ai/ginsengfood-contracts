@@ -1,0 +1,36 @@
+version: v1
+name: channel-delivery-status
+title: Channel Delivery Status
+description: Channel v1 outbound delivery state values from TECH-06.
+source_documents:
+  - docs/documents/3_tech/TECH-06 - FACEBOOK GATEWAY META LIVE & MESSENGER CHANNEL DELIVERY COMMENT-TO-MESSENGER.md
+values:
+  - value: DELIVERY_NOT_STARTED
+    description: Delivery has not started.
+  - value: DELIVERY_POLICY_CHECKING
+    description: Delivery policy is being checked.
+  - value: DELIVERY_ALLOWED
+    description: Delivery is allowed.
+  - value: DELIVERY_BLOCKED
+    description: Delivery is blocked.
+  - value: DELIVERY_RATE_LIMITED
+    description: Delivery is rate limited.
+  - value: DELIVERY_TYPING_REQUIRED
+    description: Typing indicator or channel-specific preparation is required.
+  - value: DELIVERY_QUEUED
+    description: Delivery is queued.
+  - value: DELIVERY_SENDING
+    description: Delivery is sending.
+  - value: DELIVERY_SENT
+    description: Delivery was sent.
+  - value: DELIVERY_FAILED
+    description: Delivery failed.
+  - value: DELIVERY_RETRY_PENDING
+    description: Delivery retry is pending.
+  - value: DELIVERY_DUPLICATE_BLOCKED
+    description: Duplicate delivery was blocked.
+  - value: DELIVERY_CLOSED
+    description: Delivery lifecycle is closed.
+compatibility:
+  breaking_change: Sending blocked, duplicate, or private data through an unsafe public delivery path is breaking.
+todos: []

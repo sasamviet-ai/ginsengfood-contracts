@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-sale-lock-20260518-001",
+    "sourceSystem": "ops-core",
+    "timestamp": "2026-05-18T10:15:00+07:00"
+  },
+  "data": {
+    "sale_lock_id": "sale-lock-20260518-001",
+    "scope_type": "SKU",
+    "scope_id": "sku-gf-rice-001",
+    "status": "ACTIVE",
+    "active": true,
+    "reason": "Recall review requires stop-sale until owner release decision.",
+    "recall_case_id": "recall-case-20260518-001",
+    "effective_from": "2026-05-18T10:15:00+07:00",
+    "owner_approval_ref": {
+      "sourceId": "owner-decision-20260518-001",
+      "sourceType": "owner-decision",
+      "ownerCore": "ops-core",
+      "decisionAuthority": "owner"
+    },
+    "evidence_refs": [
+      {
+        "evidenceId": "evidence-sale-lock-20260518-001",
+        "evidenceStatus": "APPROVED",
+        "scope": "sale-lock"
+      }
+    ]
+  }
+}

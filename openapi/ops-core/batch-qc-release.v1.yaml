@@ -1,0 +1,118 @@
+openapi: 3.1.0
+info:
+  title: Ops Core Batch QC Release API
+  version: 1.0.0
+  description: Batch, QC Inspection, and Batch Release v1 API contract. QC_PASS is not RELEASED.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+paths:
+  /v1/batches/{batchId}:
+    get:
+      summary: Get batch
+      description: Returns one batch record with production/QC/release boundary data.
+      operationId: getBatchV1
+      tags: [batch-qc-release]
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        "200":
+          description: Batch wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/batch.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/qc-inspections:
+    post:
+      summary: Create QC inspection
+      description: Creates QC inspection contract data. QC result must not be interpreted as batch release without the Batch Release boundary.
+      operationId: createQcInspectionV1
+      tags: [batch-qc-release]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../../schemas/ops/qc-inspection.schema.json"
+      responses:
+        "201":
+          description: QC inspection created and wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/qc-inspection.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/batch-releases:
+    post:
+      summary: Create batch release decision
+      description: Creates a Batch Release contract record. Batch Release is the release boundary after QC and required evidence/audit.
+      operationId: createBatchReleaseV1
+      tags: [batch-qc-release]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../../schemas/ops/batch-release.schema.json"
+      responses:
+        "201":
+          description: Batch release created and wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/batch-release.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+components:
+  schemas:
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error:
+              $ref: "../../schemas/common/error.schema.json"
+  responses:
+    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

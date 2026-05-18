@@ -1,0 +1,17 @@
+version: v1
+name: dietary-type
+title: Dietary Type
+description: Dietary grouping observed in the 20 SKU operational formula catalog.
+source_documents:
+  - docs/documents/2_pack/operational_more/CONG THUC VAN HANH 20 SKU MOI.md
+values:
+  - value: VEGAN
+    description: Vegan / Thuan chay SKU group.
+    source: 20 SKU formula catalog.
+  - value: SAVORY
+    description: Man SKU group from the catalog.
+    source: 20 SKU formula catalog; TODO: confirm exact English naming and whether this means non-vegan savory.
+compatibility:
+  breaking_change: Renaming dietary values is breaking for product classification consumers.
+todos:
+  - Confirm whether the source label Man should be represented as SAVORY, NON_VEGAN, or another owner-approved English value.

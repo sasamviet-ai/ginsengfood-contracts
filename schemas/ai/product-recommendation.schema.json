@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ai/v1/product-recommendation.schema.json",
+  "title": "Product Recommendation",
+  "description": "AI v1 product recommendation contract that must rely on sellable/availability guards and approved product knowledge.",
+  "$comment": "Sources: PACK-05, TECH-05, TECH-02, and TECH-04. AI must not recommend products blocked by out-of-stock, recall, sale lock, or claim guard unless offering a sellable alternative. TODO: recommendation scoring taxonomy is not defined.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "product_recommendation_id": { "type": "string", "minLength": 1, "description": "Product recommendation identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "ai_intent_id": { "type": "string", "description": "Source AI intent." },
+    "customer_memory_ref_id": { "type": "string", "description": "Customer memory reference used under privacy policy." },
+    "sku_id": { "type": "string", "description": "Recommended SKU." },
+    "availability_check_id": { "type": "string", "description": "Availability check proving sellable status." },
+    "claim_guard_result_id": { "type": "string", "description": "Claim guard result for product claims." },
+    "quote_snapshot_id": { "type": "string", "description": "QuoteSnapshot if recommendation includes final price." },
+    "recommendation_status": { "type": "string", "description": "Recommendation status. TODO: define official recommendation status enum." },
+    "sellable_required": { "type": "boolean", "const": true, "description": "Invariant: recommendation must pass sellable/availability guard." },
+    "blocked_reason": { "type": "string", "description": "Reason recommendation is blocked." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["product_recommendation_id", "version"]
+}

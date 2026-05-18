@@ -1,0 +1,28 @@
+version: v1
+name: channel-type
+title: Channel Type
+description: Channel v1 context types for Facebook Gateway and Messenger routing.
+source_documents:
+  - docs/documents/3_tech/TECH-06 - FACEBOOK GATEWAY META LIVE & MESSENGER CHANNEL DELIVERY COMMENT-TO-MESSENGER.md
+values:
+  - value: CHANNEL_NOT_RESOLVED
+    description: Channel context is not resolved.
+  - value: CHANNEL_RESOLVING
+    description: Channel context resolution is in progress.
+  - value: CHANNEL_PUBLIC_COMMENT
+    description: Public Facebook comment context.
+  - value: CHANNEL_LIVE_COMMENT
+    description: Meta Live public comment context.
+  - value: CHANNEL_PRIVATE_MESSENGER
+    description: Private Messenger context.
+  - value: CHANNEL_CRM_OUTBOUND
+    description: CRM outbound context.
+  - value: CHANNEL_INTERNAL_TEST
+    description: Internal test context.
+  - value: CHANNEL_UNKNOWN
+    description: Unknown channel context.
+  - value: CHANNEL_BLOCKED
+    description: Channel context is blocked.
+compatibility:
+  breaking_change: Mixing public and private channel types is breaking.
+todos: []

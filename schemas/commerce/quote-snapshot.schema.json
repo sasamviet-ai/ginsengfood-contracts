@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/quote-snapshot.schema.json",
+  "title": "Quote Snapshot",
+  "description": "Commerce v1 immutable quote snapshot contract. QuoteSnapshot is the sole source for final price used by cart, order draft, official order, and downstream measurement.",
+  "$comment": "Sources: TECH-04 states no module may recalculate final price outside QuoteSnapshot; QuoteSnapshot must carry validity and final totals. TODO: source documents do not define precision, tax, discount, or member benefit line shapes in detail.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "quote_snapshot_id": { "type": "string", "minLength": 1, "description": "Quote snapshot identifier." },
+    "quote_code": { "type": "string", "description": "Human-visible quote code if the runtime issues one." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "status": { "type": "string", "description": "Quote status. Prefer enums/commerce/quote-status.yaml." },
+    "cart_id": { "type": "string", "description": "Cart linked to this quote, if any." },
+    "customer_id": { "type": "string", "description": "Customer reference if known." },
+    "valid_from": { "type": "string", "format": "date-time", "description": "Quote validity start." },
+    "valid_until": { "type": "string", "format": "date-time", "description": "Quote expiry time." },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sku_id": { "type": "string" },
+          "quantity": { "$ref": "../common/quantity.schema.json" },
+          "unit_price": { "$ref": "../common/money.schema.json" },
+          "line_total": { "$ref": "../common/money.schema.json" },
+          "availability_check_id": { "type": "string" }
+        }
+      },
+      "description": "Quoted SKU lines. TODO: define official line tax/discount/member benefit fields from source docs."
+    },
+    "shipping_fee": { "$ref": "../common/money.schema.json" },
+    "cod_fee": { "$ref": "../common/money.schema.json" },
+    "final_total": { "$ref": "../common/money.schema.json" },
+    "pricing_source": { "$ref": "../common/source-ref.schema.json" },
+    "idempotency": { "$ref": "../common/idempotency.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["quote_snapshot_id", "version"]
+}

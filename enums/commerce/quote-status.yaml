@@ -1,0 +1,32 @@
+version: v1
+name: quote-status
+title: Quote Status
+description: Commerce v1 QuoteSnapshot state values from TECH-04.
+source_documents:
+  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
+values:
+  - value: QUOTE_NOT_CREATED
+    description: Quote has not been created.
+  - value: QUOTE_CREATING
+    description: Quote creation is in progress.
+  - value: QUOTE_ACTIVE
+    description: Quote is active and can be used within validity rules.
+  - value: QUOTE_EXPIRED
+    description: Quote validity has expired.
+  - value: QUOTE_SUPERSEDED
+    description: Quote was replaced by a newer quote.
+  - value: QUOTE_CANCELLED
+    description: Quote was cancelled.
+  - value: QUOTE_BLOCKED
+    description: Quote is blocked by guard or runtime conditions.
+  - value: QUOTE_USED_FOR_DRAFT
+    description: Quote has been used for an Order Draft.
+  - value: QUOTE_USED_FOR_ORDER
+    description: Quote has been used for an Official Order.
+  - value: QUOTE_DISPUTE_REVIEW
+    description: Quote is under dispute review.
+  - value: QUOTE_CLOSED
+    description: Quote lifecycle is closed.
+compatibility:
+  breaking_change: Allowing expired, cancelled, blocked, or superseded quotes to create official orders is breaking.
+todos: []

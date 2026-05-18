@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/customer.schema.json",
+  "title": "Customer",
+  "description": "Commerce v1 customer reference contract for order, quote, channel, and customer memory linkage without embedding sensitive profile details.",
+  "$comment": "Sources: PACK-05 customer memory boundaries and TECH-04 customer/order runtime. TODO: source documents do not define full customer master data schema or PII handling fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customer_id": { "type": "string", "minLength": 1, "description": "Customer identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "customer_code": { "type": "string", "description": "Optional customer code if assigned by source system." },
+    "display_name": { "type": "string", "description": "Safe display name. Do not expose private data publicly." },
+    "channel_customer_refs": { "type": "array", "items": { "$ref": "../common/source-ref.schema.json" }, "description": "Channel identity references." },
+    "memory_allowed": { "type": "boolean", "description": "Whether customer memory may be used under source privacy policy." },
+    "privacy_flags": { "type": "array", "items": { "type": "string" }, "description": "Privacy flags. TODO: define official privacy taxonomy." },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["customer_id", "version"]
+}

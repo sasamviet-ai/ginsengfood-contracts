@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/mrp-run.schema.json",
+  "title": "MRP Run",
+  "description": "MRP Run v1 contract for resolving demand through G1 formula, Production BOM Snapshot, dynamic thresholds, and material requirements.",
+  "$comment": "Sources: PACK-03 MRP flow. TODO: full MRP status machine is not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "mrp_run_id": { "type": "string", "minLength": 1, "description": "MRP run identifier." },
+    "demand_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Demand records included in this MRP run." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU resolved by this MRP run." },
+    "formula_version_id": { "type": "string", "minLength": 1, "description": "Resolved G1 Formula Version." },
+    "production_bom_snapshot_id": { "type": "string", "minLength": 1, "description": "Production BOM Snapshot used for MRP calculations." },
+    "anchor_rice_quantity": { "$ref": "../common/quantity.schema.json" },
+    "status": { "type": "string", "description": "MRP run status. Prefer enums/ops/mrp-status.yaml." },
+    "material_requirement_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Material requirement outputs." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["mrp_run_id"]
+}

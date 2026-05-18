@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/warehouse.schema.json",
+  "title": "Warehouse",
+  "description": "Warehouse v1 contract. Warehouse must be a registry entry, not hardcoded; MISA mapping is reserved through integration contracts.",
+  "$comment": "Sources: PACK-01 placeholder registry control. TODO: official warehouse type/status values are not specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "warehouse_id": { "type": "string", "minLength": 1, "description": "Warehouse identifier." },
+    "warehouse_code": { "type": "string", "minLength": 1, "description": "Warehouse code." },
+    "warehouse_name": { "type": "string", "minLength": 1, "description": "Warehouse name." },
+    "warehouse_type": { "type": "string", "description": "Warehouse type. TODO: define official values." },
+    "status": { "type": "string", "description": "Warehouse status. TODO: define official values." },
+    "misa_mapping_code": { "type": "string", "minLength": 1, "description": "MISA mapping code when configured." },
+    "source_ref": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["warehouse_id"]
+}

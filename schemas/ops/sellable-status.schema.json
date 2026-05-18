@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/sellable-status.schema.json",
+  "title": "Sellable Status",
+  "description": "Sellable Status v1 contract. Sellable requires released batch, warehouse receipt confirmed, inventory ledger pass, stock available, HSD valid, QC clear, trace ready, no recall, and no sale lock.",
+  "$comment": "Sources: PACK-01 Sellable Gate and PACK-02 Product Activation dependency. TODO: exact sellable decision status taxonomy is not fully specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "sellable_status_id": { "type": "string", "minLength": 1, "description": "Sellable status identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU being evaluated." },
+    "batch_id": { "type": "string", "minLength": 1, "description": "Batch being evaluated." },
+    "decision": { "type": "string", "description": "Sellable decision. Prefer enums/ops/sellable-status.yaml." },
+    "batch_released": { "type": "boolean", "description": "True when batch release is complete." },
+    "warehouse_receipt_confirmed": { "type": "boolean", "description": "True when warehouse receipt is confirmed." },
+    "inventory_ledger_pass": { "type": "boolean", "description": "True when ledger supports the stock state." },
+    "stock_available": { "type": "boolean", "description": "True when available stock is greater than zero and not held." },
+    "hsd_valid": { "type": "boolean", "description": "True when shelf life/HSD is valid." },
+    "quality_hold": { "type": "boolean", "description": "True when quality hold blocks sellable." },
+    "recall_hold": { "type": "boolean", "description": "True when recall hold blocks sellable." },
+    "sale_lock": { "type": "boolean", "description": "True when sale lock blocks sellable." },
+    "trace_ready": { "type": "boolean", "description": "True when trace chain is ready." },
+    "block_reasons": { "type": "array", "items": { "type": "string" }, "description": "Reasons blocking sellable status." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["sellable_status_id"]
+}

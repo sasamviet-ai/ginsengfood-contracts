@@ -1,0 +1,46 @@
+version: v1
+name: evidence-status
+title: Evidence Status
+description: Common evidence lifecycle/status values used by evidence registry, smoke, completion, and release gates.
+source_documents:
+  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
+  - docs/documents/1_master/MASTER-03 - TRACEABILITY ID STANDARD.md
+  - docs/documents/1_master/MASTER-05 - EVIDENCE SMOKE COMPLETION GATE STANDARD.md
+values:
+  - value: DRAFT
+    description: Evidence draft; not usable for PASS.
+    source: MASTER-03 evidence states.
+  - value: PENDING
+    description: Evidence pending submission or completion.
+    source: TECH-01 Evidence Lifecycle.
+  - value: SUBMITTED
+    description: Evidence submitted for review.
+    source: TECH-01 and MASTER-03 evidence states.
+  - value: UNDER_REVIEW
+    description: Evidence under review.
+    source: TECH-01 and MASTER-03 evidence states.
+  - value: ACCEPTED
+    description: Evidence accepted. Only this status may be used for PASS.
+    source: TECH-01, MASTER-03, and MASTER-05.
+  - value: REJECTED
+    description: Evidence rejected; not usable for PASS.
+    source: TECH-01, MASTER-03, and MASTER-05.
+  - value: NEEDS_RETEST
+    description: Evidence needs retest.
+    source: TECH-01 Evidence Lifecycle.
+  - value: OWNER_REVIEW_REQUIRED
+    description: Owner review is required before acceptance.
+    source: TECH-01 Evidence Lifecycle.
+  - value: SUPERSEDED
+    description: Evidence replaced by newer evidence; not usable for PASS.
+    source: TECH-01, MASTER-03, and MASTER-05.
+  - value: EXPIRED
+    description: Evidence expired due to source, code, config, environment, scope, or policy change.
+    source: TECH-01 Evidence Lifecycle.
+  - value: VOID
+    description: Evidence voided; not usable for PASS.
+    source: MASTER-03 and MASTER-05 evidence states.
+compatibility:
+  breaking_change: Renaming, removing, or reinterpreting evidence statuses is breaking because release and completion gates depend on them.
+todos:
+  - Reconcile whether PENDING and DRAFT should remain distinct once an authoritative evidence registry contract is generated.

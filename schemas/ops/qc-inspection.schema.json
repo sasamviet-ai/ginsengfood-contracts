@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/qc-inspection.schema.json",
+  "title": "QC Inspection",
+  "description": "QC Inspection v1 contract for raw material, after-drying, and finished product QC. Moisture thresholds are below 2% PASS, 2%-4% HOLD/REVIEW, above 4% FAIL.",
+  "$comment": "Sources: PACK-01 QC threshold registry and Operational Forms FRM-17/FRM-20. TODO: full QC criteria catalog is not specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "qc_inspection_id": { "type": "string", "minLength": 1, "description": "QC inspection identifier." },
+    "inspection_stage": { "type": "string", "description": "Inspection stage such as RAW_MATERIAL, AFTER_DRYING, FINISHED_PRODUCT. TODO: define official values." },
+    "object_type": { "type": "string", "description": "Inspected object type." },
+    "object_id": { "type": "string", "minLength": 1, "description": "Inspected object identifier." },
+    "moisture_percent": { "type": "string", "description": "Measured moisture percent when applicable." },
+    "qc_status": { "type": "string", "description": "QC status. Prefer enums/ops/qc-status.yaml." },
+    "review_required": { "type": "boolean", "description": "True for HOLD/REVIEW outcomes." },
+    "inspector": { "$ref": "../common/actor.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["qc_inspection_id"]
+}

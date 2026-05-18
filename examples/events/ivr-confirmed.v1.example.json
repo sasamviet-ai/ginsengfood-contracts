@@ -1,0 +1,22 @@
+{
+  "eventId": "evt-ivr-confirmed-20260518-001",
+  "eventType": "business-platform.ivr.ivr-confirmed.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-18T10:30:00+07:00",
+  "source": "business-platform",
+  "correlationId": "corr-ivr-20260518-001",
+  "causationId": "ivr-call-attempt-20260518-001",
+  "idempotencyKey": "ivr-confirmed-order-20260518-001",
+  "data": {
+    "ivr_call_result_id": "ivr-result-20260518-001",
+    "version": "v1",
+    "ivr_call_job_id": "ivr-call-job-20260518-001",
+    "official_order_id": "order-20260518-001",
+    "final_result_status": "IVR_CONFIRMED",
+    "core_order_handoff_required": true,
+    "human_review_required": false,
+    "input_signal_only": true,
+    "no_direct_order_update": true,
+    "no_payment_or_revenue_effect": true
+  }
+}

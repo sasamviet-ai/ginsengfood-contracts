@@ -1,0 +1,25 @@
+version: v1
+name: stock-alert-status
+title: Stock Alert Status
+description: Product stock alert levels and actions.
+source_documents:
+  - docs/documents/2_pack/extra/Muc canh bao ton kho san pham.md
+values:
+  - value: STOCK_OK
+    description: Available stock is above yellow alert threshold; normal monitoring.
+    source: Stock alert document.
+  - value: STOCK_YELLOW_ALERT
+    description: Available stock is at or below yellow threshold; create yellow warning.
+    source: Stock alert document.
+  - value: STOCK_RED_ALERT
+    description: Available stock is at or below safety stock; create Production Demand.
+    source: Stock alert document.
+  - value: STOCKOUT_RISK
+    description: Available stock may not cover demand until production; prioritize production demand board.
+    source: Stock alert document.
+  - value: STOCK_ZERO_OR_NOT_SELLABLE
+    description: Available stock is zero or SKU is not sellable; activate Stock/Sellable Guard.
+    source: Stock alert document.
+compatibility:
+  breaking_change: Renaming these statuses is breaking for demand and stock/sellable guard consumers.
+todos: []

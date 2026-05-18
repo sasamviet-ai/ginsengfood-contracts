@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/business-platform/ivr/ivr-confirmation-requested.v1.json",
+  "title": "Ivr Confirmation Requested Event v1",
+  "description": "Published when IVR order confirmation is requested for an eligible Official Order only. It must not run for Quote, Cart, or Order Draft.",
+  "$comment": "Sources: PACK-09 IVR Official Order only; TECH-09 IVR eligibility.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique event identifier."
+    },
+    "eventType": {
+      "type": "string",
+      "const": "business-platform.ivr.ivr-confirmation-requested.v1",
+      "description": "Stable event type including source, domain, name, and v1 suffix."
+    },
+    "eventVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Event contract version."
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the domain event occurred."
+    },
+    "source": {
+      "type": "string",
+      "const": "business-platform",
+      "description": "System that owns and emits this event."
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Cross-system correlation identifier."
+    },
+    "causationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional parent command, event, or workflow identifier."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required when emitted from retryable or high-risk command; optional for derived read-model notifications."
+    },
+    "data": {
+      "allOf": [
+        {
+          "$ref": "../../../schemas/ivr/ivr-call-job.schema.json"
+        },
+        {
+          "type": "object",
+          "required": [
+            "ivr_call_job_id",
+            "version",
+            "official_order_id",
+            "call_purpose",
+            "not_for_quote_cart_draft"
+          ],
+          "properties": {
+            "call_purpose": {
+              "const": "ORDER_CONFIRMATION_ONLY"
+            },
+            "not_for_quote_cart_draft": {
+              "const": true
+            }
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "occurredAt",
+    "source",
+    "correlationId",
+    "data"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/channel/v1/human-takeover.schema.json",
+  "title": "Human Takeover",
+  "description": "Channel v1 human takeover contract for channel conversations where AI must pause and a human owner handles the case.",
+  "$comment": "Sources: PACK-05 and PACK-06 require human takeover for complaints, legal/media, payment dispute, privacy deletion, quality/adverse event, low confidence, or AI handoff-required cases. TODO: source snippets do not expose a fully locked human takeover state enum; enum contains conservative source-backed states.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "human_takeover_id": { "type": "string", "minLength": 1, "description": "Human takeover identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "channel_context_id": { "type": "string", "description": "Channel context under takeover." },
+    "status": { "type": "string", "description": "Human takeover status. Prefer enums/channel/human-takeover-status.yaml." },
+    "reason": { "type": "string", "description": "Reason for takeover. TODO: define official reason taxonomy." },
+    "owner_team": { "type": "string", "description": "Team or owner responsible for takeover." },
+    "assigned_actor": { "$ref": "../common/actor.schema.json" },
+    "ai_paused": { "type": "boolean", "description": "Whether AI responses are paused for this context." },
+    "return_to_ai_allowed": { "type": "boolean", "description": "Whether policy allows returning the conversation to AI." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["human_takeover_id", "version"]
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/bom-line.schema.json",
+  "title": "BOM Line",
+  "description": "BOM Line v1 contract for ingredients, anchor rice, packaging, and materials. Ratio-to-rice is captured where the source formula defines it.",
+  "$comment": "Sources: PACK-03 rice anchor and ratio_to_rice rules. TODO: unit conversion catalog and density handling are not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "bom_line_id": { "type": "string", "minLength": 1, "description": "BOM line identifier." },
+    "line_type": { "type": "string", "enum": ["ANCHOR_RICE", "INGREDIENT", "PACKAGING", "MATERIAL", "OUTPUT"], "description": "Line type used by formula, MRP, and packaging calculations." },
+    "ingredient_id": { "type": "string", "minLength": 1, "description": "Ingredient/material identifier for this line." },
+    "material_group": { "type": "string", "enum": ["A1", "A2", "A3", "B1", "B2", "B3"], "description": "Material group if the line participates in MRP or stock policy." },
+    "quantity": { "$ref": "../common/quantity.schema.json" },
+    "standardized_quantity": { "$ref": "../common/quantity.schema.json" },
+    "ratio_to_rice": { "type": "string", "description": "Ratio calculated as standardized quantity / standardized rice quantity * 100%. Required by policy for Group A pilot formula ingredients when applicable." },
+    "usage_basis": { "type": "string", "description": "Usage basis when ratio_to_rice is not available, for example liters/ml without density config. TODO: define allowed usage basis values." },
+    "is_anchor_rice": { "type": "boolean", "description": "True for the rice anchor line." },
+    "unit_policy": { "type": "string", "description": "Unit policy for this line." },
+    "rounding_policy": { "type": "string", "description": "Rounding policy for calculated quantities." }
+  },
+  "required": ["bom_line_id"]
+}

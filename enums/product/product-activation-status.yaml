@@ -1,0 +1,32 @@
+version: v1
+name: product-activation-status
+title: Product Activation Status
+description: Product Activation status values. Activation is Product/config readiness and does not equal sellable.
+source_documents:
+  - docs/documents/2_pack/PACK-02 - PRODUCT MASTER SKU INGREDIENT RECIPE FORMULA VERSION PRODUCT ACTIVATION.md
+values:
+  - value: PENDING_CONFIG
+    description: Required Product/Operational/Packaging/Print/QC/HSD/Trace/Recall config is missing.
+    source: PACK-02 activation guard.
+  - value: PENDING_EVIDENCE
+    description: Activation evidence is missing.
+    source: PACK-02 Product Activation Evidence Packet.
+  - value: PENDING_SMOKE
+    description: Smoke has not passed.
+    source: PACK-02 smoke gate.
+  - value: PENDING_OWNER_SIGNOFF
+    description: Owner sign-off is missing.
+    source: PACK-02 final status table.
+  - value: ACTIVE
+    description: Product Activation is active at Product/config level.
+    source: PACK-02 Product Activation Resolver.
+  - value: BLOCKED
+    description: Activation is blocked by guard conditions.
+    source: PACK-02 Product Activation Guard.
+  - value: NOT_SELLABLE_DEPENDENCY
+    description: Product/config activation exists but Operational Core Sellable Gate is not satisfied.
+    source: PACK-02 Sellable dependency rule.
+compatibility:
+  breaking_change: Treating ACTIVE as sellable is a breaking semantic change and violates PACK-02.
+todos:
+  - Confirm whether inactive/suspended activation needs a separate value in a later state-machine phase.

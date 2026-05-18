@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/live/v1/live-measurement-event.schema.json",
+  "title": "Live Measurement Event",
+  "description": "Live v1 measurement event contract for handing live funnel signals to Ads Measurement without treating live comments or inbox as revenue.",
+  "$comment": "Sources: PACK-08, TECH-08, PACK-07, and PACK-10. Live measurement handoff may feed funnel measurement, but official ROAS still depends on Verified Revenue. TODO: official live measurement event taxonomy is not locked.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "live_measurement_event_id": { "type": "string", "minLength": 1, "description": "Live measurement event identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "live_session_id": { "type": "string", "description": "Live session identifier." },
+    "channel_context_id": { "type": "string", "description": "Channel context for the live signal." },
+    "event_type": { "type": "string", "description": "Measurement event type. TODO: define official live measurement event enum." },
+    "funnel_event_id": { "type": "string", "description": "Ads funnel event created from this signal." },
+    "verified_revenue_link_id": { "type": "string", "description": "Verified revenue link if revenue was later verified." },
+    "raw_or_clean_status": { "type": "string", "description": "Whether the event is raw or cleaned. TODO: define official raw/clean status values." },
+    "not_revenue_by_itself": { "type": "boolean", "const": true, "description": "Invariant: live signal is not verified revenue by itself." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["live_measurement_event_id", "version"]
+}

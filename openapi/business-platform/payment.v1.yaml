@@ -1,0 +1,228 @@
+openapi: 3.1.0
+info:
+  title: GinsengFood Business Platform Payment API
+  version: 1.0.0
+  description: >
+    v1 contract for payment reference, bank transfer, and accounting review.
+    A payment must not be treated as paid without customer confirmation and
+    accounting review where required. This API does not create accounting
+    postings or MISA handoff records.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+tags:
+  - name: Payments
+  - name: Bank Transfers
+  - name: Accounting Review
+paths:
+  /v1/payments:
+    post:
+      tags:
+        - Payments
+      summary: Register a payment reference
+      description: >
+        Registers or updates the contract-level payment reference for an
+        official order. Payment status must not become PAID unless customer
+        confirmation and the required accounting review conditions are
+        satisfied. TODO: Finalize external payment provider and reconciliation
+        reference fields when source documents define them.
+      operationId: createPaymentReferenceV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/commerce/payment.schema.json
+      responses:
+        "200":
+          description: Payment reference accepted.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/commerce/payment.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/payments/{paymentId}:
+    get:
+      tags:
+        - Payments
+      summary: Get payment reference
+      description: >
+        Returns payment reference status for an official order. This endpoint is
+        a contract read and must not infer verified revenue by itself.
+      operationId: getPaymentReferenceV1
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment reference.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/commerce/payment.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/bank-transfers:
+    post:
+      tags:
+        - Bank Transfers
+      summary: Record a bank transfer signal
+      description: >
+        Records bank transfer information for accounting review. A transfer
+        signal is not a paid confirmation by itself.
+      operationId: createBankTransferV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/commerce/bank-transfer.schema.json
+      responses:
+        "200":
+          description: Bank transfer signal recorded.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/commerce/bank-transfer.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/accounting-reviews:
+    post:
+      tags:
+        - Accounting Review
+      summary: Submit payment accounting review
+      description: >
+        Captures accounting review status for payment evidence. This endpoint
+        does not create MISA vouchers or inventory/accounting postings.
+      operationId: createAccountingReviewV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/commerce/accounting-review.schema.json
+      responses:
+        "200":
+          description: Accounting review recorded.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/commerce/accounting-review.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    BadRequest:
+      description: Invalid request syntax or parameters.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Unauthorized:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Forbidden:
+      description: Caller is not allowed to perform this operation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    NotFound:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Conflict:
+      description: Request conflicts with current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    UnprocessableEntity:
+      description: Request is syntactically valid but violates contract validation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json

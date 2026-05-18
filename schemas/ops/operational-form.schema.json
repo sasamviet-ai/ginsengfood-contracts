@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/operational-form.schema.json",
+  "title": "Operational Form",
+  "description": "Operational Form v1 contract for FRM-01 through FRM-27. Forms must carry form code, source object, auto-generated/inherited fields, confirmation, evidence, audit, and status.",
+  "$comment": "Sources: Operational Forms pack and PHIEU TU SINH. TODO: official per-form payload schemas will be generated in later phases if source documents lock them.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "operational_form_id": { "type": "string", "minLength": 1, "description": "Operational form identifier." },
+    "form_code": { "type": "string", "pattern": "^FRM-[0-9]{2}$", "description": "Form code, e.g. FRM-01 through FRM-27." },
+    "form_type": { "type": "string", "description": "Human-readable form type." },
+    "status": { "type": "string", "description": "Operational form status. Prefer enums/ops/operational-form-status.yaml." },
+    "source_object": { "$ref": "../common/source-ref.schema.json" },
+    "previous_form_id": { "type": "string", "minLength": 1, "description": "Previous form inherited by this form when applicable." },
+    "production_profile_id": { "type": "string", "minLength": 1, "description": "Original production profile/source profile when forms inherit from it." },
+    "auto_generated_fields": { "type": "object", "additionalProperties": true, "description": "Fields auto-generated or auto-pulled by the system; not operator-entered business logic." },
+    "manual_fields": { "type": "object", "additionalProperties": true, "description": "Fields that operators are allowed to enter manually when source documents allow." },
+    "confirmations": {
+      "type": "array",
+      "description": "Personal confirmation block required before transitions.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "actor": { "$ref": "../common/actor.schema.json" },
+          "confirmation_status": { "type": "string" },
+          "confirmed_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "misa_checkpoint": { "type": "boolean", "description": "Whether this form can create or represent a MISA checkpoint." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["operational_form_id", "form_code"]
+}

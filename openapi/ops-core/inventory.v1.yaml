@@ -1,0 +1,124 @@
+openapi: 3.1.0
+info:
+  title: Ops Core Inventory API
+  version: 1.0.0
+  description: Inventory v1 API contract for stock balances, ledger reads, and stock alerts. Inventory Ledger is append-only and is not directly mutable through consumer API.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+paths:
+  /v1/inventory/stock-balances:
+    get:
+      summary: List stock balances
+      description: Returns derived stock balances. This API is available to business-platform for sellable/availability checks but must not mutate ops-core inventory truth.
+      operationId: listStockBalancesV1
+      tags: [inventory]
+      parameters:
+        - name: skuId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: materialId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: warehouseId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: itemType
+          in: query
+          required: false
+          schema: { type: string, enum: [MATERIAL, PACKAGING, FINISHED_GOOD] }
+      responses:
+        "200":
+          description: Stock balances wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "../../schemas/ops/stock-balance.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/inventory/ledger:
+    get:
+      summary: List inventory ledger entries
+      description: Returns inventory ledger entries for audit/ops views. No POST/PATCH/DELETE is exposed here because consumer APIs must not directly edit ledger truth.
+      operationId: listInventoryLedgerV1
+      tags: [inventory]
+      responses:
+        "200":
+          description: Inventory ledger entries wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "../../schemas/ops/inventory-ledger.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/inventory/stock-alerts:
+    get:
+      summary: List stock alerts
+      description: "Lists stock alert contracts for ops-core planning. TODO: source documents do not lock final alert filter fields."
+      operationId: listStockAlertsV1
+      tags: [inventory]
+      responses:
+        "200":
+          description: Stock alerts wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "../../schemas/ops/stock-alert.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+components:
+  schemas:
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error:
+              $ref: "../../schemas/common/error.schema.json"
+  responses:
+    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

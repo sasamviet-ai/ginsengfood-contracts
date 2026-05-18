@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/channel/v1/channel-delivery.schema.json",
+  "title": "Channel Delivery",
+  "description": "Channel v1 delivery contract for policy-checked outbound channel responses.",
+  "$comment": "Sources: TECH-06 Channel Delivery State Model. Delivery must pass policy, visibility, duplicate/rate-limit, and human takeover checks before send.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "channel_delivery_id": { "type": "string", "minLength": 1, "description": "Channel delivery identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "channel_context_id": { "type": "string", "description": "Channel context for delivery." },
+    "response_instruction_id": { "type": "string", "description": "AI response instruction or human-authored response reference." },
+    "status": { "type": "string", "description": "Delivery status. Prefer enums/channel/channel-delivery-status.yaml." },
+    "visibility_state": { "type": "string", "description": "Visibility decision used for delivery." },
+    "delivery_target": { "type": "string", "description": "Target channel object. TODO: define structured target schema by channel." },
+    "guard_passed": { "type": "boolean", "description": "Whether delivery guard passed." },
+    "rate_limited": { "type": "boolean", "description": "Whether delivery was rate limited." },
+    "duplicate_blocked": { "type": "boolean", "description": "Whether duplicate delivery was blocked." },
+    "retry_count": { "type": "integer", "minimum": 0, "description": "Retry count for delivery." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["channel_delivery_id", "version"]
+}

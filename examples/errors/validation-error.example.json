@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-error-validation-001",
+    "sourceSystem": "business-platform",
+    "timestamp": "2026-05-18T09:00:00+07:00"
+  },
+  "error": {
+    "code": "VALIDATION.REQUIRED_FIELD_MISSING",
+    "message": "Required field is missing.",
+    "httpStatus": 422,
+    "details": [
+      {
+        "field": "data.sku_id",
+        "reason": "sku_id is required for an availability check."
+      }
+    ],
+    "correlationId": "corr-error-validation-001",
+    "auditId": "audit-error-validation-001"
+  }
+}

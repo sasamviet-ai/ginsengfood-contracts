@@ -1,0 +1,71 @@
+version: v1
+name: audit-action
+title: Audit Action
+description: Common audit action values explicitly supported by TECH-01 foundation audit requirements.
+source_documents:
+  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
+values:
+  - value: LOGIN
+    description: Login action.
+    source: TECH-01 Audit Category Model includes login.
+  - value: LOGOUT
+    description: Logout action.
+    source: TECH-01 Audit Category Model includes logout.
+  - value: FAILED_LOGIN
+    description: Failed login action.
+    source: TECH-01 Audit Category Model includes failed login.
+  - value: ROLE_CREATED
+    description: Role created.
+    source: TECH-01 RBAC audit requirement.
+  - value: ROLE_UPDATED
+    description: Role updated.
+    source: TECH-01 RBAC audit requirement.
+  - value: ROLE_ASSIGNED
+    description: Role assigned.
+    source: TECH-01 RBAC audit requirement.
+  - value: PERMISSION_GRANTED
+    description: Permission granted.
+    source: TECH-01 RBAC audit requirement.
+  - value: PERMISSION_REVOKED
+    description: Permission revoked.
+    source: TECH-01 RBAC audit requirement.
+  - value: SERVICE_ACCOUNT_PERMISSION_CHANGED
+    description: Service account permission changed.
+    source: TECH-01 RBAC audit requirement.
+  - value: EXPORT_PERMISSION_USED
+    description: Export permission used.
+    source: TECH-01 RBAC audit requirement.
+  - value: ACCESS_DENIED
+    description: Sensitive or protected action denied.
+    source: TECH-01 RBAC smoke and audit requirements.
+  - value: ADMIN_OVERRIDE
+    description: Admin override action.
+    source: TECH-01 audit P0 blockers and smoke matrix.
+  - value: AUDIT_CORRECTION
+    description: Correction audit record created; old audit remains unchanged.
+    source: TECH-01 audit append-only requirement.
+  - value: EVIDENCE_SUBMITTED
+    description: Evidence submitted.
+    source: TECH-01 Evidence Audit category.
+  - value: EVIDENCE_ACCEPTED
+    description: Evidence accepted.
+    source: TECH-01 audit smoke matrix.
+  - value: EVIDENCE_REJECTED
+    description: Evidence rejected.
+    source: TECH-01 Evidence Audit category.
+  - value: RELEASE_APPROVED
+    description: Release approved.
+    source: TECH-01 release approve audit smoke.
+  - value: RELEASE_HELD
+    description: Release held.
+    source: TECH-01 idempotency command list.
+  - value: RELEASE_ROLLED_BACK
+    description: Release rolled back.
+    source: TECH-01 idempotency command list.
+  - value: GO_LIVE_APPROVED
+    description: Go-live approved.
+    source: TECH-01 idempotency command list.
+compatibility:
+  breaking_change: Renaming, removing, or changing the meaning of an audit action is breaking.
+todos:
+  - TECH-01 defines many domain-specific audited actions. Keep this common enum limited to foundation actions until domain phases generate their own action enums.

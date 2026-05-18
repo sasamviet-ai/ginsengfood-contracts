@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/public-trace.schema.json",
+  "title": "Public Trace",
+  "description": "Public Trace v1 contract for safe trace exposure. Public trace must not expose internal operational data.",
+  "$comment": "Sources: PACK-01 public trace negative smoke. TODO: exact public payload schema and privacy exclusions are not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "public_trace_id": { "type": "string", "minLength": 1, "description": "Public trace identifier." },
+    "trace_chain_id": { "type": "string", "minLength": 1, "description": "Internal trace chain source." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU shown in public trace." },
+    "batch_id": { "type": "string", "minLength": 1, "description": "Batch shown in public trace when allowed." },
+    "status": { "type": "string", "description": "Public trace status. TODO: define official values." },
+    "public_payload": { "type": "object", "additionalProperties": true, "description": "Public-safe payload only. TODO: define exact fields later." },
+    "internal_data_excluded": { "type": "boolean", "description": "True when internal data has been excluded." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["public_trace_id"]
+}

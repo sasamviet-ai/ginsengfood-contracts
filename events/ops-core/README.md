@@ -1,7 +1,13 @@
 # events/ops-core
 
-Thư mục này chứa event payload contracts phát ra từ `ginsengfood-ops-core`.
+Events published by `ginsengfood-ops-core`.
 
-Consumer chính là `ginsengfood-business-platform` và các contract tests liên quan. Không đặt .NET handler, domain service, database migration hoặc event bus config vào đây.
+Consumer chinh la `ginsengfood-business-platform` va contract tests. Khong dat .NET handler, service logic, database migration, broker config, hay operational truth mutation code vao day.
 
-Ví dụ nhóm event: product, inventory, sellable, recall và MISA handoff. Event breaking change phải tăng major version hoặc publish event mới có migration note.
+## Groups
+
+- `product`: product activation, formula approval, suspension.
+- `inventory`: warehouse receipt confirmation, stock availability, stock threshold/risk signals.
+- `sellable`: sellable status change signals consumed by commerce/channel/ads/live.
+- `recall`: recall, sale lock, and stop-sale suppression events.
+- `misa`: accounting handoff and MISA sync result events; these do not modify Operational Truth.

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/channel/v1/channel-context.schema.json",
+  "title": "Channel Context",
+  "description": "Channel v1 context contract that identifies public/private/internal boundary before AI response, handoff, or delivery.",
+  "$comment": "Sources: PACK-06 and TECH-06 Channel Gateway. Public comments, live comments, Messenger, CRM outbound, internal test, and unknown contexts must be separated. TODO: source documents do not define all channel payload fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "channel_context_id": { "type": "string", "minLength": 1, "description": "Channel context identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "channel_type": { "type": "string", "description": "Channel type. Prefer enums/channel/channel-type.yaml." },
+    "visibility_state": { "type": "string", "description": "Visibility/public-safe state. Prefer enums/channel/visibility-state.yaml." },
+    "source_event_id": { "type": "string", "description": "Source channel event identifier." },
+    "page_id": { "type": "string", "description": "Facebook page identifier when applicable." },
+    "post_id": { "type": "string", "description": "Facebook post identifier when applicable." },
+    "live_session_id": { "type": "string", "description": "Live session identifier when applicable." },
+    "messenger_thread_id": { "type": "string", "description": "Messenger thread identifier when applicable." },
+    "customer_id": { "type": "string", "description": "Customer reference if resolved." },
+    "public_private_boundary": { "type": "string", "description": "Boundary decision for this context. TODO: define official boundary enum if separate from visibility-state." },
+    "human_takeover_status": { "type": "string", "description": "Human takeover status. Prefer enums/channel/human-takeover-status.yaml." },
+    "correlation": { "$ref": "../common/correlation.schema.json" },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["channel_context_id", "version"]
+}

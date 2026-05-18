@@ -1,0 +1,32 @@
+version: v1
+name: mrp-status
+title: MRP Status
+description: MRP Run and MRP guard status values for formula scaling, material requirements, and procurement suppression.
+source_documents:
+  - docs/documents/2_pack/PACK-03 - DEMAND MRP FORMULA SCALING PROCUREMENT STOCK ALERT MATERIAL PACKAGING CONTROL PACK.md
+values:
+  - value: PENDING
+    description: MRP run has not completed.
+    source: Conservative lifecycle value.
+  - value: RUNNING
+    description: MRP calculation is running.
+    source: Conservative lifecycle value.
+  - value: COMPLETED
+    description: MRP run completed and produced requirements.
+    source: PACK-03 MRP Run.
+  - value: BLOCKED_CONFIG_MISSING
+    description: Required formula, UOM, stock policy, or config is missing.
+    source: PACK-03 BLOCKED_CONFIG_MISSING.
+  - value: PROCUREMENT_SUPPRESSED
+    description: Available stock plus approved incoming is at or above threshold, so procurement is suppressed.
+    source: PACK-03 PROCUREMENT_SUPPRESSED.
+  - value: DIRECTOR_APPROVAL_REQUIRED
+    description: Large-plan override requires director approval.
+    source: PACK-03 DIRECTOR_APPROVAL_REQUIRED.
+  - value: FAILED
+    description: MRP run failed.
+    source: TODO: failure taxonomy is not specified.
+compatibility:
+  breaking_change: Weakening BLOCKED_CONFIG_MISSING, PROCUREMENT_SUPPRESSED, or DIRECTOR_APPROVAL_REQUIRED semantics is breaking.
+todos:
+  - Split MRP run status from procurement suppression result if future documents define separate state machines.

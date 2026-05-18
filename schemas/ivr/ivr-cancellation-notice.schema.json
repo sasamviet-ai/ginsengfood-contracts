@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ivr/v1/ivr-cancellation-notice.schema.json",
+  "title": "IVR Cancellation Notice",
+  "description": "IVR v1 cancellation notice contract for notifying customers only after Core Order State Machine policy accepts cancellation/hold result.",
+  "$comment": "Sources: PACK-09 and TECH-09. IVR technical exception must not send cancellation notice, and SIM gateway/raw IVR result must not directly notify cancellation. TODO: source documents do not lock notification channel payload schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ivr_cancellation_notice_id": { "type": "string", "minLength": 1, "description": "IVR cancellation notice identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "ivr_call_result_id": { "type": "string", "description": "IVR result that contributed input signal." },
+    "official_order_id": { "type": "string", "description": "Official Order identifier." },
+    "notice_trigger": { "type": "string", "description": "Trigger for notice. TODO: define official trigger enum." },
+    "allowed_after_core_cancelled": { "type": "boolean", "description": "Whether Core Order State Machine accepted cancellation before notice." },
+    "not_sent_for_technical_exception": { "type": "boolean", "const": true, "description": "Invariant: no cancellation notice for technical exception." },
+    "not_sent_by_sim_gateway": { "type": "boolean", "const": true, "description": "Invariant: SIM gateway/raw IVR does not send cancellation notice directly." },
+    "privacy_safe": { "type": "boolean", "description": "Whether notice content is privacy-safe for selected channel." },
+    "notification_owner_ref": { "$ref": "../common/source-ref.schema.json" },
+    "status": { "type": "string", "description": "Notice status. TODO: define notification notice status enum." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["ivr_cancellation_notice_id", "version"]
+}

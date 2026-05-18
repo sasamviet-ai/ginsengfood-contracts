@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/pagination.schema.json",
+  "title": "Common Pagination",
+  "description": "Common v1 pagination placeholder for list contracts.",
+  "$comment": "TODO: Phase 1 source documents do not define a concrete pagination model. Keep all fields optional until an API source document defines cursor/page rules.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "page": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional page number if a future API contract uses page-based pagination."
+    },
+    "pageSize": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional page size if a future API contract uses page-based pagination."
+    },
+    "totalItems": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Optional total item count when the provider exposes it."
+    },
+    "nextCursor": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional cursor for the next page when cursor pagination is used."
+    },
+    "previousCursor": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional cursor for the previous page when cursor pagination is used."
+    }
+  }
+}

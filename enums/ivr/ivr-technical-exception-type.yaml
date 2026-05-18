@@ -1,0 +1,36 @@
+version: v1
+name: ivr-technical-exception-type
+title: IVR Technical Exception Type
+description: IVR v1 technical exception categories for failures that must not be treated as no-answer.
+source_documents:
+  - docs/documents/2_pack/PACK-09 - IVR_ORDER_CONFIRMATION.md
+  - docs/documents/3_tech/TECH-09 - IVR ORDER CONFIRMATION AUTO CALL VERIFICATION ANTI-FAKE-ORDER CONTROL.md
+values:
+  - value: IVR_TECHNICAL_EXCEPTION
+    description: Generic IVR technical exception.
+  - value: IVR_CAPACITY_EXCEPTION
+    description: Capacity exception.
+  - value: TECHNICAL_FAILURE
+    description: Generic technical failure outcome.
+  - value: PROVIDER_FAILURE
+    description: Provider failure outcome.
+  - value: SIM_GATEWAY_FAILURE
+    description: SIM gateway failure.
+  - value: SERVER_ERROR
+    description: Server error.
+  - value: DTMF_CAPTURE_ERROR
+    description: DTMF capture error.
+  - value: AUDIO_PLAYBACK_ERROR
+    description: Audio playback error.
+  - value: SCHEDULER_ERROR
+    description: Scheduler error.
+  - value: CALLBACK_ERROR
+    description: Callback error.
+  - value: ATTEMPT_POLICY_UNAVAILABLE
+    description: Attempt Policy Resolver unavailable.
+  - value: PRIVACY_POLICY_UNAVAILABLE
+    description: Privacy Policy unavailable.
+compatibility:
+  breaking_change: Hiding technical exception or converting it to customer no-answer is breaking.
+todos:
+  - Source docs list technical failure categories in prose; confirm whether these should stay one enum or split by provider/system.

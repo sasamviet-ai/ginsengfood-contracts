@@ -1,0 +1,30 @@
+version: v1
+namespace: PERMISSION
+title: Permission Errors
+description: Common RBAC and permission errors for protected actions.
+source_documents:
+  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
+codes:
+  - code: PERMISSION.ACCESS_DENIED
+    httpStatus: 403
+    message: Access denied.
+    description: TECH-01 RBAC smoke expects unauthorized sensitive actions to be blocked and audited.
+    retryable: false
+  - code: PERMISSION.MISSING_PERMISSION
+    httpStatus: 403
+    message: Required permission is missing.
+    description: TECH-01 requires action-level permission and backend/application enforcement.
+    retryable: false
+  - code: PERMISSION.OUT_OF_SCOPE
+    httpStatus: 403
+    message: Actor is outside the allowed scope.
+    description: TECH-01 requires permission checks to respect scope; service accounts must be within scope.
+    retryable: false
+  - code: PERMISSION.GUARD_NOT_PASSED
+    httpStatus: 409
+    message: Permission exists but guard did not pass.
+    description: TECH-01 says permission is not enough; guard conditions must also pass.
+    retryable: false
+compatibility:
+  breaking_change: Removing or changing code semantics is breaking.
+todos: []

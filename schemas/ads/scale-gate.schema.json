@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ads/v1/scale-gate.schema.json",
+  "title": "Scale Gate",
+  "description": "Ads v1 scale gate contract requiring verified revenue, data quality, attribution clarity, and owner decision before ads scale.",
+  "$comment": "Sources: PACK-07, TECH-07, PACK-10, and TECH-01 role boundary. Ads measurement pilot is not Ads scale; Ads operator may view measurement but cannot self-approve scale. TODO: exact scale threshold fields are not defined by source docs.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "scale_gate_id": { "type": "string", "minLength": 1, "description": "Scale gate identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "campaign_id": { "type": "string", "description": "Campaign identifier." },
+    "roas_measurement_id": { "type": "string", "description": "ROAS measurement reference." },
+    "data_quality_status_id": { "type": "string", "description": "Data quality status reference." },
+    "verified_revenue_link_id": { "type": "string", "description": "Verified revenue link reference." },
+    "owner_decision": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "scale_decision": { "type": "string", "description": "Scale decision. TODO: define official scale decision enum." },
+    "blocked_reason": { "type": "string", "description": "Reason scale is blocked." },
+    "no_auto_scale_without_owner_approval": { "type": "boolean", "const": true, "description": "Invariant: scale requires owner decision." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["scale_gate_id", "version"]
+}

@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/audit.schema.json",
+  "title": "Audit Record",
+  "description": "Common v1 audit record for business and control actions that require traceability.",
+  "$comment": "Source: TECH-01 Audit Record Standard lists audit ID, actor, role snapshot, permission, action, object, state, reason, result, environment, source channel, correlation ID, idempotency key, timestamp, and safe metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "auditId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Audit identifier."
+    },
+    "auditCategory": {
+      "type": "string",
+      "enum": [
+        "AUTH_AUDIT",
+        "RBAC_AUDIT",
+        "MASTER_DATA_AUDIT",
+        "OPERATIONAL_AUDIT",
+        "INVENTORY_AUDIT",
+        "TRACE_AUDIT",
+        "RECALL_AUDIT",
+        "COMMERCE_AUDIT",
+        "PAYMENT_AUDIT",
+        "AI_AUDIT",
+        "CHANNEL_AUDIT",
+        "ADS_AUDIT",
+        "LIVE_AUDIT",
+        "IVR_AUDIT",
+        "EVIDENCE_AUDIT",
+        "RELEASE_AUDIT",
+        "SECURITY_AUDIT"
+      ],
+      "description": "Audit category from TECH-01 audit category model."
+    },
+    "actor": {
+      "$ref": "actor.schema.json"
+    },
+    "permissionChecked": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Permission checked for the action, when applicable."
+    },
+    "action": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Action being audited. Prefer values from enums/common/audit-action.yaml when one exists."
+    },
+    "objectType": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Type of object affected by the action."
+    },
+    "objectId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of the object affected by the action."
+    },
+    "fromState": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Previous state, if the action changes state."
+    },
+    "toState": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Next state, if the action changes state."
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reason for a risky, denied, blocked, fallback, suppression, or correction action."
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "SUCCESS",
+        "DENIED",
+        "FAILED"
+      ],
+      "description": "Audit result from TECH-01 Audit Record Standard."
+    },
+    "failureReason": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reason when result is FAILED or DENIED."
+    },
+    "environment": {
+      "type": "string",
+      "enum": [
+        "LOCAL",
+        "DEV",
+        "STAGING",
+        "PILOT",
+        "PROD"
+      ],
+      "description": "Environment from TECH-01 Audit Record Standard."
+    },
+    "sourceChannel": {
+      "type": "string",
+      "enum": [
+        "ADMIN",
+        "PWA",
+        "AI",
+        "GATEWAY",
+        "WORKER",
+        "IVR"
+      ],
+      "description": "Source channel from TECH-01 Audit Record Standard."
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Correlation ID for request or flow traceability."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Idempotency key when the audited command is idempotent."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Audit timestamp."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Safe metadata only. Do not include secrets, full payment credentials, or unnecessary sensitive data.",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "auditId",
+    "actor",
+    "action",
+    "result",
+    "correlationId",
+    "timestamp"
+  ]
+}

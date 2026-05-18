@@ -1,7 +1,27 @@
 # enums/common
 
-Thư mục này chứa enum dùng chung xuyên domain.
+This folder contains v1 common enums shared by `ginsengfood-ops-core` and `ginsengfood-business-platform`.
 
-Không đặt enum chỉ thuộc product, ops, commerce, channel hoặc IVR vào đây nếu không dùng chung thật sự. Không đặt generated code hoặc database seed.
+These enums are foundation values for API, event, schema, evidence, audit, resolver, guard, and release contracts. They must not contain domain-only statuses such as product lifecycle, inventory state, order state, payment state, IVR call state, ads lifecycle, or live session state.
 
-Ví dụ file sau này: `source-system-v1.md`, `actor-type-v1.md`, `error-severity-v1.md`. Enum value đã publish không được đổi meaning nếu chưa review.
+Allowed content:
+
+- Actor type values.
+- Evidence lifecycle/status values.
+- Foundation audit action values.
+- Release, completion, gateway, and go-live status values.
+- Guard decision values.
+- Runtime resolution status values.
+
+Rules:
+
+- Every enum file must declare `version: v1`.
+- Enum values must be source-backed from `docs/documents/` or an existing standard in `docs/`.
+- Adding a new optional enum value may still require consumer review.
+- Removing, renaming, or changing the meaning of an enum value is a breaking change and must be recorded under `compatibility/`.
+- Do not add generated code, database seed data, UI labels, or business logic here.
+
+TODO:
+
+- `evidence-status.yaml` intentionally keeps both `DRAFT` and `PENDING` because TECH-01 and MASTER-03/MASTER-05 use overlapping lifecycle wording. A later evidence registry contract should decide whether they remain distinct.
+- `release-status.yaml` currently combines completion, gateway, and release decision statuses because Phase 1 documents use them together. Phase 7 compatibility notes may split them if needed.

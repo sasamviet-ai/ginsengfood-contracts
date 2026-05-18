@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/channel/v1/messenger-thread.schema.json",
+  "title": "Messenger Thread",
+  "description": "Channel v1 Messenger thread contract used for private conversation context and public-comment-to-private handoff.",
+  "$comment": "Sources: PACK-06 and TECH-06. Messenger/private channel may carry private context only under policy and must preserve source context from public comment handoff.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "messenger_thread_id": { "type": "string", "minLength": 1, "description": "Messenger thread identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "channel_context_id": { "type": "string", "description": "Linked channel context." },
+    "customer_id": { "type": "string", "description": "Customer reference if resolved." },
+    "source_comment_id": { "type": "string", "description": "Public comment that initiated this private thread, if any." },
+    "visibility_state": { "type": "string", "description": "Visibility state, normally private-safe for Messenger." },
+    "private_context_confirmed": { "type": "boolean", "description": "Whether private thread is bound and safe to continue private workflow." },
+    "human_takeover_status": { "type": "string", "description": "Human takeover status when human agent is required." },
+    "correlation": { "$ref": "../common/correlation.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["messenger_thread_id", "version"]
+}

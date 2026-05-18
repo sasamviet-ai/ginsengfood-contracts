@@ -1,0 +1,45 @@
+version: v1
+name: inventory-movement-type
+title: Inventory Movement Type
+description: Inventory Ledger movement types for append-only stock movements.
+source_documents:
+  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+  - docs/documents/2_pack/operational_more/DANH_MUC_PHAN_NHOM_NGUYEN_LIEU_VAT_TU_2_V1_2_CLEAN_FINAL 3(1).md
+values:
+  - value: RAW_MATERIAL_RECEIPT
+    description: Raw material receipt movement.
+    source: PACK-01 intake chain.
+  - value: MATERIAL_ISSUE
+    description: Material issue to production.
+    source: PACK-01 material issue chain.
+  - value: MATERIAL_RECEIPT
+    description: Material receipt or return movement.
+    source: PACK-01 material receipt chain.
+  - value: PRODUCTION_OUTPUT
+    description: Production output before or at warehouse receipt boundary.
+    source: PACK-01 production execution chain.
+  - value: WAREHOUSE_RECEIPT_CONFIRMED
+    description: Finished goods warehouse receipt confirmed movement.
+    source: PACK-01 inventory increases at Warehouse Receipt Confirmed.
+  - value: QUALITY_HOLD
+    description: Movement or classification for quality hold.
+    source: PACK-01 Hold behavior.
+  - value: RECALL_HOLD
+    description: Movement or classification for recall hold.
+    source: PACK-01 Recall/Hold.
+  - value: SALE_LOCK_HOLD
+    description: Movement or classification for sale-lock hold affecting availability.
+    source: PACK-01 Sale Lock.
+  - value: RELEASE_FROM_HOLD
+    description: Release from hold.
+    source: PACK-01 recovery/release behavior.
+  - value: WRITE_OFF
+    description: Inventory write-off/disposal movement.
+    source: PACK-03 disposal/write-off flow.
+  - value: ADJUSTMENT
+    description: Controlled adjustment movement.
+    source: TODO: exact adjustment policy is not specified.
+compatibility:
+  breaking_change: Removing movement types can break ledger consumers and stock balance derivation.
+todos:
+  - Confirm final movement taxonomy and whether hold entries are movement types or balance classifications.

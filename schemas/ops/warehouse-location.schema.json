@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/warehouse-location.schema.json",
+  "title": "Warehouse Location",
+  "description": "Warehouse Location v1 contract for location-level stock balance and ledger references.",
+  "$comment": "Sources: PACK-01 warehouse/inventory registry. TODO: source documents do not define a warehouse location taxonomy.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "warehouse_location_id": { "type": "string", "minLength": 1, "description": "Warehouse location identifier." },
+    "warehouse_id": { "type": "string", "minLength": 1, "description": "Parent warehouse identifier." },
+    "location_code": { "type": "string", "minLength": 1, "description": "Location code." },
+    "location_name": { "type": "string", "minLength": 1, "description": "Location name." },
+    "location_type": { "type": "string", "description": "Location type. TODO: define official values." },
+    "status": { "type": "string", "description": "Location status. TODO: define official values." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["warehouse_location_id"]
+}

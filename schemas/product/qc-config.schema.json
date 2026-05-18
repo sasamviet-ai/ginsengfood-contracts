@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/qc-config.schema.json",
+  "title": "QC Config",
+  "description": "QC Config v1 contract for SKU or material quality thresholds. PACK-01 locks moisture thresholds: below 2% PASS, 2%-4% HOLD/REVIEW, above 4% FAIL.",
+  "$comment": "Sources: PACK-01 QC threshold registry and PACK-02 QC Config requirement. TODO: full sensory and microbiology criteria are not specified in Phase 2 sources.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "qc_config_id": { "type": "string", "minLength": 1, "description": "QC config identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "Configured SKU when SKU-specific." },
+    "ingredient_id": { "type": "string", "minLength": 1, "description": "Configured ingredient/material when material-specific." },
+    "status": { "type": "string", "description": "Config status. Prefer enums/product/config-status.yaml." },
+    "moisture_pass_below_percent": { "type": "string", "description": "PASS threshold from PACK-01: below 2%." },
+    "moisture_hold_review_from_percent": { "type": "string", "description": "HOLD/REVIEW lower threshold from PACK-01: 2%." },
+    "moisture_fail_above_percent": { "type": "string", "description": "FAIL threshold from PACK-01: above 4%." },
+    "qc_required": { "type": "boolean", "description": "Whether QC is required before downstream use." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["qc_config_id"]
+}

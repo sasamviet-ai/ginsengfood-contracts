@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/quantity.schema.json",
+  "title": "Quantity",
+  "description": "Common v1 quantity placeholder for future API and event contracts.",
+  "$comment": "TODO: Phase 1 source documents do not define unit catalogs, precision, or conversion policy. Fields are intentionally minimal until product/ops sources define concrete units.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "value": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Quantity value represented as a string to avoid precision loss. TODO: define numeric format from a source document."
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unit code or label. TODO: define the allowed unit set from product/ops source documents."
+    }
+  }
+}

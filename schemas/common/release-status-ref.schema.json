@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/release-status-ref.schema.json",
+  "title": "Release Status Reference",
+  "description": "Common v1 release, completion, gateway, or go-live status reference.",
+  "$comment": "Source: MASTER-05, MASTER-07, and TECH-10 define release/completion/gateway status values and require evidence, audit, owner sign-off, and correlation before PASS/READY/GO-LIVE claims.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "releaseStatus": {
+      "type": "string",
+      "enum": [
+        "NOT_STARTED",
+        "IN_PROGRESS",
+        "PENDING_EVIDENCE",
+        "UNDER_REVIEW",
+        "BLOCKED",
+        "GATE_REVIEW_READY",
+        "GATE_PASS",
+        "RELEASE_REVIEW_READY",
+        "RELEASE_APPROVED",
+        "DOCUMENTATION_COMPLETE_PENDING_EVIDENCE",
+        "EVIDENCE_SUBMITTED_PENDING_REVIEW",
+        "EVIDENCE_ACCEPTED_PENDING_SMOKE",
+        "SMOKE_RUNNING",
+        "SMOKE_PASS_PENDING_UAT",
+        "UAT_RUNNING",
+        "UAT_PASS_PENDING_OWNER_SIGNOFF",
+        "OWNER_SIGNED_PENDING_RELEASE_DECISION",
+        "RELEASE_APPROVED_PENDING_GO_LIVE",
+        "GO_LIVE_APPROVED",
+        "GO_LIVE_BLOCKED",
+        "ROLLBACK_REQUIRED",
+        "ROLLED_BACK",
+        "PAUSED",
+        "LIVE"
+      ],
+      "description": "Release, gateway, or completion status from MASTER-05, MASTER-07, and TECH-10."
+    },
+    "releaseDecisionId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Release or final decision identifier."
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Release or gate scope."
+    },
+    "evidencePackageId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Evidence package supporting the status."
+    },
+    "ownerSignoffId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Owner sign-off supporting release approval or go-live approval."
+    },
+    "auditId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Audit record for this status."
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Correlation ID for release/gate traceability."
+    },
+    "decidedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Decision or status timestamp."
+    }
+  },
+  "required": [
+    "releaseStatus"
+  ]
+}

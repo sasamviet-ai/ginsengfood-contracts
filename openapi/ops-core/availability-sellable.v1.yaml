@@ -1,0 +1,105 @@
+openapi: 3.1.0
+info:
+  title: Ops Core Availability Sellable API
+  version: 1.0.0
+  description: Availability and sellable v1 API contract. Business-platform may check sellable status but must not mutate ops-core truth.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+paths:
+  /v1/availability/check:
+    post:
+      summary: Check availability and sellable status
+      description: "Checks ops-core sellable/availability state for a SKU or batch. This endpoint is a read/guard check for business-platform and does not mutate inventory, recall, sale lock, trace, batch, or warehouse truth. TODO: source documents do not define a dedicated availability-check request schema for ops-core OpenAPI."
+      operationId: checkAvailabilityV1
+      tags: [availability-sellable]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AvailabilityCheckRequest"
+      responses:
+        "200":
+          description: Sellable status wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/sellable-status.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/sellable-statuses/{sellableStatusId}:
+    get:
+      summary: Get sellable status
+      description: Returns a previously resolved sellable status record for audit/consumer traceability.
+      operationId: getSellableStatusV1
+      tags: [availability-sellable]
+      parameters:
+        - name: sellableStatusId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        "200":
+          description: Sellable status wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/sellable-status.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+components:
+  schemas:
+    AvailabilityCheckRequest:
+      type: object
+      additionalProperties: false
+      description: "Minimal v1 availability check request. TODO: replace with a dedicated schema if source docs later define quantity, channel, and reservation semantics."
+      properties:
+        sku_id:
+          type: string
+          minLength: 1
+        batch_id:
+          type: string
+          minLength: 1
+        requested_quantity:
+          $ref: "../../schemas/common/quantity.schema.json"
+        channel_context:
+          $ref: "../../schemas/common/source-ref.schema.json"
+        correlation:
+          $ref: "../../schemas/common/correlation.schema.json"
+      required: [sku_id]
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error:
+              $ref: "../../schemas/common/error.schema.json"
+  responses:
+    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

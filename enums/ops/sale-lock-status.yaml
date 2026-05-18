@@ -1,0 +1,26 @@
+version: v1
+name: sale-lock-status
+title: Sale Lock Status
+description: Sale Lock / Stop Sale v1 status values.
+source_documents:
+  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+values:
+  - value: ACTIVE
+    description: Sale lock is active and must suppress field app and consumer actions.
+    source: PACK-01 Sale Lock active behavior.
+  - value: RELEASE_REQUESTED
+    description: Release from sale lock has been requested and needs evidence/sign-off.
+    source: PACK-01 recovery evidence/sign-off.
+  - value: RELEASED
+    description: Sale lock has been released.
+    source: PACK-01 recovery behavior.
+  - value: REVIEW_REQUIRED
+    description: Sale lock action requires review.
+    source: PACK-01 REVIEW_REQUIRED negative path.
+  - value: BLOCKED
+    description: Sale lock transition is blocked.
+    source: PACK-01 negative paths.
+compatibility:
+  breaking_change: Ignoring ACTIVE sale lock is breaking.
+todos:
+  - Confirm whether WARNING or PRE_LOCK states are required.

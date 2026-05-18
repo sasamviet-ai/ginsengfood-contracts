@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/recipe.schema.json",
+  "title": "Recipe",
+  "description": "Recipe v1 contract linking SKU, G1 Formula Version, BOM, and owner approval. Recipe G1 must be approved before complete Product Activation.",
+  "$comment": "Sources: PACK-02 Recipe/BOM/Formula Version registry. TODO: source documents do not define a separate recipe line schema beyond formula/BOM line concepts.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "recipe_id": { "type": "string", "minLength": 1, "description": "Recipe identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU governed by this recipe." },
+    "recipe_version": { "type": "string", "minLength": 1, "description": "Recipe version label, usually aligned with G1 for operational use." },
+    "formula_version_id": { "type": "string", "minLength": 1, "description": "Formula Version used by the recipe." },
+    "bom_id": { "type": "string", "minLength": 1, "description": "BOM governed by the recipe." },
+    "status": { "type": "string", "description": "Recipe lifecycle status. Prefer enums/product/recipe-status.yaml." },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "effective_date": { "type": "string", "format": "date", "description": "Date when the recipe becomes effective." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["recipe_id"]
+}

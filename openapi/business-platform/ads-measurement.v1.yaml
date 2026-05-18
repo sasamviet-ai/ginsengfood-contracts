@@ -1,0 +1,223 @@
+openapi: 3.1.0
+info:
+  title: GinsengFood Business Platform Ads Measurement API
+  version: 1.0.0
+  description: >
+    v1 contract for raw funnel events, verified revenue linking, ROAS
+    measurement, and scale gates. Raw or pending commerce data must not be used
+    as verified revenue.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+tags:
+  - name: Ads Measurement
+paths:
+  /v1/ads/funnel-events:
+    post:
+      tags:
+        - Ads Measurement
+      summary: Record raw funnel event
+      description: >
+        Records a raw funnel event from comments, inbox, quote, cart, draft, or
+        other channel/commerce signals. This is not verified revenue.
+      operationId: createAdsFunnelEventV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ads/funnel-event.schema.json
+      responses:
+        "200":
+          description: Funnel event contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ads/funnel-event.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ads/verified-revenue-links:
+    post:
+      tags:
+        - Ads Measurement
+      summary: Link verified revenue
+      description: >
+        Links a verified revenue record to ads attribution. Attribution conflict
+        must remain explicit and unresolved conflicts must not be counted as
+        official ROAS.
+      operationId: createVerifiedRevenueLinkV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ads/verified-revenue-link.schema.json
+      responses:
+        "200":
+          description: Verified revenue link contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ads/verified-revenue-link.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ads/roas-measurements/{roasMeasurementId}:
+    get:
+      tags:
+        - Ads Measurement
+      summary: Get ROAS measurement
+      description: >
+        Returns ROAS measurement based on verified revenue links. TODO: Finalize
+        official attribution window and conflict resolution policy.
+      operationId: getRoasMeasurementV1
+      parameters:
+        - name: roasMeasurementId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ROAS measurement contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ads/roas-measurement.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ads/scale-gates:
+    post:
+      tags:
+        - Ads Measurement
+      summary: Record scale gate decision
+      description: >
+        Records a scale gate decision based on verified measurement and owner
+        decision references. It must not scale from raw funnel signals alone.
+      operationId: createScaleGateV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ads/scale-gate.schema.json
+      responses:
+        "200":
+          description: Scale gate contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ads/scale-gate.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    BadRequest:
+      description: Invalid request syntax or parameters.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Unauthorized:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Forbidden:
+      description: Caller is not allowed to perform this operation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    NotFound:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Conflict:
+      description: Request conflicts with current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    UnprocessableEntity:
+      description: Request is syntactically valid but violates contract validation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json

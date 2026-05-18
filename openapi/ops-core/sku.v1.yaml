@@ -1,0 +1,113 @@
+openapi: 3.1.0
+info:
+  title: Ops Core SKU API
+  version: 1.0.0
+  description: SKU v1 API contract for internal SKU records, public SKU projection, and operational status. Product Activation is not sellable.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+paths:
+  /v1/skus/{skuId}:
+    get:
+      summary: Get SKU
+      description: Returns internal SKU contract data for ops-core frontend and authorized internal consumers.
+      operationId: getSkuV1
+      tags: [sku]
+      parameters:
+        - $ref: "#/components/parameters/SkuId"
+      responses:
+        "200":
+          description: SKU wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/product/sku.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/skus/{skuId}/public:
+    get:
+      summary: Get public SKU projection
+      description: "Returns the public-safe SKU projection for business-platform and channel consumers. Must not expose recipe, formula, supplier, QC internals, cost, or private operational data. TODO: source documents do not lock the final public projection shape."
+      operationId: getPublicSkuV1
+      tags: [sku]
+      parameters:
+        - $ref: "#/components/parameters/SkuId"
+      responses:
+        "200":
+          description: Public-safe SKU payload wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/product/sku.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+  /v1/skus/{skuId}/operational-status:
+    get:
+      summary: Get SKU operational status
+      description: Returns the ops-core operational sellable status for a SKU. Business-platform may read this status but must not mutate ops-core truth.
+      operationId: getSkuOperationalStatusV1
+      tags: [sku, availability-sellable]
+      parameters:
+        - $ref: "#/components/parameters/SkuId"
+      responses:
+        "200":
+          description: Sellable status wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/sellable-status.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+components:
+  parameters:
+    SkuId:
+      name: skuId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1 }
+  schemas:
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error:
+              $ref: "../../schemas/common/error.schema.json"
+  responses:
+    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/production-bom-snapshot.schema.json",
+  "title": "Production BOM Snapshot",
+  "description": "Production BOM Snapshot v1 contract. Changing only anchor_rice_quantity can create a calculation/BOM snapshot; changing ratio, ingredient, unit, or structure requires a new Formula Version with approval, evidence, and audit.",
+  "$comment": "Sources: PACK-02 snapshot control and PACK-03 rice-anchor scaling. TODO: exact snapshot immutability metadata is not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "production_bom_snapshot_id": { "type": "string", "minLength": 1, "description": "Production BOM Snapshot identifier." },
+    "production_order_id": { "type": "string", "minLength": 1, "description": "Production order using this snapshot." },
+    "formula_version_id": { "type": "string", "minLength": 1, "description": "Formula Version used to calculate the snapshot." },
+    "bom_id": { "type": "string", "minLength": 1, "description": "Source BOM identifier." },
+    "anchor_ingredient_id": { "type": "string", "minLength": 1, "description": "Anchor ingredient, usually rice." },
+    "anchor_rice_quantity": { "$ref": "../common/quantity.schema.json" },
+    "snapshot_lines": { "type": "array", "items": { "$ref": "../product/bom-line.schema.json" }, "description": "Calculated snapshot lines including ratio_to_rice where applicable." },
+    "created_at": { "type": "string", "format": "date-time", "description": "Snapshot creation timestamp." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["production_bom_snapshot_id"]
+}

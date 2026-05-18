@@ -1,0 +1,31 @@
+version: v1
+name: shipping-status
+title: Shipping Status
+description: Commerce v1 shipping eligibility state values from TECH-04.
+source_documents:
+  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
+values:
+  - value: SHIPPING_NOT_CHECKED
+    description: Shipping has not been checked.
+  - value: SHIPPING_CHECKING
+    description: Shipping eligibility is being checked.
+  - value: SHIPPING_ADDRESS_MISSING
+    description: Shipping address is missing.
+  - value: SHIPPING_ELIGIBLE
+    description: Shipping is eligible.
+  - value: SHIPPING_NOT_ELIGIBLE
+    description: Shipping is not eligible.
+  - value: SHIPPING_FEE_PENDING
+    description: Shipping fee is pending.
+  - value: SHIPPING_FEE_CONFIRMED
+    description: Shipping fee is confirmed.
+  - value: SHIPPING_BLOCKED
+    description: Shipping is blocked.
+  - value: SHIPPING_RUNTIME_UNAVAILABLE
+    description: Shipping runtime is unavailable.
+  - value: SHIPPING_CLOSED
+    description: Shipping lifecycle is closed.
+compatibility:
+  breaking_change: Creating official order when shipping is not eligible is breaking.
+todos:
+  - Source documents do not define official carrier, tracking, or shipping method enums.

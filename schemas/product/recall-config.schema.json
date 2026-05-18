@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/recall-config.schema.json",
+  "title": "Recall Config",
+  "description": "Recall Config v1 contract for recall readiness and stop-sale linkage. Recall must use the traceability chain and must not build a separate chain.",
+  "$comment": "Sources: PACK-01 recall/traceability and PACK-02 Recall Config requirement. TODO: recall severity taxonomy is not finalized in Phase 2 sources.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "recall_config_id": { "type": "string", "minLength": 1, "description": "Recall config identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "Configured SKU." },
+    "status": { "type": "string", "description": "Config status. Prefer enums/product/config-status.yaml." },
+    "trace_chain_required": { "type": "boolean", "description": "Recall readiness requires a complete trace chain." },
+    "sale_lock_required_on_recall": { "type": "boolean", "description": "Whether sale lock/stop-sale is required when recall is active." },
+    "recovery_evidence_required": { "type": "boolean", "description": "Whether recovery/disposition evidence is required before closing recall." },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["recall_config_id"]
+}

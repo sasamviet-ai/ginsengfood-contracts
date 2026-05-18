@@ -1,0 +1,60 @@
+version: v1
+name: misa-handoff-status
+title: MISA Handoff Status
+description: MISA handoff mapping, sync, and reconcile status values for FRM-25 and PACK-04.
+source_documents:
+  - docs/documents/2_pack/PACK-04 - MISA INTEGRATION ACCOUNTING HANDOFF COSTING SYNC RECONCILE PACK.md
+  - docs/documents/2_pack/extra/HE THONG PHIEU - OPERATIONAL FORMS AUTO-GENERATED FORMS MISA ACCOUNTING HANDOFF PACK.md
+values:
+  - value: PENDING_MAPPING
+    category: mapping
+    description: Mapping is pending.
+    source: Operational Forms MISA Mapping table.
+  - value: MAPPED
+    category: mapping
+    description: MISA mapping exists.
+    source: Operational Forms Mapping MISA co/khong.
+  - value: MISA_MAPPING_MISSING
+    category: mapping
+    description: Required MISA mapping is missing.
+    source: Operational Forms MISA_MAPPING_MISSING.
+  - value: NOT_SYNCED
+    category: sync
+    description: Handoff has not been synced.
+    source: Operational Forms Sync status.
+  - value: PENDING
+    category: sync_or_reconcile
+    description: Sync or reconcile is pending; field context determines category.
+    source: Operational Forms Sync/Reconcile status.
+  - value: SUCCESS
+    category: sync
+    description: Sync succeeded.
+    source: Operational Forms Sync status.
+  - value: ERROR
+    category: sync
+    description: Sync errored.
+    source: Operational Forms Sync status.
+  - value: SYNC_BLOCKED
+    category: sync
+    description: Sync is blocked, commonly by missing mapping or invalid checkpoint.
+    source: Operational Forms SYNC_BLOCKED.
+  - value: ACCEPTED_BY_MISA
+    category: sync
+    description: MISA accepted the handoff.
+    source: PACK-04 smoke status.
+  - value: RECONCILE_PENDING
+    category: reconcile
+    description: Reconcile is pending.
+    source: PACK-04 Reconcile Pending.
+  - value: MATCHED
+    category: reconcile
+    description: Reconcile matched.
+    source: Operational Forms Reconcile status.
+  - value: EXCEPTION
+    category: reconcile
+    description: Reconcile exception.
+    source: Operational Forms Reconcile status.
+compatibility:
+  breaking_change: Treating missing mapping as syncable is breaking.
+todos:
+  - Split mapping, sync, and reconcile into separate enums if future phases require stricter typing.

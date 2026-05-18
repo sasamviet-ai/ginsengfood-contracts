@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/live/v1/private-handoff-cue.schema.json",
+  "title": "Private Handoff Cue",
+  "description": "Live v1 private handoff cue contract for moving live public interactions into Messenger/private handling when private data or order flow is needed.",
+  "$comment": "Sources: PACK-08, TECH-08, PACK-06, and PACK-05. Live must not close orders publicly or collect private information in public comments.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "private_handoff_cue_id": { "type": "string", "minLength": 1, "description": "Private handoff cue identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "live_session_id": { "type": "string", "description": "Live session identifier." },
+    "source_comment_id": { "type": "string", "description": "Public live comment triggering private handoff." },
+    "comment_to_messenger_handoff_id": { "type": "string", "description": "Channel handoff reference." },
+    "cue_text": { "type": "string", "description": "Public-safe cue/acknowledgement text." },
+    "private_handoff_required": { "type": "boolean", "description": "Whether private handoff is required." },
+    "status": { "type": "string", "description": "Handoff status. Prefer enums/channel/handoff-status.yaml." },
+    "public_safe": { "type": "boolean", "description": "Whether cue is safe for public live channel." },
+    "no_public_order_closing": { "type": "boolean", "const": true, "description": "Invariant: live cue must not close orders publicly." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["private_handoff_cue_id", "version"]
+}

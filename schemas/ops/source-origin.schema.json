@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/source-origin.schema.json",
+  "title": "Source Origin",
+  "description": "Source Origin v1 contract for raw material provenance before intake, QC, lot readiness, traceability, and recall.",
+  "$comment": "Sources: PACK-01 Source Zone -> Source Origin chain and PACK-03 source/material catalog. TODO: exact source type taxonomy is not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "source_origin_id": { "type": "string", "minLength": 1, "description": "Source origin identifier." },
+    "source_origin_code": { "type": "string", "minLength": 1, "description": "Source origin code." },
+    "source_origin_name": { "type": "string", "minLength": 1, "description": "Source origin name." },
+    "source_type": { "type": "string", "description": "Source type such as company source or supplier source. TODO: define official values." },
+    "supplier_id": { "type": "string", "minLength": 1, "description": "Linked supplier when the source is supplier-owned." },
+    "material_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Materials available from this source." },
+    "trace_required": { "type": "boolean", "description": "Whether this source must be traceable into raw material lot and recall chain." },
+    "source_ref": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["source_origin_id"]
+}

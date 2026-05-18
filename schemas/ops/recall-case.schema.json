@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/recall-case.schema.json",
+  "title": "Recall Case",
+  "description": "Recall Case v1 contract for impact, hold, sale lock, recovery, disposition, and CAPA based on the trace chain.",
+  "$comment": "Sources: PACK-01 Recall/Recovery/Disposition/CAPA. TODO: full recall severity and transition model is not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "recall_case_id": { "type": "string", "minLength": 1, "description": "Recall case identifier." },
+    "trace_chain_id": { "type": "string", "minLength": 1, "description": "Trace chain used for recall." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "Affected SKU." },
+    "batch_id": { "type": "string", "minLength": 1, "description": "Affected batch when scoped to batch." },
+    "status": { "type": "string", "description": "Recall status. Prefer enums/ops/recall-status.yaml." },
+    "impact_snapshot": { "type": "object", "additionalProperties": true, "description": "Impact snapshot. TODO: define exact exposure fields from trace/commerce documents." },
+    "sale_lock_id": { "type": "string", "minLength": 1, "description": "Sale lock created from this recall when applicable." },
+    "recovery_status": { "type": "string", "description": "Recovery status. TODO: define official values." },
+    "disposition_status": { "type": "string", "description": "Disposition status. PACK-03 disposal statuses may apply to material/write-off flows." },
+    "capa_ref": { "type": "string", "minLength": 1, "description": "CAPA reference when applicable." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["recall_case_id"]
+}

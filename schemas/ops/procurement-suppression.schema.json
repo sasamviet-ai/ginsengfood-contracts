@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/procurement-suppression.schema.json",
+  "title": "Procurement Suppression",
+  "description": "Procurement Suppression v1 contract. If available_stock + approved_incoming is greater than or equal to dynamic_suppression_threshold, the material is excluded from procurement unless a large plan has director approval, MRP run, evidence, and audit.",
+  "$comment": "Sources: PACK-03 procurement suppression threshold. TODO: exact override request lifecycle is not specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "procurement_suppression_id": { "type": "string", "minLength": 1, "description": "Procurement suppression identifier." },
+    "material_requirement_id": { "type": "string", "minLength": 1, "description": "Material requirement being evaluated." },
+    "available_stock": { "$ref": "../common/quantity.schema.json" },
+    "approved_incoming": { "$ref": "../common/quantity.schema.json" },
+    "dynamic_suppression_threshold": { "$ref": "../common/quantity.schema.json" },
+    "status": { "type": "string", "description": "Suppression status. TODO: no dedicated enum file was requested; use MRP/material requirement status until split." },
+    "suppression_reason": { "type": "string", "description": "Reason for suppression or override requirement." },
+    "director_approval_required": { "type": "boolean", "description": "True when a large plan needs director approval for override." },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["procurement_suppression_id"]
+}

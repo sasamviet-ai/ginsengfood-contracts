@@ -1,0 +1,112 @@
+version: v1
+name: order-status
+title: Order Status
+description: Commerce v1 order lifecycle values covering Order Draft, Customer Confirmation, and Official Order states.
+source_documents:
+  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
+values:
+  - value: DRAFT_NOT_CREATED
+    description: Order Draft has not been created.
+    category: order_draft
+  - value: DRAFT_CREATING
+    description: Order Draft creation is in progress.
+    category: order_draft
+  - value: DRAFT_INCOMPLETE
+    description: Draft lacks required shipping/receiver, payment option, or quote/total data.
+    category: order_draft
+  - value: DRAFT_READY_FOR_CUSTOMER_REVIEW
+    description: Draft is ready for customer review.
+    category: order_draft
+  - value: DRAFT_SENT_TO_CUSTOMER
+    description: Draft was sent to customer.
+    category: order_draft
+  - value: DRAFT_CUSTOMER_REVIEWING
+    description: Customer is reviewing the draft.
+    category: order_draft
+  - value: DRAFT_EXPIRED
+    description: Draft expired.
+    category: order_draft
+  - value: DRAFT_BLOCKED
+    description: Draft is blocked.
+    category: order_draft
+  - value: DRAFT_CONFIRMED_BY_CUSTOMER
+    description: Customer confirmed the draft.
+    category: order_draft
+  - value: DRAFT_CONVERTED_TO_ORDER
+    description: Draft was converted to official order.
+    category: order_draft
+  - value: DRAFT_CANCELLED
+    description: Draft was cancelled.
+    category: order_draft
+  - value: DRAFT_CLOSED
+    description: Draft lifecycle is closed.
+    category: order_draft
+  - value: CONFIRMATION_NOT_REQUESTED
+    description: Customer confirmation has not been requested.
+    category: customer_confirmation
+  - value: CONFIRMATION_REQUESTED
+    description: Customer confirmation was requested.
+    category: customer_confirmation
+  - value: CUSTOMER_REVIEWING_DRAFT
+    description: Customer is reviewing the Order Draft.
+    category: customer_confirmation
+  - value: CUSTOMER_CONFIRMED
+    description: Customer confirmed the Order Draft.
+    category: customer_confirmation
+  - value: CONFIRMATION_EXPIRED
+    description: Confirmation expired.
+    category: customer_confirmation
+  - value: CONFIRMATION_INVALID
+    description: Confirmation is invalid.
+    category: customer_confirmation
+  - value: CONFIRMATION_BLOCKED
+    description: Confirmation is blocked.
+    category: customer_confirmation
+  - value: CONFIRMATION_CLOSED
+    description: Confirmation lifecycle is closed.
+    category: customer_confirmation
+  - value: ORDER_NOT_CREATED
+    description: Official Order has not been created.
+    category: official_order
+  - value: ORDER_CREATING
+    description: Official Order creation is in progress.
+    category: official_order
+  - value: ORDER_CREATED
+    description: Official Order was created.
+    category: official_order
+  - value: ORDER_CODE_ISSUED
+    description: Official order code was issued.
+    category: official_order
+  - value: ORDER_PAYMENT_PENDING
+    description: Order awaits payment.
+    category: official_order
+  - value: ORDER_PAYMENT_REVIEW
+    description: Payment is under review.
+    category: official_order
+  - value: ORDER_PAYMENT_CONFIRMED
+    description: Payment is confirmed.
+    category: official_order
+  - value: ORDER_VERIFICATION_PENDING
+    description: Order verification is pending.
+    category: official_order
+  - value: ORDER_VERIFIED
+    description: Order verification passed.
+    category: official_order
+  - value: ORDER_CANCELLED
+    description: Order was cancelled.
+    category: official_order
+  - value: ORDER_EXPIRED
+    description: Order expired.
+    category: official_order
+  - value: ORDER_REFUNDED
+    description: Order was refunded.
+    category: official_order
+  - value: ORDER_FULFILLMENT_PENDING
+    description: Fulfillment is pending.
+    category: official_order
+  - value: ORDER_CLOSED
+    description: Order lifecycle is closed.
+    category: official_order
+compatibility:
+  breaking_change: Creating Official Order before valid Customer Confirmation is breaking.
+todos: []

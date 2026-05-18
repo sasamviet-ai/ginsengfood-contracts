@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/sku.schema.json",
+  "title": "SKU",
+  "description": "SKU canonical v1 contract for Product Master. A SKU can be complete or active without being sellable; sellable belongs to Operational Core.",
+  "$comment": "Sources: PACK-02 sections on SKU canonical and Product Activation dependency. TODO: final SKU lifecycle values are not fully enumerated in the source documents.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU identifier." },
+    "sku_code": { "type": "string", "minLength": 1, "description": "Canonical SKU code such as A1/CS/DM/HS from the 20 SKU formula catalog." },
+    "product_id": { "type": "string", "minLength": 1, "description": "Owning product master identifier." },
+    "canonical_name": { "type": "string", "minLength": 1, "description": "Canonical SKU name." },
+    "public_name": { "type": "string", "minLength": 1, "description": "Public product name for the SKU." },
+    "dietary_type": { "type": "string", "enum": ["VEGAN", "SAVORY"], "description": "Dietary grouping from the 20 SKU catalog: Vegan / Man. TODO: confirm exact English label for Man." },
+    "product_group": { "type": "string", "minLength": 1, "description": "Catalog product group." },
+    "lifecycle_status": { "type": "string", "description": "SKU lifecycle status. Prefer enums/product/sku-lifecycle-status.yaml." },
+    "formula_version_id": { "type": "string", "minLength": 1, "description": "Linked current Formula Version, usually G1 for operational production." },
+    "recipe_id": { "type": "string", "minLength": 1, "description": "Linked Recipe record." },
+    "bom_id": { "type": "string", "minLength": 1, "description": "Linked BOM record." },
+    "activation_id": { "type": "string", "minLength": 1, "description": "Linked Product Activation record." },
+    "source_ref": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["sku_id", "sku_code"]
+}

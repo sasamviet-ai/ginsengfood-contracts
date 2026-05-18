@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/member-benefit.schema.json",
+  "title": "Member Benefit",
+  "description": "Commerce v1 member benefit reference used by QuoteSnapshot and order draft flows without recalculating final price outside QuoteSnapshot.",
+  "$comment": "Sources: TECH-04 runtime chain includes Price/Program/Member/Referral/Policy before QuoteSnapshot. TODO: source documents do not define a detailed member benefit taxonomy or eligibility rule schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "member_benefit_id": { "type": "string", "minLength": 1, "description": "Member benefit identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "customer_id": { "type": "string", "description": "Customer receiving benefit." },
+    "quote_snapshot_id": { "type": "string", "description": "QuoteSnapshot where benefit is applied." },
+    "benefit_type": { "type": "string", "description": "Benefit type. TODO: define official values from source docs." },
+    "eligibility_status": { "type": "string", "description": "Eligibility status. TODO: define official member benefit eligibility enum." },
+    "benefit_amount": { "$ref": "../common/money.schema.json" },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["member_benefit_id", "version"]
+}

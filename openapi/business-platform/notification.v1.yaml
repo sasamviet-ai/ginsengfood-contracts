@@ -1,0 +1,146 @@
+openapi: 3.1.0
+info:
+  title: GinsengFood Business Platform Notification API
+  version: 1.0.0
+  description: >
+    v1 reserved contract for notification handoff. Source documents only define
+    IVR cancellation notice boundaries; a general notification domain schema is
+    not defined in Phase 3.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+tags:
+  - name: Notifications
+paths:
+  /v1/notifications/cancellation-notices:
+    post:
+      tags:
+        - Notifications
+      summary: Request cancellation notice after core order cancellation
+      description: >
+        Reserved notification handoff for cancellation notices after the core
+        order state machine has made the cancellation decision. IVR call results
+        and technical exceptions must not send this notice directly. TODO:
+        Define full notification channel payload, delivery policy, retry rules,
+        and consent fields in source documents before expanding this API.
+      x-internal-status: reserved
+      operationId: createCancellationNoticeV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-cancellation-notice.schema.json
+      responses:
+        "200":
+          description: Cancellation notice handoff accepted.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-cancellation-notice.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/notifications/cancellation-notices/{noticeId}:
+    get:
+      tags:
+        - Notifications
+      summary: Get cancellation notice handoff
+      description: >
+        Reserved read endpoint for cancellation notice handoff state. TODO:
+        Define notification delivery receipt schema before adding delivery
+        lifecycle endpoints.
+      x-internal-status: reserved
+      operationId: getCancellationNoticeV1
+      parameters:
+        - name: noticeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cancellation notice handoff contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-cancellation-notice.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    BadRequest:
+      description: Invalid request syntax or parameters.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Unauthorized:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Forbidden:
+      description: Caller is not allowed to perform this operation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    NotFound:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Conflict:
+      description: Request conflicts with current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    UnprocessableEntity:
+      description: Request is syntactically valid but violates contract validation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json

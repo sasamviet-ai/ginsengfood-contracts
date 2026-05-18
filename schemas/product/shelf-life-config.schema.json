@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/shelf-life-config.schema.json",
+  "title": "Shelf Life Config",
+  "description": "Shelf-life/HSD Config v1 contract. PACK-02 references 12 months HSD via shelf-life config; exact policy must be configured, not hardcoded.",
+  "$comment": "Sources: PACK-02 HSD Config requirement. TODO: source documents do not define all shelf-life policy variants.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "shelf_life_config_id": { "type": "string", "minLength": 1, "description": "Shelf-life config identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "Configured SKU." },
+    "status": { "type": "string", "description": "Config status. Prefer enums/product/config-status.yaml." },
+    "shelf_life_months": { "type": "integer", "minimum": 0, "description": "Shelf life in months. PACK-02 mentions 12 months through config." },
+    "start_event": { "type": "string", "description": "Event/date basis for shelf-life start. TODO: confirm if start is production, release, or warehouse receipt." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["shelf_life_config_id"]
+}

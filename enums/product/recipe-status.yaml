@@ -1,0 +1,29 @@
+version: v1
+name: recipe-status
+title: Recipe Status
+description: Recipe lifecycle values for Recipe G1 governance.
+source_documents:
+  - docs/documents/2_pack/PACK-02 - PRODUCT MASTER SKU INGREDIENT RECIPE FORMULA VERSION PRODUCT ACTIVATION.md
+values:
+  - value: DRAFT
+    description: Recipe is being prepared.
+    source: Conservative lifecycle value.
+  - value: PENDING_CONFIG
+    description: Recipe has missing configuration.
+    source: PACK-02 placeholder/config rule.
+  - value: PENDING_EVIDENCE
+    description: Recipe lacks required evidence.
+    source: PACK-02 evidence gate.
+  - value: APPROVED
+    description: Recipe G1 is approved.
+    source: PACK-02 Recipe G1 Approved requirement.
+  - value: ACTIVE
+    description: Recipe is active for Product Master governance.
+    source: PACK-02 Product Activation chain.
+  - value: BLOCKED
+    description: Recipe is blocked by guard conditions.
+    source: PACK-02 guard behavior.
+compatibility:
+  breaking_change: Removing or renaming recipe status values is breaking for Product Activation checks.
+todos:
+  - Confirm whether APPROVED and ACTIVE are separate recipe states or separate readiness flags.

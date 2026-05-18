@@ -1,0 +1,79 @@
+version: v1
+name: handoff-status
+title: Handoff Status
+description: Channel v1 handoff status values for human or private Messenger handoff flows.
+source_documents:
+  - docs/documents/3_tech/TECH-06 - FACEBOOK GATEWAY META LIVE & MESSENGER CHANNEL DELIVERY COMMENT-TO-MESSENGER.md
+values:
+  - value: HANDOFF_NOT_REQUIRED
+    description: Handoff is not required.
+    category: general_handoff
+  - value: HANDOFF_CHECKING
+    description: Handoff requirement is being checked.
+    category: general_handoff
+  - value: HANDOFF_REQUIRED
+    description: Handoff is required.
+    category: general_handoff
+  - value: HANDOFF_REASON_CLASSIFIED
+    description: Handoff reason has been classified.
+    category: general_handoff
+  - value: HANDOFF_OWNER_RESOLVED
+    description: Handoff owner was resolved.
+    category: general_handoff
+  - value: HANDOFF_CONTEXT_PREPARED
+    description: Handoff context packet was prepared.
+    category: general_handoff
+  - value: HANDOFF_CREATED
+    description: Handoff was created.
+    category: general_handoff
+  - value: HANDOFF_ACK_TO_CUSTOMER_READY
+    description: Customer acknowledgement is ready.
+    category: general_handoff
+  - value: HANDOFF_ACK_SENT
+    description: Customer acknowledgement was sent.
+    category: general_handoff
+  - value: HANDOFF_FAILED
+    description: Handoff failed.
+    category: general_handoff
+  - value: HANDOFF_CLOSED
+    description: Handoff lifecycle is closed.
+    category: general_handoff
+  - value: PRIVATE_HANDOFF_NOT_STARTED
+    description: Private handoff has not started.
+    category: private_handoff
+  - value: PRIVATE_TRIGGER_DETECTED
+    description: Trigger for private handoff was detected.
+    category: private_handoff
+  - value: PRIVATE_HANDOFF_ELIGIBILITY_CHECKING
+    description: Private handoff eligibility is being checked.
+    category: private_handoff
+  - value: PRIVATE_HANDOFF_ALLOWED
+    description: Private handoff is allowed.
+    category: private_handoff
+  - value: PRIVATE_HANDOFF_BLOCKED
+    description: Private handoff is blocked.
+    category: private_handoff
+  - value: PRIVATE_MESSAGE_CREATING
+    description: Private message creation is in progress.
+    category: private_handoff
+  - value: PRIVATE_MESSAGE_SENT
+    description: Private message was sent.
+    category: private_handoff
+  - value: PRIVATE_THREAD_BOUND
+    description: Private Messenger thread was bound to the public context.
+    category: private_handoff
+  - value: PUBLIC_ACK_ALLOWED
+    description: Safe public acknowledgement is allowed.
+    category: private_handoff
+  - value: PUBLIC_ACK_SENT
+    description: Safe public acknowledgement was sent.
+    category: private_handoff
+  - value: PRIVATE_HANDOFF_FAILED
+    description: Private handoff failed.
+    category: private_handoff
+  - value: PRIVATE_HANDOFF_CLOSED
+    description: Private handoff lifecycle is closed.
+    category: private_handoff
+compatibility:
+  breaking_change: Claiming private handoff success when it failed is breaking.
+todos: []

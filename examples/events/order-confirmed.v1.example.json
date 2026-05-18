@@ -1,0 +1,26 @@
+{
+  "eventId": "evt-order-confirmed-20260518-001",
+  "eventType": "business-platform.order.order-confirmed.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-18T09:19:30+07:00",
+  "source": "business-platform",
+  "correlationId": "corr-order-20260518-001",
+  "causationId": "customer-confirmation-20260518-001",
+  "idempotencyKey": "order-confirmed-order-20260518-001",
+  "data": {
+    "order_id": "order-20260518-001",
+    "version": "v1",
+    "order_code": "GF-20260518-0001",
+    "order_draft_id": "order-draft-20260518-001",
+    "customer_confirmation_id": "customer-confirmation-20260518-001",
+    "quote_snapshot_id": "quote-20260518-001",
+    "customer_id": "customer-001",
+    "status": "ORDER_CREATED",
+    "payment_status": "PAYMENT_PENDING",
+    "shipping_status": "FEE_CONFIRMED",
+    "final_total": {
+      "amount": 275000,
+      "currencyCode": "VND"
+    }
+  }
+}

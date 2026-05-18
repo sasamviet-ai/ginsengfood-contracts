@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-warehouse-receipt-20260518-001",
+    "sourceSystem": "ops-core",
+    "timestamp": "2026-05-18T11:00:00+07:00"
+  },
+  "data": {
+    "warehouse_receipt_id": "warehouse-receipt-20260518-001",
+    "batch_id": "batch-20260518-001",
+    "warehouse_id": "warehouse-hcm-001",
+    "warehouse_location_id": "location-hcm-a01",
+    "status": "CONFIRMED",
+    "receipt_confirmed": true,
+    "received_quantity": {
+      "value": 100,
+      "unit": "pack"
+    },
+    "inventory_ledger_entry_id": "inventory-ledger-20260518-001",
+    "misa_checkpoint_eligible": true,
+    "evidence_refs": [
+      {
+        "evidenceId": "evidence-warehouse-receipt-20260518-001",
+        "evidenceStatus": "APPROVED",
+        "scope": "warehouse-receipt"
+      }
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "eventId": "evt-sale-lock-activated-20260518-001",
+  "eventType": "ops-core.recall.sale-lock-activated.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-18T10:15:00+07:00",
+  "source": "ops-core",
+  "correlationId": "corr-sale-lock-20260518-001",
+  "causationId": "recall-case-20260518-001",
+  "idempotencyKey": "sale-lock-sku-gf-rice-001-20260518",
+  "data": {
+    "sale_lock_id": "sale-lock-20260518-001",
+    "scope_type": "SKU",
+    "scope_id": "sku-gf-rice-001",
+    "status": "ACTIVE",
+    "active": true,
+    "reason": "Recall review requires stop-sale until owner release decision.",
+    "recall_case_id": "recall-case-20260518-001",
+    "effective_from": "2026-05-18T10:15:00+07:00",
+    "owner_approval_ref": {
+      "sourceId": "owner-decision-20260518-001",
+      "sourceType": "owner-decision",
+      "ownerCore": "ops-core",
+      "decisionAuthority": "owner"
+    }
+  }
+}

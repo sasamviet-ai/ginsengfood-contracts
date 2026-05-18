@@ -1,0 +1,45 @@
+version: v1
+name: availability-status
+title: Availability Status
+description: Commerce v1 availability outcomes for quote/cart/order sellable checks.
+source_documents:
+  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
+  - docs/documents/3_tech/TECH-03 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+values:
+  - value: AVAILABILITY_NOT_CHECKED
+    description: Availability has not been checked.
+    source: Commerce runtime guard flow.
+  - value: AVAILABILITY_CHECKING
+    description: Availability check is in progress.
+    source: Commerce runtime guard flow.
+  - value: AVAILABLE
+    description: SKU is sellable, stock available, not recall-held, not sale-locked, and trace-ready when required.
+    source: TECH-04 sellable gate.
+  - value: NOT_SELLABLE
+    description: SKU is not sellable.
+    source: TECH-04 sellable gate.
+  - value: OUT_OF_STOCK
+    description: Stock is not available for sale.
+    source: TECH-04 stock guard.
+  - value: QUALITY_HOLD
+    description: Quality hold blocks sale.
+    source: TECH-03 quality hold boundary.
+  - value: RECALL_LOCKED
+    description: Recall hold blocks sale.
+    source: TECH-03 recall boundary.
+  - value: SALE_LOCKED
+    description: Sale lock blocks sale.
+    source: TECH-03 sale lock boundary.
+  - value: TRACE_NOT_READY
+    description: Trace readiness is missing where required.
+    source: TECH-03 traceability boundary.
+  - value: AVAILABILITY_BLOCKED
+    description: Availability is blocked by guard conditions.
+    source: TECH-04 blockers.
+  - value: RUNTIME_UNAVAILABLE
+    description: Availability runtime source is unavailable.
+    source: TECH-04 runtime dependency.
+compatibility:
+  breaking_change: Weakening a blocking status into AVAILABLE is breaking.
+todos:
+  - Source documents do not define a complete availability status enum; keep additions source-backed.

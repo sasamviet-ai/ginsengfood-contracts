@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/operational-evidence.schema.json",
+  "title": "Operational Evidence",
+  "description": "Operational Evidence v1 contract for FRM-26 evidence packets that gather chain evidence for operations, smoke, recall, sale lock, MISA, and owner review.",
+  "$comment": "Sources: Operational Forms FRM-26 and PACK-01 evidence packet. TODO: exact packet close-out fields are not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "evidence_packet_id": { "type": "string", "minLength": 1, "description": "Operational evidence packet identifier." },
+    "source_object": { "$ref": "../common/source-ref.schema.json" },
+    "form_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Operational forms included in the packet." },
+    "trace_chain_id": { "type": "string", "minLength": 1, "description": "Trace chain supported by the evidence packet when applicable." },
+    "status": { "type": "string", "description": "Evidence packet status. Prefer common evidence status enum when possible." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["evidence_packet_id"]
+}

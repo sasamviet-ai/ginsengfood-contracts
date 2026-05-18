@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ads/v1/attribution.schema.json",
+  "title": "Attribution",
+  "description": "Ads v1 attribution contract linking funnel events to verified revenue while preserving attribution conflict handling.",
+  "$comment": "Sources: PACK-07 and TECH-07 Ads Measurement. Ads cannot treat comments, inbox, quote, cart, order draft, unpaid order, or pending revenue as verified revenue. TODO: source documents do not define a complete attribution rule schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "attribution_id": { "type": "string", "minLength": 1, "description": "Attribution identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "funnel_event_id": { "type": "string", "description": "Linked funnel event." },
+    "channel_context_id": { "type": "string", "description": "Channel context that produced the funnel signal." },
+    "customer_id": { "type": "string", "description": "Customer reference if resolved." },
+    "order_id": { "type": "string", "description": "Official order reference when available." },
+    "verified_revenue_id": { "type": "string", "description": "Verified revenue reference required for official ROAS." },
+    "attribution_rule_id": { "type": "string", "description": "Attribution rule used. TODO: define official attribution rule registry." },
+    "conflict_status": { "type": "string", "description": "Attribution conflict status. TODO: define official conflict enum." },
+    "conflict_reasons": { "type": "array", "items": { "type": "string" }, "description": "Source-backed reasons attribution is conflicted or blocked." },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["attribution_id", "version"]
+}

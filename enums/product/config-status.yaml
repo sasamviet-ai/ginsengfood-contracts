@@ -1,0 +1,29 @@
+version: v1
+name: config-status
+title: Product Config Status
+description: Shared config readiness status for packaging, print, QC, shelf-life, trace, and recall configs.
+source_documents:
+  - docs/documents/2_pack/PACK-02 - PRODUCT MASTER SKU INGREDIENT RECIPE FORMULA VERSION PRODUCT ACTIVATION.md
+values:
+  - value: MISSING
+    description: Config does not exist; downstream action must be blocked when this config is required.
+    source: PACK-02 no operation without required config.
+  - value: PENDING_CONFIG
+    description: Config exists but still contains placeholders or missing data.
+    source: PACK-02 placeholder rule.
+  - value: PENDING_EVIDENCE
+    description: Config lacks evidence.
+    source: PACK-02 evidence gate.
+  - value: READY
+    description: Config is ready for Product Activation checks.
+    source: PACK-02 operational config readiness.
+  - value: ACTIVE
+    description: Config is active for runtime consumers.
+    source: PACK-02 config runtime boundary.
+  - value: BLOCKED
+    description: Config is blocked by governance or owner-review conditions.
+    source: PACK-02 guard behavior.
+compatibility:
+  breaking_change: Weakening required config semantics is breaking because Product Activation and production guards depend on it.
+todos:
+  - Split per-config status if later documents define distinct lifecycles.

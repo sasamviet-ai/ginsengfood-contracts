@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/ops-core/inventory/warehouse-receipt-confirmed.v1.json",
+  "title": "Warehouse Receipt Confirmed Event v1",
+  "description": "Published when a warehouse receipt is confirmed. Inventory may increase only after confirmed receipt for released batches.",
+  "$comment": "Sources: PACK-01 Warehouse Receipt; TECH-03 Inventory Ledger append-only.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique event identifier."
+    },
+    "eventType": {
+      "type": "string",
+      "const": "ops-core.inventory.warehouse-receipt-confirmed.v1",
+      "description": "Stable event type including source, domain, name, and v1 suffix."
+    },
+    "eventVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Event contract version."
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the domain event occurred."
+    },
+    "source": {
+      "type": "string",
+      "const": "ops-core",
+      "description": "System that owns and emits this event."
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Cross-system correlation identifier."
+    },
+    "causationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional parent command, event, or workflow identifier."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required when emitted from retryable or high-risk command; optional for derived read-model notifications."
+    },
+    "data": {
+      "allOf": [
+        {
+          "$ref": "../../../schemas/ops/warehouse-receipt.schema.json"
+        },
+        {
+          "type": "object",
+          "required": [
+            "warehouse_receipt_id",
+            "batch_id",
+            "receipt_confirmed",
+            "inventory_ledger_entry_id"
+          ],
+          "properties": {
+            "receipt_confirmed": {
+              "const": true
+            }
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "occurredAt",
+    "source",
+    "correlationId",
+    "data"
+  ]
+}

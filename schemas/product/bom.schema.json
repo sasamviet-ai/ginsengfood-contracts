@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/bom.schema.json",
+  "title": "BOM",
+  "description": "Bill of Materials v1 contract for SKU production. Production must use a BOM snapshot, not the live recipe/formula.",
+  "$comment": "Sources: PACK-02 BOM G1 and Snapshot Control; PACK-03 formula scaling. TODO: final BOM version numbering is not defined.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "bom_id": { "type": "string", "minLength": 1, "description": "BOM identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU governed by this BOM." },
+    "formula_version_id": { "type": "string", "minLength": 1, "description": "Formula Version used by this BOM." },
+    "bom_version": { "type": "string", "minLength": 1, "description": "BOM version label, usually G1 for current operational use." },
+    "generation": { "type": "string", "enum": ["G0", "G1", "POST_G1"], "description": "BOM generation aligned with formula governance." },
+    "status": { "type": "string", "description": "BOM status. Prefer enums/product/bom-status.yaml." },
+    "anchor_ingredient_id": { "type": "string", "minLength": 1, "description": "Anchor ingredient used for scaling, usually rice." },
+    "bom_lines": { "type": "array", "items": { "$ref": "bom-line.schema.json" }, "description": "BOM lines including anchor rice, ingredients, and packaging/material lines when governed by this BOM." },
+    "snapshot_required": { "type": "boolean", "description": "Whether a Production BOM Snapshot is required before production order creation." },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["bom_id"]
+}

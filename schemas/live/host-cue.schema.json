@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/live/v1/host-cue.schema.json",
+  "title": "Host Cue",
+  "description": "Live v1 host cue contract for product/script prompts that are allowed only inside Live Plan and Product Scope.",
+  "$comment": "Sources: PACK-08, TECH-08, TECH-02, and TECH-04. Host cue must not cue out-of-scope SKU, sale-locked/recall-held SKU, unapproved claims, fake urgency/scarcity, or public order closing.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "host_cue_id": { "type": "string", "minLength": 1, "description": "Host cue identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "live_plan_id": { "type": "string", "description": "Live Plan that authorizes this cue." },
+    "live_session_id": { "type": "string", "description": "Live session identifier." },
+    "cue_type": { "type": "string", "description": "Cue type. TODO: define official cue type enum." },
+    "cue_text": { "type": "string", "description": "Cue text or summarized cue instruction." },
+    "sku_id": { "type": "string", "description": "SKU referenced by cue, if any." },
+    "quote_snapshot_id": { "type": "string", "description": "QuoteSnapshot reference if cue mentions final price." },
+    "product_recommendation_id": { "type": "string", "description": "Product recommendation reference if cue is AI-generated." },
+    "claim_guard_result_id": { "type": "string", "description": "Claim guard result reference." },
+    "public_safe": { "type": "boolean", "description": "Whether cue is safe for public live context." },
+    "allowed_to_present": { "type": "boolean", "description": "Whether host may present this cue." },
+    "no_fake_urgency": { "type": "boolean", "const": true, "description": "Invariant: cue must not create fake urgency/scarcity." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["host_cue_id", "version"]
+}

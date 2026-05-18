@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/live/v1/live-plan.schema.json",
+  "title": "Live Plan",
+  "description": "Live v1 plan contract for MC AI Live sessions, product scope, script/cue approval, guard readiness, and release evidence.",
+  "$comment": "Sources: PACK-08, TECH-08, MASTER-07, PACK-10, and TECH-02. MC AI Live requires Live Plan, Product Scope, claim guard, privacy guard, stock/recall/sale-lock guard, and fake urgency guard. TODO: source documents do not define a complete live plan status enum.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "live_plan_id": { "type": "string", "minLength": 1, "description": "Live plan identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "live_session_id": { "type": "string", "description": "Live session identifier." },
+    "plan_status": { "type": "string", "description": "Live plan status. TODO: define official live plan status enum." },
+    "mc_ai_script_brief_id": { "type": "string", "description": "Approved MC AI script brief identifier." },
+    "product_scope_refs": { "type": "array", "items": { "$ref": "../common/source-ref.schema.json" }, "description": "Live Product Scope references." },
+    "stock_guard_pass": { "type": "boolean", "description": "Whether stock/sellable guard passed." },
+    "recall_sale_lock_guard_pass": { "type": "boolean", "description": "Whether recall and sale lock guard passed." },
+    "claim_guard_result_id": { "type": "string", "description": "Claim guard result reference." },
+    "privacy_guard_pass": { "type": "boolean", "description": "Whether privacy guard passed." },
+    "fake_urgency_guard_pass": { "type": "boolean", "description": "Whether fake urgency/scarcity guard passed." },
+    "no_fake_urgency": { "type": "boolean", "const": true, "description": "Invariant: live plan must not authorize fake urgency or fake scarcity." },
+    "release_status": { "$ref": "../common/release-status-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["live_plan_id", "version"]
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-error-idempotency-001",
+    "sourceSystem": "business-platform",
+    "timestamp": "2026-05-18T09:30:00+07:00"
+  },
+  "error": {
+    "code": "IDEMPOTENCY.CONFLICT",
+    "message": "The idempotency key was reused with a different payload.",
+    "httpStatus": 409,
+    "details": [
+      {
+        "field": "idempotencyKey",
+        "reason": "Use a new idempotency key for a materially different command payload."
+      }
+    ],
+    "correlationId": "corr-error-idempotency-001",
+    "auditId": "audit-error-idempotency-001"
+  }
+}

@@ -1,0 +1,290 @@
+asyncapi: 2.6.0
+info:
+  title: GinsengFood Ops Core Events
+  version: 1.0.0
+  description: AsyncAPI v1 contract for events published by ops-core. This is a placeholder
+    contract and does not define real broker configuration.
+servers:
+  placeholder:
+    url: message-broker.example.local
+    protocol: amqp
+    description: Placeholder only. Not a real broker configuration.
+channels:
+  ops-core.product.product-activated.v1:
+    description: Published when Product Activation becomes active. Product Activation
+      is not sellable and consumers must still check the Operational Core Sellable
+      Gate.
+    publish:
+      summary: ops-core publishes product-activated.v1.
+      operationId: productActivatedV1
+      message:
+        $ref: '#/components/messages/productActivatedV1Message'
+  ops-core.product.formula-version-approved.v1:
+    description: Published when a Formula Version is approved. Used formulas must
+      not be overwritten; later changes require a new version.
+    publish:
+      summary: ops-core publishes formula-version-approved.v1.
+      operationId: formulaVersionApprovedV1
+      message:
+        $ref: '#/components/messages/formulaVersionApprovedV1Message'
+  ops-core.product.product-suspended.v1:
+    description: Published when Product Activation is suspended or blocked. Suspension
+      does not directly edit inventory or sellable truth.
+    publish:
+      summary: ops-core publishes product-suspended.v1.
+      operationId: productSuspendedV1
+      message:
+        $ref: '#/components/messages/productSuspendedV1Message'
+  ops-core.inventory.warehouse-receipt-confirmed.v1:
+    description: Published when a warehouse receipt is confirmed. Inventory may increase
+      only after confirmed receipt for released batches.
+    publish:
+      summary: ops-core publishes warehouse-receipt-confirmed.v1.
+      operationId: warehouseReceiptConfirmedV1
+      message:
+        $ref: '#/components/messages/warehouseReceiptConfirmedV1Message'
+  ops-core.inventory.inventory-available-changed.v1:
+    description: Published when derived available stock changes from Inventory Ledger.
+      Consumers must not mutate ledger through this event.
+    publish:
+      summary: ops-core publishes inventory-available-changed.v1.
+      operationId: inventoryAvailableChangedV1
+      message:
+        $ref: '#/components/messages/inventoryAvailableChangedV1Message'
+  ops-core.inventory.stock-below-threshold.v1:
+    description: Published when stock crosses a warning threshold. Stock alert is
+      a signal and must not create Production Order directly.
+    publish:
+      summary: ops-core publishes stock-below-threshold.v1.
+      operationId: stockBelowThresholdV1
+      message:
+        $ref: '#/components/messages/stockBelowThresholdV1Message'
+  ops-core.inventory.stockout-risk-detected.v1:
+    description: Published when stockout risk is detected. It may feed demand review
+      but cannot bypass Sale Lock, Recall, Hold, MRP, or owner approval.
+    publish:
+      summary: ops-core publishes stockout-risk-detected.v1.
+      operationId: stockoutRiskDetectedV1
+      message:
+        $ref: '#/components/messages/stockoutRiskDetectedV1Message'
+  ops-core.sellable.sku-became-sellable.v1:
+    description: Published when SKU/batch becomes sellable after release, receipt,
+      ledger, stock, HSD, QC, trace, recall, and sale-lock checks pass.
+    publish:
+      summary: ops-core publishes sku-became-sellable.v1.
+      operationId: skuBecameSellableV1
+      message:
+        $ref: '#/components/messages/skuBecameSellableV1Message'
+  ops-core.sellable.sku-became-not-sellable.v1:
+    description: Published when SKU/batch becomes not sellable due to stock, quality
+      hold, recall hold, sale lock, trace, HSD, or release boundary.
+    publish:
+      summary: ops-core publishes sku-became-not-sellable.v1.
+      operationId: skuBecameNotSellableV1
+      message:
+        $ref: '#/components/messages/skuBecameNotSellableV1Message'
+  ops-core.sellable.sellable-status-changed.v1:
+    description: Published when sellable status changes. Business-platform may read
+      this as availability input but must not mutate ops-core truth.
+    publish:
+      summary: ops-core publishes sellable-status-changed.v1.
+      operationId: sellableStatusChangedV1
+      message:
+        $ref: '#/components/messages/sellableStatusChangedV1Message'
+  ops-core.recall.recall-case-opened.v1:
+    description: Published when a recall case is opened from trace evidence. Recall
+      uses trace chain and does not create an independent truth chain.
+    publish:
+      summary: ops-core publishes recall-case-opened.v1.
+      operationId: recallCaseOpenedV1
+      message:
+        $ref: '#/components/messages/recallCaseOpenedV1Message'
+  ops-core.recall.sale-lock-activated.v1:
+    description: Published when sale lock becomes active. Payload includes sale-lock
+      scope needed for business-platform to stop quote, order, AI, CRM, Ads, and Live
+      flows for the affected scope.
+    publish:
+      summary: ops-core publishes sale-lock-activated.v1.
+      operationId: saleLockActivatedV1
+      message:
+        $ref: '#/components/messages/saleLockActivatedV1Message'
+  ops-core.recall.sale-lock-released.v1:
+    description: Published when sale lock is released after owner-approved recovery.
+      Consumers must re-check sellable status before reopening commerce flows.
+    publish:
+      summary: ops-core publishes sale-lock-released.v1.
+      operationId: saleLockReleasedV1
+      message:
+        $ref: '#/components/messages/saleLockReleasedV1Message'
+  ops-core.recall.stop-sale-required.v1:
+    description: Published when stop-sale is required for a scope. This is a high-risk
+      suppression signal and must not be ignored by consumer channels.
+    publish:
+      summary: ops-core publishes stop-sale-required.v1.
+      operationId: stopSaleRequiredV1
+      message:
+        $ref: '#/components/messages/stopSaleRequiredV1Message'
+  ops-core.misa.accounting-handoff-created.v1:
+    description: Published when an accounting handoff contract is created from a valid
+      operational checkpoint. It does not modify Operational Truth.
+    publish:
+      summary: ops-core publishes accounting-handoff-created.v1.
+      operationId: accountingHandoffCreatedV1
+      message:
+        $ref: '#/components/messages/accountingHandoffCreatedV1Message'
+  ops-core.misa.misa-sync-succeeded.v1:
+    description: Published when MISA sync succeeds. This acknowledges integration
+      state only and must not rewrite Operational Truth.
+    publish:
+      summary: ops-core publishes misa-sync-succeeded.v1.
+      operationId: misaSyncSucceededV1
+      message:
+        $ref: '#/components/messages/misaSyncSucceededV1Message'
+  ops-core.misa.misa-sync-failed.v1:
+    description: Published when MISA sync fails or is blocked. Failure must preserve
+      mapping/sync/reconcile status without changing Operational Truth.
+    publish:
+      summary: ops-core publishes misa-sync-failed.v1.
+      operationId: misaSyncFailedV1
+      message:
+        $ref: '#/components/messages/misaSyncFailedV1Message'
+components:
+  messages:
+    productActivatedV1Message:
+      name: product-activated.v1
+      title: Product Activated Event v1
+      summary: Published when Product Activation becomes active. Product Activation
+        is not sellable and consumers must still check the Operational Core Sellable
+        Gate.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/product/product-activated.v1.json
+    formulaVersionApprovedV1Message:
+      name: formula-version-approved.v1
+      title: Formula Version Approved Event v1
+      summary: Published when a Formula Version is approved. Used formulas must not
+        be overwritten; later changes require a new version.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/product/formula-version-approved.v1.json
+    productSuspendedV1Message:
+      name: product-suspended.v1
+      title: Product Suspended Event v1
+      summary: Published when Product Activation is suspended or blocked. Suspension
+        does not directly edit inventory or sellable truth.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/product/product-suspended.v1.json
+    warehouseReceiptConfirmedV1Message:
+      name: warehouse-receipt-confirmed.v1
+      title: Warehouse Receipt Confirmed Event v1
+      summary: Published when a warehouse receipt is confirmed. Inventory may increase
+        only after confirmed receipt for released batches.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/inventory/warehouse-receipt-confirmed.v1.json
+    inventoryAvailableChangedV1Message:
+      name: inventory-available-changed.v1
+      title: Inventory Available Changed Event v1
+      summary: Published when derived available stock changes from Inventory Ledger.
+        Consumers must not mutate ledger through this event.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/inventory/inventory-available-changed.v1.json
+    stockBelowThresholdV1Message:
+      name: stock-below-threshold.v1
+      title: Stock Below Threshold Event v1
+      summary: Published when stock crosses a warning threshold. Stock alert is a
+        signal and must not create Production Order directly.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/inventory/stock-below-threshold.v1.json
+    stockoutRiskDetectedV1Message:
+      name: stockout-risk-detected.v1
+      title: Stockout Risk Detected Event v1
+      summary: Published when stockout risk is detected. It may feed demand review
+        but cannot bypass Sale Lock, Recall, Hold, MRP, or owner approval.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/inventory/stockout-risk-detected.v1.json
+    skuBecameSellableV1Message:
+      name: sku-became-sellable.v1
+      title: Sku Became Sellable Event v1
+      summary: Published when SKU/batch becomes sellable after release, receipt, ledger,
+        stock, HSD, QC, trace, recall, and sale-lock checks pass.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/sellable/sku-became-sellable.v1.json
+    skuBecameNotSellableV1Message:
+      name: sku-became-not-sellable.v1
+      title: Sku Became Not Sellable Event v1
+      summary: Published when SKU/batch becomes not sellable due to stock, quality
+        hold, recall hold, sale lock, trace, HSD, or release boundary.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/sellable/sku-became-not-sellable.v1.json
+    sellableStatusChangedV1Message:
+      name: sellable-status-changed.v1
+      title: Sellable Status Changed Event v1
+      summary: Published when sellable status changes. Business-platform may read
+        this as availability input but must not mutate ops-core truth.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/sellable/sellable-status-changed.v1.json
+    recallCaseOpenedV1Message:
+      name: recall-case-opened.v1
+      title: Recall Case Opened Event v1
+      summary: Published when a recall case is opened from trace evidence. Recall
+        uses trace chain and does not create an independent truth chain.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/recall/recall-case-opened.v1.json
+    saleLockActivatedV1Message:
+      name: sale-lock-activated.v1
+      title: Sale Lock Activated Event v1
+      summary: Published when sale lock becomes active. Payload includes sale-lock
+        scope needed for business-platform to stop quote, order, AI, CRM, Ads, and
+        Live flows for the affected scope.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/recall/sale-lock-activated.v1.json
+    saleLockReleasedV1Message:
+      name: sale-lock-released.v1
+      title: Sale Lock Released Event v1
+      summary: Published when sale lock is released after owner-approved recovery.
+        Consumers must re-check sellable status before reopening commerce flows.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/recall/sale-lock-released.v1.json
+    stopSaleRequiredV1Message:
+      name: stop-sale-required.v1
+      title: Stop Sale Required Event v1
+      summary: Published when stop-sale is required for a scope. This is a high-risk
+        suppression signal and must not be ignored by consumer channels.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/recall/stop-sale-required.v1.json
+    accountingHandoffCreatedV1Message:
+      name: accounting-handoff-created.v1
+      title: Accounting Handoff Created Event v1
+      summary: Published when an accounting handoff contract is created from a valid
+        operational checkpoint. It does not modify Operational Truth.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/misa/accounting-handoff-created.v1.json
+    misaSyncSucceededV1Message:
+      name: misa-sync-succeeded.v1
+      title: Misa Sync Succeeded Event v1
+      summary: Published when MISA sync succeeds. This acknowledges integration state
+        only and must not rewrite Operational Truth.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/misa/misa-sync-succeeded.v1.json
+    misaSyncFailedV1Message:
+      name: misa-sync-failed.v1
+      title: Misa Sync Failed Event v1
+      summary: Published when MISA sync fails or is blocked. Failure must preserve
+        mapping/sync/reconcile status without changing Operational Truth.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/misa/misa-sync-failed.v1.json

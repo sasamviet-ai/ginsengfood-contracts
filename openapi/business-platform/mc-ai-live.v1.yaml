@@ -1,0 +1,223 @@
+openapi: 3.1.0
+info:
+  title: GinsengFood Business Platform MC AI Live API
+  version: 1.0.0
+  description: >
+    v1 contract for live plan, host cue, risk cue, and private handoff cue.
+    Live contracts must not create fake urgency, fake scarcity, or public order
+    closing instructions.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+tags:
+  - name: MC AI Live
+paths:
+  /v1/live/plans:
+    post:
+      tags:
+        - MC AI Live
+      summary: Create live plan contract
+      description: >
+        Creates a live plan bounded by product scope, approved claims, channel
+        rules, and commerce availability. The live plan is not an order or
+        revenue source.
+      operationId: createLivePlanV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/live/live-plan.schema.json
+      responses:
+        "200":
+          description: Live plan contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/live/live-plan.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/live/host-cues:
+    post:
+      tags:
+        - MC AI Live
+      summary: Create host cue
+      description: >
+        Creates a host cue for live operation. Host cues must remain within
+        approved claim and commerce boundaries.
+      operationId: createHostCueV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/live/host-cue.schema.json
+      responses:
+        "200":
+          description: Host cue contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/live/host-cue.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/live/risk-cues:
+    post:
+      tags:
+        - MC AI Live
+      summary: Record live risk cue
+      description: >
+        Records risk cue output for unsafe claims, fake urgency/scarcity, or
+        other live-script risks.
+      operationId: createLiveRiskCueV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/live/live-risk-cue.schema.json
+      responses:
+        "200":
+          description: Live risk cue contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/live/live-risk-cue.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/live/private-handoff-cues:
+    post:
+      tags:
+        - MC AI Live
+      summary: Create private handoff cue
+      description: >
+        Creates a cue to move customer-specific handling to a private channel.
+        Public live content must not close orders or expose private data.
+      operationId: createPrivateHandoffCueV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/live/private-handoff-cue.schema.json
+      responses:
+        "200":
+          description: Private handoff cue contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/live/private-handoff-cue.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    BadRequest:
+      description: Invalid request syntax or parameters.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Unauthorized:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Forbidden:
+      description: Caller is not allowed to perform this operation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    NotFound:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Conflict:
+      description: Request conflicts with current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    UnprocessableEntity:
+      description: Request is syntactically valid but violates contract validation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json

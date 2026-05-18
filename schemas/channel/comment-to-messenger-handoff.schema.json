@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/channel/v1/comment-to-messenger-handoff.schema.json",
+  "title": "Comment To Messenger Handoff",
+  "description": "Channel v1 handoff contract for moving a public Facebook comment context into Messenger/private channel.",
+  "$comment": "Sources: PACK-06 and TECH-06 private handoff model. If private handoff fails, the system must not collect private info in public or claim handoff success.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "handoff_id": { "type": "string", "minLength": 1, "description": "Handoff identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "source_comment_id": { "type": "string", "description": "Public comment id." },
+    "channel_context_id": { "type": "string", "description": "Source channel context." },
+    "messenger_thread_id": { "type": "string", "description": "Target Messenger thread." },
+    "status": { "type": "string", "description": "General handoff status. Prefer enums/channel/handoff-status.yaml." },
+    "private_handoff_status": { "type": "string", "description": "Private handoff state. Prefer PRIVATE_HANDOFF_* values in enums/channel/handoff-status.yaml." },
+    "public_ack_allowed": { "type": "boolean", "description": "Whether a safe public acknowledgement is allowed." },
+    "public_ack_sent": { "type": "boolean", "description": "Whether public acknowledgement was sent." },
+    "failure_reason": { "type": "string", "description": "Failure reason if handoff failed." },
+    "context_preserved": { "type": "boolean", "description": "Whether the original public context was preserved in the private handoff." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["handoff_id", "version"]
+}

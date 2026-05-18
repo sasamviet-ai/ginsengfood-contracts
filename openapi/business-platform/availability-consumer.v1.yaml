@@ -1,0 +1,77 @@
+openapi: 3.1.0
+info:
+  title: Business Platform Availability Consumer API
+  version: 1.0.0
+  description: >-
+    Availability consumer v1 contract for business-platform to request sellable/availability checks from ops-core.
+    This contract records the consumer-side boundary; ops-core remains the source-of-truth for sellable, stock, recall, sale lock, and trace readiness.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+paths:
+  /v1/availability/check:
+    post:
+      summary: Check product availability
+      description: >-
+        Requests an availability check and returns the business-platform availability-check contract.
+        The operation must not mutate ops-core inventory, sellable status, recall, sale lock, or trace truth.
+        TODO: source documents do not define a dedicated business-platform availability request schema.
+      operationId: checkAvailabilityConsumerV1
+      tags: [availability-consumer]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AvailabilityCheckRequest"
+      responses:
+        "200":
+          description: Availability check wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "../../schemas/commerce/availability-check.schema.json"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+components:
+  schemas:
+    AvailabilityCheckRequest:
+      type: object
+      additionalProperties: false
+      description: >-
+        Minimal availability check request. TODO: define official request shape if source docs lock quantity, channel, reservation, and customer context semantics.
+      properties:
+        sku_id: { type: string, minLength: 1 }
+        batch_id: { type: string, minLength: 1 }
+        requested_quantity:
+          $ref: "../../schemas/common/quantity.schema.json"
+        channel_context_id: { type: string }
+        customer_id: { type: string }
+        correlation:
+          $ref: "../../schemas/common/correlation.schema.json"
+      required: [sku_id]
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error:
+              $ref: "../../schemas/common/error.schema.json"
+  responses:
+    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

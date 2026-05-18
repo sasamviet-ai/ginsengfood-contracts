@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/ingredient.schema.json",
+  "title": "Ingredient",
+  "description": "Ingredient canonical v1 contract for materials used by formula, recipe, BOM, MRP, QC, trace, and source-origin control.",
+  "$comment": "Sources: PACK-02 Ingredient Canonical and PACK-03 material grouping catalog. TODO: complete material master attributes and UOM catalog are not finalized in the source documents.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ingredient_id": { "type": "string", "minLength": 1, "description": "Ingredient or material identifier." },
+    "ingredient_code": { "type": "string", "minLength": 1, "description": "Canonical ingredient/material code when known." },
+    "ingredient_name": { "type": "string", "minLength": 1, "description": "Canonical ingredient/material name." },
+    "material_group": { "type": "string", "enum": ["A1", "A2", "A3", "B1", "B2", "B3"], "description": "Material group from PACK-03: A1/A2/A3 ingredients and B1/B2/B3 packaging/materials." },
+    "source_origin_id": { "type": "string", "minLength": 1, "description": "Linked source-origin record when source traceability is required." },
+    "is_anchor_ingredient": { "type": "boolean", "description": "True when this ingredient is the rice anchor for formula scaling." },
+    "default_buffer_rate": { "type": "string", "description": "Planning buffer rate, e.g. 5% for Group A or 7% for B1/B2. Stored as string to avoid precision loss." },
+    "qc_required": { "type": "boolean", "description": "Whether lot-level QC is required before production readiness." },
+    "trace_required": { "type": "boolean", "description": "Whether source/lot traceability is required." },
+    "source_ref": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["ingredient_id"]
+}

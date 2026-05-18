@@ -1,0 +1,36 @@
+version: v1
+name: ivr-call-attempt-status
+title: IVR Call Attempt Status
+description: IVR v1 call attempt state values from TECH-09.
+source_documents:
+  - docs/documents/3_tech/TECH-09 - IVR ORDER CONFIRMATION AUTO CALL VERIFICATION ANTI-FAKE-ORDER CONTROL.md
+values:
+  - value: ATTEMPT_NOT_CREATED
+    description: Attempt has not been created.
+  - value: ATTEMPT_POLICY_CHECKED
+    description: Attempt policy was checked.
+  - value: ATTEMPT_READY
+    description: Attempt is ready.
+  - value: ATTEMPT_CREATED
+    description: Attempt was created.
+  - value: ATTEMPT_DISPATCHED
+    description: Attempt was dispatched.
+  - value: ATTEMPT_RINGING
+    description: Attempt is ringing.
+  - value: ATTEMPT_CONNECTED
+    description: Attempt connected.
+  - value: ATTEMPT_COMPLETED
+    description: Attempt completed.
+  - value: ATTEMPT_FAILED_TECHNICAL
+    description: Attempt failed due to technical issue.
+  - value: ATTEMPT_NOT_COUNTED
+    description: Attempt does not count because of technical or policy failure.
+  - value: ATTEMPT_COUNTED
+    description: Attempt counts as valid.
+  - value: ATTEMPT_SUPPRESSED
+    description: Attempt was suppressed by policy.
+  - value: ATTEMPT_EXPIRED
+    description: Attempt expired outside call window.
+compatibility:
+  breaking_change: Counting failed technical attempts toward no-answer max attempts is breaking.
+todos: []

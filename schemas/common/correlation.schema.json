@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/correlation.schema.json",
+  "title": "Correlation Context",
+  "description": "Common v1 correlation context for flows that cross packs, systems, APIs, workers, or events.",
+  "$comment": "Source: MASTER-03 requires correlation for multi-pack flows and docs/correlation-audit-standard.md recommends correlation id, causation id, actor, source system, and timestamp when end-to-end traceability is needed.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier connecting steps in the same flow. It does not replace business IDs."
+    },
+    "causationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional identifier of the request, command, event, or decision that caused this item."
+    },
+    "sourceSystem": {
+      "type": "string",
+      "minLength": 1,
+      "description": "System that emitted or handled the item."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the correlation context was attached."
+    }
+  },
+  "required": [
+    "correlationId"
+  ]
+}

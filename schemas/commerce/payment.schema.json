@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/payment.schema.json",
+  "title": "Payment",
+  "description": "Commerce v1 payment contract. Payment must not be marked paid without Payment Gateway, Core, Accounting Review for bank transfer, or COD collection confirmation.",
+  "$comment": "Sources: TECH-04 Payment Confirmation state model and direct bank transfer rule. Customer transfer image is PAYMENT_REVIEW, not PAID. TODO: source documents do not define full provider payload schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "payment_id": { "type": "string", "minLength": 1, "description": "Payment identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "order_id": { "type": "string", "description": "Official order being paid." },
+    "payment_method": { "type": "string", "description": "Payment method such as bank transfer or COD. TODO: define official payment method enum." },
+    "status": { "type": "string", "description": "Payment status. Prefer enums/commerce/payment-status.yaml." },
+    "payment_reference": { "type": "string", "description": "Reference used by gateway, bank transfer, COD collection, or accounting review." },
+    "amount": { "$ref": "../common/money.schema.json" },
+    "bank_transfer_id": { "type": "string", "description": "Bank transfer record when payment method is transfer." },
+    "accounting_review_id": { "type": "string", "description": "Accounting review required for direct bank transfer confirmation." },
+    "cod_collection_status": { "type": "string", "description": "COD collection status when payment method is COD." },
+    "confirmation_source": { "$ref": "../common/source-ref.schema.json" },
+    "confirmed_at": { "type": "string", "format": "date-time", "description": "Payment confirmation timestamp." },
+    "paid_requires_confirmation": { "type": "boolean", "const": true, "description": "Invariant: no paid state without confirmation." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["payment_id", "version"]
+}

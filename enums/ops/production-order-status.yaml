@@ -1,0 +1,36 @@
+version: v1
+name: production-order-status
+title: Production Order Status
+description: Production Order v1 status values. Production Order must use a Production BOM Snapshot.
+source_documents:
+  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+  - docs/documents/2_pack/PACK-03 - DEMAND MRP FORMULA SCALING PROCUREMENT STOCK ALERT MATERIAL PACKAGING CONTROL PACK.md
+values:
+  - value: DRAFT
+    description: Draft production order.
+    source: PACK-03 Production Order Draft.
+  - value: PENDING_OWNER_APPROVAL
+    description: Waiting for owner approval.
+    source: PACK-03 Owner Approval.
+  - value: APPROVED
+    description: Approved for production.
+    source: PACK-03 Production Order official flow.
+  - value: RELEASED_TO_PRODUCTION
+    description: Released for production execution.
+    source: PACK-01 production chain.
+  - value: IN_PROGRESS
+    description: Production execution is in progress.
+    source: PACK-01 production execution chain.
+  - value: COMPLETED
+    description: Production execution completed.
+    source: Conservative lifecycle value.
+  - value: BLOCKED
+    description: Blocked by missing BOM snapshot, invalid formula, or guard condition.
+    source: PACK-01/PACK-02 guard behavior.
+  - value: CANCELLED
+    description: Production order cancelled.
+    source: TODO: cancellation semantics are not specified.
+compatibility:
+  breaking_change: Allowing APPROVED without BOM snapshot would break PACK-01/PACK-02 contract semantics.
+todos:
+  - Confirm official production order state transitions in Phase 7.

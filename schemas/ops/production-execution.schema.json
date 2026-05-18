@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/production-execution.schema.json",
+  "title": "Production Execution",
+  "description": "Production Execution v1 contract for event/evidence capture during production before batch QC and release.",
+  "$comment": "Sources: PACK-01 production execution chain and event log requirement for audit, costing, trace, and recall. TODO: execution event type catalog is not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "production_execution_id": { "type": "string", "minLength": 1, "description": "Production execution identifier." },
+    "production_order_id": { "type": "string", "minLength": 1, "description": "Production order being executed." },
+    "batch_id": { "type": "string", "minLength": 1, "description": "Batch created or updated by execution." },
+    "status": { "type": "string", "description": "Execution status. TODO: source documents do not define a dedicated execution status enum." },
+    "execution_events": {
+      "type": "array",
+      "description": "Operational event log used for audit, costing, trace, and recall.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "event_time": { "type": "string", "format": "date-time" },
+          "event_type": { "type": "string" },
+          "actor": { "$ref": "../common/actor.schema.json" },
+          "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+        }
+      }
+    },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["production_execution_id"]
+}

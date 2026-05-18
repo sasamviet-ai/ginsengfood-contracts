@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/shipping.schema.json",
+  "title": "Shipping",
+  "description": "Commerce v1 shipping contract for shipping eligibility, COD eligibility, ETA, tracking, and shipping fee boundaries.",
+  "$comment": "Sources: TECH-04 Shipping Eligibility state model. Missing address blocks draft/order; non-eligible shipping blocks official order. TODO: source documents do not lock carrier/tracking payload shape.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "shipping_id": { "type": "string", "minLength": 1, "description": "Shipping record identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "order_id": { "type": "string", "description": "Official order for shipping." },
+    "order_draft_id": { "type": "string", "description": "Order draft if shipping is checked before official order." },
+    "status": { "type": "string", "description": "Shipping status. Prefer enums/commerce/shipping-status.yaml." },
+    "eligible": { "type": "boolean", "description": "Whether shipping is eligible for the address/order." },
+    "cod_eligible": { "type": "boolean", "description": "Whether COD is allowed for this shipping context." },
+    "shipping_fee": { "$ref": "../common/money.schema.json" },
+    "eta_window": { "$ref": "../common/date-range.schema.json" },
+    "carrier": { "type": "string", "description": "Carrier or shipping method. TODO: define official carrier/method enum from source docs." },
+    "tracking_number": { "type": "string", "description": "Carrier tracking number if available." },
+    "tracking_url": { "type": "string", "description": "Tracking URL if safe to expose." },
+    "block_reason": { "type": "string", "description": "Reason shipping is blocked or unavailable." },
+    "shipping_source": { "$ref": "../common/source-ref.schema.json" },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["shipping_id", "version"]
+}

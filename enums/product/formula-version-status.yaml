@@ -1,0 +1,33 @@
+version: v1
+name: formula-version-status
+title: Formula Version Status
+description: Formula Version status values for G0/G1 governance.
+source_documents:
+  - docs/documents/2_pack/PACK-02 - PRODUCT MASTER SKU INGREDIENT RECIPE FORMULA VERSION PRODUCT ACTIVATION.md
+  - docs/documents/2_pack/PACK-03 - DEMAND MRP FORMULA SCALING PROCUREMENT STOCK ALERT MATERIAL PACKAGING CONTROL PACK.md
+values:
+  - value: DRAFT
+    description: Formula version is being prepared.
+    source: Conservative lifecycle value; full state machine not locked.
+  - value: PENDING_EVIDENCE
+    description: Required evidence is missing.
+    source: PACK-02 evidence gate.
+  - value: APPROVED
+    description: Formula version has owner approval.
+    source: PACK-02 G1 owner approval.
+  - value: ACTIVE
+    description: Formula version is active for operational use, typically G1.
+    source: PACK-02 Formula Version G1 Active requirement.
+  - value: LOCKED
+    description: Formula version has been used and must not be overwritten.
+    source: PACK-02 no overwrite of used G1.
+  - value: SUPERSEDED
+    description: Formula version has been replaced by a later version.
+    source: Inferred from PACK-02 requirement that changes after G1 create new versions.
+  - value: BLOCKED
+    description: Formula version is blocked by config/evidence/approval gaps.
+    source: PACK-02 guard behavior.
+compatibility:
+  breaking_change: Removing or reinterpreting formula statuses is breaking for BOM snapshot and production order contracts.
+todos:
+  - Define official Formula Version state transitions in Phase 7.

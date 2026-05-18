@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/demand.schema.json",
+  "title": "Demand",
+  "description": "Production Demand v1 contract. Stock Alert red can create Production Demand, but must not create Production Order directly.",
+  "$comment": "Sources: PACK-03 Demand Board and Stock Alert smoke. TODO: final demand status enum is not fully specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "demand_id": { "type": "string", "minLength": 1, "description": "Production demand identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU requiring production." },
+    "demand_source": { "type": "string", "description": "Demand source, such as stock alert, dealer order shortage, or owner plan. TODO: define official values." },
+    "source_object": { "$ref": "../common/source-ref.schema.json" },
+    "required_quantity": { "$ref": "../common/quantity.schema.json" },
+    "available_stock": { "$ref": "../common/quantity.schema.json" },
+    "shortage_quantity": { "$ref": "../common/quantity.schema.json" },
+    "priority": { "type": "string", "description": "Demand priority. TODO: source documents do not define a priority enum." },
+    "status": { "type": "string", "description": "Demand status. Prefer enums/ops/production-demand-status.yaml." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["demand_id"]
+}

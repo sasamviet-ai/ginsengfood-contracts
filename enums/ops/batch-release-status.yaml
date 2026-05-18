@@ -1,0 +1,26 @@
+version: v1
+name: batch-release-status
+title: Batch Release Status
+description: Batch release decision status values.
+source_documents:
+  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+values:
+  - value: PENDING_RELEASE_REVIEW
+    description: Release review is pending.
+    source: PACK-01 release boundary.
+  - value: RELEASED
+    description: Batch release approved.
+    source: PACK-01 RELEASED batch.
+  - value: REJECTED
+    description: Batch release rejected.
+    source: Conservative value; source does not define full decision list.
+  - value: ON_HOLD
+    description: Release is held for review or quality issue.
+    source: PACK-01 HOLD/REVIEW behavior.
+  - value: BLOCKED
+    description: Release blocked by QC, evidence, trace, or guard condition.
+    source: PACK-01 negative paths.
+compatibility:
+  breaking_change: Allowing warehouse receipt before RELEASED is breaking.
+todos:
+  - Define release decision transitions in Phase 7.

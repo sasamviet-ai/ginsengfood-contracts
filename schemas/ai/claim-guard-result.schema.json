@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ai/v1/claim-guard-result.schema.json",
+  "title": "Claim Guard Result",
+  "description": "AI v1 claim guard result contract for checking whether response/recommendation claims are allowed and public-safe.",
+  "$comment": "Sources: PACK-05 and TECH-05. AI must not create unapproved claims or expose internal/private operational data. TODO: source documents do not define a full claim category enum.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "claim_guard_result_id": { "type": "string", "minLength": 1, "description": "Claim guard result identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "response_instruction_id": { "type": "string", "description": "Response instruction checked by guard." },
+    "product_recommendation_id": { "type": "string", "description": "Product recommendation checked by guard." },
+    "decision": { "type": "string", "description": "Guard decision. Prefer enums/common/guard-decision.yaml." },
+    "public_safe": { "type": "boolean", "description": "Whether checked content is public-safe." },
+    "approved_claim_refs": { "type": "array", "items": { "$ref": "../common/source-ref.schema.json" }, "description": "Approved public-safe claim sources." },
+    "blocked_claims": { "type": "array", "items": { "type": "string" }, "description": "Claims blocked by guard." },
+    "handoff_required": { "type": "boolean", "description": "Whether guard requires handoff." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["claim_guard_result_id", "version"]
+}

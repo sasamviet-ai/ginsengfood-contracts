@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ads/v1/data-quality-status.schema.json",
+  "title": "Data Quality Status",
+  "description": "Ads v1 data quality status contract for raw/clean/verified revenue measurement readiness.",
+  "$comment": "Sources: PACK-07, TECH-07, and PACK-10 require Data Quality PASS before official ROAS/scale. TODO: source documents do not define a complete data quality enum or metric thresholds.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "data_quality_status_id": { "type": "string", "minLength": 1, "description": "Data quality status identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "scope": { "type": "string", "description": "Measurement scope such as campaign, adset, ad, channel, or period. TODO: define official scope enum." },
+    "raw_event_count": { "type": "integer", "minimum": 0, "description": "Count of raw measurement events." },
+    "clean_event_count": { "type": "integer", "minimum": 0, "description": "Count of cleaned measurement events." },
+    "verified_revenue_count": { "type": "integer", "minimum": 0, "description": "Count of verified revenue links." },
+    "status": { "type": "string", "description": "Data quality status. TODO: define official values such as PASS/BLOCKED/PENDING if source locks them." },
+    "issues": { "type": "array", "items": { "type": "string" }, "description": "Data quality issues, including missing verified revenue or attribution conflict." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["data_quality_status_id", "version"]
+}

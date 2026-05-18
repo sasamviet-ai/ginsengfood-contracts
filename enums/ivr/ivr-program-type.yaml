@@ -1,0 +1,15 @@
+version: v1
+name: ivr-program-type
+title: IVR Program Type
+description: IVR v1 program types mentioned by PACK-09 for order confirmation attempts.
+source_documents:
+  - docs/documents/2_pack/PACK-09 - IVR_ORDER_CONFIRMATION.md
+values:
+  - value: GOLDEN_HOUR
+    description: Golden Hour order confirmation program.
+  - value: TWENTY_FOUR_SEVEN
+    description: 24/7 order confirmation program.
+compatibility:
+  breaking_change: Changing attempt policy for a program without evidence and owner decision is breaking.
+todos:
+  - TECH-09 V1.0 locks baseline MAX_ATTEMPT_PER_ORDER = 2; reconcile program-specific attempt counts before Phase 7.

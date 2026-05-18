@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-error-conflict-001",
+    "sourceSystem": "business-platform",
+    "timestamp": "2026-05-18T09:20:00+07:00"
+  },
+  "error": {
+    "code": "INTEGRATION.RESOLVER_CONFLICT",
+    "message": "The requested operation conflicts with the current operational truth.",
+    "httpStatus": 409,
+    "details": [
+      {
+        "field": "data.quote_snapshot_id",
+        "reason": "The quote snapshot is expired or superseded and cannot create an official order."
+      }
+    ],
+    "correlationId": "corr-error-conflict-001",
+    "auditId": "audit-error-conflict-001"
+  }
+}

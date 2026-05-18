@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-error-forbidden-001",
+    "sourceSystem": "ops-core",
+    "timestamp": "2026-05-18T09:10:00+07:00"
+  },
+  "error": {
+    "code": "PERMISSION.ACCESS_DENIED",
+    "message": "The caller is not allowed to perform this action.",
+    "httpStatus": 403,
+    "details": [
+      {
+        "field": "actor",
+        "reason": "The requested high-risk command requires owner approval evidence."
+      }
+    ],
+    "correlationId": "corr-error-forbidden-001",
+    "auditId": "audit-error-forbidden-001"
+  }
+}

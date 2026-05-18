@@ -1,0 +1,362 @@
+asyncapi: 2.6.0
+info:
+  title: GinsengFood Cross-System Integration Events
+  version: 1.0.0
+  description: AsyncAPI v1 contract for high-risk cross-system events consumed across
+    ops-core, business-platform, Ads, IVR, MISA, and channel boundaries. Placeholder
+    only.
+servers:
+  placeholder:
+    url: message-broker.example.local
+    protocol: amqp
+    description: Placeholder only. Not a real broker configuration.
+channels:
+  ops-core.inventory.inventory-available-changed.v1:
+    description: Published when derived available stock changes from Inventory Ledger.
+      Consumers must not mutate ledger through this event.
+    publish:
+      summary: ops-core publishes inventory-available-changed.v1.
+      operationId: inventoryAvailableChangedV1
+      message:
+        $ref: '#/components/messages/inventoryAvailableChangedV1Message'
+  ops-core.sellable.sku-became-sellable.v1:
+    description: Published when SKU/batch becomes sellable after release, receipt,
+      ledger, stock, HSD, QC, trace, recall, and sale-lock checks pass.
+    publish:
+      summary: ops-core publishes sku-became-sellable.v1.
+      operationId: skuBecameSellableV1
+      message:
+        $ref: '#/components/messages/skuBecameSellableV1Message'
+  ops-core.sellable.sku-became-not-sellable.v1:
+    description: Published when SKU/batch becomes not sellable due to stock, quality
+      hold, recall hold, sale lock, trace, HSD, or release boundary.
+    publish:
+      summary: ops-core publishes sku-became-not-sellable.v1.
+      operationId: skuBecameNotSellableV1
+      message:
+        $ref: '#/components/messages/skuBecameNotSellableV1Message'
+  ops-core.recall.sale-lock-activated.v1:
+    description: Published when sale lock becomes active. Payload includes sale-lock
+      scope needed for business-platform to stop quote, order, AI, CRM, Ads, and Live
+      flows for the affected scope.
+    publish:
+      summary: ops-core publishes sale-lock-activated.v1.
+      operationId: saleLockActivatedV1
+      message:
+        $ref: '#/components/messages/saleLockActivatedV1Message'
+  ops-core.recall.sale-lock-released.v1:
+    description: Published when sale lock is released after owner-approved recovery.
+      Consumers must re-check sellable status before reopening commerce flows.
+    publish:
+      summary: ops-core publishes sale-lock-released.v1.
+      operationId: saleLockReleasedV1
+      message:
+        $ref: '#/components/messages/saleLockReleasedV1Message'
+  ops-core.recall.stop-sale-required.v1:
+    description: Published when stop-sale is required for a scope. This is a high-risk
+      suppression signal and must not be ignored by consumer channels.
+    publish:
+      summary: ops-core publishes stop-sale-required.v1.
+      operationId: stopSaleRequiredV1
+      message:
+        $ref: '#/components/messages/stopSaleRequiredV1Message'
+  ops-core.misa.accounting-handoff-created.v1:
+    description: Published when an accounting handoff contract is created from a valid
+      operational checkpoint. It does not modify Operational Truth.
+    publish:
+      summary: ops-core publishes accounting-handoff-created.v1.
+      operationId: accountingHandoffCreatedV1
+      message:
+        $ref: '#/components/messages/accountingHandoffCreatedV1Message'
+  ops-core.misa.misa-sync-succeeded.v1:
+    description: Published when MISA sync succeeds. This acknowledges integration
+      state only and must not rewrite Operational Truth.
+    publish:
+      summary: ops-core publishes misa-sync-succeeded.v1.
+      operationId: misaSyncSucceededV1
+      message:
+        $ref: '#/components/messages/misaSyncSucceededV1Message'
+  ops-core.misa.misa-sync-failed.v1:
+    description: Published when MISA sync fails or is blocked. Failure must preserve
+      mapping/sync/reconcile status without changing Operational Truth.
+    publish:
+      summary: ops-core publishes misa-sync-failed.v1.
+      operationId: misaSyncFailedV1
+      message:
+        $ref: '#/components/messages/misaSyncFailedV1Message'
+  business-platform.order.order-confirmed.v1:
+    description: Published when business-platform confirms an Official Order. Payload
+      carries order id, order code, customer confirmation, and quote snapshot references
+      for ops-core fulfillment boundary.
+    publish:
+      summary: business-platform publishes order-confirmed.v1.
+      operationId: orderConfirmedV1
+      message:
+        $ref: '#/components/messages/orderConfirmedV1Message'
+  business-platform.order.order-cancelled.v1:
+    description: Published when the Core Order State Machine has cancelled the official
+      order. IVR alone must not publish this state.
+    publish:
+      summary: business-platform publishes order-cancelled.v1.
+      operationId: orderCancelledV1
+      message:
+        $ref: '#/components/messages/orderCancelledV1Message'
+  business-platform.order.order-paid.v1:
+    description: Published when payment is confirmed by a valid owner source. A transfer
+      image or payment pending state is not paid.
+    publish:
+      summary: business-platform publishes order-paid.v1.
+      operationId: orderPaidV1
+      message:
+        $ref: '#/components/messages/orderPaidV1Message'
+  business-platform.order.order-ready-for-fulfillment.v1:
+    description: Published when an official order is ready to be handed to fulfillment
+      consumers. Ops-core must still enforce sellable, stock, sale-lock, recall, and
+      trace boundaries.
+    publish:
+      summary: business-platform publishes order-ready-for-fulfillment.v1.
+      operationId: orderReadyForFulfillmentV1
+      message:
+        $ref: '#/components/messages/orderReadyForFulfillmentV1Message'
+  business-platform.payment.payment-confirmed.v1:
+    description: Published when payment or collection is confirmed by the payment/accounting
+      owner. This can feed verified revenue review but does not create ops-core truth.
+    publish:
+      summary: business-platform publishes payment-confirmed.v1.
+      operationId: paymentConfirmedV1
+      message:
+        $ref: '#/components/messages/paymentConfirmedV1Message'
+  business-platform.shipping.shipping-status-changed.v1:
+    description: Published when shipping status changes. Tracking status does not
+      mutate order/payment/revenue by itself.
+    publish:
+      summary: business-platform publishes shipping-status-changed.v1.
+      operationId: shippingStatusChangedV1
+      message:
+        $ref: '#/components/messages/shippingStatusChangedV1Message'
+  business-platform.ads.verified-revenue-created.v1:
+    description: Published only by business-platform/commerce when revenue is verified.
+      Ops-core must not emit VerifiedRevenueCreated, and Ads must not use quote/cart/draft/unpaid/pending
+      as revenue.
+    publish:
+      summary: business-platform publishes verified-revenue-created.v1.
+      operationId: verifiedRevenueCreatedV1
+      message:
+        $ref: '#/components/messages/verifiedRevenueCreatedV1Message'
+  business-platform.ads.attribution-resolved.v1:
+    description: Published when attribution conflict is resolved or an owner-approved
+      attribution rule is applied. Unresolved conflicts must not feed official ROAS.
+    publish:
+      summary: business-platform publishes attribution-resolved.v1.
+      operationId: attributionResolvedV1
+      message:
+        $ref: '#/components/messages/attributionResolvedV1Message'
+  business-platform.ads.scale-gate-decision-created.v1:
+    description: Published when a scale gate decision is created. Scale gate is not
+      an automatic budget increase and requires owner decision.
+    publish:
+      summary: business-platform publishes scale-gate-decision-created.v1.
+      operationId: scaleGateDecisionCreatedV1
+      message:
+        $ref: '#/components/messages/scaleGateDecisionCreatedV1Message'
+  business-platform.ivr.ivr-confirmation-requested.v1:
+    description: Published when IVR order confirmation is requested for an eligible
+      Official Order only. It must not run for Quote, Cart, or Order Draft.
+    publish:
+      summary: business-platform publishes ivr-confirmation-requested.v1.
+      operationId: ivrConfirmationRequestedV1
+      message:
+        $ref: '#/components/messages/ivrConfirmationRequestedV1Message'
+  business-platform.ivr.ivr-confirmed.v1:
+    description: Published when IVR result is confirmed by the customer. It is an
+      input signal only and must pass Core Order State Machine.
+    publish:
+      summary: business-platform publishes ivr-confirmed.v1.
+      operationId: ivrConfirmedV1
+      message:
+        $ref: '#/components/messages/ivrConfirmedV1Message'
+  business-platform.ivr.ivr-customer-cancelled.v1:
+    description: Published when customer cancellation is captured by IVR. It is input
+      signal only; Core Order State Machine decides final cancellation and Notification
+      owner sends notice only after official cancellation.
+    publish:
+      summary: business-platform publishes ivr-customer-cancelled.v1.
+      operationId: ivrCustomerCancelledV1
+      message:
+        $ref: '#/components/messages/ivrCustomerCancelledV1Message'
+components:
+  messages:
+    inventoryAvailableChangedV1Message:
+      name: inventory-available-changed.v1
+      title: Inventory Available Changed Event v1
+      summary: Published when derived available stock changes from Inventory Ledger.
+        Consumers must not mutate ledger through this event.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/inventory/inventory-available-changed.v1.json
+    skuBecameSellableV1Message:
+      name: sku-became-sellable.v1
+      title: Sku Became Sellable Event v1
+      summary: Published when SKU/batch becomes sellable after release, receipt, ledger,
+        stock, HSD, QC, trace, recall, and sale-lock checks pass.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/sellable/sku-became-sellable.v1.json
+    skuBecameNotSellableV1Message:
+      name: sku-became-not-sellable.v1
+      title: Sku Became Not Sellable Event v1
+      summary: Published when SKU/batch becomes not sellable due to stock, quality
+        hold, recall hold, sale lock, trace, HSD, or release boundary.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/sellable/sku-became-not-sellable.v1.json
+    saleLockActivatedV1Message:
+      name: sale-lock-activated.v1
+      title: Sale Lock Activated Event v1
+      summary: Published when sale lock becomes active. Payload includes sale-lock
+        scope needed for business-platform to stop quote, order, AI, CRM, Ads, and
+        Live flows for the affected scope.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/recall/sale-lock-activated.v1.json
+    saleLockReleasedV1Message:
+      name: sale-lock-released.v1
+      title: Sale Lock Released Event v1
+      summary: Published when sale lock is released after owner-approved recovery.
+        Consumers must re-check sellable status before reopening commerce flows.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/recall/sale-lock-released.v1.json
+    stopSaleRequiredV1Message:
+      name: stop-sale-required.v1
+      title: Stop Sale Required Event v1
+      summary: Published when stop-sale is required for a scope. This is a high-risk
+        suppression signal and must not be ignored by consumer channels.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/recall/stop-sale-required.v1.json
+    accountingHandoffCreatedV1Message:
+      name: accounting-handoff-created.v1
+      title: Accounting Handoff Created Event v1
+      summary: Published when an accounting handoff contract is created from a valid
+        operational checkpoint. It does not modify Operational Truth.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/misa/accounting-handoff-created.v1.json
+    misaSyncSucceededV1Message:
+      name: misa-sync-succeeded.v1
+      title: Misa Sync Succeeded Event v1
+      summary: Published when MISA sync succeeds. This acknowledges integration state
+        only and must not rewrite Operational Truth.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/misa/misa-sync-succeeded.v1.json
+    misaSyncFailedV1Message:
+      name: misa-sync-failed.v1
+      title: Misa Sync Failed Event v1
+      summary: Published when MISA sync fails or is blocked. Failure must preserve
+        mapping/sync/reconcile status without changing Operational Truth.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/misa/misa-sync-failed.v1.json
+    orderConfirmedV1Message:
+      name: order-confirmed.v1
+      title: Order Confirmed Event v1
+      summary: Published when business-platform confirms an Official Order. Payload
+        carries order id, order code, customer confirmation, and quote snapshot references
+        for ops-core fulfillment boundary.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/order/order-confirmed.v1.json
+    orderCancelledV1Message:
+      name: order-cancelled.v1
+      title: Order Cancelled Event v1
+      summary: Published when the Core Order State Machine has cancelled the official
+        order. IVR alone must not publish this state.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/order/order-cancelled.v1.json
+    orderPaidV1Message:
+      name: order-paid.v1
+      title: Order Paid Event v1
+      summary: Published when payment is confirmed by a valid owner source. A transfer
+        image or payment pending state is not paid.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/order/order-paid.v1.json
+    orderReadyForFulfillmentV1Message:
+      name: order-ready-for-fulfillment.v1
+      title: Order Ready For Fulfillment Event v1
+      summary: Published when an official order is ready to be handed to fulfillment
+        consumers. Ops-core must still enforce sellable, stock, sale-lock, recall,
+        and trace boundaries.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/order/order-ready-for-fulfillment.v1.json
+    paymentConfirmedV1Message:
+      name: payment-confirmed.v1
+      title: Payment Confirmed Event v1
+      summary: Published when payment or collection is confirmed by the payment/accounting
+        owner. This can feed verified revenue review but does not create ops-core
+        truth.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/payment/payment-confirmed.v1.json
+    shippingStatusChangedV1Message:
+      name: shipping-status-changed.v1
+      title: Shipping Status Changed Event v1
+      summary: Published when shipping status changes. Tracking status does not mutate
+        order/payment/revenue by itself.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/shipping/shipping-status-changed.v1.json
+    verifiedRevenueCreatedV1Message:
+      name: verified-revenue-created.v1
+      title: Verified Revenue Created Event v1
+      summary: Published only by business-platform/commerce when revenue is verified.
+        Ops-core must not emit VerifiedRevenueCreated, and Ads must not use quote/cart/draft/unpaid/pending
+        as revenue.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ads/verified-revenue-created.v1.json
+    attributionResolvedV1Message:
+      name: attribution-resolved.v1
+      title: Attribution Resolved Event v1
+      summary: Published when attribution conflict is resolved or an owner-approved
+        attribution rule is applied. Unresolved conflicts must not feed official ROAS.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ads/attribution-resolved.v1.json
+    scaleGateDecisionCreatedV1Message:
+      name: scale-gate-decision-created.v1
+      title: Scale Gate Decision Created Event v1
+      summary: Published when a scale gate decision is created. Scale gate is not
+        an automatic budget increase and requires owner decision.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ads/scale-gate-decision-created.v1.json
+    ivrConfirmationRequestedV1Message:
+      name: ivr-confirmation-requested.v1
+      title: Ivr Confirmation Requested Event v1
+      summary: Published when IVR order confirmation is requested for an eligible
+        Official Order only. It must not run for Quote, Cart, or Order Draft.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-confirmation-requested.v1.json
+    ivrConfirmedV1Message:
+      name: ivr-confirmed.v1
+      title: Ivr Confirmed Event v1
+      summary: Published when IVR result is confirmed by the customer. It is an input
+        signal only and must pass Core Order State Machine.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-confirmed.v1.json
+    ivrCustomerCancelledV1Message:
+      name: ivr-customer-cancelled.v1
+      title: Ivr Customer Cancelled Event v1
+      summary: Published when customer cancellation is captured by IVR. It is input
+        signal only; Core Order State Machine decides final cancellation and Notification
+        owner sends notice only after official cancellation.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-customer-cancelled.v1.json

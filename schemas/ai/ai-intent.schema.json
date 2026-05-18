@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ai/v1/ai-intent.schema.json",
+  "title": "AI Intent",
+  "description": "AI v1 intent contract for classifying customer/channel requests before response instruction, guard, recommendation, or handoff.",
+  "$comment": "Sources: PACK-05 and TECH-05 AI Advisor. AI may interpret and recommend but is not source of truth for price, stock, order, payment, claims, or private data. TODO: source documents do not lock a complete intent taxonomy.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ai_intent_id": { "type": "string", "minLength": 1, "description": "AI intent identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "channel_context_id": { "type": "string", "description": "Channel context for the request." },
+    "customer_id": { "type": "string", "description": "Customer reference if resolved." },
+    "intent_type": { "type": "string", "description": "Detected intent type. TODO: define official intent enum from source docs." },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1, "description": "Model confidence, when available." },
+    "requires_handoff": { "type": "boolean", "description": "Whether AI must hand off to human or Commerce Runtime." },
+    "public_private_context": { "type": "string", "description": "Public/private context used before response. Prefer enums/channel/visibility-state.yaml when available." },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["ai_intent_id", "version"]
+}

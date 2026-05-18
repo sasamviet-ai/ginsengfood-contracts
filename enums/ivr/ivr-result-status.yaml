@@ -1,0 +1,52 @@
+version: v1
+name: ivr-result-status
+title: IVR Result Status
+description: IVR v1 result and outcome values for order confirmation signals.
+source_documents:
+  - docs/documents/2_pack/PACK-09 - IVR_ORDER_CONFIRMATION.md
+  - docs/documents/3_tech/TECH-09 - IVR ORDER CONFIRMATION AUTO CALL VERIFICATION ANTI-FAKE-ORDER CONTROL.md
+values:
+  - value: IVR_CONFIRMED
+    description: Customer confirmed order through IVR.
+  - value: IVR_CUSTOMER_CANCELLED
+    description: Customer cancelled through IVR signal.
+  - value: CUSTOMER_CANCELLED_BY_IVR_KEY_0
+    description: Customer cancellation reason from IVR key 0.
+  - value: NO_ANSWER
+    description: Valid no-answer outcome for a non-final attempt.
+  - value: IVR_NO_ANSWER_FINAL
+    description: Final no-answer after valid attempts by policy.
+  - value: NO_ANSWER_MAX_ATTEMPT_REACHED
+    description: No-answer reached max attempts and must be handed off to Core Order State Machine.
+  - value: IVR_NO_ANSWER_AFTER_PROGRAM_ATTEMPTS
+    description: Cancellation/handoff reason after program attempts.
+  - value: IVR_NO_ANSWER_AFTER_2_ATTEMPTS
+    description: No-answer reason after two valid attempts.
+  - value: IVR_NO_ANSWER_AFTER_3_ATTEMPTS
+    description: No-answer reason after three valid attempts where program policy allows it.
+  - value: INVALID_PHONE
+    description: Phone is invalid based on resolver/provider evidence.
+  - value: IVR_INVALID_PHONE_FINAL
+    description: Final invalid-phone result if policy confirms.
+  - value: IVR_INVALID_PHONE_IF_RULE_CONFIRMED
+    description: Cancellation/handoff reason for invalid phone when rule confirms.
+  - value: IVR_CONFIRMATION_WINDOW_EXPIRED
+    description: Confirmation window expired.
+  - value: IVR_TECHNICAL_EXCEPTION
+    description: IVR technical exception; not no-answer and not customer cancellation.
+  - value: TECHNICAL_FAILURE
+    description: Technical failure outcome.
+  - value: PROVIDER_FAILURE
+    description: Provider failure outcome.
+  - value: IVR_CAPACITY_EXCEPTION
+    description: Capacity exception; not no-answer.
+  - value: BUSY
+    description: Busy signal; must not be auto-grouped into no-answer unless policy defines it.
+  - value: REJECTED
+    description: Rejected call; must not be auto-grouped into no-answer unless policy defines it.
+  - value: UNREACHABLE
+    description: Unreachable call; must not be auto-grouped into no-answer unless policy defines it.
+compatibility:
+  breaking_change: Treating technical exception, capacity exception, invalid phone, busy, rejected, or unreachable as no-answer without policy is breaking.
+todos:
+  - Resolve whether PACK-09 program-based final reasons or TECH-09 V1.0 baseline max-attempt policy is authoritative for Phase 7 state machines.

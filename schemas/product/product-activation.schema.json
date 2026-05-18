@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/product-activation.schema.json",
+  "title": "Product Activation",
+  "description": "Product Activation v1 contract for product/config activation. Product Activation is not sellable and cannot override Operational Core Sellable Gate, Recall, Sale Lock, or Hold.",
+  "$comment": "Sources: PACK-02 Product Activation Resolver and Guard. TODO: final activation resolver status taxonomy is not fully specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "activation_id": { "type": "string", "minLength": 1, "description": "Product Activation identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU being activated." },
+    "activation_version": { "type": "string", "minLength": 1, "description": "Activation version." },
+    "status": { "type": "string", "description": "Activation status. Prefer enums/product/product-activation-status.yaml." },
+    "required_chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Minimum Product Activation readiness chain from PACK-02.",
+      "properties": {
+        "sku_canonical_ready": { "type": "boolean" },
+        "ingredient_canonical_ready": { "type": "boolean" },
+        "recipe_g1_approved": { "type": "boolean" },
+        "bom_g1_approved": { "type": "boolean" },
+        "formula_g1_active": { "type": "boolean" },
+        "configs_ready": { "type": "boolean" },
+        "evidence_ready": { "type": "boolean" },
+        "owner_signoff_ready": { "type": "boolean" }
+      }
+    },
+    "sellable_dependency_status": { "type": "string", "description": "Operational Core sellable dependency summary; Product Activation must not be treated as sellable." },
+    "guard_block_reasons": { "type": "array", "items": { "type": "string" }, "description": "Reasons why Product Activation is blocked, e.g. missing config/evidence/smoke or Formula G1 not active." },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["activation_id"]
+}

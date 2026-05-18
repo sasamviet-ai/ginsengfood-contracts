@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/product.schema.json",
+  "title": "Product",
+  "description": "Product Master v1 contract for the product governance chain: SKU canonical, ingredient canonical, G1 formula, recipe, BOM, formula version, BOM snapshot, operational configs, and activation dependency.",
+  "$comment": "Sources: PACK-02 Product Master and TECH-02. TODO: source documents do not provide a final product category code list.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "product_id": { "type": "string", "minLength": 1, "description": "Product master identifier." },
+    "product_code": { "type": "string", "minLength": 1, "description": "Canonical product code. TODO: confirm product code format from source documents." },
+    "product_name": { "type": "string", "minLength": 1, "description": "Canonical product name." },
+    "public_name": { "type": "string", "minLength": 1, "description": "Public-facing product name when different from canonical name." },
+    "product_group": { "type": "string", "minLength": 1, "description": "Product group from the 20 SKU catalog when available." },
+    "sku_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "SKUs governed under this product." },
+    "activation_id": { "type": "string", "minLength": 1, "description": "Linked Product Activation record, if activation has been prepared." },
+    "source_ref": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["product_id"]
+}

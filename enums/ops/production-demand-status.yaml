@@ -1,0 +1,32 @@
+version: v1
+name: production-demand-status
+title: Production Demand Status
+description: Production Demand Board v1 status values. Stock alerts can create demand, not production orders.
+source_documents:
+  - docs/documents/2_pack/PACK-03 - DEMAND MRP FORMULA SCALING PROCUREMENT STOCK ALERT MATERIAL PACKAGING CONTROL PACK.md
+values:
+  - value: DRAFT
+    description: Demand record is being prepared.
+    source: Conservative lifecycle value; source does not lock full status list.
+  - value: PENDING_EVIDENCE
+    description: Demand lacks evidence and cannot be approved.
+    source: PACK-03 smoke case Demand missing evidence.
+  - value: OWNER_REVIEW_REQUIRED
+    description: Owner review is required before approval.
+    source: PACK-03 demand governance.
+  - value: APPROVED
+    description: Demand approved for MRP.
+    source: PACK-03 Demand Board flow.
+  - value: CONVERTED_TO_MRP
+    description: Demand has been consumed by an MRP run.
+    source: PACK-03 Demand -> MRP flow.
+  - value: BLOCKED
+    description: Demand is blocked by missing evidence, invalid source, or guard condition.
+    source: PACK-03 guard behavior.
+  - value: CLOSED
+    description: Demand handling is closed.
+    source: TODO: closure semantics are not specified.
+compatibility:
+  breaking_change: Renaming demand statuses is breaking for MRP producers/consumers.
+todos:
+  - Define official demand state machine in Phase 7.

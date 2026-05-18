@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/verified-revenue.schema.json",
+  "title": "Verified Revenue",
+  "description": "Commerce v1 verified revenue contract. Only verified revenue may feed official Ads ROAS, KPI, and commission calculations.",
+  "$comment": "Sources: TECH-04 Verified Revenue rules and PACK-07 dependency. Quote, cart, draft, unpaid, cancelled, refunded, COD failed, and payment pending states are not verified revenue.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "verified_revenue_id": { "type": "string", "minLength": 1, "description": "Verified revenue identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "order_id": { "type": "string", "description": "Verified official order." },
+    "payment_id": { "type": "string", "description": "Payment or collection confirmation reference." },
+    "status": { "type": "string", "description": "Verified revenue status. Prefer enums/commerce/verified-revenue-status.yaml." },
+    "revenue_amount": { "$ref": "../common/money.schema.json" },
+    "order_verified": { "type": "boolean", "description": "Whether order verification passed." },
+    "payment_or_collection_confirmed": { "type": "boolean", "description": "Whether payment or COD collection was confirmed." },
+    "excluded": { "type": "boolean", "description": "Whether revenue is excluded by refund/cancellation/policy." },
+    "exclusion_reason": { "type": "string", "description": "Reason for exclusion or reversal." },
+    "verified_at": { "type": "string", "format": "date-time", "description": "Verified revenue timestamp." },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["verified_revenue_id", "version"]
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/envelope.schema.json",
+  "title": "Common Envelope",
+  "description": "Common v1 wrapper for API responses, event payloads, or command results that need traceable data or error output across ops-core and business-platform.",
+  "$comment": "Source: docs/api-design-standard.md and docs/correlation-audit-standard.md require versioned APIs and consistent request/response/error metadata with correlation support.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "v1",
+      "description": "Contract schema version."
+    },
+    "correlation": {
+      "$ref": "correlation.schema.json",
+      "description": "Correlation context for end-to-end traceability."
+    },
+    "data": {
+      "description": "Domain payload. Phase 1 does not define domain-specific data shapes."
+    },
+    "error": {
+      "$ref": "error.schema.json",
+      "description": "Error payload when the envelope represents a failed or blocked result."
+    },
+    "meta": {
+      "type": "object",
+      "description": "Safe optional metadata. Do not place business logic or sensitive data here.",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "schemaVersion"
+  ]
+}

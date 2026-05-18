@@ -1,0 +1,223 @@
+openapi: 3.1.0
+info:
+  title: GinsengFood Business Platform IVR Order Confirmation API
+  version: 1.0.0
+  description: >
+    v1 contract for IVR order confirmation only. IVR call results are input
+    signals for the core order state machine and must not directly mutate
+    order, payment, shipping, revenue, warehouse, MISA, or notification state.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+tags:
+  - name: IVR Order Confirmation
+paths:
+  /v1/ivr/order-confirmation/call-jobs:
+    post:
+      tags:
+        - IVR Order Confirmation
+      summary: Create IVR call job
+      description: >
+        Creates an IVR call job for official order confirmation only. The
+        program type must not be used for sales, CRM, payment collection, or
+        delivery operations.
+      operationId: createIvrCallJobV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-call-job.schema.json
+      responses:
+        "200":
+          description: IVR call job contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-call-job.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ivr/order-confirmation/call-jobs/{ivrCallJobId}:
+    get:
+      tags:
+        - IVR Order Confirmation
+      summary: Get IVR call job
+      description: Returns IVR call job state for order confirmation.
+      operationId: getIvrCallJobV1
+      parameters:
+        - name: ivrCallJobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: IVR call job contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-call-job.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ivr/order-confirmation/call-attempts:
+    post:
+      tags:
+        - IVR Order Confirmation
+      summary: Record IVR call attempt
+      description: >
+        Records an IVR attempt, including no-answer, invalid-phone, and
+        technical exception outcomes where applicable. The attempt itself is not
+        the final order decision.
+      operationId: createIvrCallAttemptV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-call-attempt.schema.json
+      responses:
+        "200":
+          description: IVR call attempt contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-call-attempt.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ivr/order-confirmation/call-results:
+    post:
+      tags:
+        - IVR Order Confirmation
+      summary: Record IVR call result
+      description: >
+        Records IVR result status for order confirmation. Result status is an
+        input signal only and cannot directly cancel an order or send a
+        cancellation notification.
+      operationId: createIvrCallResultV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-call-result.schema.json
+      responses:
+        "200":
+          description: IVR call result contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-call-result.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    BadRequest:
+      description: Invalid request syntax or parameters.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Unauthorized:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Forbidden:
+      description: Caller is not allowed to perform this operation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    NotFound:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Conflict:
+      description: Request conflicts with current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    UnprocessableEntity:
+      description: Request is syntactically valid but violates contract validation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json

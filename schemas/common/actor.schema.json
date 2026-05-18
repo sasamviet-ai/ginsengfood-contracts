@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/actor.schema.json",
+  "title": "Actor",
+  "description": "Common v1 actor reference for audit, permission, evidence, and owner decisions.",
+  "$comment": "Source: TECH-01 Audit Record Standard defines Actor Type as Human / Service Account / System and requires Actor ID plus role snapshot for audit.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "actorType": {
+      "type": "string",
+      "enum": [
+        "HUMAN",
+        "SERVICE_ACCOUNT",
+        "SYSTEM"
+      ],
+      "description": "Actor type from TECH-01."
+    },
+    "actorId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human, service account, or system identifier."
+    },
+    "actorRoleSnapshot": {
+      "type": "array",
+      "description": "Roles held at the time of the action, when applicable.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Access or decision scope when the source document requires scoped permission."
+    }
+  },
+  "required": [
+    "actorType",
+    "actorId"
+  ]
+}

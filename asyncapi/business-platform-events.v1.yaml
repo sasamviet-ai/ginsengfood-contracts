@@ -1,0 +1,365 @@
+asyncapi: 2.6.0
+info:
+  title: GinsengFood Business Platform Events
+  version: 1.0.0
+  description: AsyncAPI v1 contract for events published by business-platform. This
+    is a placeholder contract and does not define real broker configuration.
+servers:
+  placeholder:
+    url: message-broker.example.local
+    protocol: amqp
+    description: Placeholder only. Not a real broker configuration.
+channels:
+  business-platform.order.order-created.v1:
+    description: Published when an Official Order is created after valid QuoteSnapshot,
+      Order Draft, and Customer Confirmation. It is not paid or verified revenue by
+      itself.
+    publish:
+      summary: business-platform publishes order-created.v1.
+      operationId: orderCreatedV1
+      message:
+        $ref: '#/components/messages/orderCreatedV1Message'
+  business-platform.order.order-confirmed.v1:
+    description: Published when business-platform confirms an Official Order. Payload
+      carries order id, order code, customer confirmation, and quote snapshot references
+      for ops-core fulfillment boundary.
+    publish:
+      summary: business-platform publishes order-confirmed.v1.
+      operationId: orderConfirmedV1
+      message:
+        $ref: '#/components/messages/orderConfirmedV1Message'
+  business-platform.order.order-cancelled.v1:
+    description: Published when the Core Order State Machine has cancelled the official
+      order. IVR alone must not publish this state.
+    publish:
+      summary: business-platform publishes order-cancelled.v1.
+      operationId: orderCancelledV1
+      message:
+        $ref: '#/components/messages/orderCancelledV1Message'
+  business-platform.order.order-paid.v1:
+    description: Published when payment is confirmed by a valid owner source. A transfer
+      image or payment pending state is not paid.
+    publish:
+      summary: business-platform publishes order-paid.v1.
+      operationId: orderPaidV1
+      message:
+        $ref: '#/components/messages/orderPaidV1Message'
+  business-platform.order.order-ready-for-fulfillment.v1:
+    description: Published when an official order is ready to be handed to fulfillment
+      consumers. Ops-core must still enforce sellable, stock, sale-lock, recall, and
+      trace boundaries.
+    publish:
+      summary: business-platform publishes order-ready-for-fulfillment.v1.
+      operationId: orderReadyForFulfillmentV1
+      message:
+        $ref: '#/components/messages/orderReadyForFulfillmentV1Message'
+  business-platform.order.order-delivered.v1:
+    description: Published when delivery status reaches delivered according to the
+      shipping/order owner. Delivery alone is not ads verified revenue unless VerifiedRevenue
+      rules pass.
+    publish:
+      summary: business-platform publishes order-delivered.v1.
+      operationId: orderDeliveredV1
+      message:
+        $ref: '#/components/messages/orderDeliveredV1Message'
+  business-platform.payment.payment-reference-created.v1:
+    description: Published when a payment reference is created for an official order.
+      It is not paid confirmation.
+    publish:
+      summary: business-platform publishes payment-reference-created.v1.
+      operationId: paymentReferenceCreatedV1
+      message:
+        $ref: '#/components/messages/paymentReferenceCreatedV1Message'
+  business-platform.payment.payment-confirmed.v1:
+    description: Published when payment or collection is confirmed by the payment/accounting
+      owner. This can feed verified revenue review but does not create ops-core truth.
+    publish:
+      summary: business-platform publishes payment-confirmed.v1.
+      operationId: paymentConfirmedV1
+      message:
+        $ref: '#/components/messages/paymentConfirmedV1Message'
+  business-platform.payment.payment-failed.v1:
+    description: Published when payment fails or is rejected by owner review. Failure
+      must not be treated as cancellation unless Core Order State Machine decides
+      it.
+    publish:
+      summary: business-platform publishes payment-failed.v1.
+      operationId: paymentFailedV1
+      message:
+        $ref: '#/components/messages/paymentFailedV1Message'
+  business-platform.shipping.shipping-created.v1:
+    description: Published when a shipping contract is created for order/draft eligibility.
+      Carrier/tracking fields remain bounded by source documents.
+    publish:
+      summary: business-platform publishes shipping-created.v1.
+      operationId: shippingCreatedV1
+      message:
+        $ref: '#/components/messages/shippingCreatedV1Message'
+  business-platform.shipping.shipping-status-changed.v1:
+    description: Published when shipping status changes. Tracking status does not
+      mutate order/payment/revenue by itself.
+    publish:
+      summary: business-platform publishes shipping-status-changed.v1.
+      operationId: shippingStatusChangedV1
+      message:
+        $ref: '#/components/messages/shippingStatusChangedV1Message'
+  business-platform.shipping.delivery-issue-opened.v1:
+    description: Published when a delivery issue is opened. It must not become cancellation,
+      refund, or verified revenue without owner state transitions.
+    publish:
+      summary: business-platform publishes delivery-issue-opened.v1.
+      operationId: deliveryIssueOpenedV1
+      message:
+        $ref: '#/components/messages/deliveryIssueOpenedV1Message'
+  business-platform.demand.sales-demand-created.v1:
+    description: Published when sales demand is created for ops-core review. Sales
+      demand must not create Production Order directly and must respect Sale Lock/Recall/Hold.
+    publish:
+      summary: business-platform publishes sales-demand-created.v1.
+      operationId: salesDemandCreatedV1
+      message:
+        $ref: '#/components/messages/salesDemandCreatedV1Message'
+  business-platform.demand.campaign-demand-forecasted.v1:
+    description: Published when campaign demand is forecasted. Forecast is planning
+      input only and cannot bypass MRP, stock, sale-lock, or owner approval.
+    publish:
+      summary: business-platform publishes campaign-demand-forecasted.v1.
+      operationId: campaignDemandForecastedV1
+      message:
+        $ref: '#/components/messages/campaignDemandForecastedV1Message'
+  business-platform.demand.dealer-order-demand-created.v1:
+    description: Published when dealer/distributor order demand is created for ops-core
+      review. It must not become production order without MRP/owner checks.
+    publish:
+      summary: business-platform publishes dealer-order-demand-created.v1.
+      operationId: dealerOrderDemandCreatedV1
+      message:
+        $ref: '#/components/messages/dealerOrderDemandCreatedV1Message'
+  business-platform.ads.verified-revenue-created.v1:
+    description: Published only by business-platform/commerce when revenue is verified.
+      Ops-core must not emit VerifiedRevenueCreated, and Ads must not use quote/cart/draft/unpaid/pending
+      as revenue.
+    publish:
+      summary: business-platform publishes verified-revenue-created.v1.
+      operationId: verifiedRevenueCreatedV1
+      message:
+        $ref: '#/components/messages/verifiedRevenueCreatedV1Message'
+  business-platform.ads.attribution-resolved.v1:
+    description: Published when attribution conflict is resolved or an owner-approved
+      attribution rule is applied. Unresolved conflicts must not feed official ROAS.
+    publish:
+      summary: business-platform publishes attribution-resolved.v1.
+      operationId: attributionResolvedV1
+      message:
+        $ref: '#/components/messages/attributionResolvedV1Message'
+  business-platform.ads.scale-gate-decision-created.v1:
+    description: Published when a scale gate decision is created. Scale gate is not
+      an automatic budget increase and requires owner decision.
+    publish:
+      summary: business-platform publishes scale-gate-decision-created.v1.
+      operationId: scaleGateDecisionCreatedV1
+      message:
+        $ref: '#/components/messages/scaleGateDecisionCreatedV1Message'
+  business-platform.ivr.ivr-confirmation-requested.v1:
+    description: Published when IVR order confirmation is requested for an eligible
+      Official Order only. It must not run for Quote, Cart, or Order Draft.
+    publish:
+      summary: business-platform publishes ivr-confirmation-requested.v1.
+      operationId: ivrConfirmationRequestedV1
+      message:
+        $ref: '#/components/messages/ivrConfirmationRequestedV1Message'
+  business-platform.ivr.ivr-confirmed.v1:
+    description: Published when IVR result is confirmed by the customer. It is an
+      input signal only and must pass Core Order State Machine.
+    publish:
+      summary: business-platform publishes ivr-confirmed.v1.
+      operationId: ivrConfirmedV1
+      message:
+        $ref: '#/components/messages/ivrConfirmedV1Message'
+  business-platform.ivr.ivr-customer-cancelled.v1:
+    description: Published when customer cancellation is captured by IVR. It is input
+      signal only; Core Order State Machine decides final cancellation and Notification
+      owner sends notice only after official cancellation.
+    publish:
+      summary: business-platform publishes ivr-customer-cancelled.v1.
+      operationId: ivrCustomerCancelledV1
+      message:
+        $ref: '#/components/messages/ivrCustomerCancelledV1Message'
+components:
+  messages:
+    orderCreatedV1Message:
+      name: order-created.v1
+      title: Order Created Event v1
+      summary: Published when an Official Order is created after valid QuoteSnapshot,
+        Order Draft, and Customer Confirmation. It is not paid or verified revenue
+        by itself.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/order/order-created.v1.json
+    orderConfirmedV1Message:
+      name: order-confirmed.v1
+      title: Order Confirmed Event v1
+      summary: Published when business-platform confirms an Official Order. Payload
+        carries order id, order code, customer confirmation, and quote snapshot references
+        for ops-core fulfillment boundary.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/order/order-confirmed.v1.json
+    orderCancelledV1Message:
+      name: order-cancelled.v1
+      title: Order Cancelled Event v1
+      summary: Published when the Core Order State Machine has cancelled the official
+        order. IVR alone must not publish this state.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/order/order-cancelled.v1.json
+    orderPaidV1Message:
+      name: order-paid.v1
+      title: Order Paid Event v1
+      summary: Published when payment is confirmed by a valid owner source. A transfer
+        image or payment pending state is not paid.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/order/order-paid.v1.json
+    orderReadyForFulfillmentV1Message:
+      name: order-ready-for-fulfillment.v1
+      title: Order Ready For Fulfillment Event v1
+      summary: Published when an official order is ready to be handed to fulfillment
+        consumers. Ops-core must still enforce sellable, stock, sale-lock, recall,
+        and trace boundaries.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/order/order-ready-for-fulfillment.v1.json
+    orderDeliveredV1Message:
+      name: order-delivered.v1
+      title: Order Delivered Event v1
+      summary: Published when delivery status reaches delivered according to the shipping/order
+        owner. Delivery alone is not ads verified revenue unless VerifiedRevenue rules
+        pass.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/order/order-delivered.v1.json
+    paymentReferenceCreatedV1Message:
+      name: payment-reference-created.v1
+      title: Payment Reference Created Event v1
+      summary: Published when a payment reference is created for an official order.
+        It is not paid confirmation.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/payment/payment-reference-created.v1.json
+    paymentConfirmedV1Message:
+      name: payment-confirmed.v1
+      title: Payment Confirmed Event v1
+      summary: Published when payment or collection is confirmed by the payment/accounting
+        owner. This can feed verified revenue review but does not create ops-core
+        truth.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/payment/payment-confirmed.v1.json
+    paymentFailedV1Message:
+      name: payment-failed.v1
+      title: Payment Failed Event v1
+      summary: Published when payment fails or is rejected by owner review. Failure
+        must not be treated as cancellation unless Core Order State Machine decides
+        it.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/payment/payment-failed.v1.json
+    shippingCreatedV1Message:
+      name: shipping-created.v1
+      title: Shipping Created Event v1
+      summary: Published when a shipping contract is created for order/draft eligibility.
+        Carrier/tracking fields remain bounded by source documents.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/shipping/shipping-created.v1.json
+    shippingStatusChangedV1Message:
+      name: shipping-status-changed.v1
+      title: Shipping Status Changed Event v1
+      summary: Published when shipping status changes. Tracking status does not mutate
+        order/payment/revenue by itself.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/shipping/shipping-status-changed.v1.json
+    deliveryIssueOpenedV1Message:
+      name: delivery-issue-opened.v1
+      title: Delivery Issue Opened Event v1
+      summary: Published when a delivery issue is opened. It must not become cancellation,
+        refund, or verified revenue without owner state transitions.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/shipping/delivery-issue-opened.v1.json
+    salesDemandCreatedV1Message:
+      name: sales-demand-created.v1
+      title: Sales Demand Created Event v1
+      summary: Published when sales demand is created for ops-core review. Sales demand
+        must not create Production Order directly and must respect Sale Lock/Recall/Hold.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/demand/sales-demand-created.v1.json
+    campaignDemandForecastedV1Message:
+      name: campaign-demand-forecasted.v1
+      title: Campaign Demand Forecasted Event v1
+      summary: Published when campaign demand is forecasted. Forecast is planning
+        input only and cannot bypass MRP, stock, sale-lock, or owner approval.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/demand/campaign-demand-forecasted.v1.json
+    dealerOrderDemandCreatedV1Message:
+      name: dealer-order-demand-created.v1
+      title: Dealer Order Demand Created Event v1
+      summary: Published when dealer/distributor order demand is created for ops-core
+        review. It must not become production order without MRP/owner checks.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/demand/dealer-order-demand-created.v1.json
+    verifiedRevenueCreatedV1Message:
+      name: verified-revenue-created.v1
+      title: Verified Revenue Created Event v1
+      summary: Published only by business-platform/commerce when revenue is verified.
+        Ops-core must not emit VerifiedRevenueCreated, and Ads must not use quote/cart/draft/unpaid/pending
+        as revenue.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ads/verified-revenue-created.v1.json
+    attributionResolvedV1Message:
+      name: attribution-resolved.v1
+      title: Attribution Resolved Event v1
+      summary: Published when attribution conflict is resolved or an owner-approved
+        attribution rule is applied. Unresolved conflicts must not feed official ROAS.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ads/attribution-resolved.v1.json
+    scaleGateDecisionCreatedV1Message:
+      name: scale-gate-decision-created.v1
+      title: Scale Gate Decision Created Event v1
+      summary: Published when a scale gate decision is created. Scale gate is not
+        an automatic budget increase and requires owner decision.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ads/scale-gate-decision-created.v1.json
+    ivrConfirmationRequestedV1Message:
+      name: ivr-confirmation-requested.v1
+      title: Ivr Confirmation Requested Event v1
+      summary: Published when IVR order confirmation is requested for an eligible
+        Official Order only. It must not run for Quote, Cart, or Order Draft.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-confirmation-requested.v1.json
+    ivrConfirmedV1Message:
+      name: ivr-confirmed.v1
+      title: Ivr Confirmed Event v1
+      summary: Published when IVR result is confirmed by the customer. It is an input
+        signal only and must pass Core Order State Machine.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-confirmed.v1.json
+    ivrCustomerCancelledV1Message:
+      name: ivr-customer-cancelled.v1
+      title: Ivr Customer Cancelled Event v1
+      summary: Published when customer cancellation is captured by IVR. It is input
+        signal only; Core Order State Machine decides final cancellation and Notification
+        owner sends notice only after official cancellation.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-customer-cancelled.v1.json

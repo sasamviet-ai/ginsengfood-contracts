@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/raw-material-lot.schema.json",
+  "title": "Raw Material Lot",
+  "description": "Raw Material Lot v1 contract. A lot must be QC_PASS and marked READY_FOR_PRODUCTION before material issue; QC_PASS alone is not enough.",
+  "$comment": "Sources: PACK-01 and TECH-03 raw lot readiness guard. TODO: full lot lifecycle is not finalized.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "raw_material_lot_id": { "type": "string", "minLength": 1, "description": "Raw material lot identifier." },
+    "material_id": { "type": "string", "minLength": 1, "description": "Material/ingredient identifier." },
+    "raw_material_receipt_id": { "type": "string", "minLength": 1, "description": "Source intake receipt." },
+    "source_origin_id": { "type": "string", "minLength": 1, "description": "Source origin used for traceability." },
+    "lot_code": { "type": "string", "minLength": 1, "description": "Lot code." },
+    "received_quantity": { "$ref": "../common/quantity.schema.json" },
+    "qc_status": { "type": "string", "description": "QC status. Prefer enums/ops/qc-status.yaml." },
+    "readiness_status": { "type": "string", "description": "Readiness status, especially READY_FOR_PRODUCTION when backend guard passes." },
+    "trace_ready": { "type": "boolean", "description": "Whether source-to-lot trace is ready." },
+    "hold_reason": { "type": "string", "description": "Reason when lot is on hold or not ready." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["raw_material_lot_id"]
+}

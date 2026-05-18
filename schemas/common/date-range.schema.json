@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/date-range.schema.json",
+  "title": "Date Range",
+  "description": "Common v1 date-time range placeholder.",
+  "$comment": "TODO: Phase 1 source documents do not define inclusive/exclusive range semantics or timezone policy beyond timestamp traceability. Keep both boundaries optional until a contract source defines the exact rule.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "startsAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional range start timestamp."
+    },
+    "endsAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional range end timestamp."
+    }
+  }
+}

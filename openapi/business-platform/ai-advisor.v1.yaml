@@ -1,0 +1,227 @@
+openapi: 3.1.0
+info:
+  title: GinsengFood Business Platform AI Advisor API
+  version: 1.0.0
+  description: >
+    v1 contract for AI Advisor response instructions, product recommendations,
+    claim guard checks, and order draft handoff. AI Advisor receives channel
+    context and returns instructions; it is not a source of truth for price,
+    stock, order, payment, revenue, claims, or private customer data.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+tags:
+  - name: AI Advisor
+paths:
+  /v1/ai-advisor/response-instructions:
+    post:
+      tags:
+        - AI Advisor
+      summary: Create response instruction from channel context
+      description: >
+        Produces a public-safe response instruction from channel context. The
+        instruction must rely on commerce and ops-core contracts for quote,
+        stock, sellable status, and claims. Human takeover or out-of-scope
+        authority must result in handoff behavior.
+      operationId: createAiResponseInstructionV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/channel/channel-context.schema.json
+      responses:
+        "200":
+          description: AI response instruction.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ai/ai-response-instruction.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ai-advisor/product-recommendations:
+    post:
+      tags:
+        - AI Advisor
+      summary: Create product recommendation instruction
+      description: >
+        Creates a recommendation contract that must remain bounded by available
+        product facts, claim guards, QuoteSnapshot, and availability checks.
+      operationId: createProductRecommendationV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ai/product-recommendation.schema.json
+      responses:
+        "200":
+          description: Product recommendation contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ai/product-recommendation.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ai-advisor/claim-guards:
+    post:
+      tags:
+        - AI Advisor
+      summary: Evaluate claim guard result
+      description: >
+        Evaluates whether a proposed AI or live response claim is allowed,
+        blocked, or requires human review. TODO: Source documents do not define
+        the full claim taxonomy or approved claim library contract.
+      operationId: evaluateClaimGuardV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ai/claim-guard-result.schema.json
+      responses:
+        "200":
+          description: Claim guard result.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ai/claim-guard-result.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ai-advisor/order-draft-handoffs:
+    post:
+      tags:
+        - AI Advisor
+      summary: Handoff to order draft workflow
+      description: >
+        Requests an order draft handoff from AI/channel context. The handoff is
+        not an official order and must still pass QuoteSnapshot, Customer
+        Confirmation, payment, shipping, and stock/sellable boundaries.
+      operationId: createOrderDraftHandoffV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ai/order-draft-handoff.schema.json
+      responses:
+        "200":
+          description: Order draft handoff contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ai/order-draft-handoff.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    BadRequest:
+      description: Invalid request syntax or parameters.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Unauthorized:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Forbidden:
+      description: Caller is not allowed to perform this operation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    NotFound:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    Conflict:
+      description: Request conflicts with current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    UnprocessableEntity:
+      description: Request is syntactically valid but violates contract validation.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json

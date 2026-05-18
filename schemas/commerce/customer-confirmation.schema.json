@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/customer-confirmation.schema.json",
+  "title": "Customer Confirmation",
+  "description": "Commerce v1 customer confirmation contract proving that the customer reviewed and confirmed an Order Draft before official order creation.",
+  "$comment": "Sources: TECH-04 Customer Confirmation state model; no official order may be created from invalid, expired, or unconfirmed draft.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customer_confirmation_id": { "type": "string", "minLength": 1, "description": "Customer confirmation identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "order_draft_id": { "type": "string", "description": "Confirmed draft." },
+    "quote_snapshot_id": { "type": "string", "description": "QuoteSnapshot visible to the customer." },
+    "customer_id": { "type": "string", "description": "Customer reference." },
+    "status": { "type": "string", "description": "Confirmation status. Prefer enums/commerce/order-status.yaml values prefixed CONFIRMATION_ or CUSTOMER_." },
+    "confirmed_at": { "type": "string", "format": "date-time", "description": "Confirmation timestamp." },
+    "confirmation_channel": { "type": "string", "description": "Channel where confirmation happened. TODO: bind to channel-type when source policy is finalized." },
+    "customer_action_evidence": { "$ref": "../common/evidence-ref.schema.json" },
+    "valid_for_order_creation": { "type": "boolean", "description": "Whether this confirmation can be used to create an official order." },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["customer_confirmation_id", "version"]
+}

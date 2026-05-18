@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/material-issue.schema.json",
+  "title": "Material Issue",
+  "description": "Material Issue v1 contract for issuing only eligible raw material lots into production. Lots must be QC_PASS and READY_FOR_PRODUCTION.",
+  "$comment": "Sources: PACK-01 Material Issue guard and Operational Forms FRM-12/FRM-13/FRM-14. TODO: exact material issue state machine is not fully specified.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "material_issue_id": { "type": "string", "minLength": 1, "description": "Material issue identifier." },
+    "production_order_id": { "type": "string", "minLength": 1, "description": "Production order receiving issued materials." },
+    "status": { "type": "string", "description": "Material issue status. Prefer enums/ops/material-issue-status.yaml." },
+    "issue_lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "raw_material_lot_id": { "type": "string", "minLength": 1 },
+          "material_id": { "type": "string", "minLength": 1 },
+          "issued_quantity": { "$ref": "../common/quantity.schema.json" },
+          "lot_readiness_status": { "type": "string" }
+        }
+      }
+    },
+    "misa_checkpoint_eligible": { "type": "boolean", "description": "Whether this confirmed issue can create a MISA accounting handoff checkpoint." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["material_issue_id"]
+}

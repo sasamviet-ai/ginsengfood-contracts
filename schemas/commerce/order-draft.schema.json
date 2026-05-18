@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/order-draft.schema.json",
+  "title": "Order Draft",
+  "description": "Commerce v1 order draft contract. Order Draft is temporary and does not issue an official order code before customer confirmation.",
+  "$comment": "Sources: TECH-04 requires Order Draft to contain shipping/receiver info, payment option, total/quote validity and to remain non-official until customer confirmation.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "order_draft_id": { "type": "string", "minLength": 1, "description": "Order draft identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "cart_id": { "type": "string", "description": "Source cart." },
+    "quote_snapshot_id": { "type": "string", "description": "QuoteSnapshot used for totals." },
+    "customer_id": { "type": "string", "description": "Customer reference if known." },
+    "status": { "type": "string", "description": "Draft status. Prefer enums/commerce/order-status.yaml values prefixed DRAFT_." },
+    "receiver": { "type": "object", "additionalProperties": true, "description": "Receiver and shipping information. TODO: source documents do not define PII-safe receiver field schema." },
+    "payment_option": { "type": "string", "description": "Selected payment option. TODO: define official payment option enum from source docs." },
+    "total": { "$ref": "../common/money.schema.json" },
+    "quote_valid_until": { "type": "string", "format": "date-time", "description": "Quote expiry visible to customer." },
+    "official_order_code_issued": { "type": "boolean", "const": false, "description": "Must stay false for Order Draft." },
+    "blocking_reasons": { "type": "array", "items": { "type": "string" }, "description": "Reasons preventing confirmation or official order creation." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["order_draft_id", "version"]
+}

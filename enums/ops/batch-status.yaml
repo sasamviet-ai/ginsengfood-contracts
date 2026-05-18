@@ -1,0 +1,41 @@
+version: v1
+name: batch-status
+title: Batch Status
+description: Batch v1 status values across production, QC, release, and hold boundaries.
+source_documents:
+  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+values:
+  - value: CREATED
+    description: Batch has been created.
+    source: PACK-01 production chain.
+  - value: IN_PRODUCTION
+    description: Batch is in production execution.
+    source: PACK-01 production execution.
+  - value: QC_PENDING
+    description: Batch is waiting for QC.
+    source: PACK-01 QC chain.
+  - value: QC_PASS
+    description: Batch QC passed but batch is not automatically released.
+    source: PACK-01 QC_PASS does not mean RELEASED.
+  - value: QC_HOLD
+    description: Batch is on QC hold.
+    source: PACK-01 HOLD/REVIEW threshold.
+  - value: QC_FAIL
+    description: Batch failed QC.
+    source: PACK-01 QC threshold.
+  - value: RELEASE_PENDING
+    description: Batch is waiting for release decision.
+    source: PACK-01 release boundary.
+  - value: RELEASED
+    description: Batch has been released and can proceed to warehouse receipt.
+    source: PACK-01 only RELEASED batch can be warehouse received.
+  - value: ON_HOLD
+    description: Batch is on hold.
+    source: PACK-01 hold behavior.
+  - value: BLOCKED
+    description: Batch is blocked by guard conditions.
+    source: PACK-01 negative paths.
+compatibility:
+  breaking_change: Merging QC_PASS and RELEASED is breaking.
+todos:
+  - Confirm official Batch state machine in Phase 7.

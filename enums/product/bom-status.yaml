@@ -1,0 +1,32 @@
+version: v1
+name: bom-status
+title: BOM Status
+description: BOM lifecycle values for BOM G1 and snapshot governance.
+source_documents:
+  - docs/documents/2_pack/PACK-02 - PRODUCT MASTER SKU INGREDIENT RECIPE FORMULA VERSION PRODUCT ACTIVATION.md
+values:
+  - value: DRAFT
+    description: BOM is being prepared.
+    source: Conservative lifecycle value.
+  - value: PENDING_CONFIG
+    description: BOM has missing configuration or unresolved lines.
+    source: PACK-02 placeholder/config rule.
+  - value: PENDING_EVIDENCE
+    description: BOM lacks required evidence.
+    source: PACK-02 evidence gate.
+  - value: APPROVED
+    description: BOM G1 is approved.
+    source: PACK-02 BOM G1 Approved requirement.
+  - value: ACTIVE
+    description: BOM is active for snapshot generation.
+    source: PACK-02 BOM snapshot control.
+  - value: LOCKED
+    description: BOM has been used in production snapshot and must not be overwritten.
+    source: PACK-02 snapshot control.
+  - value: BLOCKED
+    description: BOM is blocked by guard conditions.
+    source: PACK-02 guard behavior.
+compatibility:
+  breaking_change: Removing BOM statuses is breaking for production order and BOM snapshot contracts.
+todos:
+  - Confirm official BOM lifecycle transition rules in Phase 7.

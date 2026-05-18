@@ -1,0 +1,31 @@
+{
+  "eventId": "evt-payment-confirmed-20260518-001",
+  "eventType": "business-platform.payment.payment-confirmed.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-18T09:35:00+07:00",
+  "source": "business-platform",
+  "correlationId": "corr-payment-20260518-001",
+  "causationId": "bank-transfer-20260518-001",
+  "idempotencyKey": "payment-confirmed-payment-20260518-001",
+  "data": {
+    "payment_id": "payment-20260518-001",
+    "version": "v1",
+    "order_id": "order-20260518-001",
+    "payment_method": "BANK_TRANSFER",
+    "status": "PAYMENT_CONFIRMED",
+    "payment_reference": "PAY-GF-20260518-0001",
+    "amount": {
+      "amount": 275000,
+      "currencyCode": "VND"
+    },
+    "bank_transfer_id": "bank-transfer-20260518-001",
+    "accounting_review_id": "accounting-review-20260518-001",
+    "confirmation_source": {
+      "sourceId": "accounting-review-20260518-001",
+      "sourceType": "accounting-review",
+      "ownerCore": "business-platform"
+    },
+    "confirmed_at": "2026-05-18T09:35:00+07:00",
+    "paid_requires_confirmation": true
+  }
+}

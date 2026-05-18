@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/source-ref.schema.json",
+  "title": "Source Reference",
+  "description": "Common v1 reference to a Source-of-Truth, runtime source, or evidence source.",
+  "$comment": "Source: MASTER-01 Source-of-Truth Registry requires source_id, source_name, source_type, owner, decision_authority, access method, evidence rule, and fallback rule for registered sources.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "sourceId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Registered source identifier."
+    },
+    "sourceName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Registered source name."
+    },
+    "sourceType": {
+      "type": "string",
+      "enum": [
+        "GOVERNANCE_SOURCE",
+        "MASTER_DATA_SOURCE",
+        "RUNTIME_DECISION_SOURCE",
+        "TRANSACTION_STATE_SOURCE",
+        "OPERATIONAL_STATE_SOURCE",
+        "EVIDENCE_SOURCE",
+        "PUBLIC_SAFE_SOURCE"
+      ],
+      "description": "Source type derived from MASTER-01 source classification."
+    },
+    "ownerCore": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Owner Core that has authority over the source."
+    },
+    "decisionAuthority": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Decision authority for the source."
+    }
+  },
+  "required": [
+    "sourceId"
+  ]
+}

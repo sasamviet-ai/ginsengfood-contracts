@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/business-platform/ads/verified-revenue-created.v1.json",
+  "title": "Verified Revenue Created Event v1",
+  "description": "Published only by business-platform/commerce when revenue is verified. Ops-core must not emit VerifiedRevenueCreated, and Ads must not use quote/cart/draft/unpaid/pending as revenue.",
+  "$comment": "Sources: PACK-07 Verified Revenue boundary; TECH-07 No-Fake-ROAS rule; TECH-04 Verified Revenue.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique event identifier."
+    },
+    "eventType": {
+      "type": "string",
+      "const": "business-platform.ads.verified-revenue-created.v1",
+      "description": "Stable event type including source, domain, name, and v1 suffix."
+    },
+    "eventVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Event contract version."
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the domain event occurred."
+    },
+    "source": {
+      "type": "string",
+      "const": "business-platform",
+      "description": "System that owns and emits this event."
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Cross-system correlation identifier."
+    },
+    "causationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional parent command, event, or workflow identifier."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required when emitted from retryable or high-risk command; optional for derived read-model notifications."
+    },
+    "data": {
+      "allOf": [
+        {
+          "$ref": "../../../schemas/commerce/verified-revenue.schema.json"
+        },
+        {
+          "type": "object",
+          "required": [
+            "verified_revenue_id",
+            "version",
+            "order_id",
+            "status",
+            "revenue_amount",
+            "order_verified",
+            "payment_or_collection_confirmed",
+            "verified_at"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "occurredAt",
+    "source",
+    "correlationId",
+    "data"
+  ]
+}

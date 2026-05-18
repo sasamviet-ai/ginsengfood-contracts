@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/bank-transfer.schema.json",
+  "title": "Bank Transfer",
+  "description": "Commerce v1 bank transfer contract for customer transfer evidence that must go through Accounting Review before paid confirmation.",
+  "$comment": "Sources: TECH-04 direct bank transfer rule; customer image/proof is review evidence and not payment confirmation by itself.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "bank_transfer_id": { "type": "string", "minLength": 1, "description": "Bank transfer identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "payment_id": { "type": "string", "description": "Linked payment." },
+    "company_bank_account_id": { "type": "string", "description": "Company bank account chosen from registry, not hardcoded." },
+    "payment_reference": { "type": "string", "description": "Transfer reference/memo used for matching." },
+    "transfer_amount": { "$ref": "../common/money.schema.json" },
+    "proof_evidence_ref": { "$ref": "../common/evidence-ref.schema.json" },
+    "status": { "type": "string", "description": "Review-oriented transfer status. Prefer enums/commerce/payment-status.yaml." },
+    "accounting_review_id": { "type": "string", "description": "Accounting review outcome." },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["bank_transfer_id", "version"]
+}

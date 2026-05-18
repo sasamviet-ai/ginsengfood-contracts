@@ -1,0 +1,43 @@
+version: v1
+name: resolution-status
+title: Resolution Status
+description: Common runtime resolver result statuses.
+source_documents:
+  - docs/documents/1_master/MASTER-04 - RUNTIME RESOLUTION & GUARD CONTROL STANDARD.md
+values:
+  - value: RESOLVED
+    description: Data was resolved from the correct source and can proceed to guard evaluation.
+    source: MASTER-04 runtime resolver status set.
+  - value: PARTIAL
+    description: Only part of the required context was resolved.
+    source: MASTER-04 runtime resolver status set.
+  - value: MISSING
+    description: Required data is missing.
+    source: MASTER-04 runtime resolver status set.
+  - value: STALE
+    description: Resolved data is stale.
+    source: MASTER-04 runtime resolver status set.
+  - value: CONFLICT
+    description: Multiple sources, states, or rules conflict.
+    source: MASTER-04 runtime resolver status set.
+  - value: BLOCKED
+    description: Resolver determined that action cannot proceed.
+    source: MASTER-04 runtime resolver status set.
+  - value: SUPPRESSED
+    description: Resolver result is suppressed.
+    source: MASTER-04 runtime resolver status set.
+  - value: FALLBACK_REQUIRED
+    description: A safe fallback is required.
+    source: MASTER-04 runtime resolver status set.
+  - value: HANDOFF_REQUIRED
+    description: Handoff is required.
+    source: MASTER-04 runtime resolver status set.
+  - value: REVIEW_REQUIRED
+    description: Review is required before the action can continue.
+    source: MASTER-04 runtime resolver status set.
+  - value: ERROR
+    description: Resolver failed technically or could not complete.
+    source: MASTER-04 runtime resolver status set.
+compatibility:
+  breaking_change: Renaming, removing, or reinterpreting a resolution status is breaking.
+todos: []

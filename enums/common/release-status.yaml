@@ -1,0 +1,85 @@
+version: v1
+name: release-status
+title: Release Status
+description: Common release, completion, gateway, and go-live status values from MASTER-05, MASTER-07, and TECH-10.
+source_documents:
+  - docs/documents/1_master/MASTER-05 - EVIDENCE SMOKE COMPLETION GATE STANDARD.md
+  - docs/documents/1_master/MASTER-07 - GLOBAL RELEASE GOVERNANCE PRODUCTION READINESS GO-LIVE CONTROL.md
+  - docs/documents/3_tech/TECH-10 - GLOBAL SMOKE UAT EVIDENCE RELEASE GATEWAY PRODUCTION READINESS CONTROL.md
+values:
+  - value: NOT_STARTED
+    description: Completion/report flow has not started.
+    source: MASTER-05 Completion Report status.
+  - value: IN_PROGRESS
+    description: Completion/report flow is in progress.
+    source: MASTER-05 Completion Report status.
+  - value: PENDING_EVIDENCE
+    description: Waiting for accepted evidence.
+    source: MASTER-05 Completion Report status and MASTER-07 final decision value.
+  - value: UNDER_REVIEW
+    description: Under review.
+    source: MASTER-05 Completion Report status.
+  - value: BLOCKED
+    description: Blocked by missing condition or open blocker.
+    source: MASTER-05, MASTER-07, TECH-10.
+  - value: GATE_REVIEW_READY
+    description: Evidence is sufficient for gate review.
+    source: MASTER-05 Completion Report status.
+  - value: GATE_PASS
+    description: Completion gate passed.
+    source: MASTER-05 Completion Report status.
+  - value: RELEASE_REVIEW_READY
+    description: Ready for release review.
+    source: MASTER-05 Completion Report status.
+  - value: RELEASE_APPROVED
+    description: Release approved.
+    source: MASTER-05 Completion Report status.
+  - value: DOCUMENTATION_COMPLETE_PENDING_EVIDENCE
+    description: Documentation is complete and waiting for evidence.
+    source: TECH-10 Global Gateway status.
+  - value: EVIDENCE_SUBMITTED_PENDING_REVIEW
+    description: Evidence submitted and pending review.
+    source: TECH-10 Global Gateway status.
+  - value: EVIDENCE_ACCEPTED_PENDING_SMOKE
+    description: Evidence accepted and waiting for smoke.
+    source: TECH-10 Global Gateway status.
+  - value: SMOKE_RUNNING
+    description: Smoke is running.
+    source: TECH-10 Global Gateway status.
+  - value: SMOKE_PASS_PENDING_UAT
+    description: Smoke passed and waiting for UAT.
+    source: TECH-10 Global Gateway status.
+  - value: UAT_RUNNING
+    description: UAT is running.
+    source: TECH-10 Global Gateway status.
+  - value: UAT_PASS_PENDING_OWNER_SIGNOFF
+    description: UAT passed and waiting for owner sign-off.
+    source: TECH-10 Global Gateway status.
+  - value: OWNER_SIGNED_PENDING_RELEASE_DECISION
+    description: Owner signed and release decision is pending.
+    source: TECH-10 Global Gateway status.
+  - value: RELEASE_APPROVED_PENDING_GO_LIVE
+    description: Release approved and waiting for go-live.
+    source: TECH-10 Global Gateway status.
+  - value: GO_LIVE_APPROVED
+    description: Go-live approved.
+    source: MASTER-05, MASTER-07, TECH-10.
+  - value: GO_LIVE_BLOCKED
+    description: Go-live blocked due to blocker.
+    source: TECH-10 Global Gateway status.
+  - value: ROLLBACK_REQUIRED
+    description: Rollback is required.
+    source: MASTER-07 and TECH-10.
+  - value: ROLLED_BACK
+    description: Rollback completed.
+    source: MASTER-07 final decision values.
+  - value: PAUSED
+    description: Release or scope paused.
+    source: MASTER-07 final decision values.
+  - value: LIVE
+    description: Scope is live.
+    source: MASTER-07 final decision values.
+compatibility:
+  breaking_change: Renaming, removing, or weakening release status semantics is breaking.
+todos:
+  - Later compatibility docs should decide whether gateway statuses and final decision values stay in one common enum or split into narrower enums.

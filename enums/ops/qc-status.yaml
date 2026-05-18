@@ -1,0 +1,26 @@
+version: v1
+name: qc-status
+title: QC Status
+description: QC result values. QC_PASS is not batch release.
+source_documents:
+  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+values:
+  - value: QC_PENDING
+    description: QC has not completed.
+    source: PACK-01 QC flow.
+  - value: QC_PASS
+    description: QC passed. For moisture threshold, below 2% is PASS.
+    source: PACK-01 QC threshold registry.
+  - value: QC_HOLD
+    description: QC result is on hold. For moisture threshold, 2%-4% is HOLD.
+    source: PACK-01 QC threshold registry.
+  - value: QC_REVIEW
+    description: QC requires review. For moisture threshold, 2%-4% is REVIEW.
+    source: PACK-01 QC threshold registry.
+  - value: QC_FAIL
+    description: QC failed. For moisture threshold, above 4% is FAIL.
+    source: PACK-01 QC threshold registry.
+compatibility:
+  breaking_change: Treating QC_PASS as RELEASED is breaking.
+todos:
+  - Add stage-specific QC statuses only if source documents define them.

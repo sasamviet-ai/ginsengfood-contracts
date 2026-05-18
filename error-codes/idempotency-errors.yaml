@@ -1,0 +1,41 @@
+version: v1
+namespace: IDEMPOTENCY
+title: Idempotency Errors
+description: Common idempotency errors for retry-safe commands.
+source_documents:
+  - docs/idempotency-standard.md
+  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
+codes:
+  - code: IDEMPOTENCY.KEY_REQUIRED
+    httpStatus: 400
+    message: Idempotency key is required for this command.
+    description: TECH-01 says risky commands without required idempotency key must be rejected or handled as policy error.
+    retryable: true
+    relatedStatus: MISSING_KEY_REJECTED
+  - code: IDEMPOTENCY.CONFLICT
+    httpStatus: 409
+    message: Idempotency key was reused with a different payload.
+    description: TECH-01 says same key with different payload must report conflict.
+    retryable: false
+    relatedStatus: CONFLICT_REJECTED
+  - code: IDEMPOTENCY.EXPIRED_KEY
+    httpStatus: 409
+    message: Idempotency key has expired.
+    description: TECH-01 defines EXPIRED_KEY_REJECTED.
+    retryable: true
+    relatedStatus: EXPIRED_KEY_REJECTED
+  - code: IDEMPOTENCY.IN_PROGRESS
+    httpStatus: 409
+    message: Command with this idempotency key is still in progress.
+    description: TECH-01 defines IN_PROGRESS_RETURNED.
+    retryable: true
+    relatedStatus: IN_PROGRESS_RETURNED
+  - code: IDEMPOTENCY.RETRY_BLOCKED
+    httpStatus: 409
+    message: Retry is blocked by business failure policy.
+    description: TECH-01 defines FAILED_RETRY_BLOCKED.
+    retryable: false
+    relatedStatus: FAILED_RETRY_BLOCKED
+compatibility:
+  breaking_change: Removing or changing code semantics is breaking.
+todos: []

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-quote-20260518-001",
+    "sourceSystem": "business-platform",
+    "timestamp": "2026-05-18T09:05:00+07:00"
+  },
+  "data": {
+    "quote_snapshot_id": "quote-20260518-001",
+    "version": "v1",
+    "customer_id": "customer-001",
+    "status": "QUOTE_ACTIVE",
+    "lines": [
+      {
+        "sku_id": "sku-gf-rice-001",
+        "quantity": {
+          "value": 2,
+          "unit": "pack"
+        },
+        "unit_price": {
+          "amount": 125000,
+          "currencyCode": "VND"
+        },
+        "line_total": {
+          "amount": 250000,
+          "currencyCode": "VND"
+        },
+        "availability_check_id": "avail-20260518-001"
+      }
+    ],
+    "shipping_fee": {
+      "amount": 25000,
+      "currencyCode": "VND"
+    },
+    "cod_fee": {
+      "amount": 0,
+      "currencyCode": "VND"
+    },
+    "final_total": {
+      "amount": 275000,
+      "currencyCode": "VND"
+    }
+  }
+}

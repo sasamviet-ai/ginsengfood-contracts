@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/trace-config.schema.json",
+  "title": "Trace Config",
+  "description": "Trace Config v1 contract for SKU traceability, QR registry readiness, public trace policy, and recall readiness.",
+  "$comment": "Sources: PACK-01 traceability chain and PACK-02 Trace Config requirement. TODO: exact public trace payload policy will be generated in later phases.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "trace_config_id": { "type": "string", "minLength": 1, "description": "Trace config identifier." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "Configured SKU." },
+    "status": { "type": "string", "description": "Config status. Prefer enums/product/config-status.yaml." },
+    "raw_lot_trace_required": { "type": "boolean", "description": "Whether raw material lot trace is required." },
+    "batch_trace_required": { "type": "boolean", "description": "Whether batch trace is required." },
+    "qr_trace_required": { "type": "boolean", "description": "Whether QR trace is required." },
+    "public_trace_allowed": { "type": "boolean", "description": "Whether public trace is allowed after internal trace readiness." },
+    "public_trace_exclusions": { "type": "array", "items": { "type": "string" }, "description": "Internal data categories excluded from public trace." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["trace_config_id"]
+}

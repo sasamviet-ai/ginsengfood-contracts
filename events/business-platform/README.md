@@ -1,7 +1,14 @@
 # events/business-platform
 
-Thư mục này chứa event payload contracts phát ra từ `ginsengfood-business-platform`.
+Events published by `ginsengfood-business-platform`.
 
-Consumer chính là `ginsengfood-ops-core` và các contract tests liên quan. Không đặt Spring Boot handler, commerce service logic, payment gateway code, secret hoặc broker config vào đây.
+Consumer chinh la `ginsengfood-ops-core`, Ads/measurement, IVR, shipping/payment integrations, va contract tests. Khong dat Spring Boot handler, commerce service logic, payment gateway code, secret, hay broker config vao day.
 
-Ví dụ nhóm event: order, payment, shipping, demand, ads và IVR. Event breaking change phải tăng major version hoặc có migration path được review.
+## Groups
+
+- `order`: Official Order lifecycle events. Order Draft is not Official Order.
+- `payment`: payment reference and confirmed/failed payment signals.
+- `shipping`: shipping lifecycle and delivery issue signals.
+- `demand`: sales/campaign/dealer demand signals for ops-core review, not Production Order commands.
+- `ads`: verified revenue, attribution, and scale gate events.
+- `ivr`: order confirmation request/result signals; IVR result is input signal only.

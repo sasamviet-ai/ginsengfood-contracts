@@ -1,0 +1,29 @@
+version: v1
+name: recall-status
+title: Recall Status
+description: Recall Case v1 status values.
+source_documents:
+  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+values:
+  - value: OPEN
+    description: Recall case has been opened.
+    source: PACK-01 Recall case concept.
+  - value: UNDER_REVIEW
+    description: Recall is under review.
+    source: PACK-01 review behavior.
+  - value: ACTIVE
+    description: Recall is active and should drive hold/sale lock as required.
+    source: PACK-01 Recall Stop-Sale Path.
+  - value: RECOVERY_IN_PROGRESS
+    description: Recovery/disposition/CAPA work is in progress.
+    source: PACK-01 recovery/disposition/CAPA.
+  - value: CLOSED
+    description: Recall case is closed after required evidence and sign-off.
+    source: PACK-01 recovery evidence/sign-off.
+  - value: BLOCKED
+    description: Recall flow is blocked by missing trace, evidence, or owner decision.
+    source: PACK-01 negative paths.
+compatibility:
+  breaking_change: Closing recall without recovery evidence/sign-off is breaking.
+todos:
+  - Define official recall transitions and severity values in Phase 7.
