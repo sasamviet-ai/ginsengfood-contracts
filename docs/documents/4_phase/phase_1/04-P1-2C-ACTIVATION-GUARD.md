@@ -157,4 +157,38 @@ BẮT ĐẦU PROMPT: Bạn được phép sửa code chỉ trong phạm vi Produ
 
 # 17. FINAL STATUS
 
+---
+
+# IMPLEMENTATION ADDENDUM 2026-05-19
+
+Status: DONE_WITH_DEFERRED_RUNTIME_GATES.
+
+Implemented P1.2C limited activation guard foundation in ops-core:
+
+- Added executable admin API `POST /api/v1/admin/recipes/{recipeId}/activate` with `RECIPE_ACTIVATE`, `X-Idempotency-Key`, audit/state transition, and OpenAPI metadata.
+- Added `RecipeActivateRequest`, `ActivationGuardResultDto`, `RecipeActivationResponse`, and `ActivatedAt` in `RecipeResponse`.
+- Added domain/application guard for `APPROVED` / `APPROVED_SEED_BASELINE -> ACTIVE_OPERATIONAL`, actor requirement, active conflict per `(skuId, formulaKind)`, SKU/Product link readiness, recipe line Ingredient/UOM/group completeness, and accepted-evidence rejection for submitted evidence tokens.
+- Tightened product activation persistence path so server recomputes discoverable readiness from Product/SKU/active recipe/BOM-line truth instead of trusting client-provided `RequiredChain` for all fields.
+- Added admin-web `useActivateRecipe` and `/admin/recipes` activation action gated by `RECIPE_ACTIVATE`; action is visible only for `APPROVED` / `APPROVED_SEED_BASELINE`.
+- Kept Product/SKU/Recipe Active separated from Sellable, Batch Released, Warehouse Receipt, Finished Goods availability, stock, and production-order side effects.
+
+Validation evidence:
+
+- `dotnet test tests/backend/Ginsengfood.Operational.Scaffold.Tests/Ginsengfood.Operational.Scaffold.Tests.csproj --filter "FullyQualifiedName~P1_2C|FullyQualifiedName~P1_2B|FullyQualifiedName~P13A" --no-build`: PASS, 37/37.
+- `dotnet build Ginsengfood.Operational.sln --no-restore`: PASS.
+- `npm run api:export`: PASS, OpenAPI SHA-256 `BDF62102407E1E541AFF5DA78ED143C3E98EB79F293FF7D64D2C486DC10DE0F8`.
+- `npx --yes @apidevtools/swagger-cli validate packages/api-contracts/openapi.json`: PASS.
+- `npm --workspace @ginsengfood/admin-web run gen:api`: PASS.
+- `npm --workspace @ginsengfood/admin-web run test -- tests/frontend/admin-web/hooks/recipe-p1-2b-client.test.ts tests/frontend/admin-web/ui/recipe-p1-2b-ui-static.test.ts tests/frontend/admin-web/ui/recipe-p1-2b-behavior.test.tsx`: PASS, 10/10.
+- `npm --workspace @ginsengfood/admin-web run typecheck`: PASS.
+- `npm --workspace @ginsengfood/admin-web run build`: PASS.
+- `npm --workspace @ginsengfood/admin-web run e2e -- tests/e2e/admin-web/p1-2b-recipes.spec.ts`: ENV-BLOCKED, Playwright runtime preflight failed with `EPERM spawn`.
+
+Seed/migration result:
+
+- No migration added; existing recipe status/counterpart columns and active partial index cover P1.2C.
+- No seed change required; `RECIPE_ACTIVATE` was already present in role permission and UI action registry.
+
+Gateway status remains BLOCKED. This addendum is evidence submitted only; it is not owner-accepted evidence, Release Ready, Production Ready, or Go-live Approved.
+
 Trạng thái cuối bắt buộc: NOT PHASE 1 COMPLETE; NOT IMPLEMENTATION COMPLETE FOR FULL PHASE 1; NOT COMPLETION PASS; NOT RELEASE READY; NOT PRODUCTION READY; NOT GO-LIVE APPROVED; GLOBAL GATEWAY: BLOCKED.

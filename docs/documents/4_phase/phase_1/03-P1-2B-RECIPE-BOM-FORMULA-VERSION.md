@@ -1349,3 +1349,28 @@ Evidence:
 Handoff:
 
 - `docs/v2-handoff/P1.2B-recipe-bom-formula-version-crud.md`
+
+---
+
+## UI Implementation Addendum 2026-05-19 - P1.2B Admin Recipe UI
+
+Trang thai: IMPLEMENTED trong ops-core admin-web, tiep noi P1.2B Full Recipe CRUD backend.
+
+Pham vi da thuc hien:
+
+1. Them admin page `/admin/recipes` cho `SCR-SKU-RECIPE`.
+2. Them dedicated frontend recipe hooks cho list/detail/create/replace-lines/submit-approval.
+3. Dong bo `PermissionCode` va fallback navigation/icon cho `RECIPE_VIEW`, `RECIPE_CREATE`, `RECIPE_UPDATE_LINES`, `RECIPE_SUBMIT_APPROVAL`, `RECIPE_APPROVE`, `RECIPE_ACTIVATE`.
+4. UI create DRAFT recipe yeu cau co line ngay tu dau; replace lines chi enabled khi recipe `DRAFT`.
+5. UI submit approval chi enabled khi recipe `DRAFT`; approve/reject van di qua generic approval flow.
+6. Client validation mirror backend cho `PILOT_PERCENT_BASED`, `FIXED_QUANTITY_BATCH`, `G0` block va 4 canonical recipe groups.
+7. Khong them activation UI/action; P1.2C van so huu Recipe Activation Guard.
+8. Khong them sellable/release/stock side effect hoac external `/v1/*` call.
+
+Evidence moi:
+
+- Frontend focused tests: `npm --workspace @ginsengfood/admin-web run test -- tests/frontend/admin-web/hooks/recipe-p1-2b-client.test.ts tests/frontend/admin-web/ui/recipe-p1-2b-ui-static.test.ts tests/frontend/admin-web/ui/recipe-p1-2b-behavior.test.tsx` PASS, 9/9.
+- Frontend typecheck: `npm --workspace @ginsengfood/admin-web run typecheck` PASS.
+- Frontend build: `npm --workspace @ginsengfood/admin-web run build` PASS; route `/admin/recipes` included in Next route output.
+- Playwright E2E spec added: `tests/e2e/admin-web/p1-2b-recipes.spec.ts`.
+- Local E2E execution: ENV-BLOCKED by Playwright runtime preflight `EPERM spawn`; rerun in CI/Linux or a Windows shell that permits Node child process pipes/IPC.
