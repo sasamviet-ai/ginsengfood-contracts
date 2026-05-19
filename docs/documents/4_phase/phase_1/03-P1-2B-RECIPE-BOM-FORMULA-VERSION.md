@@ -1,1804 +1,1351 @@
-**PROMPT-P1.2B — RECIPE / BOM / FORMULA VERSION IMPLEMENTATION HANDOFF**
+Dưới đây là **bản viết lại toàn bộ 03-P1-2B-RECIPE-BOM-FORMULA-VERSION.docx — V2.0 CLEAN FINAL**, bằng tiếng Việt, dạng **Word-ready**, không xuất file Word.
 
-**MODE: LIMITED IMPLEMENTATION**
+**03-P1-2B-RECIPE-BOM-FORMULA-VERSION**
 
-| **FILE**             | 03-P1-2B-RECIPE-BOM-FORMULA-VERSION.docx               |
-|----------------------|--------------------------------------------------------|
-| **PHASE**            | PHASE-01 — PRODUCT / SKU / RECIPE / PRODUCT ACTIVATION |
-| **MODE**             | MODE: LIMITED IMPLEMENTATION                           |
-| **PROMPT TIẾP THEO** | PROMPT-P1.2C — LIMITED IMPLEMENTATION                  |
-| **GLOBAL GATEWAY**   | BLOCKED                                                |
+**TÀI LIỆU ĐẶC TẢ RECIPE / BOM / FORMULA VERSION CHO PHASE 1**
 
-# PROMPT-P1.2B — RECIPE / BOM / FORMULA VERSION IMPLEMENTATION HANDOFF
+**Dự án:** GINSENGFOOD  
+**Tên tài liệu:** 03-P1-2B-RECIPE-BOM-FORMULA-VERSION  
+**Phiên bản:** V2.0 CLEAN FINAL  
+**Trạng thái:** TÀI LIỆU ĐẶC TẢ NGHIỆP VỤ — KỸ THUẬT / CHƯA CHO PHÉP CODE TRỰC TIẾP  
+**Áp dụng cho:** PHASE 1 — Product / SKU / Recipe / Product Activation  
+**Miền nghiệp vụ:** Recipe / BOM / Formula / Formula Version / G1 Formula Lock  
+**Nguồn phụ trợ:** BẢN GÔM TÀI LIỆU.docx
 
-MODE: LIMITED IMPLEMENTATION
+**Global Gateway Status:** BLOCKED  
+**Completion Status:** PENDING IMPLEMENTATION EVIDENCE  
+**Production Ready:** NO  
+**Go-live Approved:** NO  
+**Default Agent Mode:** ANALYSIS ONLY
 
-V1.0 CLEAN FINAL
+**PHẦN 1/4 — PHASE MARKER / PURPOSE / SOURCE-OF-TRUTH / SCOPE**
 
-# 1. PHASE MARKER
+**1. PHASE MARKER**
 
-## 1.1. Phase hiện tại
+Tài liệu này thuộc nhóm:
 
-PHASE-01 — PRODUCT / SKU / RECIPE / PRODUCT ACTIVATION
+**PHASE-01-P1-2B-RECIPE-BOM-FORMULA-VERSION**
 
-## 1.2. Prompt hiện tại
+Đây là file đặc tả lõi cho miền:
 
-# PROMPT-P1.2B — RECIPE / BOM / FORMULA VERSION IMPLEMENTATION HANDOFF
+1.  Recipe.
 
-## 1.3. Mode
+2.  BOM.
 
-MODE: LIMITED IMPLEMENTATION
+3.  Formula.
 
-## 1.4. Prompt liền trước
+4.  Formula Version.
 
-# PROMPT-P1.2A — PRODUCT MASTER / SKU MASTER / INGREDIENT UOM FOUNDATION IMPLEMENTATION HANDOFF
+5.  G1 Operational Formula.
 
-## 1.5. Prompt tiếp theo
+6.  Anchor gạo.
 
-# PROMPT-P1.2C — PRODUCT / SKU / RECIPE ACTIVATION GUARD IMPLEMENTATION HANDOFF
+7.  Ratio_to_rice.
 
-## 1.6. Điều kiện chuyển sang prompt tiếp theo
+8.  Formula scaling.
 
-Chỉ được chuyển sang P1.2C khi:
+9.  Formula snapshot requirement cho Phase 2.
 
-Recipe Master foundation đã có.
+10. Quy tắc không sửa công thức đã khóa.
 
-BOM line foundation đã có.
+11. Quy tắc tạo version mới khi thay đổi công thức.
 
-Formula Version foundation đã có.
+12. Quy tắc phân biệt công thức sản xuất và buffer planning.
 
-Formula Kind foundation đã có.
+Tài liệu này thay thế toàn bộ nội dung cũ của:
 
-Recipe/BOM không sửa đè lịch sử.
+**03-P1-2B-RECIPE-BOM-FORMULA-VERSION.docx**
 
-Recipe/BOM có liên kết Product/SKU/Ingredient/UOM đúng.
+Từ thời điểm dùng bản V2.0 CLEAN FINAL này, bản cũ không còn là nguồn giao dev chính thức cho miền Recipe/BOM/Formula.
 
-P1.2B có report đủ 14 mục.
+**2. HEADER**
 
-Không có blocker nghiêm trọng trong Recipe / BOM / Formula Version.
+| **Trường**                   | **Nội dung**                                    |
+|------------------------------|-------------------------------------------------|
+| Tên tài liệu                 | 03-P1-2B-RECIPE-BOM-FORMULA-VERSION             |
+| Phiên bản                    | V2.0 CLEAN FINAL                                |
+| Phase                        | Phase 1                                         |
+| Module                       | Recipe / BOM / Formula Version                  |
+| Loại tài liệu                | Đặc tả nghiệp vụ — kỹ thuật, chưa phải code     |
+| Nguồn chính                  | Phase 1 clean documentation                     |
+| Nguồn phụ trợ                | BẢN GÔM TÀI LIỆU.docx                           |
+| File điều phối trước         | README-PHASE-01-HANDOFF-INDEX V1.1              |
+| Checklist liên quan          | MASTER-DATA-NORMALIZATION-CHECKLIST-PHASE-01-02 |
+| Cho phép code ngay?          | Không                                           |
+| Cho phép seed ngay?          | Không                                           |
+| Cho phép tạo migration ngay? | Không                                           |
+| Mode mặc định cho Agent      | ANALYSIS ONLY                                   |
+| Gateway Status               | BLOCKED                                         |
+| Production Ready             | NO                                              |
 
-Global Gateway vẫn BLOCKED.
+**3. PURPOSE — MỤC ĐÍCH TÀI LIỆU**
 
-## 1.7. Điều kiện chuyển sang PHASE 2
+Tài liệu này được viết lại để khóa toàn bộ logic Recipe/BOM/Formula cho Phase 1 theo đúng nghiệp vụ đã được bổ sung từ Bản gôm.
 
-Chưa được chuyển sang PHASE 2 sau P1.2B.
+Mục tiêu chính:
 
-PHASE 2 chỉ được bắt đầu sau khi hoàn tất:
+1.  Chuẩn hóa cách định nghĩa công thức sản xuất cho 20 SKU baseline.
 
-P1.2C — Activation Guard.
+2.  Khóa công thức G1 là công thức vận hành nền cho go-live sau này, nhưng chưa tự gọi Production Ready.
 
-P1.2D — SKU Extension / Seed Governance.
+3.  Khóa nguyên tắc **gạo là anchor ingredient** trong công thức pilot/G1.
 
-P1.2E — PHASE 1 Smoke / Evidence / Implementation Report.
+4.  Khóa nguyên tắc khi nhập số kg gạo, hệ thống tự scale toàn bộ nguyên liệu theo ratio_to_rice.
 
-Owner/dev lead cho phép viết PROMPT-P2 Analysis Only.
+5.  Khóa nguyên tắc scale kg gạo **không phải là đổi công thức**.
 
-# 2. HEADER
+6.  Khóa nguyên tắc nếu đổi tỷ lệ, thêm nguyên liệu, bỏ nguyên liệu sau khi G1 đã khóa thì bắt buộc tạo **Formula Version mới**.
 
-## 2.1. Tên prompt
+7.  Khóa việc công thức phải bung chi tiết từng nguyên liệu cụ thể, không để nhóm mơ hồ.
 
-# PROMPT-P1.2B — RECIPE / BOM / FORMULA VERSION IMPLEMENTATION HANDOFF
+8.  Khóa UOM và conversion là điều kiện bắt buộc trước khi seed formula.
 
-## 2.2. Vị trí trong roadmap
+9.  Khóa buffer +5% nhóm A và +7% nhóm B chỉ là buffer planning, không được tự sửa công thức sản xuất đã phê duyệt.
 
-PROMPT-P1.2B thuộc:
+10. Khóa việc Phase 2 Production Order phải tiêu thụ công thức bằng snapshot, không chọn tay nguyên liệu.
 
-PHASE 1 — Product / SKU / Recipe / Product Activation
+11. Khóa smoke/evidence cần có để chứng minh Recipe/BOM/Formula đúng trước khi giao implementation.
 
-PROMPT-P1.2B là bước limited implementation thứ hai của PHASE 1, thực hiện sau:
+**4. SOURCE-OF-TRUTH — NGUỒN SỰ THẬT**
 
-# PROMPT-P1 — ANALYSIS ONLY
+| **Tầng** | **Nguồn**                           | **Vai trò**                        | **Được dùng như thế nào**                                              | **Không được dùng để làm gì**                          |
+|----------|-------------------------------------|------------------------------------|------------------------------------------------------------------------|--------------------------------------------------------|
+| Tầng 0   | MASTER Governance                   | Quy tắc quản trị cao nhất          | Giữ nguyên tắc no-bypass, no-parallel-source, no-PASS-without-evidence | Không ghi đè bằng công thức tự suy luận                |
+| Tầng 1   | README-PHASE-01-HANDOFF-INDEX V1.1  | Điều phối Phase 1                  | Biết phạm vi và gate của Phase 1                                       | Không thay thế file P1.2B chi tiết                     |
+| Tầng 2   | Tài liệu P1.2B V2.0 này             | Nguồn chính cho Recipe/BOM/Formula | Giao dev/Agent phân tích miền công thức                                | Không tự cho phép code/seed                            |
+| Tầng 3   | MASTER-DATA-NORMALIZATION-CHECKLIST | Kiểm soát dữ liệu trước seed/code  | Chốt SKU, ingredient, UOM, formula, packaging cần Owner confirm        | Không thay thế Owner confirmation                      |
+| Tầng 4   | BẢN GÔM TÀI LIỆU.docx               | Nguồn phụ trợ nghiệp vụ            | Dùng để xác định rule cần đưa vào tài liệu sạch                        | Không code/seed trực tiếp                              |
+| Tầng 5   | Code hiện tại                       | Hiện trạng triển khai              | Dùng để gap analysis                                                   | Không là source-of-truth nếu conflict với tài liệu này |
 
-# PROMPT-P1.1 — TECHNICAL DESIGN ONLY
+**5. SCOPE IN — PHẠM VI BAO GỒM**
 
-# PROMPT-P1.2A — PRODUCT / SKU / INGREDIENT / UOM FOUNDATION
+Tài liệu này bao gồm:
 
-PROMPT-P1.2B chỉ được bắt đầu khi:
+1.  Recipe master.
 
-Product Master foundation đã có.
+2.  Recipe header.
 
-SKU Master foundation đã có.
+3.  Recipe line group.
 
-Ingredient Master foundation đã có.
+4.  Recipe line.
 
-UOM foundation đã có.
+5.  BOM sản xuất.
 
-Product/SKU Active không đồng nghĩa Sellable đã được khóa.
+6.  Formula header.
 
-P1.2A có implementation report đủ 14 mục.
+7.  Formula line.
 
-Owner/dev lead cho phép limited implementation trong phạm vi P1.2B.
+8.  Formula version.
 
-## 2.3. Mục tiêu
+9.  Formula kind.
 
-Mục tiêu của PROMPT-P1.2B là cho phép dev/Codex/Copilot triển khai giới hạn phần nền của:
+10. G1 operational formula.
 
-Recipe Master.
+11. G0/research boundary.
 
-BOM / Recipe Ingredient Line.
+12. G2/G3 future version boundary.
 
-Formula Version.
+13. Anchor ingredient là gạo.
 
-Formula Kind.
+14. Ratio_to_rice.
 
-Recipe status lifecycle.
+15. Formula scaling theo kg gạo.
 
-Recipe immutability boundary.
+16. Formula snapshot requirement.
 
-Recipe-to-SKU linkage.
+17. Formula approval status.
 
-Recipe-to-Ingredient/UOM linkage.
+18. Formula activation status.
 
-BOM quantity validation.
+19. Formula change control.
 
-Formula snapshot readiness foundation.
+20. UOM dùng trong công thức.
 
-Pilot vs fixed formula boundary nếu source-of-truth đã có.
+21. UOM conversion requirement.
 
-Test/smoke tối thiểu cho Recipe / BOM / Formula Version.
+22. Rounding policy.
 
-Report implementation đầy đủ 14 mục.
+23. Buffer planning +5% nhóm A.
 
-## 2.4. Tuyên bố bắt buộc
+24. Buffer planning +7% nhóm B.
 
-Đây là prompt LIMITED IMPLEMENTATION.
+25. No manual ingredient selection trong Production Order và Material Request của Phase 2.
 
-Agent được phép sửa code chỉ trong phạm vi Recipe / BOM / Formula Version foundation.
+26. Seed requirement cho formula.
 
-Agent không được mở rộng sang:
+27. Smoke/evidence cho formula.
 
-Product Activation Guard đầy đủ.
+**6. SCOPE OUT — PHẠM VI KHÔNG BAO GỒM**
 
-SKU Activation Guard đầy đủ.
+Tài liệu này không bao gồm:
 
-Recipe Activation Guard đầy đủ.
+1.  Không triển khai code.
 
-Production Order.
+2.  Không tạo migration.
 
-Material Planning.
+3.  Không tạo seed script.
 
-Operational Core.
+4.  Không thiết kế API chi tiết.
 
-Commerce Runtime.
+5.  Không thiết kế DTO chi tiết.
 
-Sellable Gate.
+6.  Không thiết kế UI chi tiết.
 
-AI Advisor Product Knowledge.
+7.  Không triển khai Production Order thật.
 
-Facebook Gateway.
+8.  Không triển khai Material Issue thật.
 
-Ads.
+9.  Không triển khai Warehouse Ledger thật.
 
-MC AI Live.
+10. Không triển khai MRP/procurement đầy đủ.
 
-IVR.
+11. Không triển khai MISA integration.
 
-Release Gateway.
+12. Không triển khai print/QR/traceability runtime.
 
-# 3. MODE: LIMITED IMPLEMENTATION
+13. Không quyết định SKU sellable.
 
-## 3.1. Chế độ thực thi
+14. Không quyết định batch release.
 
-MODE: LIMITED IMPLEMENTATION
+15. Không quyết định production ready.
 
-Agent được phép:
+16. Không gọi Completion PASS.
 
-Inspect codebase thật.
+17. Không gọi Gateway PASS.
 
-Đọc PROMPT-P1 Analysis Report.
+18. Không gọi Go-live Approved.
 
-Đọc PROMPT-P1.1 Technical Design Handoff.
+Tài liệu này chỉ khóa nền Recipe/BOM/Formula để các file sau tiêu thụ đúng.
 
-Đọc PROMPT-P1.2A Implementation Report.
+**7. ĐỊNH NGHĨA THUẬT NGỮ**
 
-Đọc PHASE 0 Validation Report.
+| **Thuật ngữ**      | **Định nghĩa**                                                           |
+|--------------------|--------------------------------------------------------------------------|
+| Recipe             | Công thức sản phẩm ở cấp nghiệp vụ, gắn với SKU                          |
+| BOM                | Định mức nguyên liệu/vật tư cần cho sản xuất, được rút ra từ công thức   |
+| Formula            | Phiên bản công thức có thể được duyệt và dùng vận hành                   |
+| Formula Version    | Mã phiên bản của công thức, ví dụ G1, G2                                 |
+| G0                 | Công thức nghiên cứu/thử nghiệm, không được dùng làm operational formula |
+| G1                 | Công thức vận hành nền được khóa cho baseline/go-live sau này            |
+| G2/G3              | Phiên bản công thức tương lai khi có thay đổi sau G1                     |
+| Anchor Ingredient  | Nguyên liệu mốc dùng để scale công thức; trong Bản gôm khóa là gạo       |
+| Ratio_to_rice      | Tỷ lệ của từng nguyên liệu so với lượng gạo anchor                       |
+| Formula Scaling    | Tính lại lượng nguyên liệu khi thay đổi kg gạo                           |
+| Formula Change     | Thay đổi tỷ lệ/thêm/bỏ/thay nguyên liệu làm phát sinh version mới        |
+| Planning Buffer    | Hệ số dự phòng cho MRP/stock planning, không phải công thức sản xuất     |
+| Formula Snapshot   | Bản chụp công thức tại thời điểm tạo lệnh sản xuất                       |
+| Active Operational | Trạng thái công thức được phép tiêu thụ cho vận hành theo gate           |
+| Owner Confirm      | Xác nhận của chủ dự án/chủ nghiệp vụ trước seed/code                     |
 
-Sửa file trong phạm vi Recipe / BOM / Formula Version foundation.
+**PHẦN 2/4 — RECIPE / BOM / FORMULA MODEL / ANCHOR GẠO / SCALING**
 
-Bổ sung hoặc chuẩn hóa Recipe Master model/service/repository nếu cần.
+**8. NGUYÊN TẮC TỔNG QUAN RECIPE / BOM / FORMULA**
 
-Bổ sung hoặc chuẩn hóa BOM/Recipe Line model nếu cần.
+**8.1. Recipe phải gắn với SKU**
 
-Bổ sung hoặc chuẩn hóa Formula Version nếu cần.
+Mỗi recipe vận hành phải thuộc về một SKU cụ thể.
 
-Bổ sung hoặc chuẩn hóa Formula Kind nếu cần.
+Không cho phép recipe trôi nổi không có SKU.
 
-Bổ sung validation Recipe/SKU/Ingredient/UOM linkage.
+Không cho phép một recipe dùng cho nhiều SKU nếu chưa có rule chia sẻ được Owner xác nhận.
 
-Bổ sung immutability boundary cho recipe/version.
+**8.2. Formula phải có version**
 
-Bổ sung test/smoke tối thiểu.
+Mọi công thức dùng cho vận hành phải có:
 
-Chạy build/test/lint phù hợp.
+1.  Formula code.
 
-Báo cáo đầy đủ 14 mục.
+2.  Formula version.
 
-## 3.2. Điều kiện để được sửa file
+3.  SKU code.
 
-Agent chỉ được sửa file nếu đáp ứng đủ:
+4.  Formula status.
 
-Đã đọc PROMPT-P1 Analysis Report.
+5.  Approved status.
 
-Đã đọc PROMPT-P1.1 Technical Design Handoff.
+6.  Active status.
 
-Đã đọc PROMPT-P1.2A Implementation Report.
+7.  Effective date.
 
-Đã đọc PHASE 0 Validation Report.
+8.  Formula lines.
 
-Đã đọc TECH-01 / TECH-10 / TECH-11 / TECH-12 / TECH-13.
+9.  Owner confirmation.
 
-Đã inspect codebase thật.
+Không có version thì không được dùng sản xuất.
 
-Đã xác định Product/SKU/Ingredient/UOM foundation đã có.
+Không có approved status thì không được active operational.
 
-Đã xác định file nào thuộc scope P1.2B.
+Không có formula lines cụ thể thì không được seed.
 
-Đã xác định file nào không thuộc scope P1.2B.
+**8.3. Recipe line phải là nguyên liệu cụ thể**
 
-Đã xác nhận không cần tự đổi nghiệp vụ.
+Công thức không được chỉ ghi:
 
-Đã xác nhận không cần hardcode policy.
+- Nhóm đạm.
 
-Đã xác nhận không triển khai Production Order trong prompt này.
+- Nhóm rau củ.
 
-Đã xác nhận không triển khai Sellable Gate trong prompt này.
+- Nhóm gia vị.
 
-Nếu thiếu điều kiện, agent phải dừng và báo:
+- Nhóm bổ dưỡng.
 
-BLOCKED — LIMITED IMPLEMENTATION PRECONDITION NOT MET
+- Nhóm bao bì.
 
-# 4. SOURCE-OF-TRUTH BẮT BUỘC
+- Nhóm nguyên liệu phụ.
 
-## 4.1. Source chính
+Mỗi dòng công thức phải có:
 
-Agent phải đọc và ưu tiên:
+1.  Ingredient code.
 
-PROMPT-P1 Analysis Report
+2.  Ingredient canonical name.
 
-PROMPT-P1.1 Technical Design Handoff
+3.  UOM.
 
-PROMPT-P1.2A Implementation Report
+4.  Ratio hoặc quantity.
 
-PHASE 0 Validation Report
+5.  Formula line group.
 
-TECH-01 — Foundation / RBAC / Audit / Evidence / Idempotency
+6.  Status.
 
-TECH-10 — Global Smoke / UAT / Evidence / Release Gateway
+7.  Owner confirmation.
 
-TECH-11 — Implementation Roadmap / Dev Phase Plan
+Recipe line group chỉ dùng để tổ chức công thức, không được thay thế nguyên liệu cụ thể.
 
-TECH-12 — Phase Backlog Pack
+**8.4. BOM là đầu ra từ formula, không phải nhập tay độc lập**
 
-TECH-13 — Codex / Copilot Dev Prompt Pack
+BOM sản xuất phải được sinh hoặc xác định từ formula đã khóa.
 
-Recipe / BOM / Formula Version source-of-truth nếu đã có.
+Không cho phép dev tạo một danh sách BOM độc lập, tách rời formula.
 
-Product/SKU/Ingredient/UOM source-of-truth đã dùng ở P1.2A.
+Không cho phép người dùng tự nhập tay BOM ở bước sản xuất nếu công thức đã có.
 
-## 4.2. Quy tắc ưu tiên
+BOM dùng cho Phase 2 phải đến từ formula snapshot.
 
-Agent phải áp dụng:
+**9. CẤU TRÚC RECIPE HEADER**
 
-TECH mới thắng code cũ.
+Recipe header là lớp định danh công thức sản phẩm ở cấp SKU.
 
-TECH mới thắng tài liệu cũ.
+| **Trường nghiệp vụ**    | **Bắt buộc**    | **Quy tắc**                                          |
+|-------------------------|-----------------|------------------------------------------------------|
+| recipe_code             | Có              | Mã recipe duy nhất                                   |
+| sku_code                | Có              | SKU sở hữu recipe                                    |
+| sku_name_snapshot       | Có              | Snapshot tên SKU tại thời điểm tạo recipe            |
+| recipe_name             | Có              | Tên recipe nội bộ                                    |
+| recipe_purpose          | Có              | Baseline / Pilot / Operational / Research            |
+| recipe_status           | Có              | DRAFT / OWNER_REVIEW / APPROVED / ACTIVE / INACTIVE  |
+| formula_kind            | Có              | ANCHOR_BASED / FIXED_BATCH hoặc loại được Owner khóa |
+| default_formula_version | Có nếu active   | Version mặc định khi tạo production order            |
+| owner_confirmed         | Có              | Bắt buộc trước seed/code                             |
+| created_by              | Có              | Actor tạo                                            |
+| approved_by             | Có nếu approved | Actor duyệt                                          |
+| approved_at             | Có nếu approved | Thời điểm duyệt                                      |
+| effective_from          | Có nếu active   | Ngày hiệu lực                                        |
+| effective_to            | Tùy             | Ngày hết hiệu lực nếu thay version                   |
+| audit_required          | Có              | Bắt buộc                                             |
 
-Code hiện tại chỉ là CURRENT_IMPLEMENTATION_STATE_ONLY.
+**10. CẤU TRÚC FORMULA HEADER**
 
-Tài liệu cũ chỉ là LEGACY_REFERENCE_ONLY.
+Formula header là lớp khóa phiên bản công thức.
 
-PROMPT-P1/P1.1/P1.2A là đầu vào analysis/design/implementation, không phải release evidence.
+| **Trường nghiệp vụ**     | **Bắt buộc**        | **Quy tắc**                                                                                |
+|--------------------------|---------------------|--------------------------------------------------------------------------------------------|
+| formula_code             | Có                  | Mã công thức duy nhất                                                                      |
+| recipe_code              | Có                  | Trỏ về recipe                                                                              |
+| sku_code                 | Có                  | SKU áp dụng                                                                                |
+| formula_version          | Có                  | G1/G2/G3 hoặc version được khóa                                                            |
+| formula_name             | Có                  | Tên công thức                                                                              |
+| formula_kind             | Có                  | ANCHOR_BASED hoặc FIXED_BATCH                                                              |
+| formula_status           | Có                  | DRAFT / OWNER_REVIEW / APPROVED_SEED_BASELINE / ACTIVE_OPERATIONAL / SUPERSEDED / INACTIVE |
+| is_active_operational    | Có                  | TRUE duy nhất theo rule active                                                             |
+| anchor_ingredient_code   | Có với ANCHOR_BASED | Gạo anchor                                                                                 |
+| anchor_uom               | Có với ANCHOR_BASED | Đơn vị của gạo anchor                                                                      |
+| standard_anchor_quantity | Có                  | Ví dụ kg gạo chuẩn nếu Owner xác nhận                                                      |
+| standard_batch_size      | Có nếu FIXED_BATCH  | Mẻ chuẩn nếu dùng fixed batch                                                              |
+| rounding_policy          | Có                  | Quy tắc làm tròn khi scale                                                                 |
+| loss_buffer_policy_ref   | Tùy                 | Chỉ trỏ planning buffer, không sửa formula                                                 |
+| approved_by              | Có khi approved     | Người duyệt                                                                                |
+| approved_at              | Có khi approved     | Thời điểm duyệt                                                                            |
+| effective_from           | Có khi active       | Ngày hiệu lực                                                                              |
+| change_reason            | Có nếu version mới  | Lý do thay đổi                                                                             |
+| previous_formula_version | Có nếu G2+          | Version trước đó                                                                           |
+| owner_confirmed          | Có                  | Bắt buộc trước seed/code                                                                   |
+| audit_required           | Có                  | Bắt buộc                                                                                   |
 
-Không dùng legacy làm nền nghiệp vụ.
+**11. CẤU TRÚC FORMULA LINE**
 
-Không để code cũ thắng TECH mới.
+Formula line là từng dòng nguyên liệu cụ thể.
 
-Nếu code hiện tại khác TECH mới thì báo conflict hoặc xử lý trong đúng scope nếu P1.1 đã cho phép.
+| **Trường nghiệp vụ**            | **Bắt buộc**           | **Quy tắc**                                        |
+|---------------------------------|------------------------|----------------------------------------------------|
+| formula_code                    | Có                     | Trỏ về formula header                              |
+| formula_version                 | Có                     | Version cụ thể                                     |
+| line_no                         | Có                     | Thứ tự dòng, không trùng                           |
+| line_group_code                 | Có                     | Nhóm dòng công thức                                |
+| ingredient_code                 | Có                     | Nguyên liệu cụ thể                                 |
+| ingredient_name_snapshot        | Có                     | Snapshot tên nguyên liệu                           |
+| ingredient_source_type_snapshot | Có                     | Supplier / Company Source / Internal               |
+| material_group_snapshot         | Có                     | Nhóm A/B/Company Source                            |
+| formula_uom                     | Có                     | Đơn vị trong công thức                             |
+| inventory_uom_snapshot          | Có                     | Đơn vị tồn kho tương ứng                           |
+| uom_conversion_required         | Có                     | TRUE nếu cần quy đổi                               |
+| ratio_to_rice                   | Có với ANCHOR_BASED    | Tỷ lệ so với gạo                                   |
+| quantity_at_standard_anchor     | Có nếu có anchor chuẩn | Số lượng tại mức gạo chuẩn                         |
+| quantity_per_standard_batch     | Có nếu FIXED_BATCH     | Số lượng theo mẻ chuẩn                             |
+| is_anchor_ingredient            | Có                     | TRUE duy nhất với gạo                              |
+| is_active_line                  | Có                     | TRUE nếu dòng còn hiệu lực                         |
+| is_optional                     | Có                     | G1 operational không nên optional nếu chưa có rule |
+| owner_confirmed                 | Có                     | Bắt buộc trước seed                                |
+| audit_required                  | Có                     | Bắt buộc                                           |
 
-Nếu nghiệp vụ Recipe/BOM/Formula chưa có source-of-truth thì dừng phần đó và báo owner decision required.
+**12. RECIPE LINE GROUP**
 
-# 5. OBJECTIVE
+**12.1. Mục tiêu của line group**
 
-## 5.1. Mục tiêu triển khai
+Recipe line group dùng để phân nhóm nguyên liệu cho dễ quản trị, kiểm tra và hiển thị.
 
-Agent phải triển khai giới hạn:
+Line group không phải là nguyên liệu.
 
-Recipe Master foundation.
+Line group không được thay thế ingredient code.
 
-BOM / Recipe Ingredient Line foundation.
+Mỗi dòng công thức vẫn phải có ingredient cụ thể.
 
-Formula Version foundation.
+**12.2. Quy tắc line group**
 
-Formula Kind foundation.
+| **Quy tắc**                                                      | **Diễn giải**                                    |
+|------------------------------------------------------------------|--------------------------------------------------|
+| Mỗi công thức G1 phải có đủ nhóm bắt buộc theo seed spec đã khóa | Không thiếu nhóm nếu rule yêu cầu 4 nhóm         |
+| Group chỉ dùng tổ chức                                           | Không dùng group làm dòng nguyên liệu            |
+| Ingredient phải nằm trong group hợp lệ                           | Không để ingredient không group nếu rule yêu cầu |
+| Group code phải từ master/config                                 | Không nhập tay tự do                             |
+| Group không quyết định UOM                                       | UOM nằm ở ingredient/formula line                |
+| Group không quyết định quantity                                  | Quantity/ratio nằm ở formula line                |
 
-Recipe-SKU relationship foundation.
+**12.3. Fail gate line group**
 
-Recipe-Ingredient-UOM validation foundation.
+Fail nếu:
 
-BOM quantity validation foundation.
+1.  Công thức chỉ có group nhưng không có ingredient.
 
-Recipe status lifecycle foundation.
+2.  Một group chứa mô tả chung chung không thể issue nguyên liệu.
 
-Recipe immutability boundary.
+3.  Formula line không có ingredient_code.
 
-Formula snapshot readiness foundation.
+4.  Ingredient không thuộc group nào trong khi G1 yêu cầu đủ nhóm.
 
-Recipe public/private boundary nếu có.
+5.  Dev hardcode group trong service thay vì dùng master/config.
 
-Test/smoke tối thiểu.
+**13. FORMULA KIND**
 
-Report implementation đầy đủ 14 mục.
+**13.1. Các loại formula được chấp nhận trong tài liệu này**
 
-## 5.2. Mục tiêu nền tảng
+| **Formula kind** | **Ý nghĩa**                          | **Dùng khi nào**                      | **Điều kiện bắt buộc**         |
+|------------------|--------------------------------------|---------------------------------------|--------------------------------|
+| ANCHOR_BASED     | Công thức scale theo nguyên liệu mốc | Bản gôm khóa gạo làm anchor           | Có anchor gạo và ratio_to_rice |
+| FIXED_BATCH      | Công thức theo mẻ chuẩn cố định      | Dùng nếu Owner khóa batch size cụ thể | Có quantity_per_standard_batch |
+| RESEARCH_ONLY    | Công thức nghiên cứu                 | Không dùng vận hành                   | Không được active operational  |
 
-P1.2B phải tạo nền để các prompt sau có thể tiếp tục:
+**13.2. Công thức G1 ưu tiên ANCHOR_BASED theo Bản gôm**
 
-# PROMPT-P1.2C — Product / SKU / Recipe Activation Guard
+Bản gôm đã khóa:
 
-# PROMPT-P1.2D — SKU Extension Registry / Seed Governance
+1.  Pilot formula lấy gạo làm anchor ingredient.
 
-# PROMPT-P1.2E — PHASE 1 Smoke / Evidence / Implementation Report
+2.  Khi nhập số kg gạo, hệ thống tự scale toàn bộ nguyên liệu theo ratio_to_rice.
 
-PHASE 2 — Operational Core sau khi PHASE 1 đủ evidence/smoke/owner review.
+3.  Scale số kg gạo không phải đổi công thức.
 
-# 6. SCOPE IN
+Vì vậy, trong Phase 1, file này khóa hướng G1 như sau:
 
-## 6.1. Recipe Master Foundation
+**G1 operational formula phải hỗ trợ anchor-based scaling theo gạo.**
 
-Agent được phép triển khai hoặc chuẩn hóa:
+Nếu một SKU có công thức fixed batch riêng, phải được Owner xác nhận rõ và không được làm mờ rule anchor gạo.
 
-Recipe entity/model.
+**14. ANCHOR GẠO**
 
-Recipe identity.
+**14.1. Nguyên tắc**
 
-Recipe code/name nếu source-of-truth yêu cầu.
+Gạo là nguyên liệu mốc để scale công thức.
 
-Recipe linked SKU.
+Khi người dùng nhập số kg gạo trong bối cảnh sản xuất, hệ thống phải tự tính ra lượng các nguyên liệu còn lại theo ratio_to_rice.
 
-Recipe version.
+Gạo anchor phải là một ingredient canonical trong master.
 
-Recipe status.
+Không được dùng chữ “gạo” dạng text tự do nếu chưa có ingredient_code.
 
-Recipe formula kind.
+**14.2. Checklist anchor gạo**
 
-Recipe effective date nếu có.
+| **Trường**                      | **Bắt buộc** | **Quy tắc**                              |
+|---------------------------------|--------------|------------------------------------------|
+| anchor_ingredient_code          | Có           | Mã ingredient của gạo                    |
+| anchor_ingredient_name_snapshot | Có           | Tên gạo tại thời điểm formula approved   |
+| anchor_uom                      | Có           | Đơn vị tính, ví dụ kg nếu Owner xác nhận |
+| is_anchor_ingredient            | Có           | TRUE duy nhất trong formula              |
+| anchor_precision                | Có           | Số lẻ cho phép                           |
+| anchor_min_quantity             | Tùy          | Nếu có giới hạn vận hành                 |
+| anchor_max_quantity             | Tùy          | Nếu có giới hạn vận hành                 |
+| owner_confirmed                 | Có           | Bắt buộc                                 |
 
-Recipe ingredient/BOM lines.
+**14.3. Fail gate anchor**
 
-Recipe approval status nếu thuộc foundation.
+Fail nếu:
 
-Recipe immutable boundary.
+1.  Formula G1 không có anchor.
 
-Recipe public/private field boundary nếu có.
+2.  Có nhiều hơn một anchor trong cùng formula.
 
-Recipe audit hook nếu PHASE 0 Audit foundation hỗ trợ.
+3.  Anchor không phải ingredient canonical.
 
-Recipe actor/correlation linkage nếu có command foundation.
+4.  Anchor thiếu UOM.
 
-Recipe validation foundation.
+5.  Anchor không phải gạo nhưng không có Owner confirm.
 
-## 6.2. Recipe Status Foundation
+6.  Anchor bị nhập tay ở Production Order thay vì lấy từ formula.
 
-Recipe status tối thiểu có thể gồm:
+**15. RATIO_TO_RICE**
 
-Agent phải bảo đảm:
+**15.1. Định nghĩa**
 
-Recipe Active không đồng nghĩa Sellable.
+ratio_to_rice là tỷ lệ của từng nguyên liệu so với lượng gạo anchor.
 
-Recipe Active không đồng nghĩa Production Order đã được tạo.
+Khi gạo thay đổi, lượng nguyên liệu khác được tính theo tỷ lệ này.
 
-Recipe Active không đồng nghĩa Batch QC_PASS.
+Ví dụ về nguyên tắc, không phải dữ liệu thật:
 
-Recipe Active không đồng nghĩa Batch RELEASED.
+Nếu gạo là 10 kg và nguyên liệu X có ratio_to_rice = 0,05 thì nguyên liệu X được tính theo tỷ lệ 5% so với gạo.
 
-Recipe Active không đồng nghĩa Finished Goods Available.
+Tài liệu này không khóa con số thật. Con số thật phải do Owner xác nhận trong checklist chuẩn hóa.
 
-## 6.3. BOM / Recipe Ingredient Line Foundation
+**15.2. Quy tắc bắt buộc**
 
-Agent được phép triển khai hoặc chuẩn hóa:
+| **Quy tắc**                                          | **Diễn giải**                     |
+|------------------------------------------------------|-----------------------------------|
+| Mỗi dòng nguyên liệu cần scale phải có ratio_to_rice | Không để null                     |
+| Ratio_to_rice phải theo UOM đã chuẩn hóa             | Không dùng UOM mơ hồ              |
+| Ratio_to_rice thuộc formula version                  | Version khác có thể có ratio khác |
+| Ratio_to_rice không được sửa trong G1 active         | Nếu sửa phải tạo version mới      |
+| Ratio_to_rice phải Owner confirm                     | Agent không được tự suy luận      |
+| Ratio_to_rice phải test scaling                      | Smoke bắt buộc                    |
 
-Recipe line entity/model.
+**15.3. Fail gate ratio**
 
-Recipe ID linkage.
+Fail nếu:
 
-Ingredient ID linkage.
+1.  Thiếu ratio_to_rice.
 
-Ingredient quantity.
+2.  Ratio_to_rice âm.
 
-UOM linkage.
+3.  Ratio_to_rice không phù hợp UOM.
 
-Ingredient group nếu source-of-truth có.
+4.  Ratio_to_rice tự suy luận từ text Bản gôm.
 
-Line order nếu cần.
+5.  Sửa ratio_to_rice trong G1 mà không tạo version mới.
 
-Required/optional flag nếu có.
+6.  Công thức scale được dù thiếu ratio.
 
-Quantity validation.
+**16. FORMULA SCALING THEO KG GẠO**
 
-UOM validation.
+**16.1. Nguyên tắc chính**
 
-No hardcoded ingredient list.
+Khi nhập số kg gạo:
 
-No hardcoded quantity.
+1.  Hệ thống lấy formula version đang active.
 
-No missing UOM.
+2.  Hệ thống lấy anchor gạo.
 
-No invalid ingredient.
+3.  Hệ thống đọc ratio_to_rice của từng dòng nguyên liệu.
 
-## 6.4. BOM Quantity / UOM Rule
+4.  Hệ thống tính quantity cần dùng cho từng nguyên liệu.
 
-BOM/Recipe line phải bảo đảm:
+5.  Hệ thống áp dụng rounding policy.
 
-Quantity phải là số hợp lệ.
+6.  Hệ thống tạo danh sách scaled formula lines.
 
-Quantity không được âm.
+7.  Danh sách này được Phase 2 dùng để tạo production dossier/material request.
 
-Quantity không được bằng 0 nếu line bắt buộc.
+**16.2. Scaling không làm thay đổi formula version**
 
-UOM phải tồn tại.
+Thay đổi số kg gạo chỉ thay đổi sản lượng/mẻ sản xuất, không làm thay đổi công thức.
 
-UOM phải active nếu rule yêu cầu.
+Các hành động sau **không tạo formula version mới**:
 
-Ingredient phải tồn tại.
+| **Hành động**                                 | **Có tạo version mới không?** | **Ghi chú**                               |
+|-----------------------------------------------|-------------------------------|-------------------------------------------|
+| Nhập 10 kg gạo thay vì 5 kg                   | Không                         | Chỉ scale sản lượng                       |
+| Nhập 20 kg gạo theo cùng ratio                | Không                         | Chỉ scale                                 |
+| Làm tròn theo rounding policy đã khóa         | Không                         | Nếu policy không đổi                      |
+| Tính nhu cầu nguyên liệu cho production order | Không                         | Dùng snapshot                             |
+| Tính nhu cầu planning có buffer               | Không                         | Buffer thuộc planning, không phải formula |
 
-Ingredient phải active nếu rule yêu cầu.
+**16.3. Các hành động bắt buộc tạo version mới**
 
-Không tự convert UOM nếu chưa có conversion rule.
+| **Hành động**                                 | **Có tạo version mới không?** | **Lý do**                   |
+|-----------------------------------------------|-------------------------------|-----------------------------|
+| Đổi tỷ lệ giữa các nguyên liệu                | Có                            | Thay đổi công thức          |
+| Đổi ratio_to_rice                             | Có                            | Thay đổi công thức          |
+| Thêm nguyên liệu                              | Có                            | Thay đổi công thức          |
+| Bỏ nguyên liệu                                | Có                            | Thay đổi công thức          |
+| Thay nguyên liệu này bằng nguyên liệu khác    | Có                            | Thay đổi công thức          |
+| Đổi anchor ingredient                         | Có                            | Thay đổi logic scale        |
+| Đổi UOM làm thay đổi định lượng thực tế       | Có                            | Ảnh hưởng công thức         |
+| Đổi nhóm công thức làm thay đổi line bắt buộc | Có                            | Ảnh hưởng formula structure |
 
-Nếu cần conversion nhưng chưa có rule, phải báo gap.
+**16.4. Rounding policy**
 
-Không hardcode UOM trong code.
+Formula scaling phải có rounding policy.
 
-## 6.5. Formula Version Foundation
+| **Nội dung**                                                               | **Quy tắc**                      |
+|----------------------------------------------------------------------------|----------------------------------|
+| Rounding policy phải được khóa ở formula header hoặc config liên quan      | Không để dev tự làm tròn tùy ý   |
+| Rounding phải nhất quán giữa preview, production order và material request | Không được mỗi nơi một kết quả   |
+| Rounding không được làm thay đổi ratio gốc                                 | Chỉ là biểu diễn/tính lượng dùng |
+| Nếu rounding policy thay đổi làm ảnh hưởng sản xuất                        | Cần Owner review                 |
 
-Agent được phép triển khai hoặc chuẩn hóa:
+**17. UOM TRONG FORMULA**
 
-Formula version field.
+**17.1. Nguyên tắc**
 
-Formula version lifecycle.
+Mỗi formula line phải có UOM.
 
-Version uniqueness per SKU/recipe scope.
+Không được có dòng công thức thiếu đơn vị tính.
 
-Version immutability boundary.
+Không được dùng UOM text tự do.
 
-Version effective date nếu có.
+UOM phải đến từ master.
 
-Version supersede rule nếu có.
+Nếu formula_uom khác inventory_uom, phải có conversion rule.
 
-Version linked recipe lines.
+**17.2. Nhóm UOM cần hỗ trợ**
 
-Version audit hook nếu có.
+| **Nhóm**   | **Ví dụ**          | **Dùng cho**                                                              |
+|------------|--------------------|---------------------------------------------------------------------------|
+| Khối lượng | kg, g              | Gạo, nguyên liệu khô, thành phần sản xuất                                 |
+| Thể tích   | l, ml              | Nguyên liệu lỏng nếu có                                                   |
+| Đơn vị đếm | pcs, gói           | Vật tư hoặc đơn vị đặc biệt                                               |
+| Đóng gói   | hộp, thùng, carton | Packaging profile, không thay dòng nguyên liệu sản xuất nếu chưa xác nhận |
 
-Version validation.
+**17.3. Fail gate UOM**
 
-Version readiness cho production snapshot sau này.
+Fail nếu:
 
-Agent phải bảo đảm:
+1.  Formula line thiếu UOM.
 
-Formula đã dùng trong production sau này không được sửa đè.
+2.  UOM không nằm trong master.
 
-Nếu cần thay đổi, phải tạo version mới.
+3.  UOM không có conversion khi cần.
 
-Version cũ phải giữ lịch sử.
+4.  Cùng ingredient trong công thức dùng nhiều UOM không có rule.
 
-Không xóa version đã tham chiếu.
+5.  Ratio_to_rice dùng UOM không quy đổi được.
 
-Không dùng version active làm sellable.
+6.  Dev hardcode UOM trong code.
 
-## 6.6. Formula Kind Foundation
+**PHẦN 3/4 — G1 LOCK / VERSIONING / BUFFER / SNAPSHOT / PHASE 2 CONSUMPTION**
 
-Agent được phép triển khai hoặc chuẩn hóa Formula Kind nếu source-of-truth đã có.
+**18. G1 OPERATIONAL FORMULA LOCK**
 
-Formula Kind có thể gồm:
+**18.1. Định nghĩa G1**
 
-Agent không được tự tạo formula kind tùy tiện.
+G1 là công thức vận hành nền được Owner xác nhận để làm baseline cho sản xuất sau này.
 
-Nếu source-of-truth chưa khóa Formula Kind, agent phải báo:
+G1 không phải công thức nghiên cứu.
 
-BLOCKED — FORMULA KIND SOURCE-OF-TRUTH REQUIRED
+G1 không được sửa tùy tiện sau khi đã khóa.
 
-## 6.7. Pilot vs Fixed Formula Boundary
+G1 là nguồn để Phase 2 Production Order tự hiện công thức và tạo formula snapshot.
 
-Nếu source-of-truth đã khóa pilot/fixed formula, agent phải bảo đảm:
+**18.2. Điều kiện để một formula được xem là G1 hợp lệ**
 
-PILOT_PERCENT_BASED dùng ratio/anchor rule nếu có.
+| **Điều kiện**                                                  | **Bắt buộc** |
+|----------------------------------------------------------------|--------------|
+| Có sku_code                                                    | Có           |
+| Có formula_code                                                | Có           |
+| Có formula_version = G1 hoặc version được Owner khóa tương ứng | Có           |
+| Có formula_status hợp lệ                                       | Có           |
+| Có anchor gạo nếu anchor-based                                 | Có           |
+| Có ratio_to_rice cho từng line cần scale                       | Có           |
+| Có formula lines cụ thể                                        | Có           |
+| Có UOM cho từng line                                           | Có           |
+| Có ingredient canonical                                        | Có           |
+| Có Owner confirm                                               | Có           |
+| Có approved_by / approved_at nếu active operational            | Có           |
+| Có audit trail                                                 | Có           |
 
-FIXED_QUANTITY_BATCH dùng quantity per batch nếu có.
+**18.3. G0 / Research boundary**
 
-Không lẫn rule giữa hai formula kind.
+G0 hoặc công thức nghiên cứu không được dùng làm operational formula.
 
-Không active recipe nếu thiếu dữ liệu bắt buộc theo formula kind.
+Không được:
 
-Không dùng cùng một validation cho mọi formula kind nếu TECH yêu cầu tách.
+1.  Seed G0 thành active operational.
 
-Test phải chứng minh branch rule nếu có.
+2.  Dùng G0 để tạo production order.
 
-## 6.8. Recipe Snapshot Readiness Foundation
+3.  Dùng G0 để tạo material request.
 
-P1.2B chưa triển khai Production Order.
+4.  Dùng G0 để mở bán.
 
-Nhưng phải chuẩn bị recipe snapshot readiness cho PHASE 2:
+5.  Dùng G0 để tính giá thành chính thức.
 
-Recipe có version.
+Nếu cần lưu G0, phải ở trạng thái research/draft, không được tiêu thụ bởi production.
 
-Recipe có formula kind.
+**18.4. G2/G3 future version**
 
-Recipe có ingredient lines.
+G2/G3 chỉ phát sinh khi có thay đổi sau G1.
 
-Line có ingredient/quantity/UOM.
+Mỗi version mới phải có:
 
-Recipe có status hợp lệ.
+1.  Version code.
 
-Recipe có audit/version boundary.
+2.  Previous version.
 
-Recipe có thể được snapshot bởi Production Order sau này.
+3.  Change reason.
 
-Snapshot sau này phải giữ version/ingredient/quantity/UOM tại thời điểm tạo order.
+4.  Change summary.
 
-P1.2B chỉ chuẩn bị foundation, không tạo Production Order.
+5.  Changed lines.
 
-# 7. SCOPE OUT
+6.  Owner approval.
 
-PROMPT-P1.2B không được triển khai:
+7.  Effective date.
 
-Product Activation Guard đầy đủ.
+8.  Audit.
 
-SKU Activation Guard đầy đủ.
+9.  Rule không ảnh hưởng hồ sơ sản xuất cũ.
 
-Recipe Activation Guard đầy đủ.
+**19. FORMULA VERSIONING RULES**
 
-Production Order.
+**19.1. Nguyên tắc versioning**
 
-Production Batch.
+Formula versioning bảo vệ lịch sử sản xuất.
 
-Material Request.
+Khi một production order đã snapshot G1, sau này dù G2 được tạo, hồ sơ sản xuất cũ vẫn phải giữ G1 snapshot.
 
-Material Issue.
+Không được cập nhật ngược công thức cũ làm thay đổi lịch sử.
 
-Material Receipt.
+**19.2. Những thay đổi không tạo version mới**
 
-Inventory.
+| **Thay đổi**                                            | **Có tạo version mới không?** | **Ghi chú**                    |
+|---------------------------------------------------------|-------------------------------|--------------------------------|
+| Thay đổi số kg gạo để scale sản lượng                   | Không                         | Chỉ là quantity input          |
+| Tính nhu cầu cho mẻ lớn/mẻ nhỏ                          | Không                         | Dựa cùng ratio                 |
+| Làm tròn theo policy đã có                              | Không                         | Không đổi policy               |
+| Tính planning buffer                                    | Không                         | Không phải formula             |
+| Đổi trạng thái draft chưa approved trong quá trình soạn | Không bắt buộc                | Tùy workflow, miễn chưa active |
+| Sửa lỗi chính tả mô tả không ảnh hưởng công thức        | Không                         | Cần audit nếu đã approved      |
 
-Warehouse.
+**19.3. Những thay đổi bắt buộc tạo version mới**
 
-QC / Release.
+| **Thay đổi**                                        | **Có tạo version mới không?** | **Ghi chú**                 |
+|-----------------------------------------------------|-------------------------------|-----------------------------|
+| Thay đổi ratio_to_rice                              | Có                            | Thay đổi bản chất công thức |
+| Thêm nguyên liệu                                    | Có                            | Thay đổi BOM                |
+| Bỏ nguyên liệu                                      | Có                            | Thay đổi BOM                |
+| Thay nguyên liệu                                    | Có                            | Thay đổi BOM/trace          |
+| Đổi anchor gạo sang anchor khác                     | Có                            | Thay đổi logic công thức    |
+| Đổi UOM làm thay đổi định lượng                     | Có                            | Ảnh hưởng sản xuất          |
+| Đổi quantity_per_batch trong fixed batch            | Có                            | Thay đổi mẻ chuẩn           |
+| Đổi nhóm dòng bắt buộc ảnh hưởng nguyên liệu        | Có                            | Thay đổi cấu trúc công thức |
+| Thay đổi quy trình làm thay đổi nguyên liệu sử dụng | Có nếu ảnh hưởng formula      | Owner confirm               |
 
-Commerce Sellable Gate.
+**20. BUFFER +5% / +7% KHÔNG ĐƯỢC SỬA FORMULA**
 
-AI Advisor Product Knowledge.
+**20.1. Quy tắc từ Bản gôm**
 
-Facebook Gateway public product response.
+Bản gôm đã khóa:
 
-Ads product mapping.
+1.  Buffer +5% Nhóm A.
 
-MC AI Live runtime.
+2.  Buffer +7% Nhóm B.
 
-IVR order logic.
+3.  Buffer là buffer cho MRP/stock planning.
 
-Release Gateway.
+4.  Buffer không được tự sửa công thức sản xuất đã phê duyệt.
 
-Nếu phát hiện cần những phần này, agent chỉ ghi handoff cho prompt/phase tương ứng.
+**20.2. Phân biệt formula và planning**
 
-# 8. ALLOWED FILE CHANGE BOUNDARY
+| **Hạng mục**                                 | **Formula sản xuất**              | **Planning buffer**               |
+|----------------------------------------------|-----------------------------------|-----------------------------------|
+| Mục đích                                     | Định mức công thức đã duyệt       | Dự phòng mua hàng/tồn kho         |
+| Có nằm trong G1 formula không?               | Có, nếu là nguyên liệu thật       | Không                             |
+| Có làm thay đổi recipe line không?           | Có nếu thay đổi nguyên liệu/tỷ lệ | Không                             |
+| Có dùng để issue nguyên liệu mặc định không? | Theo production/material rule     | Không tự động nếu chưa duyệt      |
+| Có tạo formula version mới không?            | Có nếu đổi formula                | Không nếu chỉ đổi planning policy |
+| Ai xác nhận                                  | Owner công thức                   | Owner planning/MRP                |
 
-## 8.1. File được phép sửa
+**20.3. Fail gate buffer**
 
-Agent chỉ được sửa các file thuộc nhóm:
+Fail nếu:
 
-Recipe Master model/entity.
+1.  Dev cộng +5% vào formula line nhóm A.
 
-Recipe Master service/repository nếu nằm trong foundation scope.
+2.  Dev cộng +7% vào formula line nhóm B.
 
-Recipe Line / BOM model/entity.
+3.  Buffer làm thay đổi G1 quantity.
 
-Recipe Line / BOM service/repository nếu nằm trong foundation scope.
+4.  Buffer làm thay đổi ratio_to_rice.
 
-Formula Version model/entity.
+5.  Material request dùng buffer như công thức sản xuất khi chưa có rule phê duyệt.
 
-Formula Kind enum/config nếu source-of-truth đã có.
+6.  Agent hiểu buffer là thành phần công thức.
 
-Recipe/BOM validation foundation.
+**21. FORMULA SNAPSHOT CHO PHASE 2**
 
-Migration Recipe/BOM/Formula nếu đã được scope cho phép.
+**21.1. Mục tiêu snapshot**
 
-Test/smoke Recipe/BOM/Formula foundation.
+Phase 2 sẽ tạo Production Order và Production Dossier.
 
-Seed/dev fixture nếu đã được P1.1 cho phép và không chứa production secret.
+Khi tạo lệnh sản xuất, hệ thống phải snapshot công thức tại thời điểm đó.
 
-## 8.2. File không được sửa
+Snapshot bảo vệ lịch sử:
 
-Agent không được sửa:
+- SKU.
 
-Product Activation Guard implementation file nếu chưa thuộc scope.
+- Formula code.
 
-Commerce Sellable Gate file.
+- Formula version.
 
-Operational Core file.
+- Ingredient list.
 
-Production Order file.
+- Ratio_to_rice.
 
-Inventory/Warehouse file.
+- UOM.
 
-AI Advisor file.
+- Quantity đã scale.
 
-Gateway file.
+- Rounding.
 
-Ads/MC AI Live/IVR file.
+- Owner approval metadata.
 
-Release Gateway file.
+**21.2. Dữ liệu snapshot tối thiểu**
 
-Production config/release flag.
+| **Trường snapshot**      | **Bắt buộc**  | **Ghi chú**                       |
+|--------------------------|---------------|-----------------------------------|
+| sku_code                 | Có            | SKU sản xuất                      |
+| sku_name_snapshot        | Có            | Tên tại thời điểm sản xuất        |
+| formula_code             | Có            | Mã công thức                      |
+| formula_version          | Có            | Version đang dùng                 |
+| formula_status_snapshot  | Có            | Trạng thái tại thời điểm snapshot |
+| anchor_ingredient_code   | Có            | Gạo anchor                        |
+| anchor_quantity          | Có            | Số kg gạo nhập                    |
+| formula_lines_snapshot   | Có            | Toàn bộ dòng công thức            |
+| ratio_to_rice_snapshot   | Có            | Tỷ lệ tại thời điểm snapshot      |
+| uom_snapshot             | Có            | Đơn vị tại thời điểm snapshot     |
+| scaled_quantity          | Có            | Số lượng đã tính                  |
+| rounding_policy_snapshot | Có            | Quy tắc làm tròn                  |
+| approved_by_snapshot     | Có nếu active | Người duyệt công thức             |
+| approved_at_snapshot     | Có nếu active | Thời điểm duyệt                   |
+| snapshot_created_at      | Có            | Thời điểm tạo snapshot            |
+| snapshot_actor           | Có            | Người/hệ thống tạo snapshot       |
 
-Global Gateway config.
+**21.3. Phase 2 không được sửa snapshot ngược**
 
-## 8.3. Không được đoán file path
+Sau khi Production Order đã tạo snapshot:
 
-Agent phải inspect repo thật.
+1.  Không được sửa snapshot theo version mới.
 
-Không được bịa file path.
+2.  Không được tự động đổi G1 snapshot sang G2.
 
-Không được tạo cấu trúc thư mục lớn nếu repo đã có convention khác.
+3.  Không được thay nguyên liệu trong snapshot nếu không có version/workflow đặc biệt.
 
-Nếu không xác định được file path đúng, agent phải báo:
+4.  Không được để Material Request chọn tay nguyên liệu khác snapshot.
 
-BLOCKED — FILE BOUNDARY UNCLEAR
+5.  Không được để Material Issue cấp nguyên liệu ngoài snapshot nếu không có approved deviation.
 
-# 9. IMPLEMENTATION REQUIREMENTS
+**22. NO MANUAL INGREDIENT SELECTION — KHÔNG CHỌN TAY NGUYÊN LIỆU Ở SẢN XUẤT**
 
-## 9.1. Recipe Master Requirements
+**22.1. Nguyên tắc**
 
-Recipe Master foundation phải có tối thiểu:
+Bản gôm đã khóa:
 
-Recipe ID.
+1.  Không được cho người dùng chọn tay nguyên liệu ở lệnh sản xuất.
 
-Recipe code hoặc equivalent nếu source-of-truth yêu cầu.
+2.  Không được cho người dùng chọn tay nguyên liệu ở phiếu cấp nguyên liệu.
 
-Linked SKU ID.
+3.  Phiếu đề nghị cấp nguyên liệu phải tự hiện nguyên liệu theo công thức.
 
-Formula version.
+4.  Phiếu chấp thuận nguyên liệu đưa vào sản xuất phải kế thừa từ phiếu đề nghị.
 
-Formula kind nếu source-of-truth có.
+Phase 1 phải chuẩn bị formula đủ rõ để Phase 2 thực hiện được rule này.
 
-Recipe status.
+**22.2. Điều kiện để Phase 2 không cần chọn tay nguyên liệu**
 
-Recipe line collection.
+Phase 1 phải cung cấp:
 
-Effective date nếu có.
+1.  SKU có formula active.
 
-Created/updated metadata nếu codebase có convention.
+2.  Formula có version.
 
-Actor/correlation/audit linkage nếu command được triển khai trong scope.
+3.  Formula có line cụ thể.
 
-No sellable flag.
+4.  Formula line có ingredient code.
 
-No production released flag.
+5.  Formula line có UOM.
 
-## 9.2. BOM / Recipe Line Requirements
+6.  Formula line có ratio_to_rice hoặc quantity.
 
-BOM/Recipe Line foundation phải có tối thiểu:
+7.  Formula có snapshot-ready structure.
 
-Recipe line ID.
+8.  Formula không dùng nhóm mơ hồ.
 
-Recipe ID.
+9.  Ingredient canonical đã chuẩn hóa.
 
-Ingredient ID.
+10. UOM conversion đã chuẩn hóa.
 
-Quantity.
+Nếu Phase 1 thiếu các dữ liệu này, Phase 2 sẽ buộc phải cho chọn tay, gây sai governance.
 
-UOM.
+**23. SEED REQUIREMENT CHO FORMULA**
 
-Line group nếu source-of-truth có.
+**23.1. Điều kiện trước khi seed formula**
 
-Line order nếu cần.
+Không được seed formula nếu chưa có:
 
-Validation không thiếu ingredient.
+1.  SKU canonical.
 
-Validation không thiếu UOM.
+2.  Ingredient canonical.
 
-Validation quantity hợp lệ.
+3.  Ingredient alias mapping.
 
-Không hardcode ingredient/quantity.
+4.  UOM master.
 
-Không tự convert UOM nếu chưa có rule.
+5.  UOM conversion.
 
-## 9.3. Formula Version Requirements
+6.  Recipe line group.
 
-Formula Version foundation phải bảo đảm:
+7.  Formula header.
 
-Recipe có version.
+8.  Formula lines.
 
-Version unique trong scope phù hợp.
+9.  Anchor gạo.
 
-Version không bị sửa đè khi đã được lock/snapshot/used.
+10. Ratio_to_rice.
 
-Thay đổi công thức phải tạo version mới nếu đã used/approved.
+11. Formula version.
 
-Version cũ vẫn giữ để trace.
+12. Formula status.
 
-Version có status/lifecycle nếu source-of-truth có.
+13. Owner confirmation.
 
-Version có audit event nếu audit hook có.
+14. Seed idempotency rule.
 
-Version không đồng nghĩa sellable.
+**23.2. Seed không được làm**
 
-## 9.4. Formula Kind Requirements
+Seed formula không được:
 
-Formula Kind foundation phải bảo đảm:
+1.  Tự set SKU sellable.
 
-Có danh mục formula kind rõ nếu source-of-truth đã khóa.
+2.  Tự set SKU released.
 
-Validation branch theo formula kind nếu có.
+3.  Tự set SKU production-ready.
 
-Không dùng field của PILOT cho FIXED nếu rule cấm.
+4.  Tự tạo production order.
 
-Không dùng field của FIXED cho PILOT nếu rule cấm.
+5.  Tự tạo raw lot.
 
-Không hardcode formula kind sai source.
+6.  Tự tạo material issue.
 
-Không tự thêm formula kind chưa được owner/TECH cho phép.
+7.  Tự mở inventory.
 
-# 10. DATABASE / MIGRATION / SEED RULE
+8.  Tự tạo MISA mapping thật.
 
-## 10.1. Database / migration rule
+9.  Tự tạo print payload.
 
-P1.2B có thể cần migration cho Recipe/BOM/Formula Version foundation.
+10. Tự gọi Gateway PASS.
 
-Agent chỉ được tạo migration khi:
+**PHẦN 4/4 — EXECUTION ORDER / HANDOFF / SMOKE / DONE GATE / FAIL GATE**
 
-P1.1 đã xác định cần.
+**24. EXECUTION ORDER — THỨ TỰ XỬ LÝ FILE P1.2B**
 
-Repo đang dùng migration chuẩn.
+**24.1. Thứ tự đọc tài liệu**
 
-Migration chỉ phục vụ Recipe/BOM/Formula foundation.
+| **Thứ tự** | **Tài liệu**                             | **Mục đích**                              |
+|------------|------------------------------------------|-------------------------------------------|
+| 1          | README-PHASE-01-HANDOFF-INDEX V1.1       | Hiểu Phase 1 và boundary                  |
+| 2          | MASTER-DATA-NORMALIZATION-CHECKLIST      | Biết dữ liệu cần chuẩn hóa                |
+| 3          | 02-P1-2A-PRODUCT-SKU-INGREDIENT-UOM      | Đối chiếu SKU/Ingredient/UOM              |
+| 4          | 03-P1-2B-RECIPE-BOM-FORMULA-VERSION V2.0 | Đọc file formula này                      |
+| 5          | 05-P1-2D-SKU-EXTENSION-SEED-GOVERNANCE   | Đối chiếu seed formula sau khi viết lại   |
+| 6          | 06-P1-2E-SMOKE-EVIDENCE-REPORT           | Đối chiếu smoke/evidence sau khi viết lại |
 
-Không tạo Production Order table trong prompt này.
+**24.2. Thứ tự phân tích trước code**
 
-Không tạo Sellable Gate table.
+Khi giao cho dev/Codex/Copilot, phải theo thứ tự:
 
-Không update database production.
+1.  Documentation Reading.
 
-Không chạy production migration.
+2.  Analysis Only.
 
-Report rõ migration file trong mục 11.
+3.  Gap Matrix.
 
-Nếu chưa rõ schema hoặc source-of-truth, agent phải báo:
+4.  Owner Confirm Required.
 
-BLOCKED — RECIPE / BOM / FORMULA SCHEMA APPROVAL REQUIRED
+5.  Technical Design Only.
 
-## 10.2. Seed rule
+6.  Limited Implementation, chỉ khi có lệnh riêng.
 
-P1.2B mặc định không seed production recipe.
+7.  Smoke/Evidence Submission.
 
-Nếu cần seed/dev fixture:
+8.  Owner Review.
 
-Chỉ seed dev/test/baseline nếu source-of-truth đã rõ.
+**25. DEV / CODEX / COPILOT HANDOFF**
 
-Không seed secret.
+**25.1. Mode mặc định**
 
-Không seed production-only formula chưa được phê duyệt.
+Khi giao file này cho Agent, mode mặc định là:
 
-Không hardcode sai ingredient/quantity.
+**ANALYSIS ONLY**
 
-Seed phải idempotent nếu có.
+Agent không được code ngay.
 
-Seed không tự set sellable.
+**25.2. Prompt giao Agent đúng**
 
-Seed không tự tạo production order.
+Nội dung giao việc đúng:
 
-Report rõ trong mục 12.
+Đọc file 03-P1-2B-RECIPE-BOM-FORMULA-VERSION V2.0 CLEAN FINAL ở MODE: ANALYSIS ONLY.
 
-Nếu chưa có source-of-truth Recipe/BOM/Formula, không tạo seed.
+Nhiệm vụ:
 
-# 11. TEST / SMOKE REQUIREMENTS
+1.  Lập Gap Matrix giữa tài liệu này và code hiện tại.
 
-## 11.1. Test được phép
+2.  Liệt kê dữ liệu formula còn thiếu.
 
-Agent được phép thêm/chỉnh test trong phạm vi:
+3.  Liệt kê SKU/ingredient/UOM nào cần Owner confirm.
 
-Tạo recipe hợp lệ linked SKU.
+4.  Liệt kê impacted files.
 
-Tạo recipe line hợp lệ linked ingredient/UOM.
+5.  Liệt kê impacted database/migration nếu có.
 
-Recipe line thiếu ingredient bị reject.
+6.  Liệt kê impacted API/DTO/service/UI/worker nếu có.
 
-Recipe line thiếu UOM bị reject.
+7.  Liệt kê risk P0/P1/P2.
 
-Recipe line quantity âm/0 không hợp lệ bị reject.
+8.  Đề xuất implementation scope.
 
-Recipe version unique trong scope.
+9.  Đề xuất smoke/evidence.
 
-Recipe version không sửa đè khi locked/used nếu trạng thái đó có.
+10. Không sửa code.
 
-Formula kind validation đúng branch nếu có.
+Cấm:
 
-Recipe Active không trả Sellable.
+1.  Không tạo migration.
 
-Recipe Active không trả Released.
+2.  Không tạo seed.
 
-Recipe/BOM snapshot readiness có đủ ingredient/quantity/UOM.
+3.  Không sửa code.
 
-Seed/dev fixture recipe idempotent nếu có seed.
+4.  Không tự suy luận formula.
 
-## 11.2. Test không được phép
+5.  Không tự suy luận ratio_to_rice.
 
-Không được viết test cho:
+6.  Không tự hardcode UOM.
 
-Product Activation Guard full.
+7.  Không dùng Bản gôm để code trực tiếp.
 
-Production Order full.
+8.  Không gọi Completion PASS / Gateway PASS / Production Ready.
 
-Material Request/Issue.
+**25.3. Output Agent bắt buộc**
 
-Inventory.
+| **Mục**                          | **Nội dung**                                              |
+|----------------------------------|-----------------------------------------------------------|
+| Scope đã đọc                     | File, phase, module, mode                                 |
+| Rule P0                          | Formula version, anchor gạo, ratio_to_rice, no dirty seed |
+| Boundary                         | No code, no seed, no manual ingredient                    |
+| Gap Matrix                       | Rule tài liệu vs code hiện tại                            |
+| Impacted Files                   | File có thể bị ảnh hưởng                                  |
+| DB/Migration Impact              | Bảng/object có thể bị ảnh hưởng nếu có                    |
+| API/DTO/Service/UI/Worker Impact | Layer có thể bị ảnh hưởng                                 |
+| Owner Confirm Required           | Dữ liệu còn thiếu/mơ hồ                                   |
+| Risk Register                    | P0/P1/P2                                                  |
+| Proposed Implementation Scope    | Đề xuất phạm vi sửa sau này                               |
+| Proposed Smoke/Evidence          | Test/evidence cần nộp                                     |
+| Final Status                     | Code changed = NO                                         |
 
-Warehouse.
+**26. OWNER CONFIRM REQUIRED**
 
-QC/Release.
+Các dữ liệu sau bắt buộc Owner xác nhận trước khi seed/code:
 
-Sellable Gate.
+| **Nhóm**            | **Dữ liệu cần xác nhận**      | **Vì sao chặn**                   |
+|---------------------|-------------------------------|-----------------------------------|
+| SKU                 | SKU nào có G1 formula         | Tránh gắn nhầm công thức          |
+| Formula code        | Mã công thức từng SKU         | Tránh trùng/nhầm công thức        |
+| Formula version     | G1/G2 hoặc version chính thức | Tránh sản xuất từ version mơ hồ   |
+| Formula status      | Draft/Approved/Active         | Tránh dùng công thức chưa duyệt   |
+| Anchor gạo          | Ingredient code của gạo       | Tránh scale sai                   |
+| Anchor UOM          | kg/g hoặc đơn vị khác         | Tránh sai quantity                |
+| Ratio_to_rice       | Tỷ lệ từng nguyên liệu        | Là lõi tính nguyên liệu           |
+| Ingredient lines    | Danh sách nguyên liệu cụ thể  | Tránh công thức nhóm mơ hồ        |
+| UOM                 | Đơn vị từng dòng              | Tránh sai quy đổi                 |
+| Rounding            | Cách làm tròn                 | Tránh lệch nguyên liệu            |
+| Buffer policy       | +5%/+7% chỉ planning          | Tránh sửa formula                 |
+| Version change rule | Khi nào tạo version mới       | Tránh sửa G1 tại chỗ              |
+| Approval actor      | Người duyệt công thức         | Tránh active không có trách nhiệm |
+| Effective date      | Ngày hiệu lực                 | Tránh dùng nhầm version           |
 
-Commerce Runtime.
+**27. SMOKE REQUIREMENTS CHO P1.2B**
 
-AI Advisor product recommendation.
+Chi tiết smoke sẽ được đưa vào file P1.2E, nhưng P1.2B phải khóa các smoke tối thiểu sau:
 
-Gateway public response.
+| **Mã smoke** | **Nội dung**                                          |
+|--------------|-------------------------------------------------------|
+| SMK-P1-2B-01 | Formula G1 có formula_code, sku_code, version, status |
+| SMK-P1-2B-02 | Mỗi G1 có đúng một anchor gạo                         |
+| SMK-P1-2B-03 | Anchor gạo là ingredient canonical                    |
+| SMK-P1-2B-04 | Mỗi formula line có ingredient_code cụ thể            |
+| SMK-P1-2B-05 | Không có formula line chỉ ghi group mơ hồ             |
+| SMK-P1-2B-06 | Mỗi line có UOM hợp lệ                                |
+| SMK-P1-2B-07 | UOM khác nhau có conversion                           |
+| SMK-P1-2B-08 | Mỗi line cần scale có ratio_to_rice                   |
+| SMK-P1-2B-09 | Nhập kg gạo scale đúng toàn bộ line                   |
+| SMK-P1-2B-10 | Đổi kg gạo không tạo formula version mới              |
+| SMK-P1-2B-11 | Đổi ratio_to_rice tạo formula version mới             |
+| SMK-P1-2B-12 | Thêm nguyên liệu tạo formula version mới              |
+| SMK-P1-2B-13 | Bỏ nguyên liệu tạo formula version mới                |
+| SMK-P1-2B-14 | Buffer +5%/+7% không làm thay đổi formula             |
+| SMK-P1-2B-15 | Formula snapshot giữ nguyên khi có version mới        |
+| SMK-P1-2B-16 | Seed formula idempotent                               |
+| SMK-P1-2B-17 | Không seed formula chưa Owner confirm                 |
+| SMK-P1-2B-18 | G0/research không active operational                  |
 
-Ads/Live/IVR.
+**28. EVIDENCE REQUIREMENTS**
 
-Release Gateway.
+| **Mã evidence**            | **Nội dung evidence**                              |
+|----------------------------|----------------------------------------------------|
+| EVD-P1-2B-FORMULA-HEADER   | Danh sách formula header đã chuẩn hóa              |
+| EVD-P1-2B-FORMULA-LINES    | Danh sách formula line có ingredient cụ thể        |
+| EVD-P1-2B-ANCHOR-RICE      | Bằng chứng mỗi G1 có gạo anchor                    |
+| EVD-P1-2B-RATIO            | Bảng ratio_to_rice                                 |
+| EVD-P1-2B-UOM              | Bằng chứng UOM hợp lệ và conversion                |
+| EVD-P1-2B-SCALING          | Kết quả test scale theo kg gạo                     |
+| EVD-P1-2B-VERSIONING       | Test đổi tỷ lệ/thêm/bỏ nguyên liệu tạo version mới |
+| EVD-P1-2B-BUFFER           | Bằng chứng buffer không sửa formula                |
+| EVD-P1-2B-SNAPSHOT         | Bằng chứng snapshot formula không bị đổi ngược     |
+| EVD-P1-2B-OWNER-CONFIRM    | Biên bản/chốt Owner confirm formula                |
+| EVD-P1-2B-SEED-IDEMPOTENCY | Log seed idempotency nếu có seed sau này           |
+| EVD-P1-2B-G0-BLOCK         | Bằng chứng G0 không active operational             |
 
-## 11.3. Smoke tối thiểu
+Lưu ý:
 
-Nếu test framework cho phép, agent nên tạo/chạy smoke:
+**Evidence Submitted chưa phải Evidence Accepted.**
 
-Không gọi các smoke này là Global Smoke Pass.
+Không được gọi PASS nếu evidence chưa được Owner/Reviewer chấp nhận.
 
-# 12. SECURITY / GOVERNANCE GUARDRAILS
+**29. RISK REGISTER P1.2B**
 
-Agent phải bảo đảm:
+| **Risk**                              | **Mức độ** | **Nguyên nhân**                      | **Cách kiểm soát**       |
+|---------------------------------------|------------|--------------------------------------|--------------------------|
+| Công thức thiếu version               | P0         | Formula chưa chuẩn hóa               | Bắt buộc formula_version |
+| G1 thiếu anchor gạo                   | P0         | Chưa map ingredient anchor           | Owner confirm            |
+| Ratio_to_rice thiếu                   | P0         | Công thức chưa đủ dữ liệu            | Chặn seed/code           |
+| Công thức dùng nhóm mơ hồ             | P0         | Không có ingredient cụ thể           | Bắt buộc line detail     |
+| UOM sai                               | P0         | Thiếu conversion                     | UOM checklist            |
+| Sửa G1 trực tiếp                      | P0         | Thiếu versioning guard               | Formula version rule     |
+| Scale kg gạo bị hiểu là đổi công thức | P1         | Nhầm scaling với versioning          | Rule scaling             |
+| Buffer cộng vào formula               | P0         | Nhầm planning với production formula | Buffer boundary          |
+| Phase 2 chọn tay nguyên liệu          | P0         | Formula thiếu detail                 | Snapshot-ready formula   |
+| Seed formula bẩn                      | P0         | Chưa Owner confirm                   | No dirty seed gate       |
+| G0 active operational                 | P0         | Nhầm research và production          | G0 block                 |
+| Snapshot bị cập nhật ngược            | P0         | Không lưu snapshot                   | Snapshot requirement     |
 
-Không hardcode recipe logic.
+**30. DONE GATE**
 
-Không hardcode ingredient quantity sai source-of-truth.
+File P1.2B được xem là đạt khi:
 
-Không hardcode Recipe Active = Sellable.
+1.  Đã khóa Recipe phải gắn SKU.
 
-Không hardcode Recipe Active = Batch Released.
+2.  Đã khóa Formula phải có version.
 
-Không tạo Sellable Gate trong P1.2B.
+3.  Đã khóa G1 là operational formula baseline.
 
-Không tạo Production Order trong P1.2B.
+4.  Đã khóa G0/research không được active operational.
 
-Không bỏ qua Product/SKU/Ingredient/UOM foundation từ P1.2A.
+5.  Đã khóa G2/G3 là version tương lai khi thay đổi công thức.
 
-Không bỏ qua Actor/RBAC/Audit foundation nếu có command.
+6.  Đã khóa gạo là anchor ingredient.
 
-Không public private recipe/formula fields.
+7.  Đã khóa mỗi formula G1 có đúng một anchor.
 
-Không seed production formula chưa được duyệt.
+8.  Đã khóa ratio_to_rice cho từng line cần scale.
 
-Không sửa business domain ngoài scope.
+9.  Đã khóa formula scaling theo kg gạo.
 
-Không bypass permission.
+10. Đã khóa scale kg gạo không tạo version mới.
 
-Không mở Global Gateway.
+11. Đã khóa đổi tỷ lệ/thêm/bỏ nguyên liệu phải tạo version mới.
 
-Không gọi Recipe/BOM xong là Production Ready.
+12. Đã khóa formula line phải là nguyên liệu cụ thể.
 
-Không gọi PHASE 1 Complete.
+13. Đã khóa line group không thay thế ingredient.
 
-Không gọi Release Ready / Production Ready / Go-live Approved.
+14. Đã khóa UOM và conversion requirement.
 
-# 13. EXECUTION STEPS
+15. Đã khóa rounding policy.
 
-Agent phải thực hiện theo thứ tự:
+16. Đã khóa buffer +5%/+7% chỉ là planning.
 
-Đọc PROMPT-P1 Analysis Report.
+17. Đã khóa buffer không sửa công thức sản xuất.
 
-Đọc PROMPT-P1.1 Technical Design Handoff.
+18. Đã khóa formula snapshot cho Phase 2.
 
-Đọc PROMPT-P1.2A Implementation Report.
+19. Đã khóa Phase 2 không chọn tay nguyên liệu.
 
-Đọc PHASE 0 Validation Report.
+20. Đã khóa seed formula chỉ sau Owner confirm.
 
-Đọc TECH-01 / TECH-10 / TECH-11 / TECH-12 / TECH-13.
+21. Đã khóa Dev/Codex/Copilot handoff ở Analysis Only.
 
-Inspect codebase thật.
+22. Đã khóa smoke/evidence cần có.
 
-Xác định Recipe/BOM/Formula implementation hiện có.
+23. Không gọi Completion PASS.
 
-Xác định Product/SKU/Ingredient/UOM foundation từ P1.2A.
+24. Không gọi Gateway PASS.
 
-Xác định file thuộc scope P1.2B.
+25. Không gọi Production Ready.
 
-Xác định file không được sửa.
+**31. FAIL GATE**
 
-Xác định có cần migration không.
+File P1.2B fail nếu xảy ra một trong các trường hợp sau:
 
-Xác định có cần seed/dev fixture không.
+1.  Formula không có version.
 
-Triển khai giới hạn Recipe Master foundation.
+2.  Formula G1 không có anchor gạo.
 
-Triển khai giới hạn BOM/Recipe Line foundation.
+3.  Có nhiều anchor trong một formula.
 
-Triển khai giới hạn Formula Version foundation.
+4.  Anchor không phải ingredient canonical.
 
-Triển khai giới hạn Formula Kind foundation nếu source-of-truth đã có.
+5.  Formula line thiếu ingredient_code.
 
-Triển khai validation foundation.
+6.  Formula line chỉ ghi group mơ hồ.
 
-Thêm/chỉnh test/smoke trong scope.
+7.  Formula line thiếu UOM.
 
-Chạy build/test/lint phù hợp.
+8.  UOM thiếu conversion khi cần.
 
-Chạy migration validation nếu có migration.
+9.  Thiếu ratio_to_rice.
 
-Chạy seed validation nếu có seed.
+10. Agent tự suy luận ratio_to_rice.
 
-Chạy git status/git diff.
+11. Đổi kg gạo bị tạo version mới.
 
-Báo cáo đủ 14 mục.
+12. Đổi tỷ lệ nhưng không tạo version mới.
 
-# 14. REQUIRED REPORT FORMAT — 14 MỤC
+13. Thêm nguyên liệu nhưng không tạo version mới.
 
-Agent phải báo cáo đúng 14 mục.
+14. Bỏ nguyên liệu nhưng không tạo version mới.
 
-## 14.1. Mục 1 — Tóm tắt
+15. Sửa G1 active trực tiếp.
 
-Phải ghi:
+16. G0/research được active operational.
 
-Prompt đã chạy: PROMPT-P1.2B.
+17. Buffer +5%/+7% bị cộng vào formula.
 
-Mode: LIMITED IMPLEMENTATION.
+18. Formula snapshot không lưu.
 
-Scope đã thực hiện.
+19. Production Order cho chọn tay nguyên liệu.
 
-Recipe Master foundation đã triển khai gì.
+20. Material Request cho chọn tay nguyên liệu.
 
-BOM/Recipe Line foundation đã triển khai gì.
+21. Seed formula chưa Owner confirm.
 
-Formula Version/Foundation đã triển khai gì.
+22. Seed formula tự set sellable/released/production-ready.
 
-Test/build đã chạy.
+23. Code trực tiếp từ Bản gôm.
 
-Gap còn lại.
+24. Dev/Codex/Copilot sửa code khi đang Analysis Only.
 
-Trạng thái cuối.
+25. Gọi Evidence Submitted là Evidence Accepted.
 
-Không được ghi PHASE 1 Complete / Release Ready / Production Ready / Go-live Approved.
+26. Gọi Completion PASS.
 
-## 14.2. Mục 2 — File đã sửa
+27. Gọi Gateway PASS.
 
-Liệt kê:
+28. Gọi Production Ready.
 
-File đã sửa.
+29. Gọi Go-live Approved.
 
-File đã tạo nếu có.
+**32. FINAL STATUS**
 
-File đã xóa nếu có.
+| **Hạng mục**                         | **Trạng thái**                                                 |
+|--------------------------------------|----------------------------------------------------------------|
+| Document status                      | V2.0 CLEAN FINAL                                               |
+| Documentation review                 | READY FOR OWNER REVIEW                                         |
+| Phase                                | PHASE 1                                                        |
+| Module                               | Recipe / BOM / Formula Version                                 |
+| Implementation authorization         | NO                                                             |
+| Code authorization                   | NO                                                             |
+| Migration authorization              | NO                                                             |
+| Seed authorization                   | NO, cho đến khi Owner confirm và seed governance đạt           |
+| Limited implementation authorization | NO                                                             |
+| Gateway status                       | BLOCKED                                                        |
+| Completion status                    | PENDING IMPLEMENTATION EVIDENCE                                |
+| Evidence status                      | NOT ACCEPTED                                                   |
+| Release status                       | NOT RELEASE READY                                              |
+| Production Ready                     | NO                                                             |
+| Go-live Approved                     | NO                                                             |
+| Tài liệu kế tiếp                     | 05-P1-2D-SKU-EXTENSION-SEED-GOVERNANCE.docx — V1.1 CLEAN FINAL |
 
-Migration đã tạo nếu có.
+**33. KẾT LUẬN ĐIỀU PHỐI P1.2B**
 
-Seed/dev fixture đã tạo/sửa nếu có.
+Từ thời điểm dùng bản V2.0 này, toàn bộ Recipe/BOM/Formula trong Phase 1 phải tuân thủ các khóa sau:
 
-Lý do từng file thuộc scope P1.2B.
+1.  Công thức phải gắn SKU.
 
-Xác nhận không sửa ngoài scope.
+2.  Công thức phải có version.
 
-Git diff summary.
+3.  G1 là công thức vận hành nền, không sửa trực tiếp sau khi khóa.
 
-## 14.3. Mục 3 — Nguồn yêu cầu
+4.  Gạo là anchor ingredient.
 
-Liệt kê:
+5.  Ratio_to_rice là lõi để scale nguyên liệu.
 
-PROMPT-P1 Analysis Report.
+6.  Nhập kg gạo chỉ scale sản lượng, không đổi công thức.
 
-PROMPT-P1.1 Technical Design Handoff.
+7.  Đổi tỷ lệ/thêm/bỏ nguyên liệu thì bắt buộc tạo Formula Version mới.
 
-PROMPT-P1.2A Implementation Report.
+8.  Công thức phải bung từng nguyên liệu cụ thể, không dùng nhóm mơ hồ.
 
-PHASE 0 Validation Report.
+9.  UOM và conversion phải chuẩn hóa trước seed/code.
 
-TECH-01.
+10. Buffer +5%/+7% là planning buffer, không sửa formula.
 
-TECH-10.
+11. Phase 2 chỉ được tiêu thụ formula qua snapshot.
 
-TECH-11.
+12. Production Order và Material Request không được chọn tay nguyên liệu.
 
-TECH-12.
+13. Seed formula chỉ được thực hiện sau Owner confirm.
 
-TECH-13.
+14. Không code trực tiếp từ Bản gôm.
 
-Recipe/BOM/Formula source-of-truth nếu có.
+15. Không gọi Gateway PASS hoặc Production Ready.
 
-## 14.4. Mục 4 — Evidence đã dùng
+Tài liệu kế tiếp cần viết lại toàn bộ là:
 
-Liệt kê:
+**05-P1-2D-SKU-EXTENSION-SEED-GOVERNANCE.docx — V1.1 CLEAN FINAL**
 
-Code inspection evidence.
+---
 
-Recipe implementation evidence.
+## Implementation Addendum 2026-05-19 — P1.2B Full Recipe CRUD
 
-BOM implementation evidence.
+Trang thai: IMPLEMENTED trong ops-core, theo owner directive trong thread ngay 2026-05-19.
 
-Formula Version implementation evidence.
+Pham vi da thuc hien:
 
-Product/SKU/Ingredient/UOM evidence từ P1.2A.
+1. Them admin executable API cho `/api/v1/admin/recipes`: list, create draft, replace draft lines, submit approval.
+2. Khong them `/api/v1/admin/recipes/{recipeId}/activate`; Recipe Activation Guard day du van thuoc P1.2C.
+3. Su dung `op_production_recipe` lam recipe/formula version identity va `op_recipe_ingredient` lam BOM/recipe line source of truth; khong tao bang formula/BOM duplicate.
+4. Bo sung domain validation cho `PILOT_PERCENT_BASED` va `FIXED_QUANTITY_BATCH`, block `G0`, validate 4 recipe groups, anchor, ratio tolerance va fixed quantity.
+5. Bo sung approval side effect cho generic approval flow: `RECIPE_APPROVE` tren `op_production_recipe` cap nhat recipe `PENDING_APPROVAL -> APPROVED/REJECTED`.
+6. Bo sung RBAC/UI action registry cho `RECIPE_CREATE`, `RECIPE_UPDATE_LINES`, `RECIPE_SUBMIT_APPROVAL`; giu `RECIPE_APPROVE` va `RECIPE_ACTIVATE` cho boundary tiep theo.
 
-Test evidence.
+Evidence:
 
-Build evidence.
+- Focused test: `dotnet test tests/backend/Ginsengfood.Operational.Scaffold.Tests/Ginsengfood.Operational.Scaffold.Tests.csproj --filter FullyQualifiedName~P1_2BRecipeBomFormulaCrudTests --no-restore` PASS.
+- Related scaffold tests: `dotnet test tests/backend/Ginsengfood.Operational.Scaffold.Tests/Ginsengfood.Operational.Scaffold.Tests.csproj --filter "FullyQualifiedName~P1_2B|FullyQualifiedName~P13A|FullyQualifiedName~P05" --no-build` PASS.
+- Approval integration smoke: `dotnet test tests/integration/Ginsengfood.Operational.Integration.Tests/Ginsengfood.Operational.Integration.Tests.csproj --filter FullyQualifiedName~P01WorkflowEndpointTests --no-build` PASS.
+- Backend build: `dotnet build Ginsengfood.Operational.sln --no-restore` PASS.
+- OpenAPI export: `npm run api:export` PASS, full OpenAPI SHA-256 `335BCF3BE90FB0AABAFF4505B6A11157B82DE1CD6C5982659652D3B0A7F15379`.
+- OpenAPI validation: `npx --yes @apidevtools/swagger-cli validate packages/api-contracts/openapi.json` PASS.
+- Admin client sync/typecheck: `npm --workspace @ginsengfood/admin-web run gen:api` PASS; `npm --workspace @ginsengfood/admin-web run typecheck` PASS.
+- Seed idempotency/validation: `npm run db:seed` x2 PASS; `npm run db:seed:validate` PASS.
 
-Migration evidence nếu có.
+Handoff:
 
-Seed validation evidence nếu có.
-
-Git diff evidence.
-
-Gap evidence.
-
-Phải ghi rõ:
-
-Evidence Submitted, not Evidence Accepted.
-
-## 14.5. Mục 5 — Lệnh đã chạy
-
-Liệt kê:
-
-Lệnh inspect.
-
-Lệnh test.
-
-Lệnh build.
-
-Lệnh lint nếu có.
-
-Lệnh migration validation nếu có.
-
-Lệnh seed validation nếu có.
-
-Lệnh git status/git diff.
-
-Lệnh cleanup nếu có.
-
-## 14.6. Mục 6 — Kết quả test
-
-Ghi rõ:
-
-Test nào đã chạy.
-
-Test nào pass.
-
-Test nào fail.
-
-Test nào chưa có.
-
-Test nào cần bổ sung ở prompt sau.
-
-Không gọi test pass là Global Smoke Pass.
-
-## 14.7. Mục 7 — Kết quả backend build
-
-Ghi rõ:
-
-Có chạy backend build không.
-
-Kết quả.
-
-Log tóm tắt.
-
-Nếu không chạy, lý do.
-
-## 14.8. Mục 8 — Kết quả frontend build
-
-Nếu scope không đụng frontend, ghi rõ:
-
-Không chạy frontend build vì scope P1.2B không sửa frontend.
-
-Hoặc có chạy nếu repo yêu cầu.
-
-## 14.9. Mục 9 — Kết quả cleanup process
-
-Ghi rõ:
-
-Có process nào mở không.
-
-Có server/test runner cần dừng không.
-
-Có file tạm không.
-
-Có artifact phát sinh không.
-
-Đã cleanup chưa.
-
-## 14.10. Mục 10 — Cập nhật Markdown
-
-Ghi rõ:
-
-Có sửa Markdown không.
-
-Nếu sửa, vì sao thuộc scope.
-
-Nếu không sửa, ghi “Không cập nhật Markdown”.
-
-Mặc định không cần sửa Markdown trong P1.2B.
-
-## 14.11. Mục 11 — Kết quả database migration/update nếu áp dụng
-
-Ghi rõ:
-
-Có tạo migration không.
-
-Có chạy migration không.
-
-Có update database không.
-
-Migration có thuộc scope Recipe/BOM/Formula không.
-
-Nếu không, ghi rõ “Không áp dụng trong P1.2B”.
-
-Không update database thật.
-
-## 14.12. Mục 12 — Kết quả seed validation nếu áp dụng
-
-Ghi rõ:
-
-Có động tới seed/dev fixture không.
-
-Có validate seed không.
-
-Seed có liên quan Recipe/BOM/Formula không.
-
-Seed có idempotent không.
-
-Seed có hardcode sai ingredient/quantity không.
-
-Seed có tự set sellable không.
-
-Seed có tự set released/production-ready không.
-
-Seed có chứa secret không.
-
-Nếu không, ghi rõ “Không áp dụng trong P1.2B”.
-
-## 14.13. Mục 13 — Rủi ro còn lại
-
-Phân nhóm:
-
-Recipe Master risk.
-
-BOM/Recipe Line risk.
-
-Formula Version risk.
-
-Formula Kind risk.
-
-Formula immutability risk.
-
-Snapshot readiness risk.
-
-Product Activation Guard chưa triển khai.
-
-SKU Extension / Seed Governance chưa hoàn tất.
-
-Production Order chưa triển khai.
-
-Sellable Gate chưa triển khai.
-
-Downstream PHASE 2 risk.
-
-Global Gateway risk.
-
-## 14.14. Mục 14 — Cập nhật handoff
-
-Phải ghi:
-
-Kết quả P1.2B.
-
-Việc còn lại cho P1.2C.
-
-Việc còn lại cho P1.2D.
-
-Việc còn lại cho P1.2E.
-
-Recipe/BOM/Formula gap còn lại.
-
-Evidence cần owner review.
-
-Smoke cần bổ sung.
-
-Trạng thái cuối.
-
-Bắt buộc ghi:
-
-PROMPT-P1.2B FINAL STATUS: LIMITED IMPLEMENTATION REPORT ONLY  
-P1.2B RECIPE / BOM / FORMULA VERSION FOUNDATION ONLY  
-NOT PHASE 1 COMPLETE  
-NOT IMPLEMENTATION COMPLETE FOR FULL PHASE 1  
-NOT COMPLETION PASS  
-NOT RELEASE READY  
-NOT PRODUCTION READY  
-NOT GO-LIVE APPROVED  
-GLOBAL GATEWAY: BLOCKED
-
-# 15. DONE GATE
-
-PROMPT-P1.2B chỉ được xem là done khi đủ:
-
-Đã đọc source-of-truth.
-
-Đã đọc PROMPT-P1 Analysis Report.
-
-Đã đọc PROMPT-P1.1 Technical Design Handoff.
-
-Đã đọc P1.2A Implementation Report.
-
-Đã inspect codebase thật.
-
-Đã giới hạn scope đúng P1.2B.
-
-Đã triển khai hoặc chuẩn hóa Recipe Master foundation.
-
-Đã triển khai hoặc chuẩn hóa BOM/Recipe Line foundation.
-
-Đã triển khai hoặc chuẩn hóa Formula Version foundation.
-
-Đã triển khai Formula Kind foundation nếu source-of-truth đã có.
-
-Đã có Recipe linked SKU.
-
-Đã có Recipe Line linked Ingredient/UOM.
-
-Đã có quantity/UOM validation.
-
-Đã có Recipe Active != Sellable boundary.
-
-Đã có Recipe Active != Batch Released boundary.
-
-Đã có snapshot readiness foundation.
-
-Không sửa lan sang Production Order.
-
-Không triển khai Activation Guard đầy đủ.
-
-Không triển khai Sellable Gate.
-
-Không sửa Commerce / Operational / AI / Gateway.
-
-Có test/smoke tối thiểu hoặc báo rõ vì sao chưa có.
-
-Có build/test result nếu chạy được.
-
-Có git diff summary.
-
-Có report đủ 14 mục.
-
-Không gọi PHASE 1 Complete / Release Ready / Production Ready / Go-live Approved.
-
-Global Gateway vẫn BLOCKED.
-
-Trạng thái tối đa được phép:
-
-P1.2B LIMITED IMPLEMENTATION COMPLETED FOR RECIPE / BOM / FORMULA VERSION FOUNDATION ONLY
-
-Không được gọi:
-
-PHASE 1 Complete.
-
-Full Implementation Complete.
-
-Completion PASS.
-
-Release Ready.
-
-Production Ready.
-
-Go-live Approved.
-
-# 16. FAIL GATE
-
-PROMPT-P1.2B phải fail nếu:
-
-Agent sửa ngoài scope.
-
-Agent tự triển khai Product Activation Guard đầy đủ.
-
-Agent tự triển khai Production Order.
-
-Agent tự triển khai Operational Core.
-
-Agent tự triển khai Sellable Gate.
-
-Agent sửa Commerce / Operational / AI / Gateway không được phép.
-
-Agent hardcode Recipe Active = Sellable.
-
-Agent hardcode Recipe Active = Batch Released.
-
-Agent hardcode ingredient/quantity sai source-of-truth.
-
-Agent bỏ qua UOM validation.
-
-Agent cho recipe version sửa đè lịch sử sai rule.
-
-Agent public private/internal formula field.
-
-Agent tạo seed tự set sellable.
-
-Agent tạo seed tự set released/production-ready.
-
-Agent tạo seed chứa secret.
-
-Agent bỏ qua PHASE 0 Actor/RBAC/Audit nếu có command.
-
-Agent đổi gateway/release flag.
-
-Agent không chạy hoặc không báo test/build.
-
-Agent không report đủ 14 mục.
-
-Agent gọi Release Ready / Production Ready / Go-live Approved.
-
-Agent không chứng minh được phạm vi file đã sửa.
-
-Nếu fail, agent phải ghi:
-
-# PROMPT-P1.2B FAIL GATE — LIMITED IMPLEMENTATION NOT ACCEPTED
-
-# 17. DOWNSTREAM HANDOFF
-
-## 17.1. Sang PROMPT-P1.2C
-
-Nếu P1.2B đạt Done Gate, bước tiếp theo là:
-
-# PROMPT-P1.2C — PRODUCT / SKU / RECIPE ACTIVATION GUARD IMPLEMENTATION HANDOFF
-
-MODE: LIMITED IMPLEMENTATION
-
-V1.0 CLEAN FINAL
-
-P1.2C chỉ được bắt đầu khi:
-
-Product Master foundation đã có.
-
-SKU Master foundation đã có.
-
-Ingredient Master foundation đã có.
-
-UOM foundation đã có.
-
-Recipe Master foundation đã có.
-
-BOM/Recipe Line foundation đã có.
-
-Formula Version foundation đã có.
-
-Product/SKU/Recipe Active != Sellable boundary đã có.
-
-P1.2B report đủ 14 mục.
-
-Owner/dev lead cho phép limited implementation tiếp theo.
-
-## 17.2. Không tự chuyển prompt
-
-Agent không được tự chuyển sang P1.2C.
-
-Chỉ owner/dev lead mới quyết định prompt tiếp theo.
-
-# 18. PROMPT COPY GIAO DEV / CODEX / COPILOT
-
-## 18.1. Nội dung prompt
-
-## BẮT ĐẦU PROMPT
-
-Bạn đang tiếp tục dự án Ginsengfood theo GREENFIELD TECH SOURCE-OF-TRUTH.
-
-PHASE HIỆN TẠI:
-
-PHASE-01 — PRODUCT / SKU / RECIPE / PRODUCT ACTIVATION
-
-PROMPT HIỆN TẠI:
-
-# PROMPT-P1.2B — RECIPE / BOM / FORMULA VERSION IMPLEMENTATION HANDOFF
-
-MODE:
-
-LIMITED IMPLEMENTATION
-
-PROMPT TIẾP THEO:
-
-# PROMPT-P1.2C — PRODUCT / SKU / RECIPE ACTIVATION GUARD IMPLEMENTATION HANDOFF
-
-Bạn được phép sửa code chỉ trong phạm vi Recipe / BOM / Formula Version foundation.
-
-Bạn không được sửa lan.
-
-Bạn không được tự đổi nghiệp vụ.
-
-Bạn không được hardcode policy.
-
-Bạn không được gọi Recipe Active là Sellable.
-
-Bạn không được gọi Recipe Active là Batch Released.
-
-Bạn không được mở Global Gateway.
-
-Bạn không được gọi Completion PASS / Release Ready / Production Ready / Go-live Approved.
-
-A. Source-of-truth bắt buộc
-
-Bạn phải đọc:
-
-PROMPT-P1 Analysis Report.
-
-PROMPT-P1.1 Technical Design Handoff.
-
-PROMPT-P1.2A Implementation Report.
-
-PHASE 0 Validation Report.
-
-TECH-01.
-
-TECH-10.
-
-TECH-11.
-
-TECH-12.
-
-TECH-13.
-
-Recipe / BOM / Formula source-of-truth nếu có.
-
-Quy tắc:
-
-TECH mới thắng code cũ.
-
-TECH mới thắng tài liệu cũ.
-
-Code hiện tại chỉ là CURRENT_IMPLEMENTATION_STATE_ONLY.
-
-Legacy chỉ là LEGACY_REFERENCE_ONLY.
-
-Nếu conflict ngoài scope, báo cáo, không sửa.
-
-B. Scope In
-
-Bạn chỉ được triển khai:
-
-Recipe Master foundation.
-
-BOM / Recipe Ingredient Line foundation.
-
-Formula Version foundation.
-
-Formula Kind foundation nếu source-of-truth đã có.
-
-Recipe-SKU relationship foundation.
-
-Recipe-Ingredient-UOM validation foundation.
-
-BOM quantity validation foundation.
-
-Recipe status lifecycle foundation.
-
-Recipe immutability boundary.
-
-Formula snapshot readiness foundation.
-
-Test/smoke tối thiểu.
-
-Report 14 mục.
-
-C. Scope Out
-
-Bạn không được triển khai:
-
-Product Activation Guard đầy đủ.
-
-SKU Activation Guard đầy đủ.
-
-Recipe Activation Guard đầy đủ.
-
-Production Order.
-
-Operational Core.
-
-Commerce Runtime.
-
-Sellable Gate.
-
-AI Advisor.
-
-Facebook Gateway.
-
-Ads / MC AI Live / IVR.
-
-Release Gateway.
-
-D. Boundary bắt buộc
-
-Bạn phải bảo đảm:
-
-Recipe Active không đồng nghĩa Sellable.
-
-Recipe Active không đồng nghĩa Batch Released.
-
-Recipe Active không đồng nghĩa Finished Goods Available.
-
-Formula Version đã dùng sau này không được sửa đè.
-
-BOM line phải có Ingredient / Quantity / UOM hợp lệ.
-
-Không hardcode ingredient/quantity.
-
-Không tự convert UOM nếu chưa có conversion rule.
-
-Không tạo Production Order trong P1.2B.
-
-Không tạo Sellable Gate trong P1.2B.
-
-E. Allowed file change boundary
-
-Bạn chỉ được sửa file liên quan trực tiếp đến:
-
-Recipe Master model/entity/service/repository foundation.
-
-Recipe Line / BOM model/entity/service/repository foundation.
-
-Formula Version model/entity foundation.
-
-Formula Kind enum/config nếu source-of-truth đã có.
-
-Recipe/BOM validation foundation.
-
-Migration Recipe/BOM/Formula nếu đã được scope cho phép.
-
-Test/smoke Recipe/BOM/Formula.
-
-Seed/dev fixture nếu đã được scope cho phép.
-
-Bạn phải inspect repo thật, không được bịa file path.
-
-F. Database / migration / seed
-
-Không update database thật.
-
-Không chạy migration production.
-
-Không seed production data.
-
-Nếu cần migration trong repo, chỉ được tạo khi:
-
-Thuộc Recipe/BOM/Formula foundation.
-
-Có migration mechanism rõ.
-
-Không tạo Production Order table.
-
-Không tạo Sellable Gate table.
-
-Report đầy đủ trong mục 11.
-
-Nếu chưa rõ, dừng phần đó và báo:
-
-BLOCKED — RECIPE / BOM / FORMULA SCHEMA APPROVAL REQUIRED
-
-Nếu cần seed/dev fixture:
-
-Không chứa secret.
-
-Không tự set sellable.
-
-Không tự set released/production-ready.
-
-Không hardcode sai ingredient/quantity.
-
-Phải idempotent nếu có seed validation.
-
-Report đầy đủ trong mục 12.
-
-G. Test/smoke tối thiểu
-
-Nếu test framework có sẵn, hãy tạo/chạy smoke cho:
-
-Tạo Recipe linked SKU hợp lệ.
-
-Recipe thiếu SKU bị reject.
-
-BOM line có Ingredient/UOM/Quantity hợp lệ.
-
-BOM line thiếu UOM bị reject.
-
-BOM line quantity âm/0 bị reject.
-
-Formula version duplicate sai scope bị reject.
-
-Formula kind branch invalid bị reject nếu source-of-truth có branch rule.
-
-Recipe Active không được xem là Sellable.
-
-Recipe Active không được xem là Batch Released.
-
-Recipe snapshot readiness có đủ version/ingredient/quantity/UOM.
-
-Recipe seed/dev fixture chạy lại không duplicate, không tự sellable nếu có seed.
-
-Không gọi test này là Global Smoke Pass.
-
-H. Lệnh và kiểm tra
-
-Bạn cần chạy phù hợp:
-
-Backend build nếu có thể.
-
-Test liên quan.
-
-Lint nếu project yêu cầu.
-
-Migration validation nếu có tạo migration.
-
-Seed validation nếu có seed.
-
-Git status.
-
-Git diff.
-
-Không chạy migration production.
-
-Không update database thật.
-
-I. Report format bắt buộc 14 mục
-
-Bạn phải báo cáo đúng 14 mục:
-
-Tóm tắt.
-
-File đã sửa.
-
-Nguồn yêu cầu.
-
-Evidence đã dùng.
-
-Lệnh đã chạy.
-
-Kết quả test.
-
-Kết quả backend build.
-
-Kết quả frontend build.
-
-Kết quả cleanup process.
-
-Cập nhật Markdown.
-
-Kết quả database migration/update nếu áp dụng.
-
-Kết quả seed validation nếu áp dụng.
-
-Rủi ro còn lại.
-
-Cập nhật handoff.
-
-J. Done Gate
-
-Chỉ được coi là done nếu:
-
-Đúng scope P1.2B.
-
-Recipe Master foundation có nền.
-
-BOM/Recipe Line foundation có nền.
-
-Formula Version foundation có nền.
-
-Recipe linked SKU đúng.
-
-Recipe Line linked Ingredient/UOM đúng.
-
-Quantity/UOM validation có nền.
-
-Recipe Active != Sellable.
-
-Recipe Active != Batch Released.
-
-Snapshot readiness có nền.
-
-Không triển khai Production Order/Activation Guard/Sellable Gate.
-
-Có test/build hoặc báo rõ lý do không chạy.
-
-Có report 14 mục.
-
-Có git diff summary.
-
-Global Gateway vẫn BLOCKED.
-
-K. Fail Gate
-
-Phải fail nếu:
-
-Sửa ngoài scope.
-
-Hardcode policy.
-
-Hardcode Recipe Active = Sellable.
-
-Hardcode Recipe Active = Batch Released.
-
-Hardcode ingredient/quantity sai source-of-truth.
-
-Bỏ qua UOM validation.
-
-Recipe version sửa đè lịch sử sai rule.
-
-Public private/internal formula field.
-
-Tự triển khai Product Activation Guard/Production Order/Sellable Gate.
-
-Sửa Commerce/Operational/AI/Gateway không được phép.
-
-Seed tự set sellable/released/production-ready.
-
-Mở Gateway.
-
-Gọi Release Ready / Production Ready / Go-live Approved.
-
-Không report đủ 14 mục.
-
-L. Trạng thái cuối bắt buộc
-
-Kết thúc report phải ghi:
-
-PROMPT-P1.2B FINAL STATUS: LIMITED IMPLEMENTATION REPORT ONLY  
-P1.2B RECIPE / BOM / FORMULA VERSION FOUNDATION ONLY  
-NOT PHASE 1 COMPLETE  
-NOT IMPLEMENTATION COMPLETE FOR FULL PHASE 1  
-NOT COMPLETION PASS  
-NOT RELEASE READY  
-NOT PRODUCTION READY  
-NOT GO-LIVE APPROVED  
-GLOBAL GATEWAY: BLOCKED
-
-## KẾT THÚC PROMPT
-
-# 19. FINAL STATUS
-
-## 19.1. Trạng thái tài liệu
-
-PROMPT-P1.2B DOCUMENT STATUS: CLEAN FINAL
-
-## 19.2. Trạng thái thực thi
-
-LIMITED IMPLEMENTATION HANDOFF ONLY
-
-## 19.3. Phạm vi được phép
-
-RECIPE / BOM / FORMULA VERSION FOUNDATION ONLY
-
-## 19.4. Trạng thái PHASE 1
-
-NOT PHASE 1 COMPLETE
-
-## 19.5. Trạng thái implementation
-
-NOT IMPLEMENTATION COMPLETE FOR FULL PHASE 1
-
-## 19.6. Trạng thái Completion
-
-NOT COMPLETION PASS
-
-## 19.7. Trạng thái release
-
-NOT RELEASE READY
-
-## 19.8. Trạng thái production
-
-NOT PRODUCTION READY
-
-## 19.9. Trạng thái go-live
-
-NOT GO-LIVE APPROVED
-
-## 19.10. Trạng thái Global Gateway
-
-GLOBAL GATEWAY: BLOCKED
+- `docs/v2-handoff/P1.2B-recipe-bom-formula-version-crud.md`
