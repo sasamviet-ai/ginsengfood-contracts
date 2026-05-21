@@ -15,6 +15,7 @@
     "evidenceStatus": {
       "type": "string",
       "enum": [
+        "WAITING",
         "DRAFT",
         "PENDING",
         "SUBMITTED",

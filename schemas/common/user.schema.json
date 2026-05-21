@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/user.schema.json",
+  "title": "User",
+  "description": "Common v1 user identity contract for internal users, service accounts, integration accounts, and scoped external users.",
+  "$comment": "Sources: docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md and MASTER-01. User identity does not decide business permission; role and permission contracts do.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "userId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable user identity."
+    },
+    "userType": {
+      "type": "string",
+      "enum": [
+        "INTERNAL_USER",
+        "SERVICE_ACCOUNT",
+        "INTEGRATION_ACCOUNT",
+        "SUPPLIER_USER",
+        "EXTERNAL_USER"
+      ],
+      "description": "Foundation user/account type."
+    },
+    "accountStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING_ACTIVATION",
+        "ACTIVE",
+        "DISABLED",
+        "LOCKED",
+        "SUSPENDED",
+        "DEPROVISIONED"
+      ],
+      "description": "Account status. Disabled, locked, suspended, and deprovisioned accounts must not pass permission checks."
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "organizationRef": {
+      "$ref": "source-ref.schema.json"
+    },
+    "roleIds": {
+      "type": "array",
+      "description": "Assigned role identifiers. Roles group permissions but must not replace action-level permission checks.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "lastAuthenticatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "auditRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "audit.schema.json"
+      }
+    }
+  },
+  "required": [
+    "userId",
+    "userType",
+    "accountStatus"
+  ]
+}

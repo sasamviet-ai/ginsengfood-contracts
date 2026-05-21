@@ -1,0 +1,15 @@
+version: v1
+name: material-group-family
+title: Material Group Family
+description: Parent material/packaging families used by the appendix taxonomy before A1/A2/A3 and B1/B2/B3 subgroup classification.
+source_documents:
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
+values:
+  - value: GROUP_A_MATERIAL
+    description: Ingredient/material family controlled by formula, ratio, and batch planning rules.
+    source: Material/packaging taxonomy Group A.
+  - value: GROUP_B_PACKAGING
+    description: Packaging/material family controlled by packaging output, print, and stock policy rules.
+    source: Material/packaging taxonomy Group B.
+compatibility:
+  breaking_change: Collapsing parent family and subgroup semantics is breaking for MRP and procurement policy consumers.

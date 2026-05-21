@@ -1,0 +1,37 @@
+version: v1
+name: print-job-status
+title: Print Job Status
+description: Print job status values for system-generated print payloads, printer boundary control, QR/barcode linkage, and reprint audit.
+source_documents:
+  - docs/documents/0. appendices/03-PRINTING-CODE-RULES.md
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
+values:
+  - value: PAYLOAD_GENERATED
+    description: System generated print payload from operational source data.
+    source: Printing code rules.
+  - value: SENT_TO_PRINTER
+    description: Payload sent to printer.
+    source: Printing code rules.
+  - value: PRINTED
+    description: Print completed.
+    source: Printing code rules.
+  - value: PRINT_CONFIRMED
+    description: Print result confirmed by controlled callback or operator confirmation.
+    source: Printing code rules.
+  - value: REPRINT_REQUESTED
+    description: Reprint requested with reason and permission.
+    source: Printing reprint rules.
+  - value: REPRINT_APPROVED
+    description: Reprint approved.
+    source: Printing reprint rules.
+  - value: REPRINTED
+    description: Reprint completed and logged.
+    source: Printing reprint rules.
+  - value: PRINT_ERROR
+    description: Print failed or returned an error.
+    source: Printing error/reprint rules.
+  - value: CANCELLED
+    description: Print job cancelled before print completion.
+    source: Conservative terminal value for controlled cancellation.
+compatibility:
+  breaking_change: Allowing printer-side QR/barcode generation or reprint outside the system audit path is breaking.

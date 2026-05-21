@@ -3,8 +3,8 @@ name: ivr-result-status
 title: IVR Result Status
 description: IVR v1 result and outcome values for order confirmation signals.
 source_documents:
-  - docs/documents/2_pack/PACK-09 - IVR_ORDER_CONFIRMATION.md
-  - docs/documents/3_tech/TECH-09 - IVR ORDER CONFIRMATION AUTO CALL VERIFICATION ANTI-FAKE-ORDER CONTROL.md
+  - docs/documents/2. pack/09-PACK-09-IVR-ORDER-CONFIRMATION.md
+  - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
 values:
   - value: IVR_CONFIRMED
     description: Customer confirmed order through IVR.

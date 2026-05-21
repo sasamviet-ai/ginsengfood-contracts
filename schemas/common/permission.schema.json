@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/permission.schema.json",
+  "title": "Permission",
+  "description": "Common v1 action-level permission contract used by RBAC enforcement.",
+  "$comment": "Source: TECH-01 requires permissions to be action-level, backend-enforced, auditable, scoped, and guard-aware for risky actions.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "permissionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "permissionCode": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "description": "Action permission code, for example batch.release, payment.confirm, evidence.accept, or product.activate."
+    },
+    "domain": {
+      "type": "string",
+      "minLength": 1
+    },
+    "action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "P0_CRITICAL"
+      ],
+      "description": "Permission risk level. P0-critical permissions require evidence, audit, and release-gate awareness where applicable."
+    },
+    "requiresGuardCheck": {
+      "type": "boolean"
+    },
+    "requiresAudit": {
+      "type": "boolean"
+    },
+    "requiresEvidence": {
+      "type": "boolean"
+    },
+    "environmentScope": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "DEV",
+          "TEST",
+          "STAGING",
+          "PRODUCTION"
+        ]
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "permissionId",
+    "permissionCode",
+    "riskLevel"
+  ]
+}

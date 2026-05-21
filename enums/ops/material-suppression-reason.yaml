@@ -1,0 +1,22 @@
+version: v1
+name: material-suppression-reason
+title: Material Suppression Reason
+description: Source-backed reasons for suppressing material or packaging procurement demand.
+source_documents:
+  - docs/documents/2. pack/03-PACK-03-DEMAND-MRP-PROCUREMENT-MATERIAL-CONTROL.md
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
+values:
+  - value: AVAILABLE_STOCK_COVERS_THRESHOLD
+    description: Current approved stock covers the threshold.
+  - value: APPROVED_INCOMING_COVERS_THRESHOLD
+    description: Approved incoming stock plus available stock covers the threshold.
+  - value: OWNER_SUPPRESSION_APPROVED
+    description: Owner approved suppression for the planning run.
+  - value: MATERIAL_NOT_REQUIRED_FOR_PROFILE
+    description: Production profile does not require the material.
+  - value: PACKAGING_SHARED_POOL_AVAILABLE
+    description: Shared packaging pool is sufficient.
+  - value: P0_STOP_POINT_ACTIVE
+    description: P0 stop point blocks procurement or issue action.
+compatibility:
+  breaking_change: Removing a reason used by downstream procurement controls is breaking.

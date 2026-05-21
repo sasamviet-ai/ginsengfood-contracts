@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/operational-form-payload.schema.json",
+  "title": "Operational Form Payload",
+  "description": "Per-form payload contract for OPF-01 through OPF-12. It records generated fields, operator-entered fields, action constraints, and status constraints without embedding workflow business logic.",
+  "$comment": "Sources: docs/documents/0. appendices/01-OPERATIONAL-FORMS.md and docs/documents/0. appendices/02-AUTO-GENERATED-FORM-RULES.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "form_code": {
+      "type": "string",
+      "pattern": "^OPF-(0[1-9]|1[0-2])$"
+    },
+    "payload_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_object": {
+      "$ref": "../common/source-ref.schema.json"
+    },
+    "generated_fields": {
+      "type": "object",
+      "description": "Fields inherited or generated from approved source objects. Consumers must not require manual re-entry for these fields.",
+      "additionalProperties": true
+    },
+    "operator_fields": {
+      "type": "object",
+      "description": "Fields the source documents allow operators to enter or confirm.",
+      "additionalProperties": true
+    },
+    "action_constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "GENERATE",
+              "SUBMIT",
+              "CONFIRM",
+              "APPROVE",
+              "REJECT",
+              "RETURN_FOR_FIX",
+              "LOCK",
+              "CANCEL",
+              "REOPEN",
+              "SYNC_TO_MISA",
+              "PRINT",
+              "REPRINT"
+            ]
+          },
+          "requires_permission": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+          },
+          "requires_evidence": {
+            "type": "boolean"
+          },
+          "requires_audit": {
+            "type": "boolean"
+          },
+          "requires_p0_clearance": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      }
+    },
+    "status_constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "allowed_next_statuses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "terminal": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/evidence-ref.schema.json"
+      }
+    }
+  },
+  "required": [
+    "form_code",
+    "payload_version"
+  ]
+}

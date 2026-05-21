@@ -3,7 +3,7 @@ name: material-group
 title: Material Group
 description: Material and packaging groups used by MRP, stock alert, material master, and procurement suppression.
 source_documents:
-  - docs/documents/2_pack/operational_more/DANH_MUC_PHAN_NHOM_NGUYEN_LIEU_VAT_TU_2_V1_2_CLEAN_FINAL 3(1).md
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
 values:
   - value: A1
     description: Central/specific 20 SKU ingredients, including Quan-Than-Ta-Su materials.
@@ -26,4 +26,4 @@ values:
 compatibility:
   breaking_change: Removing or renaming material groups is breaking for BOM, MRP, procurement, and stock policy contracts.
 todos:
-  - Confirm whether higher-level GROUP_A/GROUP_B values are needed as separate contract values.
+  - Parent families are represented separately in material-group-family.yaml to keep subgroup values stable.

@@ -1,0 +1,36 @@
+version: v1
+name: p0-stop-point-status
+title: P0 Stop Point Status
+description: Foundation P0 stop-point lifecycle values. Open P0 records block release-ready, production-ready, and go-live decisions.
+source_documents:
+  - docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md
+values:
+  - value: OPEN
+    description: P0 stop point is open.
+    source: TECH-01 P0 lifecycle.
+  - value: INVESTIGATING
+    description: P0 is being investigated.
+    source: TECH-01 P0 lifecycle.
+  - value: FIX_IN_PROGRESS
+    description: Fix is in progress.
+    source: TECH-01 P0 lifecycle.
+  - value: READY_FOR_RETEST
+    description: Fix is ready for retest.
+    source: TECH-01 P0 lifecycle.
+  - value: RETEST_PASS
+    description: Retest passed, pending required review/clearance where applicable.
+    source: TECH-01 P0 lifecycle.
+  - value: RETEST_FAILED
+    description: Retest failed.
+    source: TECH-01 P0 lifecycle.
+  - value: OWNER_REVIEW_REQUIRED
+    description: Owner review is required before clearance.
+    source: TECH-01 P0 lifecycle.
+  - value: CLEARED
+    description: P0 is cleared with accepted fix/retest/smoke evidence and audit.
+    source: TECH-01 P0 clear conditions.
+  - value: REOPENED
+    description: P0 was reopened after regression or new evidence.
+    source: TECH-01 P0 lifecycle.
+compatibility:
+  breaking_change: Clearing or deleting a P0 without accepted evidence and audit is breaking.

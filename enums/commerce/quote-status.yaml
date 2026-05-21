@@ -3,7 +3,7 @@ name: quote-status
 title: Quote Status
 description: Commerce v1 QuoteSnapshot state values from TECH-04.
 source_documents:
-  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
+  - docs/documents/3. tech/05-TECH-04-COMMERCE-RUNTIME-SELLABLE-GATE-QUOTE-CART-ORDER-PAYMENT-SHIPPING.md
 values:
   - value: QUOTE_NOT_CREATED
     description: Quote has not been created.

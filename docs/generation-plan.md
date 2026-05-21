@@ -1,188 +1,116 @@
 # Contract Generation Plan
 
-This plan sequences contract generation after the Phase 0 document index. It is a planning artifact only and does not create real OpenAPI, AsyncAPI, schemas, enums, events, examples, state machines, or error codes.
+This plan sequences the remaining contract work from the current source set under:
 
-Global rules for every phase:
+- `docs/documents/0. appendices`
+- `docs/documents/1. master`
+- `docs/documents/2. pack`
+- `docs/documents/3. tech`
 
-- Read the mapped source documents before generating.
-- Generate only `v1` API, event, schema, enum, example, state machine, error code, and compatibility artifacts.
-- Do not invent domain concepts, APIs, events, enum values, schemas, or state transitions that are not grounded in `docs/documents/`.
-- Add explicit TODO notes when the source is incomplete or ambiguous.
-- Do not create implementation code, database migrations, service logic, or business logic.
-- Do not create CODEOWNERS.
-- Do not edit files under `docs/documents/`.
+Global rules:
 
-## Phase 0: Document Index & Source Map
+- Do not edit `docs/documents/**` during contract generation.
+- Keep contracts versioned as `v1`.
+- Use exact active paths from `docs/source-map.md` in `source_documents`.
+- Do not invent broker, topic, retry, outbox, SDK generation, provider behavior, or business calculations without source or owner approval.
+- TODOs are valid only for future owner decisions, not for missing source-backed contract work.
 
-Status: complete when these planning files exist.
+## Phase 0 - Baseline Closure
+
+Status: complete for the current pass.
 
 Outputs:
 
-- `docs/source-map.md`
-- `docs/domain-contract-map.md`
-- `docs/generation-plan.md`
+- refreshed `docs/source-map.md`;
+- refreshed `docs/domain-contract-map.md`;
+- refreshed review and validation planning docs;
+- removed legacy placeholder marker files;
+- active validator command: `node scripts/validate-contracts.mjs`.
 
-Allowed work:
+Gate:
 
-- Scan Markdown source documents.
-- Classify document type, domain, related repo, related contract area, generation suitability, and blocking notes.
-- Build a phase sequence for later contract generation.
+- validator passes with 0 warnings;
+- no stale source-folder references or old form-code prefixes outside source documents;
+- `git diff --check` is clean.
 
-Not allowed:
+## Phase 1 - Source-To-Contract Traceability Hardening
 
-- No OpenAPI.
-- No AsyncAPI.
-- No real JSON Schema.
-- No real enum.
-- No real event contract.
-- No state machine contract.
-- No error code catalog.
+Status: complete for the current pass, with future tightening allowed as source sections become stable.
 
-## Phase 1: Common Contract Foundation
+Outputs:
 
-Primary sources:
+- domain trace matrix from source document groups to schema, enum, API, event, and state-machine areas;
+- compatibility source-traceability policy;
+- validator checks for source-map paths and `source_documents` targets.
 
-- MASTER-01
-- MASTER-02
-- MASTER-03
-- MASTER-04
-- MASTER-05
-- MASTER-07
-- TECH-01
-- Existing contract standards under `docs/`
+Gate:
 
-Expected outputs:
+- every YAML `source_documents` entry points to `docs/source-map.md` or an exact active path listed in it;
+- every main domain has a visible trace path in `docs/domain-contract-map.md`.
 
-- `common` schemas and enums for shared IDs, correlation, idempotency, audit, evidence, resolver, guard, and compatibility primitives.
-- Shared examples where source docs provide enough fields.
-- Shared error-code conventions if grounded in the source docs.
+## Phase 2 - Deep Schema/Enum Coverage
 
-Blocking checks:
+Status: implemented for the main gaps identified in the current pass.
 
-- TODO if any shared field name, status, or guard outcome is not explicit in source documents.
-- Do not generate domain-specific Product/Ops/Commerce objects in this phase.
+Outputs:
 
-## Phase 2: ops-core Schemas & Enums
+- common foundation contracts for User, Role, Permission, RBAC Matrix, Auth Session, Evidence Registry, P0 Stop Point, Release Status Registry, and Runtime Config;
+- OPF form and payload contracts for OPF-01 through OPF-12 boundaries;
+- print payload/job contracts and status enum;
+- material planning policy, material code registry, packaging yield policy, material group/family, suppression reason, and planning policy enums;
+- MISA checkpoint, handoff, checkpoint type, mapping status, sync status, and reconcile status contracts.
 
-Primary sources:
+Gate:
 
-- PACK-01
-- PACK-02
-- PACK-03
-- TECH-02
-- TECH-03
-- Operational extra and operational_more documents
+- JSON parses cleanly;
+- schemas carry draft `2020-12`, `$id`, title, and description;
+- remaining owner decisions do not hide missing source-backed fields.
 
-Expected outputs:
+## Phase 3 - API/Event/State Alignment
 
-- `product` schemas/enums.
-- `ops` schemas/enums.
-- `misa` handoff schemas/enums where source is explicit.
-- Examples for product formulas, operational forms, production order, stock alert, material/packaging grouping, traceability, recall, sale lock, and warehouse/inventory contracts.
+Status: implemented at contract-surface level; future integration details remain owner decisions.
 
-Blocking checks:
+Outputs:
 
-- Reconcile duplicate-like material/packaging catalog files before definitive generation.
-- Treat formula catalog rows as examples/source data, not implementation formulas.
-- Preserve source enum values such as stock alert status codes exactly when generating later.
+- ops-core admin/internal OpenAPI for operational forms, print/reprint, MISA sync/reconcile, and material planning policy;
+- `/v1` consumer boundaries remain read/check oriented;
+- evidence/release events use the shared event envelope;
+- OPF, print, evidence, P0, release, batch/QC/warehouse/recall/sale-lock state-machine docs are present where source-backed.
 
-## Phase 3: business-platform Schemas & Enums
+Gate:
 
-Primary sources:
+- OpenAPI declares `3.1.0`, `info.version: 1.0.0`, and `/v1`;
+- event schemas and examples include the standard event envelope;
+- state machines name permission, evidence, audit, and P0 guards where required.
 
-- TECH-04
-- PACK-05 and TECH-05
-- PACK-06 and TECH-06
-- PACK-07 and TECH-07
-- PACK-08 and TECH-08
-- PACK-09 and TECH-09
+## Phase 4 - Examples, Fixtures, Contract Tests
 
-Expected outputs:
+Status: implemented as planning-grade fixtures and examples.
 
-- `commerce`, `ai`, `channel`, `ads`, `live`, and `ivr` schemas/enums.
-- Examples for quote/order handoff, AI advisor handoff, channel delivery, ads verified revenue, live script runtime, and IVR order confirmation when the source is explicit.
+Outputs:
 
-Blocking checks:
+- API examples for OPF, print, MISA handoff, material planning policy, and existing availability/trace flows;
+- event examples for MISA, evidence, release, sale-lock, sellable, order, payment, ads, and IVR;
+- fixture manifest with provider/consumer boundaries;
+- Pact interaction planning map without assuming a broker or Pact registry.
 
-- Commerce must depend on ops-core sellable, stock, trace, recall, and sale-lock contracts.
-- AI/channel/live/ads/IVR contracts must not bypass Commerce Runtime or Operational Core.
+Gate:
 
-## Phase 4: ops-core OpenAPI Contracts
+- example and fixture JSON parses;
+- fixture manifest targets resolve;
+- validator checks top-level required fields where fixture shape is comparable to the referenced schema or event.
 
-Primary sources:
+## Phase 5 - Release Readiness And CI Gate
 
-- PACK-01
-- PACK-02
-- PACK-03
-- TECH-02
-- TECH-03
-- Operational forms documents
-- MISA/accounting handoff documents, only where the API boundary is explicit
+Status: implemented as repo hygiene and policy gate.
 
-Expected outputs:
+Outputs:
 
-- `v1` OpenAPI contracts for ops-core-facing product, operational, demand/MRP, procurement, inventory, warehouse, traceability, recall, sale-lock, operational forms, and MISA handoff boundaries.
+- `.github/workflows/contract-validation.yml`;
+- generated-client manifests stay `manifest-only`;
+- release checklist defines source trace, validation, compatibility, OpenAPI/AsyncAPI, state, example, fixture, and generated-client evidence.
 
-Blocking checks:
+Gate:
 
-- Add TODO for any path, method, request, response, status, or error not explicitly supported by source docs.
-- Do not create service behavior or database details.
-
-## Phase 5: business-platform OpenAPI Contracts
-
-Primary sources:
-
-- TECH-04 through TECH-09
-- PACK-05 through PACK-09
-- MASTER-04 guard boundaries
-- MASTER-07 release constraints where applicable
-
-Expected outputs:
-
-- `v1` OpenAPI contracts for commerce runtime, AI advisor, channel gateway, ads measurement, MC AI Live, and IVR order confirmation boundaries.
-
-Blocking checks:
-
-- Do not create endpoints for unsupported channel/provider behavior.
-- Do not infer payment, shipping, order, call, ads, or live script behavior beyond source docs.
-
-## Phase 6: AsyncAPI & Event Contracts
-
-Primary sources:
-
-- TECH/PACK docs that explicitly name event flows, lifecycle transitions, handoffs, callbacks, or integration messages.
-- MASTER-03 for correlation and idempotency constraints.
-- MASTER-04 for guard/suppression/fallback constraints.
-- MASTER-05 and MASTER-07 for evidence and release events where explicit.
-
-Expected outputs:
-
-- `v1` AsyncAPI contracts.
-- `v1` event contracts.
-- Event examples with correlation, idempotency, source owner, consumer boundary, and evidence fields only when source-supported.
-
-Blocking checks:
-
-- Add TODO instead of inventing event names, topics, payload fields, or lifecycle transitions.
-- Keep provider-specific events separate from internal events when the source documents make that boundary clear.
-
-## Phase 7: Examples, State Machines, Error Codes, Compatibility
-
-Primary sources:
-
-- All source documents marked `yes` or `needs-review` in `docs/source-map.md`.
-- `docs/domain-contract-map.md`
-- Existing compatibility/error-code standards under `docs/`
-
-Expected outputs:
-
-- Examples for each generated contract area.
-- State-machine artifacts for source-supported operational, commerce, ads, live, IVR, release, and guard flows.
-- Error-code catalogs grounded in source docs and existing error-code standard.
-- Compatibility notes for cross-system and future-integration boundaries.
-
-Blocking checks:
-
-- Do not generate from `.artifacts` documents.
-- Treat TECH-13 as blocked until it contains usable content.
-- Add TODOs for unclear source precedence, duplicate documents, empty files, or missing contract boundary details.
+- one command validates the contract repo: `node scripts/validate-contracts.mjs`;
+- release checklist records source trace, validation evidence, compatibility impact, and owner decisions.

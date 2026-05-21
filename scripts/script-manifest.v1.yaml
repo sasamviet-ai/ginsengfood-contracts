@@ -1,17 +1,21 @@
 version: v1
 name: contract-script-manifest
 title: Contract Script Manifest
-status: manifest-only
-description: Manifest for future contract lifecycle scripts. No executable scripts are added until a toolchain is approved.
+status: active-validation
+description: Manifest for contract lifecycle scripts.
+active_scripts:
+  - name: validate-contracts
+    command: node scripts/validate-contracts.mjs
+    purpose: Validate contract repository hygiene, JSON parseability, JSON Schema metadata, local references, OpenAPI/AsyncAPI surface markers, source-map paths, YAML source_documents, event envelopes, fixture targets, and basic fixture required fields.
 future_scripts:
-  - name: validate-openapi
-    purpose: Validate OpenAPI 3.1.0 files and required v1 path/error response conventions.
-  - name: validate-asyncapi
-    purpose: Validate AsyncAPI v1 files and event payload references.
-  - name: validate-json-schema
-    purpose: Validate JSON Schema draft 2020-12 syntax and local references.
-  - name: lint-contracts
-    purpose: Check filename policy, placeholder files, README coverage, and contract folder hygiene.
+  - name: validate-openapi-strict
+    purpose: Validate OpenAPI 3.1.0 semantics with an approved OpenAPI validator.
+  - name: validate-yaml-strict
+    purpose: Validate YAML syntax with an approved parser package.
+  - name: validate-asyncapi-strict
+    purpose: Validate AsyncAPI semantics with an approved AsyncAPI validator.
+  - name: validate-json-schema-strict
+    purpose: Validate JSON Schema draft 2020-12 syntax and examples with an approved JSON Schema validator.
   - name: check-breaking-changes
     purpose: Compare contract changes against compatibility policy.
   - name: generate-dotnet-client
@@ -21,11 +25,10 @@ future_scripts:
   - name: generate-typescript-client
     purpose: Generate TypeScript clients only after generated-client policy is approved.
 disallowed_content:
-  - executable-script-before-toolchain-approval
   - business-logic
   - service-logic
   - database-migration
   - production-config
   - secrets
 todos:
-  - Choose toolchain, package manager, CI entrypoint, and generator versions.
+  - Choose strict validation packages, CI entrypoint, generator versions, and generated-client publishing policy.

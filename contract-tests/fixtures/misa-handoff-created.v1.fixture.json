@@ -1,0 +1,20 @@
+{
+  "eventId": "evt-accounting-handoff-created-20260521-001",
+  "eventType": "ops-core.misa.accounting-handoff-created.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-21T09:30:00+07:00",
+  "source": "ops-core",
+  "correlationId": "corr-misa-handoff-20260521-001",
+  "causationId": "opf-12-20260521-001",
+  "idempotencyKey": "misa-handoff-opf-12-20260521-001",
+  "data": {
+    "misa_handoff_id": "misa-handoff-20260521-001",
+    "operational_checkpoint_id": "checkpoint-opf-12-20260521-001",
+    "checkpoint_type": "MATERIAL_ISSUE_ACCOUNTING_CONFIRMED",
+    "source_form_id": "opf-12-20260521-001",
+    "mapping_status": "MAPPED",
+    "misa_mapping_code": "MISA-MAT-ISSUE-001",
+    "sync_status": "SYNC_AWAITING_REVIEW",
+    "reconcile_status": "RECONCILE_PENDING"
+  }
+}

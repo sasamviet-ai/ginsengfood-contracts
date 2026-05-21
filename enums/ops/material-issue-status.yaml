@@ -3,15 +3,15 @@ name: material-issue-status
 title: Material Issue Status
 description: Material Issue v1 status values for issuing only QC_PASS and READY_FOR_PRODUCTION lots.
 source_documents:
-  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
-  - docs/documents/2_pack/extra/HE THONG PHIEU - OPERATIONAL FORMS AUTO-GENERATED FORMS MISA ACCOUNTING HANDOFF PACK.md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
+  - docs/documents/0. appendices/01-OPERATIONAL-FORMS.md
 values:
   - value: DRAFT
     description: Draft material issue form/request.
     source: Operational forms draft behavior.
   - value: REQUESTED
     description: Material issue requested.
-    source: Operational Forms FRM-12.
+    source: Operational Forms OPF-03.
   - value: LOT_READY_CHECKING
     description: Lot readiness guard is being checked.
     source: PACK-01 requires QC_PASS plus READY_FOR_PRODUCTION.

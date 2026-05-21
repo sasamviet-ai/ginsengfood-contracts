@@ -1,0 +1,24 @@
+version: v1
+name: material-planning-policy
+title: Material Planning Policy
+description: Material and packaging planning threshold policies from the appendix taxonomy.
+source_documents:
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
+values:
+  - value: A_SPECIFIC_5_BATCH_SKU
+    description: Group A SKU-specific material threshold based on five batches for the SKU.
+    source: Material/packaging taxonomy stock threshold rules.
+  - value: A_COMMON_20_BATCH_POOL
+    description: Group A common material threshold based on aggregate twenty-batch pool logic.
+    source: Material/packaging taxonomy stock threshold rules.
+  - value: B1_15_BATCH_SKU
+    description: Level 1 packaging threshold based on fifteen batches for the SKU.
+    source: Material/packaging taxonomy stock threshold rules.
+  - value: B2_15_BATCH_SKU
+    description: Level 2 packaging threshold based on fifteen batches for the SKU.
+    source: Material/packaging taxonomy stock threshold rules.
+  - value: B3_SHARED_CONTROLLED_STOCK
+    description: Shared auxiliary packaging controlled by stock policy rather than fixed seven-percent buffer.
+    source: Material/packaging taxonomy stock threshold rules.
+compatibility:
+  breaking_change: Hardcoding threshold quantities instead of using owner-approved policy/config is breaking.

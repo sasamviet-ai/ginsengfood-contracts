@@ -3,7 +3,7 @@ name: ivr-call-attempt-status
 title: IVR Call Attempt Status
 description: IVR v1 call attempt state values from TECH-09.
 source_documents:
-  - docs/documents/3_tech/TECH-09 - IVR ORDER CONFIRMATION AUTO CALL VERIFICATION ANTI-FAKE-ORDER CONTROL.md
+  - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
 values:
   - value: ATTEMPT_NOT_CREATED
     description: Attempt has not been created.

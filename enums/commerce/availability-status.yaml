@@ -3,8 +3,8 @@ name: availability-status
 title: Availability Status
 description: Commerce v1 availability outcomes for quote/cart/order sellable checks.
 source_documents:
-  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
-  - docs/documents/3_tech/TECH-03 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+  - docs/documents/3. tech/05-TECH-04-COMMERCE-RUNTIME-SELLABLE-GATE-QUOTE-CART-ORDER-PAYMENT-SHIPPING.md
+  - docs/documents/3. tech/04-TECH-03-OPERATIONAL-CORE-PRODUCTION-WAREHOUSE-INVENTORY-TRACEABILITY-RECALL-SALE-LOCK.md
 values:
   - value: AVAILABILITY_NOT_CHECKED
     description: Availability has not been checked.

@@ -1,17 +1,17 @@
 # contract-tests
 
-Thư mục này chứa định hướng và tài sản phục vụ contract testing giữa provider và consumer của `ginsengfood-ops-core`, `ginsengfood-business-platform` và các integration consumer.
+This folder contains planning assets and fixtures for provider/consumer contract testing between `ginsengfood-ops-core`, `ginsengfood-business-platform`, and authorized integration consumers.
 
-Contract test dùng để kiểm provider/consumer có tuân thủ OpenAPI, AsyncAPI, JSON Schema, event payload, error envelope và compatibility rule đã công bố hay không. Test không thay thế unit test, integration test nội bộ hoặc business rule trong application.
+Current validation:
 
-Giai đoạn đầu có thể dùng Postman collection và fixture JSON trong repo để kiểm các request/response/event quan trọng. Giai đoạn sau có thể dùng Pact hoặc công cụ tương đương để quản lý provider/consumer verification chính thức.
+- Repository-level contract hygiene/source trace validation is available through `node scripts/validate-contracts.mjs`.
+- Existing Postman collections and JSON fixtures remain early contract-test assets.
+- Pact files remain planning-only until the provider/consumer registry and Pact toolchain are approved.
 
-Hiện chưa tạo test thật. Không đặt application implementation, dependency package, generated SDK, migration, secret hoặc production config vào đây.
+Contract tests must not contain application implementation, generated SDKs, database migrations, secrets, or production config.
 
-Các nhóm dự kiến:
+Future work:
 
-- `fixtures/`: dữ liệu mẫu dùng lại cho provider/consumer verification.
-- `postman/`: collection hoặc environment cho giai đoạn đầu.
-- `pact/`: contract pact cho giai đoạn sau nếu có policy.
-
-TODO: Chưa có toolchain chính thức, CI gate, provider registry hoặc consumer ownership registry.
+- Add strict schema/example validation after the JSON Schema validator is approved.
+- Add OpenAPI/AsyncAPI validation after strict validator packages are approved.
+- Add provider/consumer verification after ownership and CI gates are approved.

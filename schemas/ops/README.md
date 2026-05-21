@@ -1,32 +1,34 @@
 # schemas/ops
 
-## Phase 2 - Operational Core v1
-
 This folder contains Operational Core v1 JSON Schemas for `ginsengfood-ops-core`.
 
-Scope:
+## Scope
+
 - Source origin, supplier, raw material receipt/lot/QC, demand, MRP, material requirement, procurement suppression.
-- Production order, Production BOM Snapshot, material issue/receipt, production execution, personnel check, batch, packaging, print, QC, and batch release.
-- Warehouse, warehouse location, warehouse receipt, inventory ledger, stock balance, stock alert, sellable status, trace chain, public trace, recall, sale lock, MISA handoff, operational evidence, and operational form.
-- Contract surfaces only. No OpenAPI, AsyncAPI, event payloads, implementation code, migration, service logic, or business logic.
+- Production order, Production BOM Snapshot, material issue/receipt, production execution, personnel check, batch, packaging, QC, batch release, warehouse, inventory, traceability, recall, sale lock, sellable status, and public trace.
+- Operational appendices: OPF-01 through OPF-12, auto-generated form payloads, print payload/job, material code registry, packaging yield policy, material planning policy, MISA checkpoint, and MISA handoff.
+- Contract surfaces only. No implementation code, database migration, algorithm, or business calculation belongs here.
 
-Source basis:
-- PACK-01 / TECH-03 for production, warehouse, inventory, traceability, recall, sale lock, and sellable guard.
-- PACK-03 for demand, MRP, formula scaling, material groups, dynamic thresholds, procurement suppression, and stock alerts.
-- PACK-04 plus operational form documents for MISA checkpoints, sync/reconcile status, and FRM-01 through FRM-27 forms.
+## Source Basis
 
-Compatibility:
-- All schemas are v1 and must stay backward compatible unless a compatibility note is added in a later phase.
+- `docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md` and `docs/documents/3. tech/04-TECH-03-OPERATIONAL-CORE-PRODUCTION-WAREHOUSE-INVENTORY-TRACEABILITY-RECALL-SALE-LOCK.md`
+- `docs/documents/2. pack/03-PACK-03-DEMAND-MRP-PROCUREMENT-MATERIAL-CONTROL.md`
+- `docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md`
+- `docs/documents/0. appendices/01-OPERATIONAL-FORMS.md`
+- `docs/documents/0. appendices/02-AUTO-GENERATED-FORM-RULES.md`
+- `docs/documents/0. appendices/03-PRINTING-CODE-RULES.md`
+- `docs/documents/0. appendices/04-MISA-MAPPING-RULES.md`
+- `docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md`
+
+## Compatibility
+
+- All schemas are v1 and must stay backward compatible unless a compatibility note is added.
 - Inventory Ledger is append-only; Stock Balance is derived from ledger and availability guards.
 - QC_PASS is not RELEASED, and Product Activation is not Sellable.
+- Thresholds, buffers, yield rates, and suppression policies are owner-approved configuration, not hardcoded calculations.
+- MISA checkpoint, mapping, sync, and reconcile states are contract fields; MISA must not rewrite Operational Truth.
 
-TODO:
-- Confirm final state machines for demand, MRP, production order, batch, recall, sale lock, and operational forms.
-- Confirm official checkpoint type enum for MISA handoff.
-- Confirm warehouse/location taxonomy, supplier lifecycle, UOM catalog, and public trace payload fields.
+## Remaining Owner Decisions
 
-Thư mục này chứa JSON Schema cho domain vận hành như Production, Batch, QC, Warehouse, Inventory, Trace, Recall và SaleLock.
-
-Người dùng chính là ops-core provider và business-platform consumer khi cần dữ liệu vận hành. Không đặt workflow implementation, warehouse algorithm, QC business rule hoặc database migration vào đây.
-
-Ví dụ file sau này: `batch-v1.schema.json`, `qc-result-v1.schema.json`, `inventory-position-v1.schema.json`, `trace-link-v1.schema.json`, `sale-lock-v1.schema.json`. Breaking change phải được review và tăng major version.
+- Warehouse/location taxonomy and public trace detail can be tightened after owner approval.
+- Async broker/topic/retry/outbox behavior remains outside schema scope until integration owners approve it.

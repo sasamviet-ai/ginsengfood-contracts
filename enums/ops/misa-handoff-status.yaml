@@ -1,10 +1,11 @@
 version: v1
 name: misa-handoff-status
 title: MISA Handoff Status
-description: MISA handoff mapping, sync, and reconcile status values for FRM-25 and PACK-04.
+description: MISA handoff mapping, sync, and reconcile status values for OPF-12/accounting boundaries and PACK-04.
 source_documents:
-  - docs/documents/2_pack/PACK-04 - MISA INTEGRATION ACCOUNTING HANDOFF COSTING SYNC RECONCILE PACK.md
-  - docs/documents/2_pack/extra/HE THONG PHIEU - OPERATIONAL FORMS AUTO-GENERATED FORMS MISA ACCOUNTING HANDOFF PACK.md
+  - docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md
+  - docs/documents/0. appendices/04-MISA-MAPPING-RULES.md
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
 values:
   - value: PENDING_MAPPING
     category: mapping
@@ -38,6 +39,18 @@ values:
     category: sync
     description: Sync is blocked, commonly by missing mapping or invalid checkpoint.
     source: Operational Forms SYNC_BLOCKED.
+  - value: SYNC_AWAITING_REVIEW
+    category: sync
+    description: Sync is waiting for accounting/integration review.
+    source: Appendix MISA/accounting status.
+  - value: SYNC_SUCCESS
+    category: sync
+    description: Sync succeeded.
+    source: Appendix MISA/accounting status.
+  - value: SYNC_ERROR
+    category: sync
+    description: Sync failed and requires review or retry handling.
+    source: Appendix MISA/accounting status.
   - value: ACCEPTED_BY_MISA
     category: sync
     description: MISA accepted the handoff.

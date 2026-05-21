@@ -1,23 +1,17 @@
 version: v1
-name: dotnet-generated-client-manifest
-title: .NET Generated Client Manifest
+language: dotnet
 status: manifest-only
-description: Manifest for future .NET generated clients. No generated client code is committed by this file.
-consumer_target: ginsengfood-ops-core
-allowed_source_contracts:
-  - ../../openapi/ops-core/*.v1.yaml
-  - ../../asyncapi/ops-core-events.v1.yaml
-  - ../../schemas/common/*.schema.json
-  - ../../schemas/product/*.schema.json
-  - ../../schemas/ops/*.schema.json
-disallowed_content:
-  - generated-client-code
-  - handwritten-implementation
-  - nuget-package
-  - binary-build-output
-  - secrets
-  - service-logic
-compatibility:
-  breaking_change: Generated .NET clients must not be committed or published until generator and compatibility policy are approved.
-todos:
-  - Choose generator, package name, namespace policy, publishing flow, and regeneration command.
+validation_command: node ../../scripts/validate-contracts.mjs
+source_documents:
+  - docs/source-map.md
+policy:
+  generate_sdk: false
+  reason: SDK generator and distribution workflow are not owner-approved.
+  allowed_now:
+    - Track OpenAPI and schema inputs.
+    - Record generation assumptions.
+    - Keep this manifest synchronized with contract validation.
+  disallowed_now:
+    - Commit generated SDK code.
+    - Publish packages.
+    - Treat generated clients as compatibility evidence before CI approval.

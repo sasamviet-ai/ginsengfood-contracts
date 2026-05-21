@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-material-policy-20260521-001",
+    "sourceSystem": "ops-core",
+    "timestamp": "2026-05-21T09:20:00+07:00"
+  },
+  "data": {
+    "material_planning_policy_id": "material-policy-a1-v1",
+    "material_group": "A1",
+    "policy_code": "A_SPECIFIC_5_BATCH_SKU",
+    "batch_threshold_count": 5,
+    "buffer_rate": "owner-approved",
+    "suppression_rule": "Suppress procurement when approved stock plus incoming quantity covers the active threshold.",
+    "owner_approval_ref": {
+      "sourceId": "owner-decision-material-policy-v1",
+      "sourceType": "owner-decision",
+      "ownerCore": "ops-core",
+      "decisionAuthority": "owner"
+    }
+  }
+}

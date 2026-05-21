@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/ops/v1/operational-evidence.schema.json",
   "title": "Operational Evidence",
-  "description": "Operational Evidence v1 contract for FRM-26 evidence packets that gather chain evidence for operations, smoke, recall, sale lock, MISA, and owner review.",
-  "$comment": "Sources: Operational Forms FRM-26 and PACK-01 evidence packet. TODO: exact packet close-out fields are not finalized.",
+  "description": "Operational Evidence v1 contract for evidence packets that gather chain evidence for operations, smoke, recall, sale lock, MISA, and owner review.",
+  "$comment": "Sources: appendix operational form/evidence rules and PACK-01 evidence packet. TODO: exact packet close-out fields are not finalized.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

@@ -3,7 +3,7 @@ namespace: PERMISSION
 title: Permission Errors
 description: Common RBAC and permission errors for protected actions.
 source_documents:
-  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
+  - docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md
 codes:
   - code: PERMISSION.ACCESS_DENIED
     httpStatus: 403

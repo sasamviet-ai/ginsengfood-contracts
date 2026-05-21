@@ -3,7 +3,7 @@ name: production-demand-status
 title: Production Demand Status
 description: Production Demand Board v1 status values. Stock alerts can create demand, not production orders.
 source_documents:
-  - docs/documents/2_pack/PACK-03 - DEMAND MRP FORMULA SCALING PROCUREMENT STOCK ALERT MATERIAL PACKAGING CONTROL PACK.md
+  - docs/documents/2. pack/03-PACK-03-DEMAND-MRP-PROCUREMENT-MATERIAL-CONTROL.md
 values:
   - value: DRAFT
     description: Demand record is being prepared.

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/material-code-registry.schema.json",
+  "title": "Material Code Registry",
+  "description": "Material and packaging code registry contract for the material/packaging taxonomy, planning policy linkage, MISA mapping, and print linkage.",
+  "$comment": "Source: docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "material_code_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "material_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "material_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "material_group": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "B2",
+        "B3"
+      ]
+    },
+    "material_family": {
+      "type": "string",
+      "enum": [
+        "INGREDIENT",
+        "ADDITIVE",
+        "PROCESSING_AID",
+        "PRIMARY_PACKAGING",
+        "SECONDARY_PACKAGING",
+        "SHARED_PACKAGING"
+      ]
+    },
+    "base_uom": {
+      "type": "string",
+      "minLength": 1
+    },
+    "planning_policy_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "packaging_print_required": {
+      "type": "boolean"
+    },
+    "misa_mapping_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "suppression_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "AVAILABLE_STOCK_COVERS_THRESHOLD",
+          "APPROVED_INCOMING_COVERS_THRESHOLD",
+          "OWNER_SUPPRESSION_APPROVED",
+          "MATERIAL_NOT_REQUIRED_FOR_PROFILE",
+          "PACKAGING_SHARED_POOL_AVAILABLE",
+          "P0_STOP_POINT_ACTIVE"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "owner_approval_ref": {
+      "$ref": "../common/owner-decision-ref.schema.json"
+    }
+  },
+  "required": [
+    "material_code_id",
+    "material_code",
+    "material_group",
+    "material_family"
+  ]
+}

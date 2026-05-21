@@ -1,7 +1,14 @@
 # examples/api
 
-Thư mục này chứa request/response mẫu cho REST API contracts.
+API examples are source-backed request or response payloads used by QA, frontend, backend, and contract-test planning.
 
-Người dùng chính là backend, frontend, QA và contract test. Không đặt OpenAPI YAML thật, mock server implementation, credential hoặc dữ liệu production vào đây.
+Current examples cover:
 
-Ví dụ file sau này: `create-order-v1.request.json`, `create-order-v1.response.json`, `inventory-v1.response.json`. Example phải khớp version API tương ứng.
+- availability and sellable checks;
+- public trace and warehouse receipt read responses;
+- operational forms;
+- print job creation;
+- MISA handoff response;
+- material planning policy response.
+
+Examples must stay within the fields published by schemas and OpenAPI. They are not mock servers, credentials, production data, or implementation fixtures.

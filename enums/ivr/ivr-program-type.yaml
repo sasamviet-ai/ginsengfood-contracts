@@ -3,7 +3,7 @@ name: ivr-program-type
 title: IVR Program Type
 description: IVR v1 program types mentioned by PACK-09 for order confirmation attempts.
 source_documents:
-  - docs/documents/2_pack/PACK-09 - IVR_ORDER_CONFIRMATION.md
+  - docs/documents/2. pack/09-PACK-09-IVR-ORDER-CONFIRMATION.md
 values:
   - value: GOLDEN_HOUR
     description: Golden Hour order confirmation program.

@@ -3,9 +3,8 @@ namespace: INTEGRATION
 title: Integration Errors
 description: Common integration boundary errors for resolver, source, handoff, callback, and sync contracts.
 source_documents:
-  - docs/error-code-standard.md
-  - docs/documents/1_master/MASTER-01 - GLOBAL SOURCE-OF-TRUTH REGISTRY.md
-  - docs/documents/1_master/MASTER-04 - RUNTIME RESOLUTION & GUARD CONTROL STANDARD.md
+  - docs/documents/1. master/02-MASTER-01-SOURCE-OF-TRUTH.md
+  - docs/documents/1. master/05-MASTER-04-RUNTIME-RESOLUTION-GUARD.md
 codes:
   - code: INTEGRATION.SOURCE_UNAVAILABLE
     httpStatus: 503

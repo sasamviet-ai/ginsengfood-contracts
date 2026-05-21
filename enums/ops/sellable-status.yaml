@@ -3,8 +3,8 @@ name: sellable-status
 title: Sellable Status
 description: Sellable Gate decision values. Product Activation is not sellable.
 source_documents:
-  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
-  - docs/documents/2_pack/PACK-02 - PRODUCT MASTER SKU INGREDIENT RECIPE FORMULA VERSION PRODUCT ACTIVATION.md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
+  - docs/documents/2. pack/02-PACK-02-PRODUCT-MASTER-SKU-RECIPE-ACTIVATION.md
 values:
   - value: SELLABLE
     description: Batch/SKU passes released, warehouse, ledger, stock, HSD, QC, trace, recall, and sale-lock checks.

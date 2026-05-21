@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/p0-stop-point.schema.json",
+  "title": "P0 Stop Point",
+  "description": "Common v1 P0 stop-point registry record. Open P0 records block completion, release-ready, production-ready, and go-live decisions.",
+  "$comment": "Source: TECH-01 P0 stop-point Registry Principle and Lifecycle. P0 stop points must not be deleted or cleared silently.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "p0StopPointId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceDocument": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceRule": {
+      "type": "string",
+      "minLength": 1
+    },
+    "module": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "severity": {
+      "type": "string",
+      "const": "P0"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "OPEN",
+        "INVESTIGATING",
+        "FIX_IN_PROGRESS",
+        "READY_FOR_RETEST",
+        "RETEST_PASS",
+        "RETEST_FAILED",
+        "OWNER_REVIEW_REQUIRED",
+        "CLEARED",
+        "REOPENED"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "impact": {
+      "type": "string",
+      "minLength": 1
+    },
+    "detectedBy": {
+      "$ref": "actor.schema.json"
+    },
+    "detectedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "owner": {
+      "$ref": "actor.schema.json"
+    },
+    "fixPlan": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fixEvidenceRef": {
+      "$ref": "evidence-ref.schema.json"
+    },
+    "retestEvidenceRef": {
+      "$ref": "evidence-ref.schema.json"
+    },
+    "releaseImpact": {
+      "type": "string",
+      "enum": [
+        "BLOCKED",
+        "HOLD",
+        "EXCLUDED"
+      ]
+    },
+    "closedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "auditRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "audit.schema.json"
+      }
+    }
+  },
+  "required": [
+    "p0StopPointId",
+    "sourceDocument",
+    "sourceRule",
+    "severity",
+    "status",
+    "description"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "eventId": "evt-evidence-accepted-20260521-001",
+  "eventType": "ops-core.evidence.evidence-accepted.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-21T10:00:00+07:00",
+  "source": "ops-core",
+  "correlationId": "corr-evidence-20260521-001",
+  "causationId": "release-checklist-20260521-001",
+  "idempotencyKey": "evidence-accepted-20260521-001",
+  "data": {
+    "evidenceId": "evidence-20260521-001",
+    "evidenceType": "SMOKE",
+    "status": "ACCEPTED",
+    "sourceDocument": "docs/documents/1. master/06-MASTER-05-EVIDENCE-SMOKE-COMPLETION-GATE.md",
+    "sourceRule": "Only accepted evidence may pass a gate.",
+    "module": "ginsengfood-contracts",
+    "scope": "contract-validation",
+    "environment": "TEST",
+    "result": "PASS"
+  }
+}

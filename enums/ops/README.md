@@ -1,22 +1,24 @@
 # enums/ops
 
-## Phase 2 - Operational Core Enums v1
+Operational Core v1 enum contracts for `ginsengfood-ops-core`.
 
-This folder contains Operational Core v1 enum contracts for `ginsengfood-ops-core`.
+These enums define contract vocabulary only. They do not implement transitions, service logic, inventory calculations, MISA sync, or business decisions.
 
-These enums are contract values only. They do not implement state transitions, service logic, inventory calculation, MISA sync, or business decisions.
+## Source Basis
 
-Source basis:
-- PACK-01 / TECH-03 for QC, batch, release, warehouse receipt, inventory, sellable, trace, recall, and sale lock boundaries.
-- PACK-03 for material groups, demand, MRP, procurement suppression, and stock alert status.
-- PACK-04 plus operational form documents for MISA handoff and operational form status values.
+- `docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md` and `docs/documents/3. tech/04-TECH-03-OPERATIONAL-CORE-PRODUCTION-WAREHOUSE-INVENTORY-TRACEABILITY-RECALL-SALE-LOCK.md`
+- `docs/documents/2. pack/03-PACK-03-DEMAND-MRP-PROCUREMENT-MATERIAL-CONTROL.md`
+- `docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md`
+- `docs/documents/0. appendices/01-OPERATIONAL-FORMS.md`
+- `docs/documents/0. appendices/03-PRINTING-CODE-RULES.md`
+- `docs/documents/0. appendices/04-MISA-MAPPING-RULES.md`
+- `docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md`
 
-TODO:
-- Split broad MISA handoff status into mapping/sync/reconcile enums if future documents require strict typing.
-- Define official per-domain state machines in Phase 7 where the source documents currently only define guard outcomes.
+## Current Split Enums
 
-Thư mục này chứa enum chuẩn cho vận hành như QC, batch, inventory, recall và sale lock.
+- Operational forms: `operational-form-type.yaml`, `operational-form-status.yaml`
+- Printing: `print-job-status.yaml`
+- Material/packaging: `material-group.yaml`, `material-group-family.yaml`, `material-planning-policy.yaml`, `material-suppression-reason.yaml`
+- MISA: `misa-checkpoint-type.yaml`, `misa-mapping-status.yaml`, `misa-sync-status.yaml`, `misa-reconcile-status.yaml`, plus `misa-handoff-status.yaml` for compatibility with broad consumers.
 
-Không đặt workflow code, database status migration hoặc rule engine vào đây. Enum chỉ mô tả vocabulary contract.
-
-Ví dụ file sau này: `qc-status-v1.md`, `batch-status-v1.md`, `sale-lock-status-v1.md`, `recall-status-v1.md`. Enum phải versioned.
+Future tightening is allowed only when the source documents or owner decisions define stable values.

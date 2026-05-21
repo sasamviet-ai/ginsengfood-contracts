@@ -3,8 +3,8 @@ name: human-takeover-status
 title: Human Takeover Status
 description: Channel v1 human takeover status values for conversations that must pause AI.
 source_documents:
-  - docs/documents/2_pack/PACK-05 - AI ADVISOR CHANNEL CUSTOMER CONSULTING SALES RUNTIME CUSTOMER MEMORY QUOTE-ORDER HANDOFF PACK.md
-  - docs/documents/2_pack/PACK-06 - FACEBOOK CHANNEL GATEWAY META LIVE & MESSENGER COMMENT-MESSENGER ROUTING APP REVIEW CHANNEL SMOKE RELEASE CONTROL PACK.md
+  - docs/documents/2. pack/05-PACK-05-AI-ADVISOR-CHANNEL.md
+  - docs/documents/2. pack/06-PACK-06-FACEBOOK-CHANNEL-GATEWAY.md
 values:
   - value: TAKEOVER_NOT_REQUIRED
     description: Human takeover is not required.

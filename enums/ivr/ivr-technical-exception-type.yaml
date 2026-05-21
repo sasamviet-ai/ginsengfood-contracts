@@ -3,8 +3,8 @@ name: ivr-technical-exception-type
 title: IVR Technical Exception Type
 description: IVR v1 technical exception categories for failures that must not be treated as no-answer.
 source_documents:
-  - docs/documents/2_pack/PACK-09 - IVR_ORDER_CONFIRMATION.md
-  - docs/documents/3_tech/TECH-09 - IVR ORDER CONFIRMATION AUTO CALL VERIFICATION ANTI-FAKE-ORDER CONTROL.md
+  - docs/documents/2. pack/09-PACK-09-IVR-ORDER-CONFIRMATION.md
+  - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
 values:
   - value: IVR_TECHNICAL_EXCEPTION
     description: Generic IVR technical exception.

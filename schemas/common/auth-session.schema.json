@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/auth-session.schema.json",
+  "title": "Auth Session",
+  "description": "Common v1 authentication session reference for audit and permission enforcement boundaries.",
+  "$comment": "Source: TECH-01 includes login boundary, session/token boundary, failed login, and permission enforcement as Foundation concerns. This schema does not define token implementation details.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "sessionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "userId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "CREATED",
+        "ACTIVE",
+        "EXPIRED",
+        "REVOKED",
+        "LOCKED",
+        "FAILED_AUTHENTICATION"
+      ]
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "endedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "$ref": "actor.schema.json"
+    },
+    "auditRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "audit.schema.json"
+      }
+    }
+  },
+  "required": [
+    "sessionId",
+    "userId",
+    "status"
+  ]
+}

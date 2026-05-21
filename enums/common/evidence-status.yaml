@@ -3,10 +3,13 @@ name: evidence-status
 title: Evidence Status
 description: Common evidence lifecycle/status values used by evidence registry, smoke, completion, and release gates.
 source_documents:
-  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
-  - docs/documents/1_master/MASTER-03 - TRACEABILITY ID STANDARD.md
-  - docs/documents/1_master/MASTER-05 - EVIDENCE SMOKE COMPLETION GATE STANDARD.md
+  - docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md
+  - docs/documents/1. master/04-MASTER-03-TRACEABILITY-ID.md
+  - docs/documents/1. master/06-MASTER-05-EVIDENCE-SMOKE-COMPLETION-GATE.md
 values:
+  - value: WAITING
+    description: Evidence has not been submitted yet.
+    source: TECH-01 Evidence status standard.
   - value: DRAFT
     description: Evidence draft; not usable for PASS.
     source: MASTER-03 evidence states.
@@ -43,4 +46,4 @@ values:
 compatibility:
   breaking_change: Renaming, removing, or reinterpreting evidence statuses is breaking because release and completion gates depend on them.
 todos:
-  - Reconcile whether PENDING and DRAFT should remain distinct once an authoritative evidence registry contract is generated.
+  - Reconcile whether WAITING, PENDING, and DRAFT should remain distinct after owner review of historical evidence records.

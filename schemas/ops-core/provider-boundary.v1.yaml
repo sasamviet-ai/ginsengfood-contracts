@@ -5,15 +5,15 @@ description: Contract boundary statement for ginsengfood-ops-core provider-owned
 provider: ops-core
 source_documents:
   - docs/source-map.md
-  - MASTER-01
-  - MASTER-02
-  - PACK-01
-  - PACK-02
-  - PACK-03
-  - PACK-04
-  - TECH-02
-  - TECH-03
-  - TECH-10
+  - docs/documents/1. master/02-MASTER-01-SOURCE-OF-TRUTH.md
+  - docs/documents/1. master/03-MASTER-02-CROSS-PACK-DEPENDENCY.md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
+  - docs/documents/2. pack/02-PACK-02-PRODUCT-MASTER-SKU-RECIPE-ACTIVATION.md
+  - docs/documents/2. pack/03-PACK-03-DEMAND-MRP-PROCUREMENT-MATERIAL-CONTROL.md
+  - docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md
+  - docs/documents/3. tech/03-TECH-02-PRODUCT-SKU-INGREDIENT-RECIPE-FORMULA-PRODUCT-ACTIVATION.md
+  - docs/documents/3. tech/04-TECH-03-OPERATIONAL-CORE-PRODUCTION-WAREHOUSE-INVENTORY-TRACEABILITY-RECALL-SALE-LOCK.md
+  - docs/documents/3. tech/11-TECH-10-GLOBAL-SMOKE-UAT-EVIDENCE-RELEASE-GATEWAY-PRODUCTION-READINESS-CONTROL.md
 owns:
   - product-master
   - sku-canonical

@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/evidence-registry.schema.json",
+  "title": "Evidence Registry Record",
+  "description": "Common v1 evidence registry record used to prove implementation, test, smoke, security, release, and P0-clearing evidence.",
+  "$comment": "Source: TECH-01 Evidence Record Standard. Only ACCEPTED evidence may be used to PASS a gate.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "evidenceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidenceType": {
+      "type": "string",
+      "enum": [
+        "IMPLEMENTATION",
+        "TEST",
+        "SMOKE",
+        "SECURITY",
+        "RELEASE",
+        "GO_LIVE",
+        "P0_FIX",
+        "RETEST",
+        "OWNER_REVIEW"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "WAITING",
+        "SUBMITTED",
+        "UNDER_REVIEW",
+        "ACCEPTED",
+        "REJECTED",
+        "NEEDS_RETEST",
+        "EXPIRED",
+        "OWNER_REVIEW_REQUIRED",
+        "SUPERSEDED"
+      ]
+    },
+    "sourceDocument": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceRule": {
+      "type": "string",
+      "minLength": 1
+    },
+    "module": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment": {
+      "type": "string",
+      "enum": [
+        "DEV",
+        "TEST",
+        "STAGING",
+        "PRODUCTION"
+      ]
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "submittedBy": {
+      "$ref": "actor.schema.json"
+    },
+    "submittedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reviewedBy": {
+      "$ref": "actor.schema.json"
+    },
+    "reviewedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "linkedP0StopPointId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "linkedAuditId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "referenceUri": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "evidenceId",
+    "evidenceType",
+    "status",
+    "sourceDocument",
+    "sourceRule",
+    "scope"
+  ]
+}

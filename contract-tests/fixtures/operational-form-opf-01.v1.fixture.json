@@ -1,0 +1,13 @@
+{
+  "operational_form_id": "opf-01-20260521-001",
+  "form_code": "OPF-01",
+  "form_type": "RAW_MATERIAL_INBOUND_ASSESSMENT",
+  "status": "GENERATED",
+  "source_object": {
+    "sourceId": "raw-material-receipt-20260521-001",
+    "sourceType": "raw-material-receipt",
+    "ownerCore": "ops-core"
+  },
+  "form_sequence": 1,
+  "misa_checkpoint": false
+}

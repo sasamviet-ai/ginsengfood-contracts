@@ -1,7 +1,14 @@
 # state-machines
 
-Thư mục này chứa mô tả state machine bằng Markdown để hai team hiểu trạng thái và transition hợp lệ.
+This folder contains Markdown state-machine contracts for shared and domain lifecycle states.
 
-Người dùng chính là `ginsengfood-ops-core`, `ginsengfood-business-platform`, QA và reviewer contract. Không đặt implementation code, workflow engine config, database migration hoặc runtime rule vào đây.
+Primary readers are `ginsengfood-ops-core`, `ginsengfood-business-platform`, QA, and contract reviewers. Do not place implementation code, workflow engine configuration, database transition scripts, or runtime rule engines here.
 
-Ví dụ file sau này: `order-state-machine-v1.md`, `payment-state-machine-v1.md`, `sale-lock-state-machine-v1.md`. State machine phải versioned nếu được dùng như contract.
+Folders:
+
+- `common/`: foundation flows such as evidence registry, P0 stop points, and release status registry.
+- `ops/`: operational-core states, including production, batch, QC, warehouse, recall, sale lock, operational forms, and print jobs.
+- `commerce/`: commerce-runtime states.
+- `ivr/`: IVR confirmation states.
+
+State machine changes that remove states, loosen required guards, or allow previously forbidden transitions are compatibility-sensitive and must be reviewed.

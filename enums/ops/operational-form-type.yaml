@@ -1,0 +1,49 @@
+version: v1
+name: operational-form-type
+title: Operational Form Type
+description: Required operational forms from the current appendices. Codes are contract identifiers, not UI labels.
+source_documents:
+  - docs/documents/0. appendices/01-OPERATIONAL-FORMS.md
+  - docs/documents/0. appendices/02-AUTO-GENERATED-FORM-RULES.md
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
+values:
+  - value: RAW_MATERIAL_INBOUND_ASSESSMENT
+    form_code: OPF-01
+    description: Raw material assessment and inbound receipt form.
+  - value: PRODUCTION_ORDER
+    form_code: OPF-02
+    description: Production order.
+  - value: MATERIAL_ISSUE_REQUEST
+    form_code: OPF-03
+    description: Material issue request for production.
+  - value: MATERIAL_ISSUE_APPROVAL
+    form_code: OPF-04
+    description: Approval for materials allowed into production.
+  - value: WORKFORCE_CHECKIN_CHECKOUT
+    form_code: OPF-05
+    description: Workforce check-in/check-out by production order, batch, and step.
+  - value: PREPROCESS_TRACKING
+    form_code: OPF-06
+    description: Preprocess tracking form.
+  - value: FREEZE_DRY_QC
+    form_code: OPF-07
+    description: Freeze-dry quality check form.
+  - value: PACKING_LEVEL_1_TRACKING
+    form_code: OPF-08
+    description: Level 1 packing tracking form.
+  - value: PACKING_LEVEL_2_TRACKING
+    form_code: OPF-09
+    description: Level 2 packing tracking form.
+  - value: FINISHED_GOODS_QC
+    form_code: OPF-10
+    description: Finished goods QC form.
+  - value: FINISHED_GOODS_RECEIPT_ORDER
+    form_code: OPF-11
+    description: Finished goods warehouse receipt order.
+  - value: MATERIAL_ISSUE_ACCOUNTING
+    form_code: OPF-12
+    description: Accounting material issue form for production.
+compatibility:
+  breaking_change: Removing or changing an OPF code is breaking for operational form routes, examples, and state machines.
+todos:
+  - Decide whether the optional production planning form should be OPF-00 or a separate planning contract.

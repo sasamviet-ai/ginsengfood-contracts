@@ -1,7 +1,17 @@
 # examples/events
 
-Thư mục này chứa event payload mẫu.
+Event examples are source-backed event payloads for producer/consumer contract planning.
 
-Người dùng chính là producer, consumer, QA và contract test. Không đặt event log production, broker config, handler code hoặc dữ liệu nhạy cảm thật vào đây.
+Current examples cover ops-core sale lock, sellable, MISA handoff, evidence/release readiness, and business-platform order/payment/ads/IVR events.
 
-Ví dụ file sau này: `sku-became-sellable-v1.example.json`, `order-confirmed-v1.example.json`, `payment-confirmed-v1.example.json`. Example phải khớp event version.
+Examples must include the standard event envelope:
+
+- `eventId`
+- `eventType`
+- `eventVersion`
+- `occurredAt`
+- `source`
+- `correlationId`
+- `data`
+
+Broker, topic, retry, dead-letter, and outbox behavior must not be inferred from these examples.
