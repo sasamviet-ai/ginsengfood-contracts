@@ -1,0 +1,16 @@
+{
+  "print_job_id": "print-job-20260521-001",
+  "batch_id": "batch-20260521-001",
+  "packaging_job_id": "packaging-job-20260521-001",
+  "print_config_id": "print-config-level-1-v1",
+  "status": "PAYLOAD_GENERATED",
+  "generated_by_system": true,
+  "source_object": {
+    "sourceId": "packaging-job-20260521-001",
+    "sourceType": "packaging-job",
+    "ownerCore": "ops-core"
+  },
+  "print_payload_id": "print-payload-20260521-001",
+  "qr_registry_id": "qr-registry-20260521-001",
+  "barcode_registry_id": "barcode-registry-20260521-001"
+}

@@ -3,8 +3,7 @@ namespace: IDEMPOTENCY
 title: Idempotency Errors
 description: Common idempotency errors for retry-safe commands.
 source_documents:
-  - docs/idempotency-standard.md
-  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
+  - docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md
 codes:
   - code: IDEMPOTENCY.KEY_REQUIRED
     httpStatus: 400

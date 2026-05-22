@@ -3,7 +3,7 @@ name: stock-alert-status
 title: Stock Alert Status
 description: Product stock alert levels and actions.
 source_documents:
-  - docs/documents/2_pack/extra/Muc canh bao ton kho san pham.md
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
 values:
   - value: STOCK_OK
     description: Available stock is above yellow alert threshold; normal monitoring.

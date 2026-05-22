@@ -3,7 +3,7 @@ name: recall-status
 title: Recall Status
 description: Recall Case v1 status values.
 source_documents:
-  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
 values:
   - value: OPEN
     description: Recall case has been opened.

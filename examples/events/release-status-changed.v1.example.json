@@ -1,0 +1,20 @@
+{
+  "eventId": "evt-release-status-changed-20260521-001",
+  "eventType": "ops-core.evidence.release-status-changed.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-21T10:05:00+07:00",
+  "source": "ops-core",
+  "correlationId": "corr-release-status-20260521-001",
+  "causationId": "evidence-20260521-001",
+  "idempotencyKey": "release-status-changed-20260521-001",
+  "data": {
+    "releaseStatusRecordId": "release-status-contracts-20260521-001",
+    "module": "ginsengfood-contracts",
+    "scope": "v1-contract-validation",
+    "status": "READY_FOR_REVIEW",
+    "dependencyStatus": "NO_OPEN_BLOCKER",
+    "p0Status": "NO_OPEN_P0",
+    "evidencePackageId": "evidence-package-20260521-001",
+    "updatedAt": "2026-05-21T10:05:00+07:00"
+  }
+}

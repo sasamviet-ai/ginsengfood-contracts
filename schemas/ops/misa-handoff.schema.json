@@ -3,20 +3,59 @@
   "$id": "schemas/ops/v1/misa-handoff.schema.json",
   "title": "MISA Handoff",
   "description": "MISA Handoff v1 contract. MISA receives only valid operational checkpoints with mapping, sync status, reconcile status, audit, evidence, and idempotency.",
-  "$comment": "Sources: PACK-04 and Operational Forms FRM-25. TODO: exact MISA target module and payload fields are not finalized.",
+  "$comment": "Sources: docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md, docs/documents/0. appendices/04-MISA-MAPPING-RULES.md, and appendix OPF-12 accounting form rules. Exact MISA target module and payload fields remain integration-specific.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "misa_handoff_id": { "type": "string", "minLength": 1, "description": "MISA accounting handoff identifier." },
     "operational_checkpoint_id": { "type": "string", "minLength": 1, "description": "Valid operational checkpoint identifier." },
-    "checkpoint_type": { "type": "string", "description": "Checkpoint type such as material issue confirmed or warehouse receipt confirmed. TODO: define official checkpoint type enum." },
-    "source_form_id": { "type": "string", "minLength": 1, "description": "Source operational form, usually FRM-25 created from a valid checkpoint." },
+    "checkpoint_type": {
+      "type": "string",
+      "enum": [
+        "RAW_MATERIAL_RECEIPT_CONFIRMED",
+        "MATERIAL_ISSUE_CONFIRMED",
+        "PRODUCTION_COMPLETION_CONFIRMED",
+        "QC_RELEASE_CONFIRMED",
+        "FINISHED_GOODS_RECEIPT_CONFIRMED",
+        "SALE_LOCK_ACCOUNTING_CONFIRMED",
+        "MATERIAL_ISSUE_ACCOUNTING_CONFIRMED"
+      ],
+      "description": "Checkpoint type. Prefer enums/ops/misa-checkpoint-type.yaml."
+    },
+    "source_form_id": { "type": "string", "minLength": 1, "description": "Source operational form, usually OPF-12 or another valid accounting checkpoint form." },
     "source_object": { "$ref": "../common/source-ref.schema.json" },
-    "mapping_status": { "type": "string", "description": "MISA mapping status, including PENDING_MAPPING, MAPPED, MISA_MAPPING_MISSING when applicable." },
+    "mapping_status": {
+      "type": "string",
+      "enum": [
+        "PENDING_MAPPING",
+        "MAPPED",
+        "MISA_MAPPING_MISSING"
+      ],
+      "description": "MISA mapping status. Prefer enums/ops/misa-mapping-status.yaml."
+    },
     "misa_mapping_code": { "type": "string", "minLength": 1, "description": "MISA mapping code when available." },
-    "sync_status": { "type": "string", "description": "Sync status such as NOT_SYNCED, PENDING, SUCCESS, ERROR, or SYNC_BLOCKED." },
-    "reconcile_status": { "type": "string", "description": "Reconcile status such as PENDING, MATCHED, or EXCEPTION." },
-    "accounting_object_type": { "type": "string", "description": "Accounting object type. TODO: define official values." },
+    "sync_status": {
+      "type": "string",
+      "enum": [
+        "NOT_SYNCED",
+        "SYNC_BLOCKED",
+        "SYNC_AWAITING_REVIEW",
+        "SYNC_SUCCESS",
+        "SYNC_ERROR",
+        "ACCEPTED_BY_MISA"
+      ],
+      "description": "MISA sync status. Prefer enums/ops/misa-sync-status.yaml."
+    },
+    "reconcile_status": {
+      "type": "string",
+      "enum": [
+        "RECONCILE_PENDING",
+        "MATCHED",
+        "EXCEPTION"
+      ],
+      "description": "Reconcile status. Prefer enums/ops/misa-reconcile-status.yaml."
+    },
+    "accounting_object_type": { "type": "string", "description": "Accounting object type from owner-approved MISA mapping configuration." },
     "accounting_amount": { "$ref": "../common/money.schema.json" },
     "idempotency": { "$ref": "../common/idempotency.schema.json" },
     "error_reason": { "type": "string", "description": "Error reason when sync or reconcile fails." },

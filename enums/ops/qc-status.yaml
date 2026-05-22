@@ -3,7 +3,7 @@ name: qc-status
 title: QC Status
 description: QC result values. QC_PASS is not batch release.
 source_documents:
-  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
 values:
   - value: QC_PENDING
     description: QC has not completed.

@@ -4,14 +4,48 @@ title: Pact Interaction Map
 description: Planning map for future Pact provider/consumer verification. This is not a generated Pact contract and does not require a Pact broker.
 source_documents:
   - docs/source-map.md
-  - docs/domain-contract-map.md
-  - docs/generation-plan.md
-  - MASTER-01
-  - MASTER-02
-  - TECH-03
-  - TECH-04
-  - TECH-09
+  - docs/documents/0. appendices/01-OPERATIONAL-FORMS.md
+  - docs/documents/0. appendices/03-PRINTING-CODE-RULES.md
+  - docs/documents/0. appendices/04-MISA-MAPPING-RULES.md
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
+  - docs/documents/1. master/02-MASTER-01-SOURCE-OF-TRUTH.md
+  - docs/documents/1. master/03-MASTER-02-CROSS-PACK-DEPENDENCY.md
+  - docs/documents/1. master/06-MASTER-05-EVIDENCE-SMOKE-COMPLETION-GATE.md
+  - docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md
+  - docs/documents/2. pack/10-PACK-10-COMPLETION-EVIDENCE-GATEWAY.md
+  - docs/documents/3. tech/04-TECH-03-OPERATIONAL-CORE-PRODUCTION-WAREHOUSE-INVENTORY-TRACEABILITY-RECALL-SALE-LOCK.md
+  - docs/documents/3. tech/05-TECH-04-COMMERCE-RUNTIME-SELLABLE-GATE-QUOTE-CART-ORDER-PAYMENT-SHIPPING.md
+  - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
+  - docs/documents/3. tech/11-TECH-10-GLOBAL-SMOKE-UAT-EVIDENCE-RELEASE-GATEWAY-PRODUCTION-READINESS-CONTROL.md
 interactions:
+  - name: ops-admin-submits-operational-form
+    provider: ops-core
+    consumer: ops-admin-ui
+    contract:
+      openapi: ../../openapi/ops-core/operational-admin.v1.yaml
+      fixture: ../fixtures/operational-form-opf-01.v1.fixture.json
+    expected_boundary: Admin UI may submit OPF payloads through ops-core-owned routes only.
+  - name: printer-adapter-receives-print-job
+    provider: ops-core
+    consumer: printer-adapter
+    contract:
+      openapi: ../../openapi/ops-core/operational-admin.v1.yaml
+      fixture: ../fixtures/print-job-created.v1.fixture.json
+    expected_boundary: Printer receives generated print data; printer output is not source of truth.
+  - name: accounting-integration-consumes-misa-handoff
+    provider: ops-core
+    consumer: accounting-integration
+    contract:
+      event: ../../events/ops-core/misa/accounting-handoff-created.v1.json
+      fixture: ../fixtures/misa-handoff-created.v1.fixture.json
+    expected_boundary: Accounting integration consumes checkpoints and must not rewrite Operational Truth.
+  - name: release-governance-consumes-evidence
+    provider: ops-core
+    consumer: release-governance
+    contract:
+      event: ../../events/ops-core/evidence/evidence-accepted.v1.json
+      fixture: ../fixtures/evidence-accepted.v1.fixture.json
+    expected_boundary: Only accepted evidence may satisfy a release or P0 gate.
   - name: business-platform-checks-ops-core-availability
     provider: ops-core
     consumer: business-platform
@@ -49,5 +83,5 @@ interactions:
     expected_boundary: IVR result is input signal only.
 compatibility:
   breaking_change: Changing provider ownership or treating a fixture as implementation behavior requires compatibility review.
-todos:
-  - Select Pact toolchain and provider registry before adding real pact files.
+owner_decisions:
+  - Select Pact toolchain and provider registry before adding real Pact files.

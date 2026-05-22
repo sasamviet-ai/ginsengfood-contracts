@@ -3,7 +3,7 @@ name: recipe-status
 title: Recipe Status
 description: Recipe lifecycle values for Recipe G1 governance.
 source_documents:
-  - docs/documents/2_pack/PACK-02 - PRODUCT MASTER SKU INGREDIENT RECIPE FORMULA VERSION PRODUCT ACTIVATION.md
+  - docs/documents/2. pack/02-PACK-02-PRODUCT-MASTER-SKU-RECIPE-ACTIVATION.md
 values:
   - value: DRAFT
     description: Recipe is being prepared.

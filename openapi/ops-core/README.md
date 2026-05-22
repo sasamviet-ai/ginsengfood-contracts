@@ -20,6 +20,7 @@ API groups:
 - Traceability: `traceability.v1.yaml`
 - Recall / Sale Lock: `recall-sale-lock.v1.yaml`
 - Operational Evidence / Forms: `operational-evidence.v1.yaml`
+- Operational Admin / Appendix Forms / Print / MISA: `operational-admin.v1.yaml`
 - MISA Handoff: `misa-handoff.v1.yaml`
 
 ## Ops-core External Boundary With ginsengfood-business-platform
@@ -59,6 +60,7 @@ API phuc vu ops-core frontend:
 - Inventory ledger, stock balance, stock alert read APIs
 - Trace chain internal API
 - Operational Evidence/Form APIs
+- Operational Admin APIs for OPF-01 through OPF-12, controlled print/reprint, material planning policy, and MISA sync requests
 - MISA handoff create/read APIs
 
 High-risk APIs:
@@ -68,6 +70,9 @@ High-risk APIs:
 - `POST /v1/material-issues`
 - `POST /v1/warehouse-receipts`
 - `POST /v1/misa-handoffs` when it creates accounting integration handoff from an operational checkpoint
+- `POST /v1/admin/operational/*` when it creates or transitions a high-risk operational form
+- `POST /v1/admin/operational/print-jobs/{printJobId}/reprint`
+- `POST /v1/admin/operational/misa-handoffs/{misaHandoffId}/sync`
 
 Boundary notes:
 - business-platform may check sellable/availability but must not mutate ops-core truth.
@@ -77,7 +82,7 @@ Boundary notes:
 - Product Activation is not Sellable.
 
 TODO:
-- Source docs do not lock every search/filter parameter, public projection shape, state transition, MISA checkpoint enum, warehouse taxonomy, recall severity model, or availability-check request schema. These remain TODO comments in the relevant OpenAPI descriptions.
+- Source docs do not lock every search/filter parameter, public projection shape, per-form transition matrix, MISA target module payload, warehouse taxonomy, recall severity model, or availability-check request schema. These remain TODO comments in the relevant OpenAPI descriptions.
 
 Thư mục này dành cho REST API contracts do `ginsengfood-ops-core` expose cho `ginsengfood-business-platform` hoặc consumer hợp lệ khác.
 

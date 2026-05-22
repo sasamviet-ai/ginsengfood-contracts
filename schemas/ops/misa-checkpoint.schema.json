@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/misa-checkpoint.schema.json",
+  "title": "MISA Checkpoint",
+  "description": "MISA checkpoint contract separating checkpoint type, mapping status, sync status, and reconcile status for accounting handoff.",
+  "$comment": "Sources: docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md and docs/documents/0. appendices/04-MISA-MAPPING-RULES.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "misa_checkpoint_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checkpoint_type": {
+      "type": "string",
+      "enum": [
+        "RAW_MATERIAL_RECEIPT_CONFIRMED",
+        "MATERIAL_ISSUE_CONFIRMED",
+        "PRODUCTION_COMPLETION_CONFIRMED",
+        "QC_RELEASE_CONFIRMED",
+        "FINISHED_GOODS_RECEIPT_CONFIRMED",
+        "SALE_LOCK_ACCOUNTING_CONFIRMED",
+        "MATERIAL_ISSUE_ACCOUNTING_CONFIRMED"
+      ]
+    },
+    "source_form_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "operational_checkpoint_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mapping_status": {
+      "type": "string",
+      "enum": [
+        "PENDING_MAPPING",
+        "MAPPED",
+        "MISA_MAPPING_MISSING"
+      ]
+    },
+    "sync_status": {
+      "type": "string",
+      "enum": [
+        "NOT_SYNCED",
+        "SYNC_BLOCKED",
+        "SYNC_AWAITING_REVIEW",
+        "SYNC_SUCCESS",
+        "SYNC_ERROR",
+        "ACCEPTED_BY_MISA"
+      ]
+    },
+    "reconcile_status": {
+      "type": "string",
+      "enum": [
+        "RECONCILE_PENDING",
+        "MATCHED",
+        "EXCEPTION"
+      ]
+    },
+    "handoff_ref": {
+      "$ref": "../common/source-ref.schema.json"
+    },
+    "idempotency": {
+      "$ref": "../common/idempotency.schema.json"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/evidence-ref.schema.json"
+      }
+    },
+    "audit_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/audit.schema.json"
+      }
+    }
+  },
+  "required": [
+    "misa_checkpoint_id",
+    "checkpoint_type",
+    "mapping_status",
+    "sync_status"
+  ]
+}

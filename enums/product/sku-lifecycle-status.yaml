@@ -3,7 +3,7 @@ name: sku-lifecycle-status
 title: SKU Lifecycle Status
 description: SKU lifecycle values for Product Master v1. Product status does not mean sellable status.
 source_documents:
-  - docs/documents/2_pack/PACK-02 - PRODUCT MASTER SKU INGREDIENT RECIPE FORMULA VERSION PRODUCT ACTIVATION.md
+  - docs/documents/2. pack/02-PACK-02-PRODUCT-MASTER-SKU-RECIPE-ACTIVATION.md
 values:
   - value: DRAFT
     description: SKU is being prepared.

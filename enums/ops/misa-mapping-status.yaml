@@ -1,0 +1,16 @@
+version: v1
+name: misa-mapping-status
+title: MISA Mapping Status
+description: Mapping status for an operational checkpoint before MISA sync.
+source_documents:
+  - docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md
+  - docs/documents/0. appendices/04-MISA-MAPPING-RULES.md
+values:
+  - value: PENDING_MAPPING
+    description: Mapping is pending.
+  - value: MAPPED
+    description: Required MISA mapping exists.
+  - value: MISA_MAPPING_MISSING
+    description: Required MISA mapping is missing and sync must be blocked.
+compatibility:
+  breaking_change: Treating MISA_MAPPING_MISSING as syncable is breaking.

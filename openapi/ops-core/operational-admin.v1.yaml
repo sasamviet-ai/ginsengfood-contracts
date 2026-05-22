@@ -1,0 +1,277 @@
+openapi: 3.1.0
+info:
+  title: Ops Core Operational Admin API
+  version: 1.0.0
+  description: Internal/admin operational form, print, material planning, and MISA handoff API contract derived from the current appendices.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+tags:
+  - name: operational-admin
+  - name: operational-print
+  - name: operational-misa
+  - name: material-planning
+paths:
+  /v1/admin/operational/raw-material-inbound:
+    post:
+      summary: Create raw material inbound assessment form
+      operationId: createRawMaterialInboundAssessmentV1
+      tags: [operational-admin]
+      x-operational-form-type: RAW_MATERIAL_INBOUND_ASSESSMENT
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/production-orders:
+    post:
+      summary: Create production order form
+      operationId: createProductionOrderFormV1
+      tags: [operational-admin]
+      x-operational-form-type: PRODUCTION_ORDER
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/material-issue-requests:
+    post:
+      summary: Create material issue request form
+      operationId: createMaterialIssueRequestFormV1
+      tags: [operational-admin]
+      x-operational-form-type: MATERIAL_ISSUE_REQUEST
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/material-issue-approvals:
+    post:
+      summary: Create material issue approval form
+      operationId: createMaterialIssueApprovalFormV1
+      tags: [operational-admin]
+      x-operational-form-type: MATERIAL_ISSUE_APPROVAL
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/workforce-checkins:
+    post:
+      summary: Create workforce check-in/check-out form
+      operationId: createWorkforceCheckinCheckoutFormV1
+      tags: [operational-admin]
+      x-operational-form-type: WORKFORCE_CHECKIN_CHECKOUT
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/preprocess-tracking:
+    post:
+      summary: Create preprocess tracking form
+      operationId: createPreprocessTrackingFormV1
+      tags: [operational-admin]
+      x-operational-form-type: PREPROCESS_TRACKING
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/freeze-dry-qc:
+    post:
+      summary: Create freeze-dry QC form
+      operationId: createFreezeDryQcFormV1
+      tags: [operational-admin]
+      x-operational-form-type: FREEZE_DRY_QC
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/packing-level-1:
+    post:
+      summary: Create level 1 packing tracking form
+      operationId: createPackingLevel1TrackingFormV1
+      tags: [operational-admin]
+      x-operational-form-type: PACKING_LEVEL_1_TRACKING
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/packing-level-2:
+    post:
+      summary: Create level 2 packing tracking form
+      operationId: createPackingLevel2TrackingFormV1
+      tags: [operational-admin]
+      x-operational-form-type: PACKING_LEVEL_2_TRACKING
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/finished-goods-qc:
+    post:
+      summary: Create finished goods QC form
+      operationId: createFinishedGoodsQcFormV1
+      tags: [operational-admin]
+      x-operational-form-type: FINISHED_GOODS_QC
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/finished-goods-receipts:
+    post:
+      summary: Create finished goods receipt order
+      operationId: createFinishedGoodsReceiptOrderV1
+      tags: [operational-admin]
+      x-operational-form-type: FINISHED_GOODS_RECEIPT_ORDER
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/material-issue-accounting:
+    post:
+      summary: Create accounting material issue form
+      operationId: createMaterialIssueAccountingFormV1
+      tags: [operational-admin, operational-misa]
+      x-operational-form-type: MATERIAL_ISSUE_ACCOUNTING
+      requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
+      responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/forms/{formId}/status:
+    patch:
+      summary: Update operational form status
+      description: Updates an operational form status when permission, evidence, source-object, and guard conditions allow the transition.
+      operationId: updateOperationalFormStatusV1
+      tags: [operational-admin]
+      parameters:
+        - name: formId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                status: { type: string }
+                actor: { $ref: "../../schemas/common/actor.schema.json" }
+                evidence_refs:
+                  type: array
+                  items: { $ref: "../../schemas/common/evidence-ref.schema.json" }
+              required: [status, actor]
+      responses: { "200": { $ref: "#/components/responses/OperationalFormOk" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/print-jobs:
+    post:
+      summary: Create print job
+      description: Creates a system-generated print job. Printer-side QR/barcode generation is not allowed.
+      operationId: createPrintJobV1
+      tags: [operational-print]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "../../schemas/ops/print-job.schema.json" }
+      responses: { "201": { $ref: "#/components/responses/PrintJobCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/print-jobs/{printJobId}/reprint:
+    post:
+      summary: Request controlled reprint
+      operationId: requestPrintJobReprintV1
+      tags: [operational-print]
+      parameters:
+        - name: printJobId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                reprint_reason: { type: string, minLength: 1 }
+                actor: { $ref: "../../schemas/common/actor.schema.json" }
+              required: [reprint_reason, actor]
+      responses: { "202": { $ref: "#/components/responses/PrintJobAccepted" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/misa-handoffs/{misaHandoffId}/sync:
+    post:
+      summary: Request MISA sync for a valid handoff
+      description: Requests sync only after mapping and operational checkpoint guards pass. MISA must not drive factory operational truth.
+      operationId: requestMisaHandoffSyncV1
+      tags: [operational-misa]
+      parameters:
+        - name: misaHandoffId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses: { "202": { $ref: "#/components/responses/MisaHandoffAccepted" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
+  /v1/admin/operational/material-planning-policies:
+    get:
+      summary: List material planning policies
+      description: Returns owner-approved material/packaging threshold and suppression policies.
+      operationId: listMaterialPlanningPoliciesV1
+      tags: [material-planning]
+      responses:
+        "200":
+          description: Material planning policies wrapped in the common envelope.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: "../../schemas/ops/material-planning-policy.schema.json" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+components:
+  requestBodies:
+    OperationalForm:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/operational-form.schema.json" }
+  schemas:
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error: { $ref: "../../schemas/common/error.schema.json" }
+  responses:
+    OperationalFormCreated:
+      description: Operational form created and wrapped in the common envelope.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../schemas/common/envelope.schema.json"
+              - type: object
+                properties:
+                  data: { $ref: "../../schemas/ops/operational-form.schema.json" }
+    OperationalFormOk:
+      description: Operational form wrapped in the common envelope.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../schemas/common/envelope.schema.json"
+              - type: object
+                properties:
+                  data: { $ref: "../../schemas/ops/operational-form.schema.json" }
+    PrintJobCreated:
+      description: Print job created and wrapped in the common envelope.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../schemas/common/envelope.schema.json"
+              - type: object
+                properties:
+                  data: { $ref: "../../schemas/ops/print-job.schema.json" }
+    PrintJobAccepted:
+      description: Print job request accepted and wrapped in the common envelope.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../schemas/common/envelope.schema.json"
+              - type: object
+                properties:
+                  data: { $ref: "../../schemas/ops/print-job.schema.json" }
+    MisaHandoffAccepted:
+      description: MISA handoff request accepted and wrapped in the common envelope.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../schemas/common/envelope.schema.json"
+              - type: object
+                properties:
+                  data: { $ref: "../../schemas/ops/misa-handoff.schema.json" }
+    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Validation, mapping, permission, evidence, or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

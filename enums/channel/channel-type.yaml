@@ -3,7 +3,7 @@ name: channel-type
 title: Channel Type
 description: Channel v1 context types for Facebook Gateway and Messenger routing.
 source_documents:
-  - docs/documents/3_tech/TECH-06 - FACEBOOK GATEWAY META LIVE & MESSENGER CHANNEL DELIVERY COMMENT-TO-MESSENGER.md
+  - docs/documents/3. tech/07-TECH-06-FACEBOOK-GATEWAY-META-LIVE-MESSENGER-CHANNEL-DELIVERY-COMMENT-TO-MESSENGER.md
 values:
   - value: CHANNEL_NOT_RESOLVED
     description: Channel context is not resolved.

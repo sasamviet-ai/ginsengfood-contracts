@@ -3,11 +3,11 @@ name: warehouse-receipt-status
 title: Warehouse Receipt Status
 description: Warehouse Receipt v1 status values. Receipt confirmed is the boundary that can create finished goods inventory ledger entries.
 source_documents:
-  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
 values:
   - value: DRAFT
     description: Draft warehouse receipt.
-    source: Operational Forms FRM-22 draft behavior.
+    source: Operational Forms OPF-11 draft behavior.
   - value: PENDING_CONFIRMATION
     description: Receipt is waiting for confirmation.
     source: PACK-01 Warehouse Receipt Confirmed boundary.

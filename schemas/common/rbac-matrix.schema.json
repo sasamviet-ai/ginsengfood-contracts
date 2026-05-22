@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/rbac-matrix.schema.json",
+  "title": "RBAC Matrix",
+  "description": "Common v1 RBAC matrix contract binding roles to action-level permissions, risk levels, guard requirements, and owner approval evidence.",
+  "$comment": "Sources: docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md and docs/documents/1. master/05-MASTER-04-RUNTIME-RESOLUTION-GUARD.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "rbac_matrix_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "matrix_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment": {
+      "type": "string",
+      "enum": [
+        "DEV",
+        "TEST",
+        "STAGING",
+        "PRODUCTION"
+      ]
+    },
+    "role_bindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "role_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role_code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "permission_codes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+            },
+            "uniqueItems": true
+          },
+          "restricted_scopes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "role_id",
+          "role_code",
+          "permission_codes"
+        ]
+      }
+    },
+    "permission_baseline": {
+      "type": "array",
+      "items": {
+        "$ref": "permission.schema.json"
+      }
+    },
+    "p0_permissions": {
+      "type": "array",
+      "description": "Permission codes that require P0 stop-point awareness, evidence, and audit.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+      },
+      "uniqueItems": true
+    },
+    "owner_approval_ref": {
+      "$ref": "owner-decision-ref.schema.json"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "evidence-ref.schema.json"
+      }
+    }
+  },
+  "required": [
+    "rbac_matrix_id",
+    "matrix_version",
+    "role_bindings"
+  ]
+}

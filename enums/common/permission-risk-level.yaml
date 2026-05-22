@@ -1,0 +1,21 @@
+version: v1
+name: permission-risk-level
+title: Permission Risk Level
+description: Foundation permission risk levels used to decide audit, evidence, guard, and separation-of-duties requirements.
+source_documents:
+  - docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md
+values:
+  - value: LOW
+    description: Low-risk permission.
+    source: TECH-01 action-level permission model.
+  - value: MEDIUM
+    description: Medium-risk permission.
+    source: TECH-01 action-level permission model.
+  - value: HIGH
+    description: High-risk permission requiring audit and guard awareness.
+    source: TECH-01 risky permission model.
+  - value: P0_CRITICAL
+    description: Critical permission affecting release, payment, recall, sale lock, customer data, public claims, or other P0 flows.
+    source: TECH-01 P0 permission and fail-gate rules.
+compatibility:
+  breaking_change: Lowering permission risk without owner decision and audit is breaking.

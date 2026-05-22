@@ -5,19 +5,24 @@ description: Provider-level index mapping ginsengfood-ops-core responsibility ar
 provider: ops-core
 source_documents:
   - docs/source-map.md
-  - MASTER-01
-  - MASTER-02
-  - PACK-01
-  - PACK-02
-  - PACK-03
-  - PACK-04
-  - TECH-02
-  - TECH-03
-  - TECH-10
+  - docs/documents/1. master/02-MASTER-01-SOURCE-OF-TRUTH.md
+  - docs/documents/1. master/03-MASTER-02-CROSS-PACK-DEPENDENCY.md
+  - docs/documents/0. appendices/01-OPERATIONAL-FORMS.md
+  - docs/documents/0. appendices/02-AUTO-GENERATED-FORM-RULES.md
+  - docs/documents/0. appendices/03-PRINTING-CODE-RULES.md
+  - docs/documents/0. appendices/04-MISA-MAPPING-RULES.md
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
+  - docs/documents/2. pack/02-PACK-02-PRODUCT-MASTER-SKU-RECIPE-ACTIVATION.md
+  - docs/documents/2. pack/03-PACK-03-DEMAND-MRP-PROCUREMENT-MATERIAL-CONTROL.md
+  - docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md
+  - docs/documents/3. tech/03-TECH-02-PRODUCT-SKU-INGREDIENT-RECIPE-FORMULA-PRODUCT-ACTIVATION.md
+  - docs/documents/3. tech/04-TECH-03-OPERATIONAL-CORE-PRODUCTION-WAREHOUSE-INVENTORY-TRACEABILITY-RECALL-SALE-LOCK.md
+  - docs/documents/3. tech/11-TECH-10-GLOBAL-SMOKE-UAT-EVIDENCE-RELEASE-GATEWAY-PRODUCTION-READINESS-CONTROL.md
 schema_roots:
   common:
     path: ../common
-    purpose: Shared envelope, audit, correlation, idempotency, evidence, source reference, money, quantity, and pagination contracts.
+    purpose: Shared envelope, audit, RBAC, auth-session, correlation, idempotency, evidence registry, P0 stop-point, release status, source reference, money, quantity, and pagination contracts.
   product:
     path: ../product
     purpose: Product Master, SKU, ingredient, recipe, formula, BOM, and activation contracts owned by ops-core.
@@ -73,10 +78,25 @@ provider_surfaces:
   - area: evidence-forms-misa
     owner_system: ops-core
     domain_schema_paths:
+      - ../common/evidence-registry.schema.json
+      - ../common/p0-stop-point.schema.json
+      - ../common/release-status-registry.schema.json
       - ../ops/operational-evidence.schema.json
       - ../ops/operational-form.schema.json
+      - ../ops/operational-form-payload.schema.json
+      - ../ops/print-payload.schema.json
+      - ../ops/print-job.schema.json
       - ../ops/misa-handoff.schema.json
+      - ../ops/misa-checkpoint.schema.json
     notes: MISA handoff records integration checkpoints and must not rewrite Operational Truth.
+  - area: material-packaging-control
+    owner_system: ops-core
+    domain_schema_paths:
+      - ../ops/material-planning-policy.schema.json
+      - ../ops/material-code-registry.schema.json
+      - ../ops/packaging-yield-policy.schema.json
+      - ../product/packaging-config.schema.json
+    notes: Material and packaging thresholds are owner-approved config and must not be hardcoded.
 compatibility:
   breaking_change: Moving ops-core ownership for product, operational truth, inventory, traceability, recall, sale lock, or MISA checkpoint contracts is breaking.
 todos:

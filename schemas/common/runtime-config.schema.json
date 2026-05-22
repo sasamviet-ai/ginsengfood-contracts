@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/runtime-config.schema.json",
+  "title": "Runtime Config",
+  "description": "Common v1 runtime configuration contract for source-backed resolver and guard configuration.",
+  "$comment": "Source: TECH-01 runtime configuration base and MASTER-04 runtime resolution/guard control. Runtime config must be source-backed, auditable, and must not hardcode business decisions.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "runtimeConfigId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "configKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "configScope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "ACTIVE",
+        "SUSPENDED",
+        "RETIRED",
+        "OWNER_REVIEW_REQUIRED"
+      ]
+    },
+    "sourceObject": {
+      "$ref": "source-ref.schema.json"
+    },
+    "ownerDecisionRef": {
+      "$ref": "owner-decision-ref.schema.json"
+    },
+    "effectiveFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "effectiveTo": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidenceRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "evidence-ref.schema.json"
+      }
+    },
+    "auditRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "audit.schema.json"
+      }
+    }
+  },
+  "required": [
+    "runtimeConfigId",
+    "configKey",
+    "configScope",
+    "status",
+    "sourceObject"
+  ]
+}

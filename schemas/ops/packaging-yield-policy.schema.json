@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/packaging-yield-policy.schema.json",
+  "title": "Packaging Yield Policy",
+  "description": "Packaging yield and print-linkage contract for packaging materials and finished goods packaging levels.",
+  "$comment": "Sources: docs/documents/0. appendices/03-PRINTING-CODE-RULES.md and docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "packaging_yield_policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sku_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "material_code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "packaging_level": {
+      "type": "string",
+      "enum": [
+        "LEVEL_1",
+        "LEVEL_2",
+        "FINISHED_GOODS"
+      ]
+    },
+    "expected_yield_rate": {
+      "type": "string",
+      "description": "Owner-approved expected yield rate represented as a string to avoid hardcoded calculation semantics."
+    },
+    "print_payload_required": {
+      "type": "boolean"
+    },
+    "print_payload_ref": {
+      "$ref": "../common/source-ref.schema.json"
+    },
+    "source_object": {
+      "$ref": "../common/source-ref.schema.json"
+    },
+    "owner_approval_ref": {
+      "$ref": "../common/owner-decision-ref.schema.json"
+    }
+  },
+  "required": [
+    "packaging_yield_policy_id",
+    "material_code",
+    "packaging_level"
+  ]
+}

@@ -1,0 +1,27 @@
+version: v1
+name: auth-session-status
+title: Auth Session Status
+description: Foundation authentication session status values for login/session/token boundaries.
+source_documents:
+  - docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md
+values:
+  - value: CREATED
+    description: Session record created but not yet active.
+    source: TECH-01 login/session boundary.
+  - value: ACTIVE
+    description: Session is active.
+    source: TECH-01 session/token boundary.
+  - value: EXPIRED
+    description: Session expired.
+    source: TECH-01 session/token boundary.
+  - value: REVOKED
+    description: Session was revoked.
+    source: TECH-01 access control and audit requirement.
+  - value: LOCKED
+    description: Session or account access is locked.
+    source: TECH-01 account lock/disable.
+  - value: FAILED_AUTHENTICATION
+    description: Authentication attempt failed and must be auditable.
+    source: TECH-01 login, logout, failed login, session audit.
+compatibility:
+  breaking_change: Treating inactive, locked, expired, revoked, or failed sessions as authorized is breaking.

@@ -1,7 +1,12 @@
 # contract-tests/fixtures
 
-Thư mục này dành cho fixtures dùng trong contract tests.
+Fixtures are source-backed v1 payloads for future provider/consumer contract tests.
 
-Người dùng chính là QA, backend và CI. Không đặt dữ liệu khách hàng thật, secret, production dump hoặc fixtures không khớp schema version vào đây.
+Rules:
 
-Ví dụ file sau này: `order-v1.fixture.json`, `inventory-v1.fixture.json`, `payment-v1.fixture.json`. Fixture phải chỉ minh họa contract và cần version rõ.
+- fixture files must be listed in `fixture-manifest.v1.yaml`;
+- each fixture must point to an example and at least one schema or event contract;
+- fixtures must not contain production data, credentials, or fields outside the referenced contract;
+- examples may be copied into fixtures, but fixtures are the contract-test inputs.
+
+The manifest is validation input today. It is not a generated Pact file and does not require a Pact broker.

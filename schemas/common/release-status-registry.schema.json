@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/release-status-registry.schema.json",
+  "title": "Release Status Registry Record",
+  "description": "Common v1 release status registry record for module/scope readiness and go-live control.",
+  "$comment": "Source: TECH-01 Release Status Registry Principle and MASTER-05/MASTER-07/TECH-10 release gates.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "releaseStatusRecordId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "module": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "$ref": "release-status-ref.schema.json#/properties/releaseStatus"
+    },
+    "dependencyStatus": {
+      "type": "string",
+      "minLength": 1
+    },
+    "p0Status": {
+      "type": "string",
+      "description": "P0 summary for the release scope. Open P0 blocks release-ready and go-live."
+    },
+    "evidencePackageId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ownerDecisionRef": {
+      "$ref": "owner-decision-ref.schema.json"
+    },
+    "auditRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "audit.schema.json"
+      }
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "releaseStatusRecordId",
+    "module",
+    "scope",
+    "status"
+  ]
+}

@@ -3,7 +3,7 @@ name: sale-lock-status
 title: Sale Lock Status
 description: Sale Lock / Stop Sale v1 status values.
 source_documents:
-  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
 values:
   - value: ACTIVE
     description: Sale lock is active and must suppress field app and consumer actions.

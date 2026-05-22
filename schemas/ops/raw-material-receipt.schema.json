@@ -3,7 +3,7 @@
   "$id": "schemas/ops/v1/raw-material-receipt.schema.json",
   "title": "Raw Material Receipt",
   "description": "Raw Material Receipt v1 contract for intake before incoming QC and raw material lot readiness.",
-  "$comment": "Sources: PACK-01 raw material intake chain and Operational Forms FRM-09. TODO: receipt status list is not fully specified.",
+  "$comment": "Sources: PACK-01 raw material intake chain and appendix OPF-01 raw material inbound assessment. TODO: receipt status list is not fully specified.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

@@ -3,8 +3,8 @@ name: inventory-movement-type
 title: Inventory Movement Type
 description: Inventory Ledger movement types for append-only stock movements.
 source_documents:
-  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
-  - docs/documents/2_pack/operational_more/DANH_MUC_PHAN_NHOM_NGUYEN_LIEU_VAT_TU_2_V1_2_CLEAN_FINAL 3(1).md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
+  - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
 values:
   - value: RAW_MATERIAL_RECEIPT
     description: Raw material receipt movement.

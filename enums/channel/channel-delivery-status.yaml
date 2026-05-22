@@ -3,7 +3,7 @@ name: channel-delivery-status
 title: Channel Delivery Status
 description: Channel v1 outbound delivery state values from TECH-06.
 source_documents:
-  - docs/documents/3_tech/TECH-06 - FACEBOOK GATEWAY META LIVE & MESSENGER CHANNEL DELIVERY COMMENT-TO-MESSENGER.md
+  - docs/documents/3. tech/07-TECH-06-FACEBOOK-GATEWAY-META-LIVE-MESSENGER-CHANNEL-DELIVERY-COMMENT-TO-MESSENGER.md
 values:
   - value: DELIVERY_NOT_STARTED
     description: Delivery has not started.

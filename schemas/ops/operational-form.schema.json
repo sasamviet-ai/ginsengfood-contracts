@@ -2,20 +2,47 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/ops/v1/operational-form.schema.json",
   "title": "Operational Form",
-  "description": "Operational Form v1 contract for FRM-01 through FRM-27. Forms must carry form code, source object, auto-generated/inherited fields, confirmation, evidence, audit, and status.",
-  "$comment": "Sources: Operational Forms pack and PHIEU TU SINH. TODO: official per-form payload schemas will be generated in later phases if source documents lock them.",
+  "description": "Operational Form v1 contract for the required OPF-01 through OPF-12 operational forms. Forms must carry form code/type, source object, generated/inherited fields, confirmation, evidence, audit, and status.",
+  "$comment": "Sources: docs/documents/0. appendices/01-OPERATIONAL-FORMS.md, 02-AUTO-GENERATED-FORM-RULES.md, and 05-MATERIAL-PACKAGING-TAXONOMY.md. Per-form payloads remain bounded by this shared form envelope.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "operational_form_id": { "type": "string", "minLength": 1, "description": "Operational form identifier." },
-    "form_code": { "type": "string", "pattern": "^FRM-[0-9]{2}$", "description": "Form code, e.g. FRM-01 through FRM-27." },
-    "form_type": { "type": "string", "description": "Human-readable form type." },
+    "form_code": { "type": "string", "pattern": "^OPF-[0-9]{2}$", "description": "Operational form code, e.g. OPF-01 through OPF-12." },
+    "form_type": {
+      "type": "string",
+      "enum": [
+        "RAW_MATERIAL_INBOUND_ASSESSMENT",
+        "PRODUCTION_ORDER",
+        "MATERIAL_ISSUE_REQUEST",
+        "MATERIAL_ISSUE_APPROVAL",
+        "WORKFORCE_CHECKIN_CHECKOUT",
+        "PREPROCESS_TRACKING",
+        "FREEZE_DRY_QC",
+        "PACKING_LEVEL_1_TRACKING",
+        "PACKING_LEVEL_2_TRACKING",
+        "FINISHED_GOODS_QC",
+        "FINISHED_GOODS_RECEIPT_ORDER",
+        "MATERIAL_ISSUE_ACCOUNTING"
+      ],
+      "description": "Operational form type. Prefer enums/ops/operational-form-type.yaml."
+    },
     "status": { "type": "string", "description": "Operational form status. Prefer enums/ops/operational-form-status.yaml." },
     "source_object": { "$ref": "../common/source-ref.schema.json" },
     "previous_form_id": { "type": "string", "minLength": 1, "description": "Previous form inherited by this form when applicable." },
+    "form_sequence": { "type": "integer", "minimum": 1, "description": "Expected sequence in the operational form chain when applicable." },
     "production_profile_id": { "type": "string", "minLength": 1, "description": "Original production profile/source profile when forms inherit from it." },
     "auto_generated_fields": { "type": "object", "additionalProperties": true, "description": "Fields auto-generated or auto-pulled by the system; not operator-entered business logic." },
     "manual_fields": { "type": "object", "additionalProperties": true, "description": "Fields that operators are allowed to enter manually when source documents allow." },
+    "allowed_actions": {
+      "type": "array",
+      "description": "Allowed form actions for the current state. Actions must be permission-checked and audit-safe.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
     "confirmations": {
       "type": "array",
       "description": "Personal confirmation block required before transitions.",
@@ -33,5 +60,5 @@
     "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
     "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
   },
-  "required": ["operational_form_id", "form_code"]
+  "required": ["operational_form_id", "form_code", "form_type"]
 }

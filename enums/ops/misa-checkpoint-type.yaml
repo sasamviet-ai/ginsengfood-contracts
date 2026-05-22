@@ -1,0 +1,24 @@
+version: v1
+name: misa-checkpoint-type
+title: MISA Checkpoint Type
+description: Accounting checkpoint types that may create or update a MISA handoff.
+source_documents:
+  - docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md
+  - docs/documents/0. appendices/04-MISA-MAPPING-RULES.md
+values:
+  - value: RAW_MATERIAL_RECEIPT_CONFIRMED
+    description: Raw material receipt is confirmed and can be evaluated for accounting handoff.
+  - value: MATERIAL_ISSUE_CONFIRMED
+    description: Material issue is confirmed.
+  - value: PRODUCTION_COMPLETION_CONFIRMED
+    description: Production completion checkpoint is confirmed.
+  - value: QC_RELEASE_CONFIRMED
+    description: QC release checkpoint is confirmed.
+  - value: FINISHED_GOODS_RECEIPT_CONFIRMED
+    description: Finished goods receipt is confirmed.
+  - value: SALE_LOCK_ACCOUNTING_CONFIRMED
+    description: Sale lock accounting checkpoint is confirmed.
+  - value: MATERIAL_ISSUE_ACCOUNTING_CONFIRMED
+    description: OPF-12 material issue accounting form is confirmed.
+compatibility:
+  breaking_change: Removing a checkpoint type used by accounting consumers is breaking.

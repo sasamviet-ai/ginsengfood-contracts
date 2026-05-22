@@ -1,15 +1,18 @@
-# compatibility
+# Compatibility
 
-Thư mục này chứa chính sách versioning và compatibility cho contract v1 giữa `ginsengfood-ops-core`, `ginsengfood-business-platform` và các consumer liên quan.
+Compatibility documents define what downstream systems may rely on when using `ginsengfood-contracts`.
 
-Nội dung trong thư mục này chỉ là contract governance: breaking change policy, deprecation policy, version matrix và consumer compatibility. Không đặt implementation workaround, migration SQL, deployment config, generated artifact hoặc business logic vào đây.
+## Documents
 
-Các tài liệu hiện có:
+- `breaking-change-policy.md`: versioning and consumer impact rules.
+- `source-traceability-policy.md`: exact source path and traceability rules for `source_documents`.
+- `consumer-provider-boundary.v1.yaml`: provider/consumer ownership boundaries.
+- `versioning-policy.v1.yaml`: v1 compatibility and release semantics.
 
-- `breaking-change-policy.md`
-- `deprecation-policy.md`
-- `api-version-matrix.md`
-- `event-version-matrix.md`
-- `consumer-compatibility-matrix.md`
+## Rules
 
-Mọi breaking change phải được review trước khi dùng trong provider hoặc consumer. Nếu tài liệu nguồn chưa đủ rõ, ghi TODO trong policy hoặc matrix thay vì tự suy diễn.
+- A contract is traceable only when every `source_documents` entry uses an exact active path from `docs/source-map.md`; `docs/source-map.md` itself is allowed only for index or manifest files.
+- Old source aliases and legacy folders are not compatibility-safe references.
+- External `/v1` consumer APIs must remain stable unless the breaking-change policy explicitly permits the change.
+- Internal/admin APIs may evolve faster, but still require source traceability and release notes.
+- Broker/topic/retry/outbox behavior is not assumed until source documents or owners define it.

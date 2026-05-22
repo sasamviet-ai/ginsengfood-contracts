@@ -1,0 +1,22 @@
+version: v1
+name: misa-sync-status
+title: MISA Sync Status
+description: Sync lifecycle status for MISA handoff.
+source_documents:
+  - docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md
+  - docs/documents/0. appendices/04-MISA-MAPPING-RULES.md
+values:
+  - value: NOT_SYNCED
+    description: Handoff has not been synced.
+  - value: SYNC_BLOCKED
+    description: Sync is blocked by missing mapping, invalid checkpoint, or owner stop condition.
+  - value: SYNC_AWAITING_REVIEW
+    description: Sync requires accounting or integration review.
+  - value: SYNC_SUCCESS
+    description: Sync succeeded.
+  - value: SYNC_ERROR
+    description: Sync failed and needs review or retry handling.
+  - value: ACCEPTED_BY_MISA
+    description: MISA accepted the handoff.
+compatibility:
+  breaking_change: Removing a sync status used by accounting consumers is breaking.

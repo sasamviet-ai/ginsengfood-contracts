@@ -3,7 +3,7 @@ name: visibility-state
 title: Visibility State
 description: Channel v1 public/private/internal visibility and redaction guard states.
 source_documents:
-  - docs/documents/3_tech/TECH-06 - FACEBOOK GATEWAY META LIVE & MESSENGER CHANNEL DELIVERY COMMENT-TO-MESSENGER.md
+  - docs/documents/3. tech/07-TECH-06-FACEBOOK-GATEWAY-META-LIVE-MESSENGER-CHANNEL-DELIVERY-COMMENT-TO-MESSENGER.md
 values:
   - value: VIEW_NOT_SELECTED
     description: Visibility view has not been selected.

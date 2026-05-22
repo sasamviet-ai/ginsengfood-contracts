@@ -7,6 +7,7 @@ These schemas are foundation contracts for API, event, and schema payloads. They
 Allowed content:
 
 - Common envelope, error, audit, actor, correlation, idempotency, evidence, source, owner decision, release status, pagination, money, quantity, and date-range references.
+- Foundation user, role, permission, RBAC matrix, auth-session, runtime-config, evidence-registry, P0 stop-point, and release-status registry records from TECH-01.
 - Shared metadata required for traceability, audit, idempotency, evidence, resolver, guard, and release flows.
 - TODO notes where the Phase 1 source documents do not define enough detail.
 

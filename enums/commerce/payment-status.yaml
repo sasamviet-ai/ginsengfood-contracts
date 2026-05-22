@@ -3,7 +3,7 @@ name: payment-status
 title: Payment Status
 description: Commerce v1 payment method, payment confirmation, and COD collection state values from TECH-04.
 source_documents:
-  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
+  - docs/documents/3. tech/05-TECH-04-COMMERCE-RUNTIME-SELLABLE-GATE-QUOTE-CART-ORDER-PAYMENT-SHIPPING.md
 values:
   - value: PAYMENT_METHOD_NOT_SELECTED
     description: Payment method has not been selected.

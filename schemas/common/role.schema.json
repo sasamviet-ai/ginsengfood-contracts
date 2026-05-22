@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/common/v1/role.schema.json",
+  "title": "Role",
+  "description": "Common v1 role contract. A role is an audited grouping of permissions and must not be used as the action enforcement point.",
+  "$comment": "Source: docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md. TECH-01 explicitly states that permission, not role name, enforces action access.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "roleId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "roleCode": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Controlled role code. Do not hardcode role names into business logic."
+    },
+    "roleName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "ACTIVE",
+        "DISABLED",
+        "RETIRED"
+      ]
+    },
+    "permissionIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Access scope for this role, when scoped access is required."
+    },
+    "ownerDecisionRef": {
+      "$ref": "owner-decision-ref.schema.json"
+    },
+    "auditRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "audit.schema.json"
+      }
+    }
+  },
+  "required": [
+    "roleId",
+    "roleCode",
+    "status"
+  ]
+}

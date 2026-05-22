@@ -3,7 +3,7 @@
   "$id": "schemas/ops/v1/qc-inspection.schema.json",
   "title": "QC Inspection",
   "description": "QC Inspection v1 contract for raw material, after-drying, and finished product QC. Moisture thresholds are below 2% PASS, 2%-4% HOLD/REVIEW, above 4% FAIL.",
-  "$comment": "Sources: PACK-01 QC threshold registry and Operational Forms FRM-17/FRM-20. TODO: full QC criteria catalog is not specified.",
+  "$comment": "Sources: PACK-01 QC threshold registry and appendix OPF-07 freeze-dry QC / OPF-10 finished goods QC. TODO: full QC criteria catalog is not specified.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

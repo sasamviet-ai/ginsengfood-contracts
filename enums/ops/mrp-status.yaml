@@ -3,7 +3,7 @@ name: mrp-status
 title: MRP Status
 description: MRP Run and MRP guard status values for formula scaling, material requirements, and procurement suppression.
 source_documents:
-  - docs/documents/2_pack/PACK-03 - DEMAND MRP FORMULA SCALING PROCUREMENT STOCK ALERT MATERIAL PACKAGING CONTROL PACK.md
+  - docs/documents/2. pack/03-PACK-03-DEMAND-MRP-PROCUREMENT-MATERIAL-CONTROL.md
 values:
   - value: PENDING
     description: MRP run has not completed.

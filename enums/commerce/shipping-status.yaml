@@ -3,7 +3,7 @@ name: shipping-status
 title: Shipping Status
 description: Commerce v1 shipping eligibility state values from TECH-04.
 source_documents:
-  - docs/documents/3_tech/TECH-04 - COMMERCE RUNTIME SELLABLE GATE QUOTE CART ORDER PAYMENT SHIPPING.md
+  - docs/documents/3. tech/05-TECH-04-COMMERCE-RUNTIME-SELLABLE-GATE-QUOTE-CART-ORDER-PAYMENT-SHIPPING.md
 values:
   - value: SHIPPING_NOT_CHECKED
     description: Shipping has not been checked.

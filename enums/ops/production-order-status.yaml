@@ -3,8 +3,8 @@ name: production-order-status
 title: Production Order Status
 description: Production Order v1 status values. Production Order must use a Production BOM Snapshot.
 source_documents:
-  - docs/documents/2_pack/PACK-01 - OPERATIONAL CORE PRODUCTION WAREHOUSE INVENTORY TRACEABILITY RECALL SALE LOCK.md
-  - docs/documents/2_pack/PACK-03 - DEMAND MRP FORMULA SCALING PROCUREMENT STOCK ALERT MATERIAL PACKAGING CONTROL PACK.md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
+  - docs/documents/2. pack/03-PACK-03-DEMAND-MRP-PROCUREMENT-MATERIAL-CONTROL.md
 values:
   - value: DRAFT
     description: Draft production order.

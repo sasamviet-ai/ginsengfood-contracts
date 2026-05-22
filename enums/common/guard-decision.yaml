@@ -3,7 +3,7 @@ name: guard-decision
 title: Guard Decision
 description: Common guard decision values used after runtime resolver output is evaluated.
 source_documents:
-  - docs/documents/1_master/MASTER-04 - RUNTIME RESOLUTION & GUARD CONTROL STANDARD.md
+  - docs/documents/1. master/05-MASTER-04-RUNTIME-RESOLUTION-GUARD.md
 values:
   - value: PASS
     description: Guard allows the action to continue.

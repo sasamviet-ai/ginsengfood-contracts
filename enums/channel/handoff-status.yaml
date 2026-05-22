@@ -3,7 +3,7 @@ name: handoff-status
 title: Handoff Status
 description: Channel v1 handoff status values for human or private Messenger handoff flows.
 source_documents:
-  - docs/documents/3_tech/TECH-06 - FACEBOOK GATEWAY META LIVE & MESSENGER CHANNEL DELIVERY COMMENT-TO-MESSENGER.md
+  - docs/documents/3. tech/07-TECH-06-FACEBOOK-GATEWAY-META-LIVE-MESSENGER-CHANNEL-DELIVERY-COMMENT-TO-MESSENGER.md
 values:
   - value: HANDOFF_NOT_REQUIRED
     description: Handoff is not required.

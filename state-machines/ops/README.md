@@ -1,7 +1,7 @@
 # state-machines/ops
 
-Thư mục này chứa state machine contract cho domain vận hành.
+Operational state-machine contracts for ops-core provider and authorized consumers.
 
-Người dùng chính là ops-core provider và business-platform consumer. Không đặt production workflow code, database transition script hoặc business rule engine vào đây.
+This folder describes contract-level states and transitions only. Do not place production workflow code, database transition scripts, or business rule engines here.
 
-Ví dụ file sau này: `qc-status-v1.md`, `batch-status-v1.md`, `recall-status-v1.md`, `sale-lock-status-v1.md`. Breaking transition change phải được review.
+Current coverage includes production order, batch, QC, warehouse receipt, recall, sale lock, operational form, and print job states.

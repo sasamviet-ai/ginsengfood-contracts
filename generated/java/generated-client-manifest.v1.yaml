@@ -1,27 +1,17 @@
 version: v1
-name: java-generated-client-manifest
-title: Java Generated Client Manifest
+language: java
 status: manifest-only
-description: Manifest for future Java generated clients. No generated client code is committed by this file.
-consumer_target: ginsengfood-business-platform
-allowed_source_contracts:
-  - ../../openapi/business-platform/*.v1.yaml
-  - ../../asyncapi/business-platform-events.v1.yaml
-  - ../../schemas/common/*.schema.json
-  - ../../schemas/commerce/*.schema.json
-  - ../../schemas/channel/*.schema.json
-  - ../../schemas/ai/*.schema.json
-  - ../../schemas/ads/*.schema.json
-  - ../../schemas/live/*.schema.json
-  - ../../schemas/ivr/*.schema.json
-disallowed_content:
-  - generated-client-code
-  - handwritten-implementation
-  - maven-or-gradle-artifact
-  - binary-build-output
-  - secrets
-  - service-logic
-compatibility:
-  breaking_change: Generated Java clients must not be committed or published until generator and compatibility policy are approved.
-todos:
-  - Choose generator, package name, Spring compatibility policy, publishing flow, and regeneration command.
+validation_command: node ../../scripts/validate-contracts.mjs
+source_documents:
+  - docs/source-map.md
+policy:
+  generate_sdk: false
+  reason: SDK generator and distribution workflow are not owner-approved.
+  allowed_now:
+    - Track OpenAPI and schema inputs.
+    - Record generation assumptions.
+    - Keep this manifest synchronized with contract validation.
+  disallowed_now:
+    - Commit generated SDK code.
+    - Publish packages.
+    - Treat generated clients as compatibility evidence before CI approval.

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/material-planning-policy.schema.json",
+  "title": "Material Planning Policy",
+  "description": "Material Planning Policy v1 contract for material/packaging group thresholds, procurement suppression, and owner-approved planning buffers.",
+  "$comment": "Source: docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md. Thresholds and buffer rates are configuration/owner-policy data and must not be hardcoded.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "material_planning_policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "material_group": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "B2",
+        "B3"
+      ]
+    },
+    "policy_code": {
+      "type": "string",
+      "enum": [
+        "A_SPECIFIC_5_BATCH_SKU",
+        "A_COMMON_20_BATCH_POOL",
+        "B1_15_BATCH_SKU",
+        "B2_15_BATCH_SKU",
+        "B3_SHARED_CONTROLLED_STOCK"
+      ]
+    },
+    "batch_threshold_count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Batch-count threshold from the owner-approved planning policy."
+    },
+    "buffer_rate": {
+      "type": "string",
+      "description": "Owner-approved planning buffer rate, represented as a string to avoid hardcoded numeric precision semantics."
+    },
+    "suppression_rule": {
+      "type": "string",
+      "description": "Procurement/purchase suppression rule when available stock plus approved incoming quantity meets or exceeds threshold."
+    },
+    "source_object": {
+      "$ref": "../common/source-ref.schema.json"
+    },
+    "owner_approval_ref": {
+      "$ref": "../common/owner-decision-ref.schema.json"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/evidence-ref.schema.json"
+      }
+    }
+  },
+  "required": [
+    "material_planning_policy_id",
+    "material_group",
+    "policy_code"
+  ]
+}

@@ -1,0 +1,16 @@
+version: v1
+name: misa-reconcile-status
+title: MISA Reconcile Status
+description: Reconciliation status after MISA sync.
+source_documents:
+  - docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md
+  - docs/documents/0. appendices/04-MISA-MAPPING-RULES.md
+values:
+  - value: RECONCILE_PENDING
+    description: Reconciliation has not completed.
+  - value: MATCHED
+    description: Reconciliation matched.
+  - value: EXCEPTION
+    description: Reconciliation found an exception.
+compatibility:
+  breaking_change: Treating EXCEPTION as matched is breaking.

@@ -3,8 +3,7 @@ namespace: VALIDATION
 title: Validation Errors
 description: Common validation errors for contract payloads.
 source_documents:
-  - docs/error-code-standard.md
-  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
+  - docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md
 codes:
   - code: VALIDATION.REQUIRED_FIELD_MISSING
     httpStatus: 400

@@ -1,0 +1,32 @@
+name: Contract validation
+
+on:
+  pull_request:
+    paths:
+      - "asyncapi/**"
+      - "compatibility/**"
+      - "contract-tests/**"
+      - "docs/**"
+      - "enums/**"
+      - "error-codes/**"
+      - "events/**"
+      - "examples/**"
+      - "generated/**"
+      - "openapi/**"
+      - "schemas/**"
+      - "scripts/**"
+      - "state-machines/**"
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  validate-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: node scripts/validate-contracts.mjs

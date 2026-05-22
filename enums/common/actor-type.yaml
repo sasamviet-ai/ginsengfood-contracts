@@ -3,7 +3,7 @@ name: actor-type
 title: Actor Type
 description: Common actor type values for audit, permission, evidence, and owner-decision records.
 source_documents:
-  - docs/documents/3_tech/TECH-01 - FOUNDATION RBAC AUDIT IDEMPOTENCY EVIDENCE REGISTRY.md
+  - docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md
 values:
   - value: HUMAN
     description: Human user or reviewer.
