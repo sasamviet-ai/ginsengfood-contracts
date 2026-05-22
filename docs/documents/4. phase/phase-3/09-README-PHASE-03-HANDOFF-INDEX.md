@@ -1,5 +1,40 @@
 # P3 - README HANDOFF INDEX
 
+## Update 2026-05-22 - Plan tiep Phase 3
+
+Dung thu muc chinh thuc: `docs/documents/4. phase/phase-3/`.
+
+Khong dung `docs/documents/4_phase/` lam source-of-truth. Neu phat hien folder nay trong repo, xem la duplicate/deprecated va khong giao dev/Codex/Copilot chay tu do.
+
+Phase 3 chua duoc goi ready/release-ready neu P2.2F chua co owner/dev lead acceptance. Buoc dau tien bat buoc la P2 Exit Gate:
+
+- Doc P2.2F smoke/evidence report.
+- Gom blocker/risk register.
+- Xac nhan khong con P0/P1/P2 blocker nghiem trong.
+- Xin owner/dev lead cho phep bat dau P3 Analysis.
+- Neu chua ro approval, ghi blocker `P3-ENTRY-BLOCKED-BY-P2-OWNER-REVIEW`.
+
+Global Gateway tiep tuc `BLOCKED` trong toan Phase 3. Khong mo Gateway, khong tu ket luan production readiness.
+
+Thu tu thuc thi tiep theo:
+
+1. `00-P3-ANALYSIS-ONLY.md`: inspect backend that, map module/API/schema/test voi TECH-04, TECH-11/12/13 va PACK-10.
+2. `01-P3-1-TECHNICAL-DESIGN-ONLY.md`: khoa contract, API/DTO/state machine/event can doi; moi API/DTO change phai bao frontend repo cap nhat.
+3. `02-P3-2A-SELLABLE-GATE-RUNTIME.md`: COM-BLG-001, Operational blocked -> Commerce blocked; Product Active khong dong nghia Sellable.
+4. `03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md`: COM-BLG-002/003, khong co QuoteSnapshot thi khong bao final price.
+5. `04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md`: COM-BLG-004, Cart/Order Draft khong phai Official Order va khong tao order_code som.
+6. `05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md`: COM-BLG-005/006, chi tao Official Order sau customer confirmation hop le.
+7. `06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.md`: COM-BLG-007/008, payment proof khong phai PAID; COD pending khong phai revenue.
+8. `07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.md`: COM-BLG-009/010/011, Verified Revenue chi tu order/payment verified; bank account khong hardcode.
+9. `08-P3-2G-SMOKE-EVIDENCE-REPORT.md`: COM-BLG-012, nop report 14 muc, evidence submitted only, owner review.
+
+Dieu kien toi thieu de chuyen tiep Phase 4:
+
+- COM-BLG-002 QuoteSnapshot boundary co evidence.
+- COM-BLG-004 Order Draft boundary co evidence.
+- Khong con P0 Commerce blocker.
+- Global Gateway van `BLOCKED`.
+
 ## Nguon Bat Buoc
 
 File nay duoc rewrite cho PHASE theo ranh gioi MASTER/PACK/TECH hien hanh.

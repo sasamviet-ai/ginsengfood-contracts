@@ -1,5 +1,47 @@
 # P4 - README HANDOFF INDEX
 
+## Update 2026-05-22 - Plan tiep Phase 4
+
+Dung thu muc chinh thuc: `docs/documents/4. phase/phase-4/`.
+
+Khong dung `docs/documents/4_phase/` lam source-of-truth. Neu phat hien folder nay trong repo, xem la duplicate/deprecated va khong giao dev/Codex/Copilot chay tu do.
+
+Phase 4 chi duoc bat dau khi Phase 3 co evidence toi thieu cho QuoteSnapshot va Order Draft boundary. Neu chua du, ghi blocker `P4-ENTRY-BLOCKED-BY-P3-COMMERCE-DEPENDENCY`.
+
+Global Gateway tiep tuc `BLOCKED` trong toan Phase 4 cho den TECH-10/global release review rieng. Phase 4 smoke pass khong dong nghia release-ready.
+
+Nguyen tac khoa:
+
+- AI chi consume Product Knowledge approved/public-safe.
+- AI chi hien thi gia cuoi tu Commerce QuoteSnapshot.
+- AI chi handoff Order Draft tu Commerce, khong tu tao order/order_code.
+- AI chi noi payment status theo runtime hop le, khong tu xac nhan PAID.
+- AI khong public private/internal data.
+- Runtime unavailable thi fail-safe.
+- Final Response Guard la chot cuoi truoc khi downstream Gateway/Live/CRM dung.
+
+Thu tu thuc thi tiep theo:
+
+1. `00-P4-ANALYSIS-ONLY.md`: chi inspect backend/runtime hien co, khong sua file.
+2. `01-P4-1-TECHNICAL-DESIGN-ONLY.md`: khoa runtime consumer contract, API/DTO/event/state neu can doi; moi API/DTO change phai bao frontend repo cap nhat.
+3. `02-P4-2A-RUNTIME-CONSUMER-CONTRACT.md`: AIA-BLG-001, khoa consumer boundary cho Product/Commerce/Payment/Shipping/Suppression.
+4. `03-P4-2B-CUSTOMER-MEMORY-CONTEXT-RESOLVER.md`: AIA-BLG-003, customer memory chi dung public/allowed runtime context.
+5. `04-P4-2C-PRODUCT-KNOWLEDGE-CONSULTATION-ORCHESTRATOR.md`: AIA-BLG-002, Product Knowledge + Claim Guard khong dung claim chua duyet.
+6. `05-P4-2D-QUOTE-ORDER-DRAFT-CONFIRMATION-CONSUMER.md`: AIA-BLG-004/005, QuoteSnapshot consumption va Order Draft handoff.
+7. `06-P4-2E-SAFETY-PUBLIC-WORDING-CLAIM-GUARD.md`: AIA-BLG-006/007, public wording, privacy, private/internal data guard.
+8. `07-P4-2F-CHANNEL-HANDOFF-MESSENGER-LIVE-CRM-BRIDGE.md`: AIA-BLG-008/009, runtime fail-safe va channel handoff boundary.
+9. `08-P4-2G-SMOKE-EVIDENCE-REPORT.md`: AIA-BLG-010, nop report 14 muc, evidence submitted only, owner review.
+
+Smoke toi thieu phai cover:
+
+- Product Knowledge chua approved bi chan.
+- Claim chua duyet bi chan.
+- Hoi gia phai route Commerce QuoteSnapshot.
+- AI khong tu order/payment.
+- Private/internal data khong public.
+- Runtime unavailable thi fail-safe.
+- Moi response phai qua Final Response Guard.
+
 ## Nguon Bat Buoc
 
 File nay duoc rewrite cho PHASE theo ranh gioi MASTER/PACK/TECH hien hanh.
