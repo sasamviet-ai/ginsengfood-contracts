@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ivr/v1/ivr-sim-channel.schema.json",
+  "title": "IVR SIM Channel",
+  "description": "Internal SIM gateway channel contract for IVR execution and admin control.",
+  "$comment": "Source: Phase 8 IVR-06.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "sim_channel_id": { "type": "string", "minLength": 1, "description": "SIM channel id." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "status": { "type": "string", "description": "SIM channel status." },
+    "enabled": { "type": "boolean", "description": "Whether channel can be selected." },
+    "disabled_reason": { "type": "string", "description": "Reason channel is disabled." },
+    "last_health_check_at": { "type": "string", "format": "date-time", "description": "Last health check time." },
+    "active_call_job_id": { "type": "string", "description": "Currently assigned call job, if any." },
+    "admin_action_id": { "type": "string", "description": "Admin action that last changed the channel." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["sim_channel_id", "version", "enabled"]
+}

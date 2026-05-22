@@ -1,0 +1,38 @@
+version: v1
+name: ivr-call-job-status
+title: IVR Call Job Status
+description: Phase 8 IVR call job lifecycle states.
+source_documents:
+  - docs/documents/4. phase/phase-8/IVR-04-order-core-to-ivr-task-contract.md
+  - docs/documents/4. phase/phase-8/IVR-05-attempt-policy-scheduler-queue.md
+  - docs/documents/4. phase/phase-8/IVR-07-result-normalization-order-core-callback.md
+values:
+  - value: TASK_RECEIVED
+    description: IVR received an Order Core confirmation task.
+  - value: ELIGIBILITY_PENDING
+    description: Eligibility and phone/contact policy are being checked.
+  - value: ELIGIBLE_QUEUED
+    description: Task is eligible and queued for customer-counted attempts.
+  - value: SKIPPED_TRUSTED_CUSTOMER
+    description: Customer trust policy allowed Order Core to skip IVR.
+  - value: BLOCKED_POLICY
+    description: Policy, suppression, opt-out, or owner block prevented IVR execution.
+  - value: BLOCKED_OPERATIONAL
+    description: Sale Lock, Recall, availability, payment issue, or other owner revalidation blocked IVR progression.
+  - value: CALLING
+    description: At least one attempt is active or pending.
+  - value: WAITING_FOR_CALLBACK
+    description: IVR has a normalized result and is waiting for Order Core callback handling.
+  - value: FINAL_SIGNAL_SENT
+    description: Final IVR signal was sent to Order Core.
+  - value: COMPLETED_BY_CORE
+    description: Order Core accepted and handled the IVR signal.
+  - value: TECHNICAL_EXCEPTION
+    description: Job is stopped or held by a technical exception.
+  - value: CAPACITY_HELD
+    description: Job is held due to IVR capacity incident.
+  - value: CANCELLED_BY_ADMIN
+    description: Authorized admin cancelled the IVR job with evidence.
+compatibility:
+  breaking_change: Allowing IVR job state to mutate order state directly is breaking.
+todos: []

@@ -1,0 +1,14 @@
+{
+  "task_id": "ivr-task-20260522-001",
+  "version": "v1",
+  "official_order_id": "order-20260522-001",
+  "program_type": "GOLDEN_HOUR",
+  "max_attempts": 2,
+  "confirmation_window_seconds": 600,
+  "official_contact_id": "contact-001",
+  "phone_masked": "+84******123",
+  "phone_validation_status": "PHONE_VALID",
+  "eligibility_decision": "ELIGIBLE_FOR_IVR",
+  "no_direct_order_update": true,
+  "not_for_quote_cart_draft": true
+}

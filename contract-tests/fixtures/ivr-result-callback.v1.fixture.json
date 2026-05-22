@@ -1,0 +1,11 @@
+{
+  "callback_id": "ivr-callback-20260522-001",
+  "version": "v1",
+  "task_id": "ivr-task-20260522-001",
+  "official_order_id": "order-20260522-001",
+  "result_status": "IVR_CONFIRMED",
+  "result_state": "NORMALIZED",
+  "requires_core_revalidation": true,
+  "input_signal_only": true,
+  "no_direct_order_update": true
+}

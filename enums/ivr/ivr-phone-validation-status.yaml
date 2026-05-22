@@ -1,0 +1,24 @@
+version: v1
+name: ivr-phone-validation-status
+title: IVR Phone Validation Status
+description: Phase 8 phone validation statuses for official contact selection and call eligibility.
+source_documents:
+  - docs/documents/4. phase/phase-8/IVR-03-eligibility-customer-trust-official-contact.md
+values:
+  - value: PHONE_VALID
+    description: Phone can be used for IVR after official contact policy passes.
+  - value: PHONE_INVALID_FORMAT
+    description: Phone format is invalid.
+  - value: PHONE_MISSING
+    description: No official phone is available.
+  - value: PHONE_NOT_OFFICIAL_CONTACT
+    description: Phone is not the official order contact.
+  - value: PHONE_OPTED_OUT
+    description: Phone/contact has opted out or is suppressed.
+  - value: PHONE_VALIDATION_INCONCLUSIVE
+    description: Validation could not prove the phone valid or invalid.
+  - value: PHONE_VALIDATION_TECHNICAL_ERROR
+    description: Validation failed technically and must not be treated as invalid phone final.
+compatibility:
+  breaking_change: Treating validation technical error as customer no-answer is breaking.
+todos: []

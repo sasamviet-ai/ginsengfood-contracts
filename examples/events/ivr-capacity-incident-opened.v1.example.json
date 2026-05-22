@@ -1,0 +1,22 @@
+{
+  "eventId": "evt-ivr-capacity-incident-opened-20260522-001",
+  "eventType": "business-platform.ivr.ivr-capacity-incident-opened.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-22T10:40:00+07:00",
+  "source": "business-platform",
+  "correlationId": "corr-ivr-20260522-007",
+  "causationId": "ivr-queue-health-20260522-001",
+  "idempotencyKey": "ivr-capacity-incident-20260522-001",
+  "data": {
+    "capacity_incident_id": "ivr-capacity-incident-20260522-001",
+    "version": "v1",
+    "status": "CAPACITY_HELD",
+    "scope": "SIM_CHANNEL",
+    "opened_at": "2026-05-22T10:40:00+07:00",
+    "affected_queue": "ivr-order-confirmation-main",
+    "affected_sim_channel_id": "sim-channel-001",
+    "hold_new_calls": true,
+    "reason": "SIM channel health check failure.",
+    "owner_review_required": true
+  }
+}

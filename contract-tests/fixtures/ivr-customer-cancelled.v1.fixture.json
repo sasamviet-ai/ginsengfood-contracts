@@ -1,0 +1,18 @@
+{
+  "eventId": "evt-ivr-customer-cancelled-20260522-001",
+  "eventType": "business-platform.ivr.ivr-customer-cancelled.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-22T10:15:00+07:00",
+  "source": "business-platform",
+  "correlationId": "corr-ivr-20260522-002",
+  "data": {
+    "ivr_call_result_id": "ivr-result-20260522-002",
+    "version": "v1",
+    "official_order_id": "order-20260522-002",
+    "final_result_status": "IVR_CUSTOMER_CANCELLED",
+    "core_order_handoff_required": true,
+    "input_signal_only": true,
+    "no_direct_order_update": true,
+    "no_payment_or_revenue_effect": true
+  }
+}

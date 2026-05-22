@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ivr/v1/ivr-technical-exception.schema.json",
+  "title": "IVR Technical Exception",
+  "description": "Technical exception contract for IVR failures that must not be counted as customer no-answer.",
+  "$comment": "Sources: Phase 8 IVR-06 and IVR-07.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "technical_exception_id": { "type": "string", "minLength": 1, "description": "Technical exception id." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "ivr_call_job_id": { "type": "string", "description": "Related call job." },
+    "ivr_call_attempt_id": { "type": "string", "description": "Related attempt." },
+    "exception_type": { "type": "string", "description": "Exception type. Prefer enums/ivr/ivr-technical-exception-type.yaml." },
+    "technical_retry_allowed": { "type": "boolean", "description": "Whether a technical retry is allowed without consuming customer attempt quota." },
+    "customer_attempt_counted": { "type": "boolean", "const": false, "description": "Invariant: technical exception does not count as customer attempt." },
+    "opened_at": { "type": "string", "format": "date-time", "description": "Exception open time." },
+    "resolved_at": { "type": "string", "format": "date-time", "description": "Exception resolution time." },
+    "reason": { "type": "string", "description": "Exception reason." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["technical_exception_id", "version", "exception_type", "customer_attempt_counted"]
+}

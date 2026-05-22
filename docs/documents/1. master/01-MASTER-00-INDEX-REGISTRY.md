@@ -516,9 +516,9 @@ Phím 1 = xác nhận đơn.
 
 Phím 0 = khách hủy / không đặt đơn.
 
-Giờ Vàng = 5 phút, 2 cuộc, cách 2 phút 30 giây.
+Giờ Vàng = 10 phút, 2 cuộc, cách 5 phút.
 
-24/7 = 15 phút, 2 cuộc, cách 7 phút 30 giây.
+24/7 = 15 phút, 3 cuộc, lịch T0/T0+5/T0+10.
 
 Rolling real-time queue required.
 
@@ -2456,7 +2456,7 @@ IVR-01 — IVR PURPOSE / NON-SCOPE / ORDER CONFIRMATION ONLYIVR-02 — INTERNAL 
 
 Trong đó các điểm bắt buộc:
 
-1 SIM = 1 outbound call at a time.Giờ Vàng = 5 phút, 2 cuộc, cách 2 phút 30 giây.24/7 = 15 phút, 2 cuộc, cách 7 phút 30 giây.Rolling real-time queue required.Batch after session calling prohibited.SIM Gateway must not update order state directly.Technical error is not customer no-answer.
+1 SIM = 1 outbound call at a time.Giờ Vàng = 10 phút, 2 cuộc, cách 5 phút.24/7 = 15 phút, 3 cuộc, lịch T0/T0+5/T0+10.Rolling real-time queue required.Batch after session calling prohibited.SIM Gateway must not update order state directly.Technical error is not customer no-answer.
 
 
 ## 50. DEV HANDOFF CHECKLIST CẤP PACK
@@ -2486,7 +2486,7 @@ Shipping là nhóm ảnh hưởng trực tiếp quote và chốt đơn.
 
 IVR là nhóm có liên quan trực tiếp tới xác nhận đơn.
 
-[ ] IVR purpose = ORDER_CONFIRMATION_ONLY[ ] Deployment model = INTERNAL_SIM_GATEWAY_SERVER[ ] 1 SIM = 1 outbound call at a time[ ] Giờ Vàng call window = 5 phút[ ] Giờ Vàng retry = 2 cuộc, cách 2 phút 30 giây[ ] 24/7 call window = 15 phút[ ] 24/7 retry = 2 cuộc, cách 7 phút 30 giây[ ] Rolling real-time queue required[ ] Batch after session calling prohibited[ ] Phím 1 = xác nhận đơn[ ] Phím 0 = khách hủy / không đặt đơn[ ] SIM Gateway không cập nhật order state trực tiếp[ ] IVR result đi qua Core Order State Machine[ ] Technical error không được tính là customer no-answer[ ] IVR không dùng cho sales / CRM / marketing / tư vấn / chăm sóc đại trà[ ] Có IVR call log evidence[ ] Có Order Core transition evidence[ ] Có IVR smoke test
+[ ] IVR purpose = ORDER_CONFIRMATION_ONLY[ ] Deployment model = INTERNAL_SIM_GATEWAY_SERVER[ ] 1 SIM = 1 outbound call at a time[ ] Giờ Vàng call window = 10 phút[ ] Giờ Vàng retry = 2 cuộc, cách 5 phút[ ] 24/7 call window = 15 phút[ ] 24/7 retry = 3 cuộc, lịch T0/T0+5/T0+10[ ] Rolling real-time queue required[ ] Batch after session calling prohibited[ ] Phím 1 = xác nhận đơn[ ] Phím 0 = khách hủy / không đặt đơn[ ] SIM Gateway không cập nhật order state trực tiếp[ ] IVR result đi qua Core Order State Machine[ ] Technical error không được tính là customer no-answer[ ] IVR không dùng cho sales / CRM / marketing / tư vấn / chăm sóc đại trà[ ] Có IVR call log evidence[ ] Có Order Core transition evidence[ ] Có IVR smoke test
 
 
 ## 54. DEV HANDOFF CHECKLIST RIÊNG CHO AI / GATEWAY / CRM
@@ -3960,7 +3960,7 @@ IVR-SMK-002
 
 Giờ Vàng call window
 
-2 cuộc trong 5 phút, cách 2 phút 30 giây
+2 cuộc trong 10 phút, cách 5 phút
 
 Call log
 
@@ -3968,7 +3968,7 @@ IVR-SMK-003
 
 24/7 call window
 
-2 cuộc trong 15 phút, cách 7 phút 30 giây
+3 cuộc trong 15 phút, lịch T0/T0+5/T0+10
 
 IVR-SMK-004
 
@@ -5319,7 +5319,7 @@ PACK-09 status:
 
 Rule khóa:
 
-IVR chỉ xác nhận đơn hàng.1 SIM = 1 active outbound call.Phím 1 = xác nhận đơn.Phím 0 = khách hủy / không đặt đơn.Giờ Vàng = 5 phút, 2 cuộc, cách 2 phút 30 giây.24/7 = 15 phút, 2 cuộc, cách 7 phút 30 giây.Rolling real-time queue required.Batch after session calling prohibited.SIM Gateway không được cập nhật order state trực tiếp.Mọi hủy/tiếp tục xử lý đơn từ IVR phải qua Core Order State Machine.Technical error is not customer no-answer.IVR không dùng cho sales, CRM, marketing, tư vấn sản phẩm hoặc chăm sóc đại trà.
+IVR chỉ xác nhận đơn hàng.1 SIM = 1 active outbound call.Phím 1 = xác nhận đơn.Phím 0 = khách hủy / không đặt đơn.Giờ Vàng = 10 phút, 2 cuộc, cách 5 phút.24/7 = 15 phút, 3 cuộc, lịch T0/T0+5/T0+10.Rolling real-time queue required.Batch after session calling prohibited.SIM Gateway không được cập nhật order state trực tiếp.Mọi hủy/tiếp tục xử lý đơn từ IVR phải qua Core Order State Machine.Technical error is not customer no-answer.IVR không dùng cho sales, CRM, marketing, tư vấn sản phẩm hoặc chăm sóc đại trà.
 
 
 ## 143. ADMIN UI FILE SEQUENCE
@@ -5436,7 +5436,7 @@ PACK-05 pass khi:
 
 PACK-09 pass khi:
 
-[ ] IVR purpose = ORDER_CONFIRMATION_ONLY.[ ] Deployment model = INTERNAL_SIM_GATEWAY_SERVER.[ ] Order Core confirmation task contract hoạt động.[ ] Rolling real-time queue hoạt động.[ ] 1 SIM = 1 active outbound call.[ ] Giờ Vàng = 5 phút, 2 cuộc, cách 2 phút 30 giây.[ ] 24/7 = 15 phút, 2 cuộc, cách 7 phút 30 giây.[ ] Phím 1 = xác nhận đơn.[ ] Phím 0 = khách hủy / không đặt đơn.[ ] Technical error không tính là customer no-answer.[ ] Batch after session calling bị chặn.[ ] SIM Gateway không cập nhật order state trực tiếp.[ ] IVR result đi qua Core Order State Machine.[ ] IVR không dùng cho sales/CRM/marketing/tư vấn/chăm sóc đại trà.[ ] IVR monitoring có evidence.[ ] IVR smoke pass.[ ] Evidence accepted.
+[ ] IVR purpose = ORDER_CONFIRMATION_ONLY.[ ] Deployment model = INTERNAL_SIM_GATEWAY_SERVER.[ ] Order Core confirmation task contract hoạt động.[ ] Rolling real-time queue hoạt động.[ ] 1 SIM = 1 active outbound call.[ ] Giờ Vàng = 10 phút, 2 cuộc, cách 5 phút.[ ] 24/7 = 15 phút, 3 cuộc, lịch T0/T0+5/T0+10.[ ] Phím 1 = xác nhận đơn.[ ] Phím 0 = khách hủy / không đặt đơn.[ ] Technical error không tính là customer no-answer.[ ] Batch after session calling bị chặn.[ ] SIM Gateway không cập nhật order state trực tiếp.[ ] IVR result đi qua Core Order State Machine.[ ] IVR không dùng cho sales/CRM/marketing/tư vấn/chăm sóc đại trà.[ ] IVR monitoring có evidence.[ ] IVR smoke pass.[ ] Evidence accepted.
 
 Nếu chưa có đầy đủ evidence:
 
@@ -5571,7 +5571,7 @@ Nếu sau này mở rộng, đi theo:
 
 Handoff IVR phải nói rõ:
 
-IVR chỉ xác nhận đơn hàng.Không dùng IVR cho sales / CRM / marketing / tư vấn / chăm sóc đại trà.Internal SIM Gateway Server là mô hình mặc định.1 SIM = 1 active outbound call.Phím 1 = xác nhận đơn.Phím 0 = khách hủy / không đặt đơn.Giờ Vàng = 5 phút, 2 cuộc, cách 2 phút 30 giây.24/7 = 15 phút, 2 cuộc, cách 7 phút 30 giây.Rolling real-time queue required.Batch after session calling prohibited.SIM Gateway không cập nhật order state trực tiếp.IVR result phải đi qua Core Order State Machine.Technical error không phải customer no-answer.
+IVR chỉ xác nhận đơn hàng.Không dùng IVR cho sales / CRM / marketing / tư vấn / chăm sóc đại trà.Internal SIM Gateway Server là mô hình mặc định.1 SIM = 1 active outbound call.Phím 1 = xác nhận đơn.Phím 0 = khách hủy / không đặt đơn.Giờ Vàng = 10 phút, 2 cuộc, cách 5 phút.24/7 = 15 phút, 3 cuộc, lịch T0/T0+5/T0+10.Rolling real-time queue required.Batch after session calling prohibited.SIM Gateway không cập nhật order state trực tiếp.IVR result phải đi qua Core Order State Machine.Technical error không phải customer no-answer.
 
 Nếu thiếu Order Core State Machine, IVR chưa được triển khai vận hành thật.
 

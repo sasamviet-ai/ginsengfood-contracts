@@ -15,12 +15,15 @@ node scripts\validate-contracts.mjs
 - Enforce OpenAPI `3.1.0`, `info.version: 1.0.0`, and `/v1` path presence.
 - Parse AsyncAPI files and keep broker/topic/retry/outbox placeholders as explicit future integration decisions.
 - Verify `docs/source-map.md` document rows point to existing files.
+- Verify Phase 8 IVR SRS files are present in `docs/source-map.md` before contracts cite them.
 - Verify all YAML `source_documents` entries use exact existing paths, not aliases.
 - Reject legacy source folder references outside `docs/documents/**`.
 - Warn on legacy placeholder marker files if any are reintroduced.
 - Check event schema and event examples include the standard event envelope fields.
 - Verify fixture manifest path targets exist.
 - Check fixture JSON includes top-level fields required by the referenced schema when the fixture shape is directly comparable.
+- Require the Phase 8 IVR contract surface to exist across enums, schemas, OpenAPI, events, AsyncAPI, state machines, examples, and fixtures.
+- Reject stale IVR wording that treats all programs as a two-attempt policy or references the old Phase 7 IVR handoff.
 
 ## Required Local Gate
 

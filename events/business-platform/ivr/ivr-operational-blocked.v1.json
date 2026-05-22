@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/business-platform/ivr/ivr-operational-blocked.v1.json",
+  "title": "Ivr Operational Blocked Event v1",
+  "description": "Published when IVR progression is blocked by Order Core revalidation, Sale Lock, Recall, suppression, opt-out, payment issue, or owner policy.",
+  "$comment": "Sources: PACK-09, TECH-09, and Phase 8 IVR-02/IVR-07.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": { "type": "string", "minLength": 1 },
+    "eventType": { "type": "string", "const": "business-platform.ivr.ivr-operational-blocked.v1" },
+    "eventVersion": { "type": "string", "const": "1.0" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "source": { "type": "string", "const": "business-platform" },
+    "correlationId": { "type": "string", "minLength": 1 },
+    "causationId": { "type": "string", "minLength": 1 },
+    "idempotencyKey": { "type": "string", "minLength": 1 },
+    "data": {
+      "allOf": [
+        { "$ref": "../../../schemas/ivr/ivr-call-result.schema.json" },
+        {
+          "type": "object",
+          "required": ["ivr_call_result_id", "version", "official_order_id", "final_result_status", "input_signal_only", "no_direct_order_update"],
+          "properties": {
+            "final_result_status": { "const": "IVR_OPERATIONAL_BLOCKED" },
+            "input_signal_only": { "const": true },
+            "no_direct_order_update": { "const": true }
+          }
+        }
+      ]
+    }
+  },
+  "required": ["eventId", "eventType", "eventVersion", "occurredAt", "source", "correlationId", "data"]
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ivr/v1/ivr-phone-validation.schema.json",
+  "title": "IVR Phone Validation",
+  "description": "Phone validation contract for official contact selection before IVR calls.",
+  "$comment": "Source: Phase 8 IVR-03.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "phone_validation_id": { "type": "string", "minLength": 1, "description": "Phone validation id." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "official_contact_id": { "type": "string", "description": "Official contact id." },
+    "phone_ref": { "type": "string", "description": "Reference to phone value." },
+    "phone_masked": { "type": "string", "description": "Masked phone value." },
+    "status": { "type": "string", "description": "Validation status. Prefer enums/ivr/ivr-phone-validation-status.yaml." },
+    "validation_reason": { "type": "string", "description": "Reason for validation decision." },
+    "validated_at": { "type": "string", "format": "date-time", "description": "Validation time." },
+    "policy_version": { "type": "string", "description": "Validation policy version." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["phone_validation_id", "version", "status"]
+}

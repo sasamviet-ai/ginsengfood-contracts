@@ -1,0 +1,25 @@
+version: v1
+name: ivr-admin-permission
+title: IVR Admin Permission
+description: Phase 8 admin permission keys for queue, SIM, retry, and review actions.
+source_documents:
+  - docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md
+  - docs/documents/4. phase/phase-8/IVR-08-admin-monitoring-evidence-audit-privacy.md
+values:
+  - value: IVR_QUEUE_VIEW
+    description: View IVR queue and job status.
+  - value: IVR_QUEUE_PAUSE
+    description: Pause IVR queue with evidence.
+  - value: IVR_QUEUE_RESUME
+    description: Resume IVR queue with evidence.
+  - value: IVR_SIM_DISABLE
+    description: Disable a SIM channel with evidence.
+  - value: IVR_SIM_ENABLE
+    description: Enable a SIM channel after review.
+  - value: IVR_MANUAL_RETRY
+    description: Trigger a manual technical retry that does not bypass customer attempt policy.
+  - value: IVR_RESULT_REVIEW
+    description: Review or annotate a normalized IVR result.
+compatibility:
+  breaking_change: Allowing admin action without permission, audit, and evidence is breaking.
+todos: []

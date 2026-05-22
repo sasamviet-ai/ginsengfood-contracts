@@ -2513,7 +2513,7 @@ Locked scope
 
 IVR locked rules
 
-IVR chỉ xác nhận đơn hàng.Internal SIM Gateway Server là mô hình mặc định.1 SIM = 1 active outbound call.Phím 1 = xác nhận đơn.Phím 0 = khách hủy / không đặt đơn.Giờ Vàng = 5 phút, 2 cuộc, cách 2 phút 30 giây.24/7 = 15 phút, 2 cuộc, cách 7 phút 30 giây.Rolling real-time queue required.Batch after session calling prohibited.SIM Gateway không được cập nhật order state trực tiếp.Mọi hủy/tiếp tục xử lý đơn từ IVR phải qua Core Order State Machine.Technical error is not customer no-answer.IVR không dùng cho sales, CRM, marketing, tư vấn sản phẩm hoặc chăm sóc đại trà.
+IVR chỉ xác nhận đơn hàng.Internal SIM Gateway Server là mô hình mặc định.1 SIM = 1 active outbound call.Phím 1 = xác nhận đơn.Phím 0 = khách hủy / không đặt đơn.Giờ Vàng = 10 phút, 2 cuộc, cách 5 phút.24/7 = 15 phút, 3 cuộc, lịch T0/T0+5/T0+10.Rolling real-time queue required.Batch after session calling prohibited.SIM Gateway không được cập nhật order state trực tiếp.Mọi hủy/tiếp tục xử lý đơn từ IVR phải qua Core Order State Machine.Technical error is not customer no-answer.IVR không dùng cho sales, CRM, marketing, tư vấn sản phẩm hoặc chăm sóc đại trà.
 
 Monitoring.
 

@@ -5,32 +5,27 @@ description: IVR v1 technical exception categories for failures that must not be
 source_documents:
   - docs/documents/2. pack/09-PACK-09-IVR-ORDER-CONFIRMATION.md
   - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
+  - docs/documents/4. phase/phase-8/IVR-06-internal-sim-gateway-adapter.md
+  - docs/documents/4. phase/phase-8/IVR-07-result-normalization-order-core-callback.md
 values:
   - value: IVR_TECHNICAL_EXCEPTION
     description: Generic IVR technical exception.
   - value: IVR_CAPACITY_EXCEPTION
     description: Capacity exception.
-  - value: TECHNICAL_FAILURE
-    description: Generic technical failure outcome.
+  - value: SIM_GATEWAY_ERROR
+    description: Internal SIM gateway adapter error.
+  - value: SIM_CHANNEL_FAILURE
+    description: SIM channel cannot be reserved, dialed, or kept healthy.
   - value: PROVIDER_FAILURE
-    description: Provider failure outcome.
-  - value: SIM_GATEWAY_FAILURE
-    description: SIM gateway failure.
-  - value: SERVER_ERROR
-    description: Server error.
-  - value: DTMF_CAPTURE_ERROR
-    description: DTMF capture error.
-  - value: AUDIO_PLAYBACK_ERROR
-    description: Audio playback error.
-  - value: SCHEDULER_ERROR
-    description: Scheduler error.
-  - value: CALLBACK_ERROR
-    description: Callback error.
-  - value: ATTEMPT_POLICY_UNAVAILABLE
-    description: Attempt Policy Resolver unavailable.
-  - value: PRIVACY_POLICY_UNAVAILABLE
-    description: Privacy Policy unavailable.
+    description: Telephony provider or low-level call failure.
+  - value: INTERNAL_CALLBACK_ERROR
+    description: Result callback could not be delivered or accepted by Order Core for technical reasons.
+  - value: EVIDENCE_WRITE_ERROR
+    description: Evidence or audit record could not be stored.
+  - value: PHONE_VALIDATION_TECHNICAL_ERROR
+    description: Phone validation service failed without proving the phone invalid.
+  - value: POLICY_SOURCE_UNAVAILABLE
+    description: Required policy or revalidation source was unavailable.
 compatibility:
-  breaking_change: Hiding technical exception or converting it to customer no-answer is breaking.
-todos:
-  - Source docs list technical failure categories in prose; confirm whether these should stay one enum or split by provider/system.
+  breaking_change: Treating these exception types as customer no-answer or customer cancellation is breaking.
+todos: []

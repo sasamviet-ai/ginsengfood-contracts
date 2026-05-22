@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/business-platform/ivr/ivr-capacity-incident-opened.v1.json",
+  "title": "Ivr Capacity Incident Opened Event v1",
+  "description": "Published when IVR opens a queue, SIM channel, or adapter capacity incident.",
+  "$comment": "Sources: Phase 8 IVR-05 and IVR-06.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": { "type": "string", "minLength": 1 },
+    "eventType": { "type": "string", "const": "business-platform.ivr.ivr-capacity-incident-opened.v1" },
+    "eventVersion": { "type": "string", "const": "1.0" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "source": { "type": "string", "const": "business-platform" },
+    "correlationId": { "type": "string", "minLength": 1 },
+    "causationId": { "type": "string", "minLength": 1 },
+    "idempotencyKey": { "type": "string", "minLength": 1 },
+    "data": { "$ref": "../../../schemas/ivr/ivr-capacity-incident.schema.json" }
+  },
+  "required": ["eventId", "eventType", "eventVersion", "occurredAt", "source", "correlationId", "data"]
+}

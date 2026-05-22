@@ -1,0 +1,14 @@
+{
+  "admin_action_id": "ivr-admin-action-sim-disable-20260522-001",
+  "version": "v1",
+  "action_type": "SIM_DISABLE",
+  "permission": "IVR_SIM_DISABLE",
+  "actor_id": "admin-001",
+  "target_type": "SIM_CHANNEL",
+  "target_id": "sim-channel-001",
+  "reason": "Health check failed during IVR smoke test.",
+  "no_policy_bypass": true,
+  "idempotency": {
+    "idempotencyKey": "ivr-admin-sim-disable-20260522-001"
+  }
+}

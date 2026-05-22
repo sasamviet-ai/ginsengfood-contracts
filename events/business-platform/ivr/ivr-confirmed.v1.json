@@ -3,7 +3,7 @@
   "$id": "events/business-platform/ivr/ivr-confirmed.v1.json",
   "title": "Ivr Confirmed Event v1",
   "description": "Published when IVR result is confirmed by the customer. It is an input signal only and must pass Core Order State Machine.",
-  "$comment": "Sources: PACK-09 IVR_CONFIRMED; TECH-09 Core Order State Machine control.",
+  "$comment": "Sources: PACK-09, TECH-09, and Phase 8 IVR-07. Order Core must revalidate before any order confirmation.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

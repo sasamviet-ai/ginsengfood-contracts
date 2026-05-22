@@ -1,10 +1,10 @@
 # Contract Generation Review
 
-Review date: 2026-05-21
+Review date: 2026-05-22
 
 ## Baseline Closure
 
-The current contract pass is aligned to the refreshed source tree in `docs/documents/0. appendices`, `docs/documents/1. master`, `docs/documents/2. pack`, and `docs/documents/3. tech`.
+The current contract pass is aligned to the refreshed source tree in `docs/documents/0. appendices`, `docs/documents/1. master`, `docs/documents/2. pack`, `docs/documents/3. tech`, and the Phase 8 IVR SRS set in `docs/documents/4. phase/phase-8`.
 
 Current baseline gates:
 
@@ -13,6 +13,7 @@ Current baseline gates:
 - Old form-code references are removed from generated contract metadata.
 - Legacy placeholder marker files under contract areas have been deleted.
 - `TECH-13` is treated as `needs-review` handoff/report source, not as a runtime contract source.
+- Phase 8 IVR SRS files are source-map governed inputs for IVR contract extraction.
 
 ## Phase Coverage
 
@@ -24,6 +25,7 @@ Current baseline gates:
 | Phase 3 API/event/state alignment | in progress | Ops admin OpenAPI and core state/event surfaces exist. AsyncAPI broker/topic/retry/outbox must remain explicit future integration until owner-approved. |
 | Phase 4 examples/fixtures/tests | in progress | Examples and fixture manifest should track only stable schema fields. Validator checks paths and basic required fields. |
 | Phase 5 release readiness | in progress | CI command and release checklist are defined; generated-client manifests stay policy-only until SDK tooling is approved. |
+| Phase 8 IVR contract pass | in progress | IVR SRS has been extracted into v1 enum/schema/API/event/state/example/fixture contracts while preserving Order Core ownership of order state transitions. |
 
 ## Residual Owner Decisions
 
@@ -33,6 +35,7 @@ Current baseline gates:
 - Some domain taxonomies may need narrower owner-approved enumerations after operational rollout.
 - OpenAPI local component expansion can be deepened after route ownership is approved.
 - Order-paid and accounting handoff payload split remains a provider/consumer decision and should not be inferred from examples alone.
+- Phase 8 real-customer-call release remains blocked until IVR smoke, evidence, privacy, admin review, and production release gates pass.
 
 ## Merge Recommendation
 

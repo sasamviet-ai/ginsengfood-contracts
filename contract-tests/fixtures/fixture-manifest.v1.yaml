@@ -21,6 +21,12 @@ source_documents:
   - docs/documents/3. tech/08-TECH-07-ADS-MEASUREMENT-ATTRIBUTION-ROAS-CPA-AOV-VERIFIED-REVENUE-SCALE-GATE.md
   - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
   - docs/documents/3. tech/11-TECH-10-GLOBAL-SMOKE-UAT-EVIDENCE-RELEASE-GATEWAY-PRODUCTION-READINESS-CONTROL.md
+  - docs/documents/4. phase/phase-8/IVR-03-eligibility-customer-trust-official-contact.md
+  - docs/documents/4. phase/phase-8/IVR-04-order-core-to-ivr-task-contract.md
+  - docs/documents/4. phase/phase-8/IVR-05-attempt-policy-scheduler-queue.md
+  - docs/documents/4. phase/phase-8/IVR-07-result-normalization-order-core-callback.md
+  - docs/documents/4. phase/phase-8/IVR-08-admin-monitoring-evidence-audit-privacy.md
+  - docs/documents/4. phase/phase-8/IVR-09-test-matrix-smoke-release-gate.md
 fixtures:
   - file: availability-check.v1.fixture.json
     contract_area: availability
@@ -118,6 +124,68 @@ fixtures:
     source_example: ../../examples/events/ivr-confirmed.v1.example.json
     validates_against:
       - ../../events/business-platform/ivr/ivr-confirmed.v1.json
+  - file: ivr-confirmation-task.v1.fixture.json
+    contract_area: ivr
+    provider: business-platform
+    consumers:
+      - ivr-adapter
+      - order-runtime
+    source_example: ../../examples/api/ivr-confirmation-task.request.json
+    validates_against:
+      - ../../schemas/ivr/ivr-confirmation-task.schema.json
+  - file: ivr-result-callback.v1.fixture.json
+    contract_area: ivr
+    provider: business-platform
+    consumers:
+      - order-runtime
+    source_example: ../../examples/api/ivr-result-callback.request.json
+    validates_against:
+      - ../../schemas/ivr/ivr-result-callback.schema.json
+  - file: ivr-customer-cancelled.v1.fixture.json
+    contract_area: ivr
+    provider: business-platform
+    consumers:
+      - order-runtime
+    source_example: ../../examples/events/ivr-customer-cancelled.v1.example.json
+    validates_against:
+      - ../../events/business-platform/ivr/ivr-customer-cancelled.v1.json
+      - ../../schemas/ivr/ivr-call-result.schema.json
+  - file: ivr-no-answer-final.v1.fixture.json
+    contract_area: ivr
+    provider: business-platform
+    consumers:
+      - order-runtime
+    source_example: ../../examples/events/ivr-no-answer-final.v1.example.json
+    validates_against:
+      - ../../events/business-platform/ivr/ivr-no-answer-final.v1.json
+      - ../../schemas/ivr/ivr-call-result.schema.json
+  - file: ivr-invalid-phone-final.v1.fixture.json
+    contract_area: ivr
+    provider: business-platform
+    consumers:
+      - order-runtime
+    source_example: ../../examples/events/ivr-invalid-phone-final.v1.example.json
+    validates_against:
+      - ../../events/business-platform/ivr/ivr-invalid-phone-final.v1.json
+      - ../../schemas/ivr/ivr-call-result.schema.json
+  - file: ivr-technical-exception.v1.fixture.json
+    contract_area: ivr
+    provider: business-platform
+    consumers:
+      - order-runtime
+      - ivr-adapter
+    source_example: ../../examples/events/ivr-technical-exception.v1.example.json
+    validates_against:
+      - ../../events/business-platform/ivr/ivr-technical-exception.v1.json
+      - ../../schemas/ivr/ivr-technical-exception.schema.json
+  - file: ivr-admin-queue-pause.v1.fixture.json
+    contract_area: ivr
+    provider: business-platform
+    consumers:
+      - admin-web
+    source_example: ../../examples/api/ivr-admin-queue-pause.request.json
+    validates_against:
+      - ../../schemas/ivr/ivr-admin-action.schema.json
 compatibility:
   breaking_change: Changing fixture fields without changing the underlying v1 schema or event contract is not allowed.
 owner_decisions:

@@ -1,0 +1,21 @@
+{
+  "eventId": "evt-ivr-technical-exception-20260522-001",
+  "eventType": "business-platform.ivr.ivr-technical-exception.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-22T10:30:00+07:00",
+  "source": "business-platform",
+  "correlationId": "corr-ivr-20260522-005",
+  "causationId": "ivr-call-attempt-20260522-005",
+  "idempotencyKey": "ivr-technical-exception-20260522-001",
+  "data": {
+    "technical_exception_id": "ivr-tech-exception-20260522-001",
+    "version": "v1",
+    "ivr_call_job_id": "ivr-call-job-20260522-005",
+    "ivr_call_attempt_id": "ivr-call-attempt-20260522-005",
+    "exception_type": "SIM_GATEWAY_ERROR",
+    "technical_retry_allowed": true,
+    "customer_attempt_counted": false,
+    "opened_at": "2026-05-22T10:30:00+07:00",
+    "reason": "SIM gateway did not return a call disposition."
+  }
+}

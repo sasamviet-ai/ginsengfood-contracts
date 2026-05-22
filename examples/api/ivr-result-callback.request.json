@@ -1,0 +1,19 @@
+{
+  "callback_id": "ivr-callback-20260522-001",
+  "version": "v1",
+  "task_id": "ivr-task-20260522-001",
+  "ivr_call_job_id": "ivr-call-job-20260522-001",
+  "ivr_call_result_id": "ivr-result-20260522-001",
+  "official_order_id": "order-20260522-001",
+  "order_version_seen_by_ivr": "order-version-17",
+  "result_status": "IVR_CONFIRMED",
+  "result_state": "NORMALIZED",
+  "dtmf_key": "1",
+  "is_counted_customer_attempt": true,
+  "requires_core_revalidation": true,
+  "input_signal_only": true,
+  "no_direct_order_update": true,
+  "idempotency": {
+    "idempotencyKey": "ivr-callback-order-20260522-001"
+  }
+}

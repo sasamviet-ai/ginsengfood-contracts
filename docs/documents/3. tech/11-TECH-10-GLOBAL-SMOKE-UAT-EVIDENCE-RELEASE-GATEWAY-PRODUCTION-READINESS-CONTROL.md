@@ -7418,7 +7418,7 @@ Khách trusted không gọi đại trà.
 
 Invalid phone/no answer/customer cancel/technical failure tách rõ.
 
-## MAX_ATTEMPT_PER_ORDER = 2.
+## MAX_ATTEMPT_PER_ORDER = PROGRAM_BASED: Golden Hour 2 attempts / 10 ph?t; 24/7 3 attempts / 15 ph?t.
 
 IVR không tự hủy/tự nhắn.
 

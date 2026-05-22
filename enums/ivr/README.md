@@ -1,18 +1,13 @@
-# enums/ivr
+# IVR Enums
 
-## Phase 3 contract scope
+This folder contains v1 enum contracts for Phase 8 IVR order confirmation.
 
-This folder contains IVR v1 enums for result status, program type, call attempt status, and technical exception type.
+Source-backed boundaries:
 
-Enums are contract values only. They are not telephony implementation, provider mappings, database seeds, service logic, or business logic.
+- Golden Hour uses 2 customer-counted attempts in 10 minutes: `T0`, `T0 + 5`.
+- 24/7 uses 3 customer-counted attempts in 15 minutes: `T0`, `T0 + 5`, `T0 + 10`.
+- Technical retry is separate from customer no-answer attempts.
+- IVR result is an input signal only; Order Core owns order state transitions.
+- Sale Lock, Recall, Suppression, opt-out, and policy blocks override IVR confirmation.
 
-Compatibility: converting technical/capacity/provider failures, invalid phone, busy, rejected, or unreachable into no-answer without locked policy is breaking.
-
-TODO:
-- Reconcile PACK-09 program-based attempt values with TECH-09 V1.0 baseline MAX_ATTEMPT_PER_ORDER = 2 before Phase 7 state machines.
-
-Thư mục này chứa enum chuẩn cho IVR.
-
-Không đặt telephony provider config, routing code hoặc audio asset vào đây. Enum chỉ phục vụ contract giữa producer và consumer.
-
-Ví dụ file sau này: `call-status-v1.md`, `call-result-status-v1.md`, `call-cancellation-reason-v1.md`. Enum phải versioned và breaking change phải review.
+Compatibility rule: do not remove existing v1 values. When a clearer Phase 8 value is added, older values remain legacy-compatible aliases until a breaking-change review is approved.

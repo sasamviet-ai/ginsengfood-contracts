@@ -1,9 +1,11 @@
 version: v1
 name: ivr-call-attempt-status
 title: IVR Call Attempt Status
-description: IVR v1 call attempt state values from TECH-09.
+description: IVR v1 call attempt state values from TECH-09 and Phase 8 SRS.
 source_documents:
   - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
+  - docs/documents/4. phase/phase-8/IVR-05-attempt-policy-scheduler-queue.md
+  - docs/documents/4. phase/phase-8/IVR-06-internal-sim-gateway-adapter.md
 values:
   - value: ATTEMPT_NOT_CREATED
     description: Attempt has not been created.
@@ -13,12 +15,49 @@ values:
     description: Attempt is ready.
   - value: ATTEMPT_CREATED
     description: Attempt was created.
+  - value: ATTEMPT_PLANNED
+    description: Attempt has been scheduled but not prechecked.
+  - value: ATTEMPT_PRECHECK_PENDING
+    description: Attempt is waiting for just-in-time eligibility and policy precheck.
+  - value: SIM_RESERVED
+    description: SIM channel is reserved for this attempt.
   - value: ATTEMPT_DISPATCHED
-    description: Attempt was dispatched.
+    description: Attempt was dispatched to the SIM gateway.
+  - value: DIALING
+    description: Adapter is dialing the official contact.
   - value: ATTEMPT_RINGING
     description: Attempt is ringing.
+  - value: RINGING
+    description: Canonical Phase 8 ringing state.
+    alias_of: ATTEMPT_RINGING
   - value: ATTEMPT_CONNECTED
     description: Attempt connected.
+  - value: ANSWERED
+    description: Customer answered the call.
+  - value: DTMF_WAITING
+    description: IVR script is waiting for a valid DTMF key.
+  - value: DTMF_1_CONFIRMED
+    description: Customer pressed key 1 to confirm.
+  - value: DTMF_0_CANCELLED
+    description: Customer pressed key 0 to cancel.
+  - value: DTMF_INVALID
+    description: Customer pressed an unsupported key.
+  - value: DTMF_TIMEOUT
+    description: Customer did not provide a valid key within the script timeout.
+  - value: NO_ANSWER
+    description: Customer did not answer in a customer-counted attempt.
+  - value: CUSTOMER_REJECTED
+    description: Customer rejected the call.
+  - value: UNREACHABLE
+    description: Contact was unreachable.
+  - value: CALL_DROPPED
+    description: Call dropped after connection.
+  - value: SIM_FAILURE
+    description: SIM channel failed before a customer-counted outcome.
+  - value: CALL_TECHNICAL_FAILURE
+    description: Technical failure that must not count as no-answer.
+  - value: ATTEMPT_BLOCKED
+    description: Attempt was blocked by policy, capacity, Sale Lock, Recall, suppression, opt-out, or revalidation.
   - value: ATTEMPT_COMPLETED
     description: Attempt completed.
   - value: ATTEMPT_FAILED_TECHNICAL

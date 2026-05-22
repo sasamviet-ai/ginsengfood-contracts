@@ -1,0 +1,18 @@
+{
+  "eventId": "evt-ivr-invalid-phone-final-20260522-001",
+  "eventType": "business-platform.ivr.ivr-invalid-phone-final.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-22T10:25:00+07:00",
+  "source": "business-platform",
+  "correlationId": "corr-ivr-20260522-004",
+  "data": {
+    "ivr_call_result_id": "ivr-result-20260522-004",
+    "version": "v1",
+    "official_order_id": "order-20260522-004",
+    "final_result_status": "INVALID_PHONE_FINAL",
+    "core_order_handoff_required": true,
+    "input_signal_only": true,
+    "no_direct_order_update": true,
+    "no_payment_or_revenue_effect": true
+  }
+}

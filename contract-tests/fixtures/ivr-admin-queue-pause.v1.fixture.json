@@ -1,0 +1,10 @@
+{
+  "admin_action_id": "ivr-admin-action-queue-pause-20260522-001",
+  "version": "v1",
+  "action_type": "QUEUE_PAUSE",
+  "permission": "IVR_QUEUE_PAUSE",
+  "target_type": "IVR_QUEUE",
+  "target_id": "ivr-order-confirmation-main",
+  "reason": "Capacity incident review before real customer calls.",
+  "no_policy_bypass": true
+}

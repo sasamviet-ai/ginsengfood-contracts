@@ -1,0 +1,28 @@
+version: v1
+name: ivr-result-state
+title: IVR Result State
+description: Phase 8 state values for normalized IVR result handling and Order Core callback acknowledgement.
+source_documents:
+  - docs/documents/4. phase/phase-8/IVR-07-result-normalization-order-core-callback.md
+values:
+  - value: RESULT_CAPTURED
+    description: Raw SIM/DTMF outcome has been captured.
+  - value: NORMALIZATION_PENDING
+    description: IVR is mapping raw outcome to a source-backed result status.
+  - value: NORMALIZED
+    description: Result has been normalized and is ready for callback.
+  - value: CALLBACK_SENT
+    description: Result callback was sent to Order Core.
+  - value: CALLBACK_ACCEPTED
+    description: Order Core accepted the result as an input signal.
+  - value: CALLBACK_REJECTED_STALE
+    description: Order Core rejected the result because task/order version was stale.
+  - value: CALLBACK_BLOCKED_BY_CORE
+    description: Order Core revalidation blocked the signal from advancing.
+  - value: HUMAN_REVIEW_REQUIRED
+    description: Result requires admin or owner review before Order Core action.
+  - value: TECHNICAL_EXCEPTION
+    description: Result handling failed for a technical reason.
+compatibility:
+  breaking_change: Treating `CALLBACK_SENT` as order confirmation or cancellation is breaking.
+todos: []

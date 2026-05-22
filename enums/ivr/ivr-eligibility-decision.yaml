@@ -1,0 +1,27 @@
+version: v1
+name: ivr-eligibility-decision
+title: IVR Eligibility Decision
+description: Phase 8 decisions for whether an Official Order should enter IVR.
+source_documents:
+  - docs/documents/4. phase/phase-8/IVR-03-eligibility-customer-trust-official-contact.md
+  - docs/documents/4. phase/phase-8/IVR-04-order-core-to-ivr-task-contract.md
+values:
+  - value: ELIGIBLE_FOR_IVR
+    description: Official Order passes IVR eligibility checks and should receive an IVR task.
+  - value: SKIP_TRUSTED_CUSTOMER
+    description: Customer trust policy allows Order Core to skip IVR.
+  - value: BLOCK_QUOTE_CART_DRAFT
+    description: Quote, Cart, or Order Draft is not eligible for IVR.
+  - value: BLOCK_INVALID_PHONE
+    description: Official contact cannot pass phone validation.
+  - value: BLOCK_OPT_OUT
+    description: Customer or contact opted out or is suppressed.
+  - value: BLOCK_POLICY
+    description: A source-backed policy blocks IVR execution.
+  - value: BLOCK_OPERATIONAL
+    description: Sale Lock, Recall, availability, payment, or owner revalidation blocks IVR.
+  - value: OWNER_REVIEW_REQUIRED
+    description: Eligibility needs authorized owner/admin review.
+compatibility:
+  breaking_change: Auto-calling when decision is any `BLOCK_*` value is breaking.
+todos: []

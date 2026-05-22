@@ -1786,7 +1786,7 @@ PACK-09 chỉ được xét Release Ready khi chứng minh được:
 
 - Scheduler là DEADLINE_AWARE_ROLLING_QUEUE.
 
-- Golden Hour dùng đúng 5 phút / 2 attempts / 2 phút 30 giây.
+- Golden Hour dùng đúng 10 phút / 2 attempts / 5 phút.
 
 - 24/7 dùng đúng 15 phút / 3 attempts / T0, T0+5, T0+10.
 
@@ -3984,7 +3984,7 @@ SMK-IVR-001 | Call purpose | CALL_PURPOSE = ORDER_CONFIRMATION_ONLY
 
 SMK-IVR-002 | SIM capacity | 1 SIM = 1 ACTIVE OUTBOUND CALL
 
-SMK-IVR-003 | Golden Hour schedule | 5 phút / 2 attempts / interval 2 phút 30 giây
+SMK-IVR-003 | Golden Hour schedule | 10 phút / 2 attempts / interval 5 phút
 
 SMK-IVR-004 | 24/7 schedule | 15 phút / 3 attempts / T0, T0+5, T0+10
 

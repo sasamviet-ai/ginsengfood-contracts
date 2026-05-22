@@ -1,0 +1,18 @@
+{
+  "eventId": "evt-ivr-no-answer-final-20260522-001",
+  "eventType": "business-platform.ivr.ivr-no-answer-final.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-22T10:20:00+07:00",
+  "source": "business-platform",
+  "correlationId": "corr-ivr-20260522-003",
+  "data": {
+    "ivr_call_result_id": "ivr-result-20260522-003",
+    "version": "v1",
+    "official_order_id": "order-20260522-003",
+    "final_result_status": "IVR_NO_ANSWER_FINAL",
+    "core_order_handoff_required": true,
+    "input_signal_only": true,
+    "no_direct_order_update": true,
+    "no_payment_or_revenue_effect": true
+  }
+}

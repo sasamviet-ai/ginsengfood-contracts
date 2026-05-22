@@ -1,15 +1,27 @@
 version: v1
 name: ivr-program-type
 title: IVR Program Type
-description: IVR v1 program types mentioned by PACK-09 for order confirmation attempts.
+description: IVR v1 program types and attempt policies for order confirmation.
 source_documents:
   - docs/documents/2. pack/09-PACK-09-IVR-ORDER-CONFIRMATION.md
+  - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
+  - docs/documents/4. phase/phase-8/IVR-05-attempt-policy-scheduler-queue.md
 values:
   - value: GOLDEN_HOUR
-    description: Golden Hour order confirmation program.
+    description: Golden Hour order confirmation program; two customer-counted attempts within ten minutes at T0 and T0 plus five minutes.
+    max_customer_attempts: 2
+    confirmation_window_seconds: 600
+    scheduled_offsets_seconds:
+      - 0
+      - 300
   - value: TWENTY_FOUR_SEVEN
-    description: 24/7 order confirmation program.
+    description: 24/7 order confirmation program; three customer-counted attempts within fifteen minutes at T0, T0 plus five minutes, and T0 plus ten minutes.
+    max_customer_attempts: 3
+    confirmation_window_seconds: 900
+    scheduled_offsets_seconds:
+      - 0
+      - 300
+      - 600
 compatibility:
-  breaking_change: Changing attempt policy for a program without evidence and owner decision is breaking.
-todos:
-  - TECH-09 V1.0 locks baseline MAX_ATTEMPT_PER_ORDER = 2; reconcile program-specific attempt counts before Phase 7.
+  breaking_change: Changing attempt count, timing, or window for a program without an owner-approved policy version is breaking.
+todos: []

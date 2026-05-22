@@ -1,0 +1,21 @@
+version: v1
+name: ivr-capacity-incident-status
+title: IVR Capacity Incident Status
+description: Phase 8 status values for IVR queue, SIM channel, or adapter capacity incidents.
+source_documents:
+  - docs/documents/4. phase/phase-8/IVR-05-attempt-policy-scheduler-queue.md
+  - docs/documents/4. phase/phase-8/IVR-06-internal-sim-gateway-adapter.md
+values:
+  - value: CAPACITY_NORMAL
+    description: No active capacity incident.
+  - value: CAPACITY_DEGRADED
+    description: IVR throughput is degraded but queue can continue within policy.
+  - value: CAPACITY_HELD
+    description: Queue or SIM channel is held to prevent unsafe calls.
+  - value: CAPACITY_ESCALATED
+    description: Incident has been escalated for admin/owner review.
+  - value: CAPACITY_RESOLVED
+    description: Incident is resolved and queue can resume through approved action.
+compatibility:
+  breaking_change: Counting capacity-held jobs as customer no-answer is breaking.
+todos: []

@@ -340,7 +340,7 @@ Nguyên tắc nền:
 
 Program-based attempt rule:
 
-- GOLDEN_HOUR: MAX_ATTEMPT = 2 trong IVR_CONFIRMATION_WINDOW = 5_MINUTES.
+- GOLDEN_HOUR: MAX_ATTEMPT = 2 trong IVR_CONFIRMATION_WINDOW = 10_MINUTES.
 
 - TWENTY_FOUR_SEVEN: MAX_ATTEMPT = 3 trong IVR_CONFIRMATION_WINDOW = 15_MINUTES.
 
@@ -1070,21 +1070,29 @@ Fail-closed nghĩa là:
 
 PACK-09 gồm các file chính:
 
-- IVR-00 — IVR ORDER CONFIRMATION MASTER README.
+- IVR-00 — Governance / Source of Truth / Scope Boundary.
 
-- IVR-01 — ORDER RISK RULE / CUSTOMER TRUST / CALL ELIGIBILITY.
+- IVR-01 — Business Purpose / Confirmation Use Case.
 
-- IVR-02 — IVR CALL JOB / INTERNAL SIM GATEWAY / SCHEDULER / DTMF.
+- IVR-02 — Ownership Boundary / Connected Systems.
 
-- IVR-03 — CALL RESULT / ORDER STATE / CANCEL / RELEASE BOUNDARY.
+- IVR-03 — Eligibility Rule / Customer Trust / Official Contact.
 
-- IVR-04 — ADMIN UI / MONITORING / AUDIT / EVIDENCE.
+- IVR-04 — Order Core -> IVR Task Contract.
 
-- IVR-05 — IVR TEST MATRIX / SMOKE / SECURITY / RELEASE GATE.
+- IVR-05 — Attempt Policy / Scheduler / Queue.
+
+- IVR-06 — Internal SIM Gateway Adapter.
+
+- IVR-07 — Result Normalization / IVR -> Order Core Callback.
+
+- IVR-08 — Admin Monitoring / Evidence / Audit / Privacy.
+
+- IVR-09 — Test Matrix / Smoke / Release Gate.
 
 PACK-09 hiện là pack governance cấp cha.
 
-Các file IVR-00 -> IVR-05 là bộ tài liệu triển khai chi tiết tiếp theo, nhưng vẫn phải tuân thủ ranh giới đã khóa trong PACK-09.
+Các file IVR-00 -> IVR-09 là bộ tài liệu triển khai chi tiết tiếp theo, nhưng vẫn phải tuân thủ ranh giới đã khóa trong PACK-09.
 
 V1.1 inheritance note:
 
@@ -1154,7 +1162,7 @@ Khóa P0 MUST/MUST NOT/FAIL IF, smoke matrix, evidence, done/fail gate, release 
 
 - Fail-closed principles.
 
-- Document set IVR-00 -> IVR-05.
+- Document set IVR-00 -> IVR-09.
 
 - Cấu trúc 4 phần của PACK-09.
 
@@ -1844,7 +1852,7 @@ Program-based rule:
 
 - GOLDEN_HOUR:
 
-o | IVR_CONFIRMATION_WINDOW = 5_MINUTES
+o | IVR_CONFIRMATION_WINDOW = 10_MINUTES
 
 o | MAX_ATTEMPT = 2
 
@@ -1916,9 +1924,9 @@ Attempt interval phải theo từng program.
 
 ## GOLDEN_HOUR:
 
-- Attempt interval = 2 phút 30 giây.
+- Attempt interval = 5 phút.
 
-- Attempt 2 = T0 + 2 phút 30 giây.
+- Attempt 2 = T0 + 5 phút.
 
 - Window expires = T0 + 5 phút.
 
@@ -1968,7 +1976,7 @@ Rule Giờ Vàng:
 
 ## PROGRAM = GOLDEN_HOUR
 
-## IVR_CONFIRMATION_WINDOW = 5_MINUTES
+## IVR_CONFIRMATION_WINDOW = 10_MINUTES
 
 ## MAX_ATTEMPT = 2
 
@@ -1980,7 +1988,7 @@ T0 = thời điểm đơn cần xác nhận IVR
 
 ## ATTEMPT_1 = T0
 
-ATTEMPT_2 = T0 + 2 phút 30 giây
+ATTEMPT_2 = T0 + 5 phút
 
 WINDOW_EXPIRES = T0 + 5 phút
 
@@ -1996,7 +2004,7 @@ Cuộc 1 nghe + bấm 1 | IVR_CONFIRMED | Tiếp tục xử lý đơn qua Core O
 
 Cuộc 1 nghe + bấm 0 | IVR_CUSTOMER_CANCELLED | Core hủy đơn
 
-Cuộc 1 không nghe | ATTEMPT_1_NO_ANSWER | Gọi cuộc 2 sau 2 phút 30 giây
+Cuộc 1 không nghe | ATTEMPT_1_NO_ANSWER | Gọi cuộc 2 sau 5 phút
 
 Cuộc 1 lỗi kỹ thuật | IVR_TECHNICAL_EXCEPTION | Không tính là khách không nghe, chuyển Admin Review
 
@@ -2356,7 +2364,7 @@ Không được dồn toàn bộ cuộc gọi sau live hoặc cuối Giờ Vàng
 
 Ví dụ lỗi:
 
-- Giờ Vàng có 800 đơn cần IVR trong 5 phút.
+- Giờ Vàng có 800 đơn cần IVR trong 10 phút.
 
 - Hệ thống chỉ có 32 SIM.
 
@@ -2368,7 +2376,7 @@ Ví dụ lỗi:
 
 Đây là Fail Gate.
 
-Với 32 SIM, năng lực 5 phút chỉ khoảng 192 cuộc theo baseline bảo thủ. Nếu có 800–1.200 cuộc cần IVR trong 5 phút, hệ thống phải tạo capacity incident, không được giả lập gọi thành công.
+Với 32 SIM, năng lực 10 phút chỉ khoảng 384 cuộc theo baseline bảo thủ. Nếu có 800–1.200 cuộc cần IVR trong 10 phút, hệ thống phải tạo capacity incident, không được giả lập gọi thành công.
 
 ## 25.3. Deadline-aware nghĩa là gì
 
@@ -2410,7 +2418,7 @@ Ví dụ với Giờ Vàng:
 
 - Attempt 1 gọi ngay tại T0 nếu có SIM.
 
-- Nếu không nghe, attempt 2 được lên lịch T0 + 2 phút 30 giây.
+- Nếu không nghe, attempt 2 được lên lịch T0 + 5 phút.
 
 - Nếu hết 5 phút, window expired.
 
@@ -2796,7 +2804,7 @@ Nếu có trường hợp ngoại lệ, phải có owner-approved override, audi
 
 - ATTEMPT_INTERVAL = PROGRAM_BASED.
 
-- Giờ Vàng: 5 phút, 2 attempts, 2 phút 30 giây.
+- Giờ Vàng: 10 phút, 2 attempts, 5 phút.
 
 - 24/7: 15 phút, 3 attempts, T0 / T0 + 5 phút / T0 + 10 phút.
 
@@ -2838,7 +2846,7 @@ Phím 0 = khách không đặt hoặc muốn hủy đơn.
 
 Phím 9 hỗ trợ người thật hiện NOT_ENABLED.
 
-Giờ Vàng có confirmation window 5 phút, tối đa 2 cuộc, attempt 2 cách attempt 1 đúng 2 phút 30 giây.
+Giờ Vàng có confirmation window 10 phút, tối đa 2 cuộc, attempt 2 cách attempt 1 đúng 5 phút.
 
 24/7 có confirmation window 15 phút, tối đa 3 cuộc, lịch gọi T0 / T0 + 5 phút / T0 + 10 phút.
 
@@ -2872,11 +2880,11 @@ Phím 1 xác nhận, phím 0 hủy.
 
 Không có phím 9 trong scope hiện tại.
 
-Giờ Vàng 5 phút / 2 attempts.
+Giờ Vàng 10 phút / 2 attempts.
 
 24/7 15 phút / 3 attempts.
 
-Attempt interval theo program: Giờ Vàng cách 2 phút 30 giây; 24/7 cách 5 phút.
+Attempt interval theo program: Giờ Vàng cách 5 phút; 24/7 cách 5 phút.
 
 Confirmation window là giới hạn cứng.
 
@@ -3552,7 +3560,7 @@ Số SIM | Năng lực 5 phút
 
 Ý nghĩa:
 
-- Giờ Vàng window 5 phút rất ngắn.
+- Giờ Vàng window 10 phút rất ngắn.
 
 - 12 SIM không thể xử lý hàng trăm đơn trong 5 phút.
 
@@ -3602,7 +3610,7 @@ Số SIM | Năng lực 45 phút
 
 - Không lấy capacity 45 phút để hợp thức hóa window 5 phút.
 
-- Đơn Giờ Vàng vẫn phải theo window 5 phút của từng order.
+- Đơn Giờ Vàng vẫn phải theo window 10 phút của từng order.
 
 - Đơn 24/7 vẫn phải theo window 15 phút của từng order.
 
@@ -3858,25 +3866,23 @@ Nếu duplicate phát hiện, phải block và review.
 
 ## 37. CROSS-PACK BOUNDARY
 
-## 37.1. Với Operational Core / Core Order
+## 37.1. Với Commerce Order Core / IVR / Operational Core
 
-Operational Core / Core Order sở hữu:
+Boundary đúng:
 
-- Order State Machine.
+| Thành phần | Vai trò đúng |
+| ---------- | ------------ |
+| Commerce Order Core / Order State Machine | Sở hữu trạng thái đơn, xác nhận, hủy, hết hạn, release tiếp |
+| IVR | Nhận task, gọi khách, capture DTMF, normalize result, gửi callback |
+| Operational Core | Cung cấp sale lock, recall, availability, warehouse/traceability constraints |
 
-- Order cancellation.
+Luồng chuẩn:
 
-- Order release.
-
-- Order hold.
-
-- Order audit state.
-
-- Order state transition.
-
-- Order risk decision.
-
-- Order final action.
+1. Order Core tạo IVR confirmation task.
+2. IVR thực hiện cuộc gọi.
+3. IVR gửi result signal/callback về Order Core.
+4. Order Core revalidate toàn bộ điều kiện.
+5. Order Core quyết định transition trạng thái đơn.
 
 PACK-09 chỉ cung cấp IVR result như input signal.
 
@@ -4858,7 +4864,7 @@ Mục tiêu của phần này là khóa rõ:
 
 - Khi nào Gateway / Production / Go-live vẫn phải giữ bị chặn.
 
-- Cách handoff PACK-09 sang bộ file IVR-00 -> IVR-05.
+- Cách handoff PACK-09 sang bộ file IVR-00 -> IVR-09.
 
 ## PHẦN 4/4 không thiết kế code, API, database hoặc UI chi tiết.
 
@@ -4980,7 +4986,7 @@ Giờ Vàng:
 
 - Attempt 1 = T0.
 
-- Attempt 2 = T0 + 2 phút 30 giây.
+- Attempt 2 = T0 + 5 phút.
 
 - Window expires = T0 + 5 phút.
 
@@ -5016,7 +5022,7 @@ Giờ Vàng:
 
 ## FAIL IF
 
-- Giờ Vàng attempt 2 không ở T0 + 2 phút 30 giây.
+- Giờ Vàng attempt 2 không ở T0 + 5 phút.
 
 - Giờ Vàng có attempt 3.
 
@@ -5482,7 +5488,7 @@ Smoke phải chứng minh:
 
 - Lỗi DTMF đúng technical exception.
 
-- Giờ Vàng đúng 5 phút.
+- Giờ Vàng đúng 10 phút.
 
 - 24/7 đúng 15 phút với 3 attempts.
 
@@ -5700,7 +5706,7 @@ Hạng mục | Nội dung
 
 Smoke ID | IVR-SMK-009
 
-Mục tiêu | Kiểm tra Giờ Vàng 5 phút, 2 attempts, cách 2 phút 30 giây
+Mục tiêu | Kiểm tra Giờ Vàng 10 phút, 2 attempts, cách 5 phút
 
 Input | Order thuộc GOLDEN_HOUR
 
@@ -6184,7 +6190,7 @@ PACK-09 governance chỉ PASS khi có đủ:
 
 - Phím 9 NOT_ENABLED.
 
-- Rule Giờ Vàng 5 phút / 2 attempts.
+- Rule Giờ Vàng 10 phút / 2 attempts.
 
 - Rule 24/7 15 phút / 3 attempts.
 
@@ -6364,7 +6370,7 @@ Scheduler chỉ PASS khi:
 
 - Attempt schedule đúng theo program.
 
-- Golden Hour attempt 2 đúng T0 + 2 phút 30 giây.
+- Golden Hour attempt 2 đúng T0 + 5 phút.
 
 - 24/7 attempt 2 đúng T0 + 5 phút.
 
@@ -6546,13 +6552,13 @@ PACK-09 phải FAIL hoặc bị chặn nếu có bất kỳ điều kiện sau:
 
 - Phím 9 được bật ngoài rule.
 
-- Giờ Vàng không đúng 5 phút.
+- Giờ Vàng không đúng 10 phút.
 
 - 24/7 không đúng 15 phút.
 
 - Attempt schedule không đúng theo program.
 
-- Giờ Vàng attempt 2 không đúng T0 + 2 phút 30 giây.
+- Giờ Vàng attempt 2 không đúng T0 + 5 phút.
 
 - Giờ Vàng tạo attempt 3.
 
@@ -6636,7 +6642,7 @@ PACK-09 chỉ Release Ready khi có đủ:
 
 - Governance complete.
 
-- IVR-00 -> IVR-05 complete nếu scope yêu cầu.
+- IVR-00 -> IVR-09 complete nếu scope yêu cầu.
 
 - Implementation complete.
 
@@ -6896,9 +6902,9 @@ Khi PACK-09 chưa đủ release:
 
 Không được dùng PACK-09 documentation complete để gọi toàn hệ production ready.
 
-## 59. HANDOFF SANG IVR-00 -> IVR-05
+## 59. HANDOFF SANG IVR-00 -> IVR-09
 
-## 59.1. IVR-00 — IVR ORDER CONFIRMATION MASTER README
+## 59.1. IVR-00 — Governance / Source of Truth / Scope Boundary
 
 - PACK_09_VERSION = V1.1_CLEAN_FINAL.
 
@@ -6920,7 +6926,7 @@ Không được dùng PACK-09 documentation complete để gọi toàn hệ prod
 
 - Post-IVR cancellation notice boundary.
 
-## 59.2. IVR-01 — ORDER RISK RULE / CUSTOMER TRUST / CALL ELIGIBILITY
+## 59.2. IVR-01 — Business Purpose / Confirmation Use Case
 
 IVR-01 phải khóa:
 
@@ -6950,7 +6956,7 @@ IVR-01 phải khóa:
 
 - Post-IVR cancellation notice eligibility.
 
-## 59.3. IVR-02 — IVR CALL JOB / INTERNAL SIM GATEWAY / SCHEDULER / DTMF
+## 59.3. IVR-02 — Ownership Boundary / Connected Systems
 
 IVR-02 phải khóa:
 
@@ -6974,7 +6980,7 @@ IVR-02 phải khóa:
 
 - Capacity incident.
 
-## 59.4. IVR-03 — CALL RESULT / ORDER STATE / CANCEL / RELEASE BOUNDARY
+## 59.4. IVR-03 — Eligibility Rule / Customer Trust / Official Contact
 
 IVR-03 phải khóa:
 
@@ -7006,7 +7012,7 @@ IVR-03 phải khóa:
 
 - No-answer vs invalid-phone vs technical-exception distinction.
 
-## 59.5. IVR-04 — ADMIN UI / MONITORING / AUDIT / EVIDENCE
+## 59.5. IVR-04 — Order Core -> IVR Task Contract
 
 IVR-04 phải khóa:
 
@@ -7036,7 +7042,7 @@ IVR-04 phải khóa:
 
 - Cancellation notice delivery status nếu có.
 
-## 59.6. IVR-05 — IVR TEST MATRIX / SMOKE / SECURITY / RELEASE GATE
+## 59.6. IVR-05 — Attempt Policy / Scheduler / Queue
 
 IVR-05 phải khóa:
 
@@ -7067,6 +7073,46 @@ IVR-05 phải khóa:
 - Notification owner boundary smoke.
 
 - 24/7 three-attempt schedule smoke.
+
+## 59.7. IVR-06 — Internal SIM Gateway Adapter
+
+IVR-06 phải khóa:
+
+- Internal SIM Gateway adapter boundary.
+- SIM channel lifecycle.
+- Device/provider protocol owner decision.
+- DTMF capture handoff.
+- SIM health and disable rule.
+
+## 59.8. IVR-07 — Result Normalization / IVR -> Order Core Callback
+
+IVR-07 phải khóa:
+
+- Raw SIM result normalization.
+- Callback contract về Order Core.
+- Idempotency / correlation / evidence id.
+- No direct order update.
+- Technical exception vs customer no-answer distinction.
+
+## 59.9. IVR-08 — Admin Monitoring / Evidence / Audit / Privacy
+
+IVR-08 phải khóa:
+
+- Admin monitoring.
+- Evidence registry.
+- Audit fields.
+- Permission boundary.
+- Phone/call-log privacy.
+
+## 59.10. IVR-09 — Test Matrix / Smoke / Release Gate
+
+IVR-09 phải khóa:
+
+- Full smoke matrix.
+- Security/privacy tests.
+- Capacity tests.
+- Release evidence.
+- Owner sign-off.
 
 ## 60. PACK-09 FINAL DONE GATE
 
@@ -7174,7 +7220,7 @@ PACK-09 Release Ready chỉ được gọi khi:
 
 - IVR PASS.
 
-- IVR-00 -> IVR-05 hoàn tất theo scope.
+- IVR-00 -> IVR-09 hoàn tất theo scope.
 
 - Production SIM Gateway ready.
 
@@ -7262,7 +7308,7 @@ Phím 9 hỗ trợ người thật hiện:
 
 Giờ Vàng:
 
-5 phút / 2 attempts / attempt interval 2 phút 30 giây.
+10 phút / 2 attempts / attempt interval 5 phút.
 
 24/7:
 
@@ -7296,11 +7342,11 @@ Phím 1 xác nhận, phím 0 hủy.
 
 Phím 9 không bật trong scope hiện tại.
 
-Giờ Vàng 5 phút / 2 attempts.
+Giờ Vàng 10 phút / 2 attempts.
 
 24/7 15 phút / 3 attempts.
 
-Attempt schedule theo program: Giờ Vàng 2 phút 30 giây; 24/7 mỗi 5 phút.
+Attempt schedule theo program: Giờ Vàng mỗi 5 phút; 24/7 mỗi 5 phút.
 
 Technical error không phải khách không nghe.
 

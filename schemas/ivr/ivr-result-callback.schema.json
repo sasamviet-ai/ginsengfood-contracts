@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ivr/v1/ivr-result-callback.schema.json",
+  "title": "IVR Result Callback",
+  "description": "IVR to Order Core v1 callback contract carrying a normalized result signal.",
+  "$comment": "Source: Phase 8 IVR-07. Callback is input only; Order Core revalidates before any order transition.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "callback_id": { "type": "string", "minLength": 1, "description": "Stable callback identifier." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "task_id": { "type": "string", "description": "IVR task id." },
+    "ivr_call_job_id": { "type": "string", "description": "Call job id." },
+    "ivr_call_result_id": { "type": "string", "description": "Call result id." },
+    "official_order_id": { "type": "string", "description": "Official Order id." },
+    "order_version_seen_by_ivr": { "type": "string", "description": "Order version known to IVR." },
+    "result_status": { "type": "string", "description": "Normalized result status." },
+    "result_state": { "type": "string", "description": "Callback lifecycle state. Prefer enums/ivr/ivr-result-state.yaml." },
+    "dtmf_key": { "type": "string", "description": "DTMF key captured when relevant." },
+    "is_counted_customer_attempt": { "type": "boolean", "description": "Whether the underlying attempt consumed customer attempt quota." },
+    "technical_exception_type": { "type": "string", "description": "Technical exception type when relevant." },
+    "requires_core_revalidation": { "type": "boolean", "const": true, "description": "Invariant: Order Core revalidation is required." },
+    "input_signal_only": { "type": "boolean", "const": true, "description": "Invariant: callback is an input signal only." },
+    "no_direct_order_update": { "type": "boolean", "const": true, "description": "Invariant: IVR cannot directly mutate order state." },
+    "idempotency": { "$ref": "../common/idempotency.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["callback_id", "version", "task_id", "official_order_id", "result_status"]
+}

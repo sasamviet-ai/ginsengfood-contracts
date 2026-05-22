@@ -1,0 +1,15 @@
+{
+  "eventId": "evt-ivr-technical-exception-20260522-001",
+  "eventType": "business-platform.ivr.ivr-technical-exception.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-05-22T10:30:00+07:00",
+  "source": "business-platform",
+  "correlationId": "corr-ivr-20260522-005",
+  "data": {
+    "technical_exception_id": "ivr-tech-exception-20260522-001",
+    "version": "v1",
+    "exception_type": "SIM_GATEWAY_ERROR",
+    "customer_attempt_counted": false,
+    "technical_retry_allowed": true
+  }
+}

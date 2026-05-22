@@ -10,5 +10,6 @@ Current examples cover:
 - print job creation;
 - MISA handoff response;
 - material planning policy response.
+- IVR internal/admin task, callback, queue, and SIM actions.
 
 Examples must stay within the fields published by schemas and OpenAPI. They are not mock servers, credentials, production data, or implementation fixtures.

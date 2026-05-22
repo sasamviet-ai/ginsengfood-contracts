@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ivr/v1/ivr-capacity-incident.schema.json",
+  "title": "IVR Capacity Incident",
+  "description": "Capacity incident contract for IVR queue, SIM channel, or adapter health issues.",
+  "$comment": "Sources: Phase 8 IVR-05 and IVR-06.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "capacity_incident_id": { "type": "string", "minLength": 1, "description": "Capacity incident id." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "status": { "type": "string", "description": "Capacity incident status. Prefer enums/ivr/ivr-capacity-incident-status.yaml." },
+    "scope": { "type": "string", "description": "Queue, SIM channel, adapter, or policy scope affected." },
+    "opened_at": { "type": "string", "format": "date-time", "description": "Incident open time." },
+    "resolved_at": { "type": "string", "format": "date-time", "description": "Incident resolution time." },
+    "affected_queue": { "type": "string", "description": "Affected queue identifier." },
+    "affected_sim_channel_id": { "type": "string", "description": "Affected SIM channel id." },
+    "hold_new_calls": { "type": "boolean", "description": "Whether new calls must be held." },
+    "reason": { "type": "string", "description": "Incident reason." },
+    "owner_review_required": { "type": "boolean", "description": "Whether owner/admin review is required." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["capacity_incident_id", "version", "status"]
+}

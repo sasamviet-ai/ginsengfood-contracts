@@ -3,7 +3,7 @@
   "$id": "events/business-platform/ivr/ivr-confirmation-requested.v1.json",
   "title": "Ivr Confirmation Requested Event v1",
   "description": "Published when IVR order confirmation is requested for an eligible Official Order only. It must not run for Quote, Cart, or Order Draft.",
-  "$comment": "Sources: PACK-09 IVR Official Order only; TECH-09 IVR eligibility.",
+  "$comment": "Sources: PACK-09, TECH-09, and Phase 8 IVR-03/IVR-04. Order Core owns eligibility and task creation.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

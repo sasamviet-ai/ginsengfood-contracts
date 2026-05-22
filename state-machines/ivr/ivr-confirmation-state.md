@@ -1,35 +1,39 @@
 # IVR Confirmation State Machine v1
 
-Owner: business-platform
+Source basis: PACK-09, TECH-09, Phase 8 SRS IVR-00 through IVR-09, IVR schemas, and `enums/ivr/*`.
 
-Source basis: PACK-09, TECH-09, IVR schemas, `ivr-result-status` enum.
+This overview links the specialized state machines. It is intentionally contract-level and does not define SIM implementation details, broker topics, or runtime code.
 
-## Allowed Transitions
+## Program Policy
 
-| From | To | Guard |
-| --- | --- | --- |
-| REQUESTED | ATTEMPTING | Eligible official order is queued for IVR order confirmation. |
-| ATTEMPTING | IVR_CONFIRMED | Customer confirms the order through the IVR program. |
-| ATTEMPTING | IVR_CUSTOMER_CANCELLED | Customer cancels through the IVR program. |
-| ATTEMPTING | NO_ANSWER | Attempt receives no answer. |
-| NO_ANSWER | ATTEMPTING | Attempt policy allows another retry. |
-| NO_ANSWER | NO_ANSWER_MAX_ATTEMPT_REACHED | Attempt policy is exhausted. |
-| ATTEMPTING | INVALID_PHONE | Phone is invalid under IVR rules. |
-| ATTEMPTING | IVR_TECHNICAL_EXCEPTION | Provider, capacity, or technical exception occurs. |
-| Any final result | CORE_ORDER_HANDOFF_REQUIRED | Result is passed to the core order state machine as input signal. |
+| program | customer-counted attempts | confirmation window | planned offsets |
+|---|---:|---:|---|
+| `GOLDEN_HOUR` | 2 | 10 minutes | `T0`, `T0 + 5` |
+| `TWENTY_FOUR_SEVEN` | 3 | 15 minutes | `T0`, `T0 + 5`, `T0 + 10` |
 
-## Blocked Transitions
+Technical retries do not consume the customer-counted attempt budget.
 
-| From | To | Reason |
-| --- | --- | --- |
-| Any state | Direct order state update | IVR result is input signal only; core order state machine decides. |
-| Any state | Payment confirmed | IVR cannot mark an order as paid. |
-| Any state | Verified revenue | IVR cannot create verified revenue. |
-| Any state | Delivery completed | IVR cannot mark fulfillment or delivery as complete. |
-| IVR_TECHNICAL_EXCEPTION | Cancellation notice | Technical exception must not trigger customer cancellation notice. |
-| Quote, cart, order draft | REQUESTED | IVR applies only to eligible official orders. |
+## Machine Index
 
-## Notes
+| machine | file | purpose |
+|---|---|---|
+| CallJob | `call-job-state.md` | Tracks task intake, eligibility, queue, execution, final signal, and core acknowledgement. |
+| Attempt | `call-attempt-state.md` | Tracks scheduled attempts, precheck, SIM reservation, DTMF, no-answer, invalid phone, and technical failure. |
+| Result | `result-state.md` | Tracks raw result capture, normalization, callback, and Order Core acceptance/rejection. |
+| CapacityIncident | `capacity-incident-state.md` | Tracks queue/SIM capacity degradation, hold, escalation, and resume. |
+| TechnicalException | `technical-exception-state.md` | Tracks technical failures and approved technical retry handling. |
 
-- Invalid phone, no-answer, customer-cancelled, confirmed, and technical exception outcomes must stay distinct.
-- TODO: Source documents include program-based final no-answer names and baseline max-attempt policy; exact retry count and timing need owner confirmation.
+## Global Blocked Transitions
+
+| from | blocked transition | reason |
+|---|---|---|
+| Any IVR state | Direct order confirmation/cancellation | IVR result is input signal only; Order Core decides after revalidation. |
+| Any IVR state | Payment confirmation or verified revenue | IVR cannot confirm payment, revenue, shipping, warehouse, MISA, or ROAS. |
+| Quote, Cart, Order Draft | IVR task creation | IVR applies only to eligible Official Orders. |
+| Technical exception | Customer no-answer final | Technical failures are not customer attempts. |
+| Customer confirm signal | Force confirm despite Sale Lock/Recall/payment issue | Order Core revalidation wins over IVR signal. |
+| No-answer final | Auto notification | Notification owner can act only after Order Core decision and approved notice contract. |
+
+## Evidence And Audit
+
+Every transition that changes queue state, attempts a call, captures DTMF, pauses/resumes capacity, disables/enables SIM, performs manual retry, or sends callback must include audit/evidence references through the related schema.

@@ -3,7 +3,7 @@
   "$id": "events/business-platform/ivr/ivr-customer-cancelled.v1.json",
   "title": "Ivr Customer Cancelled Event v1",
   "description": "Published when customer cancellation is captured by IVR. It is input signal only; Core Order State Machine decides final cancellation and Notification owner sends notice only after official cancellation.",
-  "$comment": "Sources: PACK-09 IVR_CUSTOMER_CANCELLED; TECH-09 Notification Owner handoff.",
+  "$comment": "Sources: PACK-09, TECH-09, and Phase 8 IVR-07/IVR-08. Notification is owner-controlled after Order Core cancellation.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

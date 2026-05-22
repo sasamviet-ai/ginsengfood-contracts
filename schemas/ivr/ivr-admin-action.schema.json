@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ivr/v1/ivr-admin-action.schema.json",
+  "title": "IVR Admin Action",
+  "description": "Admin action contract for IVR queue, SIM channel, manual retry, and result review operations.",
+  "$comment": "Sources: TECH-01 and Phase 8 IVR-08.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "admin_action_id": { "type": "string", "minLength": 1, "description": "Admin action id." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "action_type": { "type": "string", "description": "Admin action type." },
+    "permission": { "type": "string", "description": "Required permission. Prefer enums/ivr/ivr-admin-permission.yaml." },
+    "actor_id": { "type": "string", "description": "Admin actor id." },
+    "target_type": { "type": "string", "description": "Target type such as queue, SIM channel, call job, attempt, or result." },
+    "target_id": { "type": "string", "description": "Target id." },
+    "reason": { "type": "string", "description": "Required reason for high-risk action." },
+    "no_policy_bypass": { "type": "boolean", "const": true, "description": "Invariant: admin action must not bypass Sale Lock, Recall, suppression, or owner policy." },
+    "technical_retry_not_customer_attempt": { "type": "boolean", "description": "Whether manual retry is a technical retry and not a customer-counted attempt." },
+    "idempotency": { "$ref": "../common/idempotency.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["admin_action_id", "version", "action_type", "permission", "target_type", "target_id"]
+}

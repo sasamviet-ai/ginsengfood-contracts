@@ -3,24 +3,107 @@ info:
   title: GinsengFood Business Platform IVR Order Confirmation API
   version: 1.0.0
   description: >
-    v1 contract for IVR order confirmation only. IVR call results are input
-    signals for the core order state machine and must not directly mutate
-    order, payment, shipping, revenue, warehouse, MISA, or notification state.
+    v1 internal/admin contract for IVR order confirmation. IVR call results are
+    input signals for Order Core and must not directly mutate order, payment,
+    shipping, revenue, warehouse, MISA, notification, or ROAS state. These
+    routes are not public consumer APIs.
 servers:
   - url: https://api.example.local
     description: Placeholder only.
 tags:
-  - name: IVR Order Confirmation
+  - name: IVR Order Confirmation Internal
+    description: Contract/internal boundary for Order Core and IVR adapter.
+  - name: IVR Order Confirmation Admin
+    description: Admin boundary for queue, SIM, retry, and review actions.
 paths:
+  /v1/ivr/order-confirmation/tasks:
+    post:
+      tags:
+        - IVR Order Confirmation Internal
+      summary: Accept IVR confirmation task from Order Core
+      description: >
+        Internal contract. Order Core creates tasks only for eligible Official
+        Orders. IVR must reject Quote, Cart, and Order Draft tasks and must not
+        update order state directly.
+      operationId: acceptIvrConfirmationTaskV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-confirmation-task.schema.json
+      responses:
+        "200":
+          description: Accepted IVR confirmation task.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-confirmation-task.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ivr/order-confirmation/eligibility-checks:
+    post:
+      tags:
+        - IVR Order Confirmation Internal
+      summary: Record IVR eligibility decision
+      description: >
+        Internal contract for source-backed eligibility, trusted customer skip,
+        official contact, phone validation, and policy block decisions.
+      operationId: recordIvrEligibilityDecisionV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-eligibility-decision.schema.json
+      responses:
+        "200":
+          description: IVR eligibility decision.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-eligibility-decision.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
   /v1/ivr/order-confirmation/call-jobs:
     post:
       tags:
-        - IVR Order Confirmation
+        - IVR Order Confirmation Internal
       summary: Create IVR call job
       description: >
-        Creates an IVR call job for official order confirmation only. The
-        program type must not be used for sales, CRM, payment collection, or
-        delivery operations.
+        Internal contract. Creates an IVR call job for official order
+        confirmation only. Golden Hour uses two customer-counted attempts;
+        24/7 uses three customer-counted attempts.
       operationId: createIvrCallJobV1
       requestBody:
         required: true
@@ -57,9 +140,9 @@ paths:
   /v1/ivr/order-confirmation/call-jobs/{ivrCallJobId}:
     get:
       tags:
-        - IVR Order Confirmation
+        - IVR Order Confirmation Internal
       summary: Get IVR call job
-      description: Returns IVR call job state for order confirmation.
+      description: Internal/admin read contract for IVR call job state.
       operationId: getIvrCallJobV1
       parameters:
         - name: ivrCallJobId
@@ -96,12 +179,11 @@ paths:
   /v1/ivr/order-confirmation/call-attempts:
     post:
       tags:
-        - IVR Order Confirmation
+        - IVR Order Confirmation Internal
       summary: Record IVR call attempt
       description: >
-        Records an IVR attempt, including no-answer, invalid-phone, and
-        technical exception outcomes where applicable. The attempt itself is not
-        the final order decision.
+        Internal contract. Records customer-counted attempts and separate
+        technical failures. Technical failures must not be counted as no-answer.
       operationId: createIvrCallAttemptV1
       requestBody:
         required: true
@@ -127,8 +209,6 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
         "422":
@@ -138,12 +218,12 @@ paths:
   /v1/ivr/order-confirmation/call-results:
     post:
       tags:
-        - IVR Order Confirmation
+        - IVR Order Confirmation Internal
       summary: Record IVR call result
       description: >
-        Records IVR result status for order confirmation. Result status is an
-        input signal only and cannot directly cancel an order or send a
-        cancellation notification.
+        Internal contract. Records normalized IVR result status. Result status
+        is an input signal only and cannot directly confirm, cancel, notify, or
+        release an order.
       operationId: createIvrCallResultV1
       requestBody:
         required: true
@@ -169,14 +249,303 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /v1/ivr/order-confirmation/result-callbacks:
+    post:
+      tags:
+        - IVR Order Confirmation Internal
+      summary: Send normalized IVR result callback to Order Core
+      description: >
+        Internal callback contract. Order Core revalidates Sale Lock, Recall,
+        suppression, opt-out, payment, and policy constraints before any order
+        transition. Callback acceptance is not direct order confirmation.
+      operationId: sendIvrResultCallbackV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-result-callback.schema.json
+      responses:
+        "200":
+          description: IVR result callback contract.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-result-callback.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /v1/ivr/order-confirmation/queue:
+    get:
+      tags:
+        - IVR Order Confirmation Admin
+      summary: Get IVR queue status
+      description: Admin/internal read contract for queue and capacity status.
+      operationId: getIvrQueueStatusV1
+      responses:
+        "200":
+          description: IVR queue status.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          queue_status:
+                            type: string
+                          active_call_jobs:
+                            type: integer
+                            minimum: 0
+                          capacity_incident:
+                            $ref: ../../schemas/ivr/ivr-capacity-incident.schema.json
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  "/v1/ivr/order-confirmation/queue:pause":
+    post:
+      tags:
+        - IVR Order Confirmation Admin
+      summary: Pause IVR queue
+      description: Admin boundary. Requires permission, reason, audit, and evidence. Pause must not bypass Order Core policy.
+      operationId: pauseIvrQueueV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-admin-action.schema.json
+      responses:
+        "200":
+          description: Queue pause action.
+          content:
+            application/json:
+              schema:
+                $ref: ../../schemas/common/envelope.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+  "/v1/ivr/order-confirmation/queue:resume":
+    post:
+      tags:
+        - IVR Order Confirmation Admin
+      summary: Resume IVR queue
+      description: Admin boundary. Requires resolved capacity/policy reason, audit, and evidence.
+      operationId: resumeIvrQueueV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-admin-action.schema.json
+      responses:
+        "200":
+          description: Queue resume action.
+          content:
+            application/json:
+              schema:
+                $ref: ../../schemas/common/envelope.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+  "/v1/ivr/order-confirmation/sim-channels/{simChannelId}:disable":
+    post:
+      tags:
+        - IVR Order Confirmation Admin
+      summary: Disable SIM channel
+      description: Admin boundary for disabling a SIM channel with permission, reason, audit, and evidence.
+      operationId: disableIvrSimChannelV1
+      parameters:
+        - name: simChannelId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-admin-action.schema.json
+      responses:
+        "200":
+          description: SIM channel disable action.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-sim-channel.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+  "/v1/ivr/order-confirmation/sim-channels/{simChannelId}:enable":
+    post:
+      tags:
+        - IVR Order Confirmation Admin
+      summary: Enable SIM channel
+      description: Admin boundary for enabling a SIM channel after health and owner review.
+      operationId: enableIvrSimChannelV1
+      parameters:
+        - name: simChannelId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-admin-action.schema.json
+      responses:
+        "200":
+          description: SIM channel enable action.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-sim-channel.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+  /v1/ivr/order-confirmation/technical-retries:
+    post:
+      tags:
+        - IVR Order Confirmation Admin
+      summary: Request technical retry
+      description: >
+        Admin/internal contract. Technical retry is allowed only for technical
+        exceptions and must not consume customer no-answer attempt quota.
+      operationId: requestIvrTechnicalRetryV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-technical-exception.schema.json
+      responses:
+        "200":
+          description: Technical retry review.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-technical-exception.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+  /v1/ivr/order-confirmation/admin-reviews:
+    post:
+      tags:
+        - IVR Order Confirmation Admin
+      summary: Record IVR admin review
+      description: >
+        Admin boundary for manual review, override request, or evidence
+        annotation. Admin action must not bypass Sale Lock, Recall, suppression,
+        opt-out, payment, or owner policy.
+      operationId: recordIvrAdminReviewV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../../schemas/ivr/ivr-admin-action.schema.json
+      responses:
+        "200":
+          description: Admin review action.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../../schemas/common/envelope.schema.json
+                  - type: object
+                    properties:
+                      data:
+                        $ref: ../../schemas/ivr/ivr-admin-action.schema.json
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
 components:
   responses:
     BadRequest:

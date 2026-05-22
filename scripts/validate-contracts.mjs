@@ -22,6 +22,51 @@ const placeholderFileName = ["cc", "md"].join(".");
 const legacyFormCodePattern = new RegExp("\\b" + ["FR", "M-"].join("") + "[0-9A-Za-z_-]+");
 const techHandoffId = ["TECH", "-13"].join("");
 const staleTechHandoffPattern = new RegExp(`${techHandoffId}.{0,80}blocked|blocked.{0,80}${techHandoffId}`, "i");
+const requiredPhase8SrsPaths = [
+  "docs/documents/4. phase/phase-8/IVR-SRS-trace-matrix.md",
+  "docs/documents/4. phase/phase-8/IVR-00-governance-source-of-truth-scope-boundary.md",
+  "docs/documents/4. phase/phase-8/IVR-01-business-purpose-confirmation-use-case.md",
+  "docs/documents/4. phase/phase-8/IVR-02-ownership-boundary-connected-systems.md",
+  "docs/documents/4. phase/phase-8/IVR-03-eligibility-customer-trust-official-contact.md",
+  "docs/documents/4. phase/phase-8/IVR-04-order-core-to-ivr-task-contract.md",
+  "docs/documents/4. phase/phase-8/IVR-05-attempt-policy-scheduler-queue.md",
+  "docs/documents/4. phase/phase-8/IVR-06-internal-sim-gateway-adapter.md",
+  "docs/documents/4. phase/phase-8/IVR-07-result-normalization-order-core-callback.md",
+  "docs/documents/4. phase/phase-8/IVR-08-admin-monitoring-evidence-audit-privacy.md",
+  "docs/documents/4. phase/phase-8/IVR-09-test-matrix-smoke-release-gate.md"
+];
+const requiredIvrContractFiles = [
+  "enums/ivr/ivr-call-job-status.yaml",
+  "enums/ivr/ivr-call-attempt-status.yaml",
+  "enums/ivr/ivr-result-status.yaml",
+  "enums/ivr/ivr-result-state.yaml",
+  "enums/ivr/ivr-capacity-incident-status.yaml",
+  "enums/ivr/ivr-technical-exception-type.yaml",
+  "enums/ivr/ivr-eligibility-decision.yaml",
+  "enums/ivr/ivr-phone-validation-status.yaml",
+  "schemas/ivr/ivr-confirmation-task.schema.json",
+  "schemas/ivr/ivr-result-callback.schema.json",
+  "schemas/ivr/ivr-call-job.schema.json",
+  "schemas/ivr/ivr-call-attempt.schema.json",
+  "schemas/ivr/ivr-call-result.schema.json",
+  "schemas/ivr/ivr-eligibility-decision.schema.json",
+  "schemas/ivr/ivr-phone-validation.schema.json",
+  "schemas/ivr/ivr-capacity-incident.schema.json",
+  "schemas/ivr/ivr-technical-exception.schema.json",
+  "schemas/ivr/ivr-sim-channel.schema.json",
+  "schemas/ivr/ivr-admin-action.schema.json",
+  "state-machines/ivr/call-job-state.md",
+  "state-machines/ivr/call-attempt-state.md",
+  "state-machines/ivr/result-state.md",
+  "state-machines/ivr/capacity-incident-state.md",
+  "state-machines/ivr/technical-exception-state.md",
+  "openapi/business-platform/ivr-order-confirmation.v1.yaml",
+  "events/business-platform/ivr/ivr-no-answer-final.v1.json",
+  "events/business-platform/ivr/ivr-invalid-phone-final.v1.json",
+  "events/business-platform/ivr/ivr-technical-exception.v1.json",
+  "events/business-platform/ivr/ivr-operational-blocked.v1.json",
+  "events/business-platform/ivr/ivr-capacity-incident-opened.v1.json"
+];
 
 function rel(filePath) {
   return path.relative(root, filePath).replaceAll(path.sep, "/");
@@ -226,6 +271,26 @@ function checkSourceMap() {
   }
 }
 
+function checkPhase8Sources() {
+  for (const documentPath of requiredPhase8SrsPaths) {
+    if (!existsRel(documentPath)) {
+      errors.push(`Phase 8 source missing: ${documentPath}`);
+      continue;
+    }
+    if (!sourceMapDocumentPaths.has(documentPath)) {
+      errors.push(`docs/source-map.md: missing Phase 8 source row for ${documentPath}`);
+    }
+  }
+}
+
+function checkRequiredIvrContracts() {
+  for (const contractPath of requiredIvrContractFiles) {
+    if (!existsRel(contractPath)) {
+      errors.push(`Required Phase 8 IVR contract file missing: ${contractPath}`);
+    }
+  }
+}
+
 function checkLegacySourcePath(filePath, text) {
   const relative = rel(filePath);
   if (relative.startsWith("docs/documents/")) return;
@@ -238,6 +303,35 @@ function checkLegacySourcePath(filePath, text) {
   }
   if (staleTechHandoffPattern.test(text)) {
     errors.push(`${relative}: stale handoff-source blocked wording remains`);
+  }
+}
+
+function checkStaleIvrWording(filePath, text) {
+  const relative = rel(filePath);
+  const isIvrContract =
+    relative.startsWith("schemas/ivr/") ||
+    relative.startsWith("enums/ivr/") ||
+    relative.startsWith("state-machines/ivr/") ||
+    relative.startsWith("events/business-platform/ivr/") ||
+    relative === "openapi/business-platform/ivr-order-confirmation.v1.yaml" ||
+    relative.startsWith("examples/events/ivr") ||
+    relative.startsWith("examples/api/ivr") ||
+    relative.startsWith("contract-tests/fixtures/ivr");
+  if (!isIvrContract) return;
+
+  const stalePatterns = [
+    /TECH-09 V1\.0 locks baseline MAX_ATTEMPT_PER_ORDER = 2/i,
+    /program-based attempts, while TECH-09 V1\.0 locks/i,
+    /baseline max-attempt policy/i,
+    /before Phase 7/i,
+    /Phase 7 state machines/i,
+    /exact retry count and timing need owner confirmation/i,
+    /resolve PACK-09 program-based attempts vs TECH-09 V1\.0 max 2/i
+  ];
+  for (const pattern of stalePatterns) {
+    if (pattern.test(text)) {
+      errors.push(`${relative}: stale Phase 8 IVR wording remains (${pattern.source})`);
+    }
   }
 }
 
@@ -406,6 +500,8 @@ function checkFixtureManifest() {
 }
 
 checkSourceMap();
+checkPhase8Sources();
+checkRequiredIvrContracts();
 
 const files = walk(root);
 for (const filePath of files) {
@@ -415,6 +511,7 @@ for (const filePath of files) {
   const text = read(filePath);
 
   checkLegacySourcePath(filePath, text);
+  checkStaleIvrWording(filePath, text);
   checkPlaceholder(filePath);
   checkRefs(filePath, text);
 

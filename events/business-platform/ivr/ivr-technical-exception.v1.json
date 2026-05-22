@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "events/business-platform/ivr/ivr-technical-exception.v1.json",
+  "title": "Ivr Technical Exception Event v1",
+  "description": "Published when IVR captures a technical exception that must not be counted as customer no-answer.",
+  "$comment": "Sources: PACK-09, TECH-09, and Phase 8 IVR-06/IVR-07.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": { "type": "string", "minLength": 1 },
+    "eventType": { "type": "string", "const": "business-platform.ivr.ivr-technical-exception.v1" },
+    "eventVersion": { "type": "string", "const": "1.0" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "source": { "type": "string", "const": "business-platform" },
+    "correlationId": { "type": "string", "minLength": 1 },
+    "causationId": { "type": "string", "minLength": 1 },
+    "idempotencyKey": { "type": "string", "minLength": 1 },
+    "data": { "$ref": "../../../schemas/ivr/ivr-technical-exception.schema.json" }
+  },
+  "required": ["eventId", "eventType", "eventVersion", "occurredAt", "source", "correlationId", "data"]
+}

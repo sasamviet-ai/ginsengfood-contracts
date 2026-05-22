@@ -185,6 +185,44 @@ channels:
       operationId: ivrCustomerCancelledV1
       message:
         $ref: '#/components/messages/ivrCustomerCancelledV1Message'
+  business-platform.ivr.ivr-no-answer-final.v1:
+    description: Published when IVR reaches final no-answer under the active program policy.
+      It is input signal only and does not send notification by itself.
+    publish:
+      summary: business-platform publishes ivr-no-answer-final.v1.
+      operationId: ivrNoAnswerFinalV1
+      message:
+        $ref: '#/components/messages/ivrNoAnswerFinalV1Message'
+  business-platform.ivr.ivr-invalid-phone-final.v1:
+    description: Published when official contact phone validation reaches invalid-phone
+      final. It is not no-answer.
+    publish:
+      summary: business-platform publishes ivr-invalid-phone-final.v1.
+      operationId: ivrInvalidPhoneFinalV1
+      message:
+        $ref: '#/components/messages/ivrInvalidPhoneFinalV1Message'
+  business-platform.ivr.ivr-technical-exception.v1:
+    description: Published when IVR captures a technical exception that does not count
+      as customer no-answer.
+    publish:
+      summary: business-platform publishes ivr-technical-exception.v1.
+      operationId: ivrTechnicalExceptionV1
+      message:
+        $ref: '#/components/messages/ivrTechnicalExceptionV1Message'
+  business-platform.ivr.ivr-operational-blocked.v1:
+    description: Published when Order Core or owner revalidation blocks IVR progression.
+    publish:
+      summary: business-platform publishes ivr-operational-blocked.v1.
+      operationId: ivrOperationalBlockedV1
+      message:
+        $ref: '#/components/messages/ivrOperationalBlockedV1Message'
+  business-platform.ivr.ivr-capacity-incident-opened.v1:
+    description: Published when IVR opens a queue, SIM channel, or adapter capacity incident.
+    publish:
+      summary: business-platform publishes ivr-capacity-incident-opened.v1.
+      operationId: ivrCapacityIncidentOpenedV1
+      message:
+        $ref: '#/components/messages/ivrCapacityIncidentOpenedV1Message'
 components:
   messages:
     orderCreatedV1Message:
@@ -363,3 +401,38 @@ components:
       contentType: application/json
       payload:
         $ref: ../events/business-platform/ivr/ivr-customer-cancelled.v1.json
+    ivrNoAnswerFinalV1Message:
+      name: ivr-no-answer-final.v1
+      title: Ivr No Answer Final Event v1
+      summary: Published when IVR reaches final no-answer under the active program policy.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-no-answer-final.v1.json
+    ivrInvalidPhoneFinalV1Message:
+      name: ivr-invalid-phone-final.v1
+      title: Ivr Invalid Phone Final Event v1
+      summary: Published when official contact phone validation reaches invalid-phone final.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-invalid-phone-final.v1.json
+    ivrTechnicalExceptionV1Message:
+      name: ivr-technical-exception.v1
+      title: Ivr Technical Exception Event v1
+      summary: Published when IVR captures a technical exception that does not count as customer no-answer.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-technical-exception.v1.json
+    ivrOperationalBlockedV1Message:
+      name: ivr-operational-blocked.v1
+      title: Ivr Operational Blocked Event v1
+      summary: Published when Order Core or owner revalidation blocks IVR progression.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-operational-blocked.v1.json
+    ivrCapacityIncidentOpenedV1Message:
+      name: ivr-capacity-incident-opened.v1
+      title: Ivr Capacity Incident Opened Event v1
+      summary: Published when IVR opens a queue, SIM channel, or adapter capacity incident.
+      contentType: application/json
+      payload:
+        $ref: ../events/business-platform/ivr/ivr-capacity-incident-opened.v1.json

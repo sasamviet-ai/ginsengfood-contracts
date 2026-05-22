@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ivr/v1/ivr-eligibility-decision.schema.json",
+  "title": "IVR Eligibility Decision",
+  "description": "Decision contract for whether an Official Order enters IVR confirmation.",
+  "$comment": "Sources: Phase 8 IVR-03 and IVR-04.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eligibility_decision_id": { "type": "string", "minLength": 1, "description": "Eligibility decision id." },
+    "version": { "type": "string", "const": "v1", "description": "Contract version." },
+    "official_order_id": { "type": "string", "description": "Official Order id." },
+    "customer_id": { "type": "string", "description": "Customer id." },
+    "decision": { "type": "string", "description": "Decision. Prefer enums/ivr/ivr-eligibility-decision.yaml." },
+    "trusted_customer_skip": { "type": "boolean", "description": "Whether trusted customer skip applies." },
+    "blocked_reasons": { "type": "array", "items": { "type": "string" }, "description": "Reasons IVR is blocked." },
+    "evaluated_at": { "type": "string", "format": "date-time", "description": "Evaluation time." },
+    "policy_version": { "type": "string", "description": "Eligibility policy version." },
+    "source": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["eligibility_decision_id", "version", "decision"]
+}
