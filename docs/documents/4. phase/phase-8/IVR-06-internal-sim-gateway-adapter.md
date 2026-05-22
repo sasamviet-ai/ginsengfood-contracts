@@ -130,3 +130,104 @@ Disable/enable SIM phải đi qua permission trong `IVR-08`.
 - Technical failure được tách khỏi no-answer.
 - SIM health và channel lifecycle có audit.
 - Các owner decision kỹ thuật còn thiếu được đánh dấu rõ.
+
+## 11. Adapter interface detail
+
+| Operation | Input | Output | Side effect |
+| --- | --- | --- | --- |
+| `ReserveSimChannel` | Attempt context, queue, program. | SIM reservation or capacity failure. | Marks SIM reserved. |
+| `ReleaseSimChannel` | Reservation id, final status. | Release ack. | Marks SIM idle/degraded. |
+| `DialOutboundCall` | SIM reservation, dial token, script version. | Provider/call id. | Starts call. |
+| `PlayScript` | Approved script template and variables. | Playback status. | Audio playback. |
+| `CaptureDtmf` | Active call id. | DTMF key/status. | Captures customer input. |
+| `GetCallDisposition` | Active call id. | Raw call outcome. | None. |
+| `HealthCheck` | SIM channel id. | Healthy/degraded/failed. | Updates health evidence. |
+
+## 12. SIM channel lifecycle
+
+```text
+ENABLED_IDLE
+  -> RESERVED
+  -> ACTIVE_CALL
+  -> RELEASING
+  -> ENABLED_IDLE
+
+Any state -> DISABLED_BY_ADMIN
+Any active state -> HEALTH_FAILED
+HEALTH_FAILED -> DISABLED_BY_ADMIN or ENABLED_IDLE after review
+```
+
+Rules:
+
+- `RESERVED` must have TTL.
+- `ACTIVE_CALL` must have exactly one attempt.
+- `DISABLED_BY_ADMIN` cannot be selected by scheduler.
+- `HEALTH_FAILED` cannot auto-enable without health pass/review.
+
+## 13. Raw outcome taxonomy
+
+| Raw adapter outcome | Normalized category | Counted customer attempt |
+| --- | --- | --- |
+| Answered + DTMF `1` | `IVR_CONFIRMED` | Yes |
+| Answered + DTMF `0` | `IVR_CUSTOMER_CANCELLED` | Yes |
+| Ring timeout under policy | `NO_ANSWER` | Yes |
+| Invalid key | `DTMF_INVALID` | Owner policy |
+| DTMF timeout after answer | `DTMF_TIMEOUT` | Owner policy |
+| Busy | `BUSY` | Owner Decision Required |
+| Rejected | `REJECTED` | Owner Decision Required |
+| Unreachable | `UNREACHABLE` | Owner Decision Required |
+| SIM gateway error | `SIM_GATEWAY_ERROR` | No |
+| Audio playback error | `AUDIO_PLAYBACK_ERROR` | No |
+| DTMF capture error | `DTMF_CAPTURE_ERROR` | No |
+| Callback/evidence write error | Technical exception | No |
+
+## 14. Script delivery rules
+
+Adapter may only play:
+
+- Approved script template.
+- Approved script version.
+- Approved variables.
+
+Adapter must not play:
+
+- Full customer address.
+- Full customer profile.
+- Payment detail.
+- Health/sensitive notes.
+- CRM/AI consultation content.
+- Marketing/upsell message.
+
+## 15. Adapter security controls
+
+| Control | Requirement |
+| --- | --- |
+| Credential scope | SIM credential only, no Order Core write credential. |
+| Secret storage | Secret manager/config boundary, no UI/log exposure. |
+| Logging | No raw phone unless explicitly approved; redact tokens. |
+| Network | Internal network only. |
+| Admin | Disable/enable through IVR admin API, not adapter local button. |
+| Recording | Disabled unless privacy/legal owner approves. |
+
+## 16. Adapter failure handling
+
+| Failure | Required output |
+| --- | --- |
+| Cannot reserve SIM | Capacity incident or technical exception. |
+| Dial fails before ring | Technical exception, not no-answer. |
+| Audio fails | Technical exception, not customer attempt. |
+| DTMF capture fails | Technical exception. |
+| Call drops after answered | `CALL_DROPPED`, owner decision for count. |
+| SIM hangs active | Health failed, admin review. |
+
+## 17. Adapter smoke tests
+
+| Test ID | Scenario | Expected |
+| --- | --- | --- |
+| IVR06-SMK-001 | Fake adapter DTMF `1` | `IVR_CONFIRMED`. |
+| IVR06-SMK-002 | Fake adapter DTMF `0` | `IVR_CUSTOMER_CANCELLED`. |
+| IVR06-SMK-003 | Fake no-answer | `NO_ANSWER`. |
+| IVR06-SMK-004 | SIM gateway error | Technical exception, not counted. |
+| IVR06-SMK-005 | Disabled SIM selected | Scheduler refuses. |
+| IVR06-SMK-006 | Two calls same SIM | Second reserve fails. |
+| IVR06-SMK-007 | Raw phone in logs | Test fails. |

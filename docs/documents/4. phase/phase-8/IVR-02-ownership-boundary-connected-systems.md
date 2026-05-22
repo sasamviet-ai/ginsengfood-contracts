@@ -76,3 +76,105 @@ Tài liệu này mô tả kiến trúc kết nối cấp SRS cho IVR. Đây chư
 - Không có hệ thống nào ngoài Order Core được quyết định trạng thái đơn.
 - Không có kết nối IVR -> Payment/MISA/Revenue.
 - Có fail-safe khi source owner không khả dụng.
+
+## 8. Detailed integration responsibility matrix
+
+| Integration | Producer | Consumer | Transport triển khai khuyến nghị | Sync/async | Data classification |
+| --- | --- | --- | --- | --- | --- |
+| Order task | Order Core | IVR Internal API | Internal REST/command API | Sync command | Internal order data + phone projection. |
+| Eligibility check | IVR/Order Core | Trust/contact/blocker resolvers | Internal API/read model | Sync trước dispatch | Sensitive decision data. |
+| Attempt dispatch | Scheduler | SIM Adapter | Internal worker command | Async worker | Sensitive phone token/call metadata. |
+| Result callback | IVR Runtime | Order Core | Internal callback API | Sync with retry | Order signal. |
+| Event publication | IVR/Business Platform | Consumers | AsyncAPI future approved toolchain | Async | Signal only, not order final. |
+| Admin action | Admin Web | IVR API | Admin API | Sync command | Audit/security sensitive. |
+| Evidence write | IVR services | Evidence Registry | Internal writer/API | Sync before final callback where required | Audit/evidence data. |
+
+## 9. Ownership by lifecycle stage
+
+| Stage | Owner | IVR role | Required handoff |
+| --- | --- | --- | --- |
+| Official Order created | Order Core | None until task. | Task only if IVR required. |
+| Task emitted | Order Core | Consumer. | `IvrConfirmationTaskV1`. |
+| Eligibility resolved | Order Core + source resolvers | Validate/consume. | Eligibility decision. |
+| Queue scheduled | IVR Runtime | Owner. | CallJob/Attempt persisted. |
+| SIM call active | IVR Infrastructure | Owner. | Raw call status/DTMF. |
+| Result normalized | IVR Runtime | Owner. | `IvrCallResult`. |
+| Callback received | Order Core | Decision owner. | Ack/stale/block/review. |
+| Notification | Notification Owner | No direct role. | Only after Core decision. |
+
+## 10. Connected system failure contracts
+
+| System unavailable | Before attempt | During attempt | During callback |
+| --- | --- | --- | --- |
+| Order Core | Do not create new task. | Continue active call only if already dispatched safely; callback retries bounded. | Retry bounded/admin review. |
+| Operational Core | Do not dispatch. | If active call already returned result, Core revalidates before action. | Core blocks if cannot revalidate. |
+| Trust/contact resolver | Hold task/review. | Do not switch contact mid-call. | Core decides with current sources. |
+| Evidence Registry | Do not final-callback if required evidence missing. | Technical exception if evidence write fails. | Hold/admin review. |
+| SIM Gateway | Technical exception. | Technical exception; not no-answer. | Not applicable. |
+| Admin Web | No operational impact. | No operational impact. | No operational impact. |
+
+## 11. Data flow details
+
+### 11.1 Order Core to IVR
+
+Data allowed:
+
+- `task_id`, `order_id`, `order_code_short`, `order_version`.
+- `program_code`, `attempt_policy_code`, schedule.
+- `customer_ref`, trust decision, risk flags.
+- `official_contact_id`, `phone_ref`, `phone_masked`, optional dial token.
+- Blocker snapshots/refs.
+- Evidence/privacy policy versions.
+
+Data prohibited:
+
+- Full customer profile.
+- Full address.
+- Health or sensitive note.
+- Payment credentials/details.
+- MISA accounting payload.
+- AI consultation content.
+
+### 11.2 IVR to SIM Adapter
+
+Data allowed:
+
+- `attempt_id`, `sim_channel_id`, script version.
+- Dial token or approved dial phone access.
+- Minimal script variables.
+
+Data prohibited:
+
+- Order write credential.
+- Full order item history beyond script-approved fields.
+- Admin credential.
+
+### 11.3 IVR to Order Core callback
+
+Data required:
+
+- `callback_id`, `task_id`, `order_id`.
+- `order_version_seen_by_ivr`.
+- `result_status`, `result_reason`, `is_counted_customer_attempt`.
+- `evidence_ref`, `audit_ref`.
+- `idempotency_key`, `correlation_id`.
+
+## 12. Boundary P0 tests
+
+| Test | Expected |
+| --- | --- |
+| SIM Adapter tries to update order | Forbidden/no credential. |
+| Facebook Gateway tries to create IVR task | Forbidden. |
+| Admin tries to force order cancel from IVR | Forbidden. |
+| IVR callback without evidence | Hold/reject/review. |
+| Operational Core unavailable before dispatch | No SIM call. |
+| Payment/MISA integration requested from IVR | Not implemented/blocked by scope. |
+
+## 13. Implementation acceptance checklist
+
+- All service identities are allowlisted.
+- All internal APIs require auth.
+- SIM Adapter has no Order Core write permission.
+- Admin actions are RBAC protected server-side.
+- Evidence/audit integration is present.
+- Downstream systems consume only Core-approved state where required.

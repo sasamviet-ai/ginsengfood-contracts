@@ -132,3 +132,130 @@ Fail-safe outcome: `ELIGIBILITY_POLICY_UNAVAILABLE` và `ADMIN_REVIEW_REQUIRED`.
 - SRS trả lời rõ khách trusted skip theo rule nào.
 - Official contact được chọn, validate, mask và audit rõ.
 - Invalid phone, no-answer và technical validation error không bị trộn.
+
+## 11. Eligibility decision tree
+
+```text
+START
+  -> Is entity Official Order?
+       NO  -> BLOCK_QUOTE_CART_DRAFT
+       YES -> Is order state IVR-callable?
+                NO  -> BLOCK_POLICY
+                YES -> Is Sale Lock/Recall/Suppression/opt-out active?
+                         YES -> BLOCK_OPERATIONAL or BLOCK_OPT_OUT
+                         NO  -> Is trusted skip allowed and no risk flag?
+                                  YES -> SKIP_TRUSTED_CUSTOMER
+                                  NO  -> Is official contact available?
+                                           NO  -> BLOCK_INVALID_PHONE or OWNER_REVIEW_REQUIRED
+                                           YES -> Validate phone
+                                                    valid -> ELIGIBLE_FOR_IVR
+                                                    invalid -> BLOCK_INVALID_PHONE
+                                                    technical error -> OWNER_REVIEW_REQUIRED
+```
+
+## 12. Required eligibility inputs
+
+| Input | Owner | Required | Use |
+| --- | --- | --- | --- |
+| `entity_type` | Order Core | Có | Chặn Quote/Cart/Draft. |
+| `official_order_id` | Order Core | Có | Link order. |
+| `order_state` | Order Core | Có | Chỉ trạng thái callable. |
+| `order_version` | Order Core | Có | Race guard. |
+| `customer_ref` | Customer/Commerce | Có | Trust lookup. |
+| `customer_trust_status` | Trust Resolver | Có | Trusted skip. |
+| `risk_flags` | Risk/Order Core | Có | Trusted vẫn phải IVR nếu có risk. |
+| `official_contact_id` | Customer/Commerce | Có | Contact được phép gọi. |
+| `phone_ref` | Customer/Commerce | Có | Không dùng raw phone nếu không cần. |
+| `phone_masked` | Customer/Commerce | Có | Admin display. |
+| `phone_validation_status` | Phone Resolver | Có | Valid/invalid/inconclusive. |
+| `sale_lock_snapshot` | Operational Core | Có | Blocker. |
+| `recall_snapshot` | Operational Core | Có | Blocker. |
+| `suppression_snapshot` | Operational/Compliance | Có | Blocker. |
+| `call_restriction_snapshot` | Compliance/Customer | Có | Opt-out/legal block. |
+
+## 13. Trusted customer skip rules
+
+Trusted skip chỉ được áp dụng khi tất cả điều kiện sau đúng:
+
+- Trust resolver trả decision rõ ràng.
+- Không có risk flags bắt buộc IVR.
+- Order state vẫn hợp lệ.
+- Không có Sale Lock/Recall/Suppression/opt-out.
+- Contact/payment/order snapshot không có thay đổi làm tăng rủi ro.
+- Policy version được ghi lại.
+
+Trusted skip không được áp dụng khi:
+
+| Điều kiện | Hành vi |
+| --- | --- |
+| New customer | Require IVR nếu đủ điều kiện. |
+| Trust resolver unavailable | `OWNER_REVIEW_REQUIRED` hoặc fallback owner-approved. |
+| Phone mới đổi gần đây | Owner Decision Required; mặc định không skip nếu risk. |
+| High value order | Owner Decision Required; mặc định require IVR nếu risk flag. |
+| Prior cancellation/no-show risk | Require IVR nếu risk flag. |
+
+## 14. Official contact selection
+
+Priority:
+
+1. Contact được Order Core đánh dấu là official contact cho order.
+2. Contact từ customer profile projection được owner duyệt.
+3. Không tự chọn contact khác nếu official contact invalid.
+
+Rules:
+
+- Không gọi số từ comment/chat/free text.
+- Không gọi số từ CRM note.
+- Không gọi số từ lịch sử cũ nếu không được resolver trả về.
+- Không gọi full address/contact list.
+- Nếu có nhiều official contact, resolver phải trả priority rõ.
+
+## 15. Phone validation taxonomy
+
+| Status | Meaning | IVR action |
+| --- | --- | --- |
+| `PHONE_VALID` | Có thể gọi theo policy. | Eligible tiếp. |
+| `PHONE_INVALID_FORMAT` | Format sai. | Block invalid phone. |
+| `PHONE_MISSING` | Không có phone. | Block/review. |
+| `PHONE_NOT_OFFICIAL_CONTACT` | Phone không thuộc contact chính thức. | Block. |
+| `PHONE_OPTED_OUT` | Opt-out/suppressed. | Block opt-out. |
+| `PHONE_VALIDATION_INCONCLUSIVE` | Không đủ kết luận. | Review/fail-safe. |
+| `PHONE_VALIDATION_TECHNICAL_ERROR` | Resolver lỗi kỹ thuật. | Technical/review, không invalid final. |
+
+## 16. Eligibility output contract
+
+| Field | Required | Note |
+| --- | --- | --- |
+| `eligibility_decision_id` | Có | Trace decision. |
+| `official_order_id` | Có | Link order. |
+| `decision` | Có | Enum decision. |
+| `trusted_customer_skip` | Có | True/false. |
+| `blocked_reasons` | Có | Empty nếu eligible. |
+| `policy_version` | Có | Source policy. |
+| `evaluated_at` | Có | Timestamp. |
+| `source_refs` | Có | Sources used. |
+| `evidence_refs` | Có nếu persisted | Evidence. |
+| `audit_refs` | Có | Audit. |
+
+## 17. Edge cases
+
+| Edge case | Required behavior |
+| --- | --- |
+| Order changed contact after task created | Revalidate before dispatch; if mismatch, block/recreate task. |
+| Phone valid at intake but opt-out before attempt | Block attempt, no call. |
+| Trusted at intake but risk flag appears before dispatch | Require/block/review per policy, no blind skip. |
+| Recall appears after key `1` | Core blocks callback. |
+| Phone resolver timeout | No call unless approved fallback. |
+| Customer has multiple phones | Use official selected contact only. |
+
+## 18. Eligibility P0 tests
+
+| Test ID | Scenario | Expected |
+| --- | --- | --- |
+| IVR03-P0-001 | Quote task | `BLOCK_QUOTE_CART_DRAFT`. |
+| IVR03-P0-002 | Trusted no risk | `SKIP_TRUSTED_CUSTOMER`. |
+| IVR03-P0-003 | Trusted with risk | Not skipped; require IVR/review. |
+| IVR03-P0-004 | Invalid phone | No SIM dispatch. |
+| IVR03-P0-005 | Phone validation technical error | Not invalid final; review/technical. |
+| IVR03-P0-006 | Sale Lock active | Block operational. |
+| IVR03-P0-007 | Opt-out active | Block opt-out. |

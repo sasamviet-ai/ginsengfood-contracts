@@ -159,3 +159,102 @@ IVR-08 FAIL nếu:
 - Evidence/audit model đủ trace.
 - Privacy/retention ghi rõ điều đã khóa và điều cần owner decision.
 - Không có đường admin override trực tiếp sang paid/revenue/order completed.
+
+## 11. Admin screen inventory
+
+| Screen | Purpose | Minimum fields | Actions |
+| --- | --- | --- | --- |
+| IVR Dashboard | Tổng quan sức khỏe queue/SIM/result. | Active jobs, due attempts, capacity, exceptions. | View only. |
+| Call Jobs | Danh sách job. | Job id, order id masked/short, program, status, deadline. | Open detail. |
+| Call Job Detail | Trace task/job/attempt/result/callback. | Timeline, evidence refs, audit refs, blocker refs. | Review if permission. |
+| SIM Channels | SIM health/capacity. | SIM id, enabled, status, active call, last health. | Disable/enable. |
+| Capacity Incidents | Incident queue/SIM. | Incident id, scope, status, reason, owner. | Pause/resume/escalate. |
+| Technical Exceptions | Lỗi kỹ thuật. | Type, attempt, counted=false, retry allowed. | Manual technical retry. |
+| Result Review | Ambiguous/stale/blocked results. | Result, callback ack, blocker, evidence. | Add review note. |
+| Evidence Viewer | Evidence/audit refs. | Evidence id, status, source, owner. | Export only if permission. |
+
+## 12. Admin action validation
+
+| Action | Required permission | Required reason | Evidence required | Hard blocks |
+| --- | --- | --- | --- | --- |
+| Pause queue | `IVR_QUEUE_PAUSE` | Yes | Audit required | None, safe action. |
+| Resume queue | `IVR_QUEUE_RESUME` | Yes | Incident resolved evidence | Cannot resume if release/security block active. |
+| Disable SIM | `IVR_SIM_DISABLE` | Yes | Health/failure evidence | Cannot drop active call unsafely. |
+| Enable SIM | `IVR_SIM_ENABLE` | Yes | Health pass evidence | Cannot enable failed/unreviewed SIM. |
+| Manual retry | `IVR_MANUAL_RETRY` | Yes | Technical exception evidence | Cannot count customer attempt; cannot bypass blockers. |
+| Result review | `IVR_RESULT_REVIEW` | Yes | Review evidence | Cannot force order transition. |
+| Evidence export | `IVR_EVIDENCE_EXPORT` if defined | Yes | Audit access | Cannot export raw PII without policy. |
+
+## 13. Audit trail detail
+
+Every admin action must record:
+
+- `admin_action_id`.
+- `actor_id`.
+- `permission`.
+- `target_type`.
+- `target_id`.
+- `reason`.
+- `state_before`.
+- `state_after`.
+- `correlation_id`.
+- `evidence_ref`.
+- `created_at`.
+
+Audit record must be immutable or append-only according to foundation policy.
+
+## 14. Privacy display rules
+
+| Data | Admin list | Admin detail | Evidence export |
+| --- | --- | --- | --- |
+| Phone | Masked only. | Masked only unless explicit permission/policy. | Owner Decision Required. |
+| Order id/code | Short/id allowed. | Allowed internal. | Allowed internal. |
+| Customer name | Short display only if approved. | Minimal projection. | Owner Decision Required. |
+| Address | Hidden. | Hidden by default. | Not exported from IVR. |
+| DTMF key | Result semantic allowed. | Allowed to authorized reviewer. | Allowed as evidence if policy. |
+| Recording | Hidden/disabled. | Disabled unless approved. | Owner Decision Required. |
+| SIM logs | Sanitized. | Sanitized. | Sanitized only. |
+
+## 15. Evidence packet model
+
+For each final result, evidence packet should link:
+
+- Task intake decision.
+- Eligibility decision.
+- Attempt schedule.
+- Attempt execution/call disposition.
+- DTMF/result normalization.
+- Callback request.
+- Core callback ack/reject/block.
+- Admin actions if any.
+- Technical/capacity incidents if any.
+
+Evidence packet must not include:
+
+- Unredacted phone without approval.
+- Secrets/SIM credentials.
+- Full customer profile.
+- Marketing notes.
+
+## 16. Privacy and retention decisions
+
+| Decision | Default until approved | Needed for |
+| --- | --- | --- |
+| Recording enabled? | No | Any audio storage. |
+| Raw phone retention | No long-term storage | Production SIM dialing. |
+| DTMF evidence retention | Minimal semantic evidence | Dispute/review. |
+| Call log retention | Owner Decision Required | Ops/debug. |
+| Admin audit retention | Foundation policy | Compliance. |
+| Evidence export scope | Restricted | Release/dispute. |
+
+## 17. Admin P0 tests
+
+| Test ID | Scenario | Expected |
+| --- | --- | --- |
+| IVR08-P0-001 | User without permission pauses queue | 403. |
+| IVR08-P0-002 | Admin manual retry on no-answer | Blocked unless technical exception. |
+| IVR08-P0-003 | Admin enable failed SIM without health pass | Blocked. |
+| IVR08-P0-004 | Admin tries force order cancel | No route/403. |
+| IVR08-P0-005 | Admin UI shows raw phone | Test fail. |
+| IVR08-P0-006 | Evidence export includes secret | Test fail. |
+| IVR08-P0-007 | Recording enabled without approval | Release fail. |

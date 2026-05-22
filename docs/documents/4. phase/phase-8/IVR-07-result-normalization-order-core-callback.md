@@ -127,3 +127,112 @@ Nếu khách bấm `1` nhưng Sale Lock/Recall/payment issue xuất hiện trư�
 - Result taxonomy tách confirm/cancel/no-answer/invalid/technical/block.
 - Stale callback không ép order transition.
 - No-answer max không tự notification.
+
+## 10. Result normalization mapping table
+
+| Input từ adapter/service | Điều kiện | Normalized result | Counted? | Final? |
+| --- | --- | --- | --- | --- |
+| DTMF `1` | Answered, script valid, evidence recorded | `IVR_CONFIRMED` | Yes | Yes |
+| DTMF `0` | Answered, script valid, evidence recorded | `IVR_CUSTOMER_CANCELLED` | Yes | Yes |
+| No answer | Attempt valid, not max | `IVR_NO_ANSWER_ATTEMPT` | Yes | No |
+| No answer | Attempt valid, max reached | `IVR_NO_ANSWER_FINAL` | Yes | Yes |
+| Window expired | No accepted final signal | `IVR_CONFIRMATION_WINDOW_EXPIRED` | Depends | Yes |
+| Phone invalid | Validation confirms invalid | `INVALID_PHONE_FINAL` | No | Yes |
+| SIM/server/audio/DTMF technical error | Technical source | `IVR_TECHNICAL_EXCEPTION` | No | Depends/review |
+| Capacity hold | Queue/SIM capacity unsafe | `IVR_CAPACITY_EXCEPTION` | No | Review |
+| Sale Lock/Recall/payment issue | Core revalidation | `IVR_OPERATIONAL_BLOCKED` | No | Yes/review |
+| Ambiguous raw status | No source-backed mapping | `IVR_CUSTOMER_NEEDS_SUPPORT` or review | Depends | Review |
+
+## 11. Callback payload validation
+
+Callback must include:
+
+| Field | Validation |
+| --- | --- |
+| `callback_id` | Unique/idempotent. |
+| `task_id` | Existing task. |
+| `call_job_id` | Existing job if job was created. |
+| `attempt_id` | Required for attempt-level outcome. |
+| `order_id` | Matches task. |
+| `order_version_seen_by_ivr` | Required race guard. |
+| `program_code` | Matches task. |
+| `attempt_no` | Within program policy. |
+| `result_type` | Known result taxonomy. |
+| `is_counted_customer_attempt` | False for technical/invalid/capacity. |
+| `evidence_ref` | Required before final action. |
+| `audit_ref` | Required. |
+| `privacy_policy_version` | Required. |
+
+## 12. Order Core callback response contract
+
+| Core response | Meaning | IVR action |
+| --- | --- | --- |
+| `CALLBACK_ACCEPTED_FOR_REVALIDATION` | Core accepted signal. | Mark callback accepted; wait/read final order state if needed. |
+| `CALLBACK_REJECTED_STALE` | Task/order version stale. | Mark stale; do not retry as new business signal. |
+| `CALLBACK_BLOCKED_BY_CORE` | Sale Lock/Recall/payment/suppression/policy block. | Mark blocked; evidence link. |
+| `CALLBACK_NEEDS_ADMIN_REVIEW` | Core requires owner/admin review. | Mark review required. |
+| `CALLBACK_TECHNICAL_RETRY_ALLOWED` | Core unavailable/transient. | Retry bounded with same idempotency key. |
+| `CALLBACK_TECHNICAL_RETRY_BLOCKED` | Retry unsafe or expired. | Admin review. |
+
+## 13. Race condition matrix
+
+| Race | Detection | Required behavior |
+| --- | --- | --- |
+| Order version changed after task | `order_version_seen_by_ivr` mismatch | Reject stale or re-evaluate by Core. |
+| Customer presses `1`, Sale Lock appears | Core blocker check | Do not confirm; block/hold. |
+| Customer presses `0`, order already cancelled | Order state check | Idempotent no-op or stale. |
+| No-answer final, payment issue appears | Core revalidation | Core decides hold/cancel; IVR no direct action. |
+| Duplicate callback | Idempotency | Return previous ack. |
+| Evidence missing | Evidence check | Reject/hold/review. |
+
+## 14. Callback retry policy
+
+Retry is technical only. It must not:
+
+- Create a new result.
+- Increment customer attempt.
+- Change result status.
+- Bypass stale/order state guard.
+- Retry forever.
+
+Retry requires:
+
+- Same `callback_id` or same idempotency scope.
+- Retry counter.
+- Last error.
+- Next retry time.
+- Admin escalation after max retry.
+
+Exact retry count/backoff remains `Owner Decision Required`.
+
+## 15. Result event publication rules
+
+Events may be published for signal visibility:
+
+- `ivr-confirmation-requested`.
+- `ivr-confirmed`.
+- `ivr-customer-cancelled`.
+- `ivr-no-answer-final`.
+- `ivr-invalid-phone-final`.
+- `ivr-technical-exception`.
+- `ivr-operational-blocked`.
+- `ivr-capacity-incident-opened`.
+
+Events must not:
+
+- Represent final order state unless event name belongs to Order Core.
+- Replace callback.
+- Feed verified revenue.
+- Trigger notification without Core decision.
+
+## 16. Result normalization P0 tests
+
+| Test ID | Scenario | Expected |
+| --- | --- | --- |
+| IVR07-P0-001 | DTMF `1` | Confirm signal only, Core revalidates. |
+| IVR07-P0-002 | DTMF `0` | Cancel signal only, Core decides. |
+| IVR07-P0-003 | SIM error | Technical exception, not no-answer. |
+| IVR07-P0-004 | Invalid phone | Invalid final, not no-answer. |
+| IVR07-P0-005 | Stale callback | No order transition. |
+| IVR07-P0-006 | Missing evidence | Callback held/rejected. |
+| IVR07-P0-007 | Operational block after key `1` | Core block, no auto confirm. |

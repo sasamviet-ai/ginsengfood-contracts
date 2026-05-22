@@ -141,3 +141,129 @@ Không được đọc:
 - DTMF result tách rõ business outcome và technical exception.
 - Không có câu nào cho phép IVR tự cập nhật order.
 - Call script không chứa dữ liệu riêng tư ngoài phạm vi.
+
+## 10. Business capability breakdown
+
+| Capability | Người dùng/hệ thống hưởng lợi | Giá trị nghiệp vụ | Không được hiểu là |
+| --- | --- | --- | --- |
+| Auto confirm order intent | Order Core, vận hành đơn | Giảm đơn ảo, đơn đặt nhầm, phone sai. | Xác nhận thanh toán. |
+| Customer cancel by key `0` | Khách hàng, Order Core | Ghi nhận ý chí không đặt/hủy. | IVR tự hủy đơn. |
+| No-answer classification | Order Core, Ops | Có signal để xử lý đơn không xác nhận. | Notification tự động. |
+| Invalid phone classification | Order Core, Admin | Tách phone sai khỏi khách không nghe. | Kết luận khách cố tình không nhận. |
+| Technical exception classification | IVR Ops | Không làm sai attempt/no-answer. | Lý do hủy đơn. |
+| Admin monitoring | Ops/Admin | Điều hành queue/SIM/review an toàn. | Quyền override order. |
+
+## 11. Use case catalog
+
+| Use case ID | Tên | Primary actor | Trigger | Final owner |
+| --- | --- | --- | --- | --- |
+| IVR01-UC-001 | Xác nhận đơn bằng phím `1` | Khách hàng | Official Order cần IVR | Order Core |
+| IVR01-UC-002 | Hủy/không đặt bằng phím `0` | Khách hàng | Khách nghe call và bấm `0` | Order Core |
+| IVR01-UC-003 | Không nghe trong Golden Hour | Khách hàng không nghe | 2 attempt hợp lệ đều no-answer | Order Core |
+| IVR01-UC-004 | Không nghe trong 24/7 | Khách hàng không nghe | 3 attempt hợp lệ đều no-answer | Order Core |
+| IVR01-UC-005 | Trusted customer skip | Order Core | Trust policy cho phép skip | Order Core |
+| IVR01-UC-006 | Invalid official phone | Phone resolver | Phone invalid/missing/not official | Order Core/Admin |
+| IVR01-UC-007 | Technical failure | IVR runtime/SIM | SIM/server/DTMF/evidence lỗi | IVR Ops/Admin |
+| IVR01-UC-008 | Operational blocker after confirm | Operational Core | Sale Lock/Recall/payment issue xuất hiện | Order Core |
+| IVR01-UC-009 | Admin pause queue | Admin/Ops | Capacity/security/incident | IVR Ops |
+| IVR01-UC-010 | Manual technical retry | Admin/Ops | Technical exception retryable | IVR Ops |
+
+## 12. Detailed scenario - customer confirms
+
+Preconditions:
+
+- Official Order đã tạo.
+- Order state còn callable.
+- Customer không được trusted skip.
+- Official contact valid.
+- Program policy resolved.
+- Không có Sale Lock/Recall/Suppression/opt-out.
+
+Main flow:
+
+1. Order Core phát hành task.
+2. IVR tạo CallJob và attempt schedule.
+3. Scheduler dispatch attempt trong window.
+4. SIM Adapter phát script đã duyệt.
+5. Khách bấm `1`.
+6. Result Normalizer tạo `IVR_CONFIRMED`.
+7. IVR callback Order Core.
+8. Order Core revalidate.
+9. Nếu pass, Order Core transition đơn theo state machine.
+
+Alternate flows:
+
+| Điều kiện | Kết quả |
+| --- | --- |
+| Callback stale | Order Core reject stale; order không đổi. |
+| Sale Lock xuất hiện | Order Core block/hold; order không confirm. |
+| Evidence thiếu | Route admin review/technical exception. |
+| Duplicate callback | Idempotency trả kết quả cũ. |
+
+## 13. Detailed scenario - customer cancels
+
+Preconditions giống confirm.
+
+Main flow:
+
+1. Khách bấm `0`.
+2. Result Normalizer tạo `IVR_CUSTOMER_CANCELLED`.
+3. IVR callback Order Core.
+4. Order Core revalidate.
+5. Nếu chính sách cho phép, Order Core hủy đơn.
+6. Notification owner gửi thông báo nếu có template/rule được duyệt.
+
+Hard blocks:
+
+- IVR/SIM không tự gửi thông báo hủy.
+- Admin IVR không sửa result thành cancel.
+- Technical exception không được chuyển thành cancel.
+
+## 14. Detailed scenario - no-answer
+
+Golden Hour:
+
+- Attempt 1 tại `T0`.
+- Attempt 2 tại `T0 + 5`.
+- Final no-answer nếu attempt 2 hợp lệ không nghe hoặc hết window theo policy.
+
+24/7:
+
+- Attempt 1 tại `T0`.
+- Attempt 2 tại `T0 + 5`.
+- Attempt 3 tại `T0 + 10`.
+- Final no-answer nếu attempt 3 hợp lệ không nghe hoặc hết window theo policy.
+
+No-answer không được sinh khi:
+
+- SIM lỗi.
+- Server lỗi.
+- DTMF capture lỗi.
+- Evidence writer lỗi.
+- Callback lỗi.
+- Phone validation technical error.
+
+## 15. Business rule matrix
+
+| Rule | Allowed | Blocked |
+| --- | --- | --- |
+| Khách mới/untrusted | Có thể IVR nếu đủ điều kiện. | Không skip nếu risk flag. |
+| Khách trusted | Có thể skip theo trust decision. | Không hardcode trong IVR. |
+| Phone invalid | Không gọi. | Không count no-answer. |
+| Key `1` | Signal confirm. | Không force confirm order. |
+| Key `0` | Signal cancel request. | Không tự hủy order. |
+| No-answer max | Signal final no-answer. | Không tự notification. |
+| Technical failure | Technical exception. | Không count customer attempt. |
+
+## 16. Business acceptance tests
+
+| Test ID | Given | When | Then |
+| --- | --- | --- | --- |
+| IVR01-BAT-001 | Official Order untrusted | Khách bấm `1` | Callback confirm, Order Core revalidate. |
+| IVR01-BAT-002 | Official Order untrusted | Khách bấm `0` | Callback cancel signal, Core quyết định. |
+| IVR01-BAT-003 | Golden Hour | 2 no-answer hợp lệ | Final no-answer, không attempt 3. |
+| IVR01-BAT-004 | 24/7 | 3 no-answer hợp lệ | Final no-answer, không attempt 4. |
+| IVR01-BAT-005 | Trusted skip | Trust pass | Không tạo call job. |
+| IVR01-BAT-006 | Phone invalid | Task created | Không dispatch SIM. |
+| IVR01-BAT-007 | SIM failure | During attempt | Technical exception, attempt not counted. |
+| IVR01-BAT-008 | Sale Lock after key `1` | Callback | Core block/hold, không confirm. |

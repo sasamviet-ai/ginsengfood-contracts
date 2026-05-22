@@ -116,3 +116,113 @@ Mỗi task intake phải ghi:
 - Contract không chứa dữ liệu riêng tư vượt policy.
 - Reject rule rõ, không để implementer tự suy luận.
 - Sẵn sàng để phase sau sinh schema `IvrConfirmationTaskV1`.
+
+## 9. Field-level contract expansion
+
+| Field group | Fields | Validation | Reject/Hold reason |
+| --- | --- | --- | --- |
+| Identity | `task_id`, `task_version`, `idempotency_key`, `correlation_id` | Non-empty, unique/idempotent, version `v1`. | `TASK_REJECTED_INVALID_TRACE`. |
+| Order | `order_id`, `order_code_short`, `order_version`, `order_state` | Official Order, callable state, current version. | `TASK_REJECTED_NOT_OFFICIAL_ORDER`, `TASK_REJECTED_STATE_NOT_CALLABLE`. |
+| Program policy | `program_code`, `attempt_policy_code`, `max_attempts`, `attempt_schedule`, `expires_at` | Golden Hour 2/10; 24/7 3/15. | `TASK_REJECTED_POLICY_MISMATCH`. |
+| Customer trust | `customer_ref`, `customer_trust_status`, `trusted_skip_allowed`, `risk_flags` | Resolver-backed, no hardcode. | `TASK_HELD_TRUST_POLICY_UNAVAILABLE`. |
+| Contact | `official_contact_id`, `phone_ref`, `phone_masked`, optional dial token | Official contact only, phone valid. | `TASK_REJECTED_CONTACT_INVALID`. |
+| Script | `call_script_template_id`, `call_script_version`, `allowed_script_variables` | Approved script and approved variables only. | `TASK_REJECTED_SCRIPT_NOT_APPROVED`. |
+| Blockers | Sale Lock, Recall, Suppression, call restriction snapshots | No active blocker. | `TASK_BLOCKED_OPERATIONAL`. |
+| Governance | `evidence_policy_version`, `privacy_policy_version` | Present and approved for target environment. | `TASK_HELD_POLICY_MISSING`. |
+
+## 10. Required request invariants
+
+Task payload must assert or imply:
+
+- `not_for_quote_cart_draft = true`.
+- `no_direct_order_update = true`.
+- `call_purpose = ORDER_CONFIRMATION_ONLY`.
+- `input_signal_only = true`.
+- `program_code` and `max_attempts` match.
+- `expires_at` does not exceed program window.
+- `order_version` is included for callback race guard.
+
+If implementation does not include these exact boolean fields, equivalent server-side validation and audit evidence are required.
+
+## 11. Intake processing sequence
+
+```text
+receive task
+  -> authenticate caller
+  -> validate schema/required fields
+  -> open idempotency scope
+  -> reject duplicate conflict or return existing decision
+  -> validate Official Order and order state
+  -> resolve attempt policy
+  -> validate official contact/phone
+  -> check trusted skip/risk flags
+  -> check operational blockers
+  -> validate script/privacy/evidence policy
+  -> create task record
+  -> create CallJob if eligible
+  -> write audit/evidence
+  -> return intake decision
+```
+
+## 12. Intake result taxonomy
+
+| Result | Creates CallJob? | Dispatch allowed? | Notes |
+| --- | --- | --- | --- |
+| `TASK_ACCEPTED_CALL_JOB_CREATED` | Yes | Only if release/scheduler gate allows. | Normal path. |
+| `TASK_ACCEPTED_DRY_RUN_ONLY` | Yes | No real SIM. | For test/staging. |
+| `TASK_SKIPPED_TRUSTED_CUSTOMER` | No | No | Order Core owns continuation. |
+| `TASK_REJECTED_NOT_OFFICIAL_ORDER` | No | No | Quote/Cart/Draft. |
+| `TASK_REJECTED_POLICY_MISMATCH` | No | No | Program/max/window mismatch. |
+| `TASK_REJECTED_CONTACT_INVALID` | No | No | Invalid phone/contact. |
+| `TASK_BLOCKED_OPERATIONAL` | No | No | Sale Lock/Recall/Suppression/etc. |
+| `TASK_HELD_ADMIN_REVIEW` | No or held | No | Missing source/ambiguous policy. |
+
+## 13. Idempotency rules
+
+| Scenario | Required behavior |
+| --- | --- |
+| Same key, same payload | Return existing intake result. |
+| Same key, different payload | Reject conflict. |
+| Same `task_id`, different key | Reject conflict unless exact duplicate mapped. |
+| Retry after transient IVR error | Safe retry using same key. |
+| Retry after task rejected | Return same rejection, do not create job later unless new task/version. |
+
+## 14. API/database mapping
+
+| Contract field | API payload | DB column/entity |
+| --- | --- | --- |
+| `task_id` | `task_id` | `ivr_confirmation_tasks.task_id` |
+| `official_order_id` | `official_order_id` / `order_id` | `official_order_id` |
+| `order_version` | `order_version` | `order_version` |
+| `program_code` | `program_type` | `program_type` |
+| `max_attempts` | `max_attempts` | `max_attempts` |
+| `attempt_schedule` | `attempt_schedule` | `attempt_schedule_json` |
+| `phone_ref` | `phone_ref` | `phone_ref` |
+| `phone_masked` | `phone_masked` | `phone_masked` |
+| `eligibility_decision` | `eligibility_decision` | `eligibility_decision` |
+| `evidence_ref` | `evidence_refs` | `evidence_refs_json` |
+| `audit_ref` | `audit_refs` | `audit_refs_json` |
+
+## 15. Negative task scenarios
+
+| Scenario | Expected |
+| --- | --- |
+| Task missing correlation | Reject. |
+| Task missing idempotency | Reject. |
+| Program `GOLDEN_HOUR` with `max_attempts = 3` | Reject policy mismatch. |
+| Program `TWENTY_FOUR_SEVEN` with only 2 attempts | Reject policy mismatch. |
+| Phone invalid | Reject or hold, no CallJob dispatch. |
+| Release flag disabled | Accept dry-run/hold, no real SIM dispatch. |
+| Script version not approved | Reject/hold. |
+
+## 16. Task acceptance tests
+
+| Test ID | Given | Then |
+| --- | --- | --- |
+| IVR04-TASK-001 | Valid Golden Hour task | CallJob with 2 attempts. |
+| IVR04-TASK-002 | Valid 24/7 task | CallJob with 3 attempts. |
+| IVR04-TASK-003 | Duplicate idempotency same payload | Existing result. |
+| IVR04-TASK-004 | Duplicate idempotency different payload | Conflict. |
+| IVR04-TASK-005 | Quote task | Reject. |
+| IVR04-TASK-006 | Active Sale Lock | Block. |
+| IVR04-TASK-007 | Missing evidence policy | Hold/review. |

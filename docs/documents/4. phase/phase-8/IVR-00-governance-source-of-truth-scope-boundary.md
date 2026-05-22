@@ -120,3 +120,88 @@ Tài liệu này đạt khi:
 - Các rule baseline khớp PACK-09, TECH-09 và Phase 8 baseline.
 - Không có quyết định nghiệp vụ nào bị giao cho implementer tự suy diễn.
 - Mọi điểm chưa có nguồn được ghi `Owner Decision Required`.
+
+## 11. Phân rã phạm vi triển khai chi tiết
+
+| Nhóm phạm vi | Trong Phase 8 | Ngoài Phase 8 | Ghi chú triển khai |
+| --- | --- | --- | --- |
+| Order confirmation | Gọi xác nhận Official Order bằng IVR. | Tư vấn sản phẩm, upsell, CRM, chăm sóc sau bán. | Call script chỉ phục vụ xác nhận đơn. |
+| Order ownership | Gửi tín hiệu cho Order Core. | IVR tự confirm/cancel/expire order. | Order Core là lớp quyết định cuối. |
+| Attempt policy | Golden Hour 2 cuộc/10 phút; 24/7 3 cuộc/15 phút. | Tự thêm attempt, tự kéo dài window. | Policy phải nằm trong resolver/config được duyệt. |
+| Contact | Dùng official contact projection. | Đọc full profile/full address/CRM note. | Ưu tiên `phone_ref`, `phone_masked`, dial token. |
+| Evidence | Ghi audit/evidence cho task/attempt/result/admin. | Tự mark release PASS. | Evidence Registry/Foundation quyết định accepted. |
+| Admin | Monitor, pause/resume, disable/enable SIM, manual technical retry. | Admin force order state. | Admin action không bypass blocker. |
+| SIM Gateway | Internal SIM Gateway Server. | Cloud IVR/SIP/brandname làm mặc định. | Provider khác là future owner decision. |
+
+## 12. Source-of-truth decision table
+
+| Quyết định | Source-of-truth | IVR consume như thế nào | Khi source không khả dụng |
+| --- | --- | --- | --- |
+| Entity có phải Official Order không | Commerce Order Core | Task payload + revalidation callback. | Không tạo/gọi task. |
+| Order còn nhận IVR result không | Order Core | Callback ack/reject. | Retry bounded hoặc admin review. |
+| Khách có trusted skip không | Customer Trust Resolver | Snapshot trong task/eligibility. | Không tự hardcode; route review hoặc require IVR theo policy an toàn nếu owner duyệt. |
+| Phone có hợp lệ không | Official Contact/Phone Resolver | `phone_validation_status`. | Không dispatch nếu không có fallback approved. |
+| Sale Lock/Recall/Suppression | Operational Core | Pre-dispatch check và Order Core callback revalidation. | Không dispatch. |
+| Payment issue | Payment/Order Core | Order Core revalidate khi callback. | Không confirm order. |
+| Evidence accepted | Evidence Registry | Evidence refs. | Không mở release/pass. |
+| Production ready | Release Owner | Release gate evidence. | `REAL_CUSTOMER_CALL_ALLOWED = NO`. |
+
+## 13. Governance state gates
+
+| Gate | Trạng thái mặc định | Điều kiện mở |
+| --- | --- | --- |
+| `IVR_DOCS_APPROVED` | `NO` | SRS/SDS được owner review. |
+| `IVR_CONTRACT_APPROVED` | `NO` | Contract validator pass và owner accepted. |
+| `IVR_TASK_INTAKE_ENABLED` | `NO` | API/auth/idempotency/evidence test pass. |
+| `IVR_SCHEDULER_ENABLED` | `NO` | Scheduler/concurrency/capacity test pass. |
+| `IVR_SIM_INTERNAL_TEST_ENABLED` | `NO` | Internal-number smoke approved. |
+| `REAL_CUSTOMER_CALL_ALLOWED` | `NO` | IVR-09 release gate pass, privacy/security approved. |
+| `DOWNSTREAM_IVR_DEPENDENCY_ALLOWED` | `NO` | Order Core/Release owner approves downstream consumption. |
+
+## 14. P0 governance rules
+
+| P0 | MUST | MUST NOT | FAIL IF |
+| --- | --- | --- | --- |
+| IVR00-P0-001 | IVR chỉ xử lý Official Order. | Không gọi Quote/Cart/Order Draft. | Có task IVR từ entity chưa phải Official Order. |
+| IVR00-P0-002 | IVR result là input signal. | Không tự transition order. | IVR/SIM có quyền update order state. |
+| IVR00-P0-003 | Order Core revalidate callback. | Không accept callback mù. | Key `1` làm order confirmed khi Sale Lock/Recall active. |
+| IVR00-P0-004 | Technical failure tách khỏi no-answer. | Không count lỗi kỹ thuật như khách không nghe. | SIM/server/DTMF lỗi tạo no-answer final. |
+| IVR00-P0-005 | Evidence/audit bắt buộc. | Không release bằng xác nhận miệng. | PASS thiếu evidence packet. |
+| IVR00-P0-006 | Privacy safe by default. | Không log raw phone/full profile. | Raw phone xuất hiện trong app log/admin UI không được duyệt. |
+
+## 15. Traceability requirement
+
+Mỗi implementation task sau này phải có tối thiểu:
+
+- Source document path trong `docs/source-map.md`.
+- Requirement ID từ `IVR-00` đến `IVR-09` hoặc SDS `IVR-10` đến `IVR-20`.
+- Contract path nếu có: schema/API/event/state-machine.
+- Test case hoặc evidence item.
+- Owner decision nếu rule chưa được khóa.
+
+## 16. Implementation readiness checklist
+
+| Checklist | Required before code |
+| --- | --- |
+| Source path hợp lệ | Có. |
+| Requirement rõ | Có. |
+| Owner/source-of-truth rõ | Có. |
+| Boundary với Order Core rõ | Có. |
+| Privacy impact rõ | Có. |
+| Evidence/audit rõ | Có. |
+| Fail-safe rõ | Có. |
+| Test expected rõ | Có. |
+
+## 17. Residual open decisions
+
+Các quyết định sau không được implementer tự bịa:
+
+- Ngưỡng trusted customer.
+- Risk flags bắt buộc vẫn phải IVR.
+- Permanent invalid phone criteria.
+- Technical retry count/backoff.
+- SIM Gateway production protocol.
+- Recording policy.
+- Retention duration.
+- Pilot real customer scope.
+- Notification template sau khi Order Core hủy/expire.

@@ -125,3 +125,126 @@ Capacity incident không được kéo dài window. Nếu miss window, IVR trả
 - Technical retry không tăng customer attempt count.
 - Queue pause/resume có permission, reason, audit.
 - Capacity miss không làm kéo dài giá/chương trình.
+
+## 10. Attempt schedule generation
+
+| Program | `T0` source | Generated customer attempts | Expiry |
+| --- | --- | --- | --- |
+| `GOLDEN_HOUR` | Time Order Core says IVR confirmation starts. | Attempt 1 at `T0`; attempt 2 at `T0 + 5 minutes`. | `T0 + 10 minutes`. |
+| `TWENTY_FOUR_SEVEN` | Time Order Core says IVR confirmation starts. | Attempt 1 at `T0`; attempt 2 at `T0 + 5 minutes`; attempt 3 at `T0 + 10 minutes`. | `T0 + 15 minutes`. |
+
+Schedule must be deterministic from:
+
+- `program_type`.
+- `T0`.
+- `policy_version`.
+- `order_version`.
+
+Schedule must not be regenerated with different offsets for the same task unless Order Core emits a new task/version.
+
+## 11. Scheduler query model
+
+Scheduler should query attempts by:
+
+| Filter | Reason |
+| --- | --- |
+| `status in (ATTEMPT_PLANNED, ATTEMPT_PRECHECK_PENDING, ATTEMPT_READY)` | Only due work. |
+| `scheduled_at <= now` | Attempt due. |
+| `scheduled_window_expires_at > now` | Not expired. |
+| `queue_status = ACTIVE` | Queue not paused/held. |
+| `capacity_status != CAPACITY_HELD` | Capacity safe. |
+| `real_call_allowed` or dry-run mode | Release gate. |
+
+Ordering:
+
+1. Earliest `scheduled_window_expires_at`.
+2. Earliest `scheduled_at`.
+3. Higher business priority only if source-backed.
+4. Stable tie-breaker by `task_id`/`attempt_id`.
+
+## 12. Pre-dispatch checks
+
+Right before SIM reserve, scheduler must re-check:
+
+- Queue not paused.
+- Job not closed/cancelled.
+- Attempt not already dispatched.
+- Window not expired.
+- Official contact still callable.
+- Sale Lock/Recall/Suppression/opt-out not active.
+- SIM capacity available.
+- Evidence writer available if required.
+- Release gate allows selected SIM mode.
+
+If any check fails, mark attempt as `ATTEMPT_BLOCKED`, `ATTEMPT_EXPIRED`, `CAPACITY_HELD`, or `ADMIN_REVIEW_REQUIRED` as appropriate.
+
+## 13. Technical retry model
+
+Technical retry is allowed only when:
+
+- Failure is classified as technical.
+- No customer outcome was reached.
+- Retry does not violate privacy/call restriction.
+- Retry does not bypass operational blocker.
+- Retry is within owner-approved retry count/backoff.
+
+Technical retry must record:
+
+| Field | Required |
+| --- | --- |
+| `technical_exception_id` | Yes |
+| `original_attempt_id` | Yes |
+| `customer_attempt_counted=false` | Yes |
+| `retry_reason` | Yes |
+| `admin_action_id` if manual | Conditional |
+| `evidence_ref` | Yes |
+| `audit_ref` | Yes |
+
+## 14. Capacity handling
+
+Capacity incident should open when:
+
+- Due attempts cannot be dispatched before expiry.
+- SIM healthy count drops below operational threshold.
+- Callback/evidence outage makes final processing unsafe.
+- Admin pauses queue for safety.
+
+Capacity incident must not:
+
+- Count as no-answer.
+- Extend commercial window.
+- Create additional customer attempts.
+- Allow batch-after-session calling.
+
+## 15. Concurrency controls
+
+| Risk | Guard |
+| --- | --- |
+| Two workers dispatch same attempt | Attempt lock/compare-and-swap state update. |
+| Two attempts reserve same SIM | Unique active SIM reservation. |
+| Queue paused while worker is dispatching | Pre-dispatch check after lock. |
+| Callback closes job while scheduler selects next attempt | Job state re-read after lock. |
+| Window expires while SIM reserve waits | Expiry check after reserve attempt. |
+
+## 16. Scheduler P0 tests
+
+| Test ID | Scenario | Expected |
+| --- | --- | --- |
+| IVR05-P0-001 | Golden Hour schedule | Exactly 2 attempts. |
+| IVR05-P0-002 | 24/7 schedule | Exactly 3 attempts. |
+| IVR05-P0-003 | Golden Hour worker tries attempt 3 | Blocked/test fail. |
+| IVR05-P0-004 | 24/7 worker tries attempt 4 | Blocked/test fail. |
+| IVR05-P0-005 | SIM failure | Technical exception, no customer count. |
+| IVR05-P0-006 | Queue paused | No dispatch. |
+| IVR05-P0-007 | Capacity miss | Incident/expired signal, no window extension. |
+
+## 17. Queue operational metrics
+
+| Metric | Use |
+| --- | --- |
+| `due_attempts_total` | Backlog by deadline. |
+| `missed_window_total` | Capacity/rule health. |
+| `dispatch_latency_ms` | Scheduler performance. |
+| `sim_reservation_conflict_total` | Concurrency defects. |
+| `technical_retry_total` | Adapter/runtime stability. |
+| `customer_attempt_count_total` | Policy validation. |
