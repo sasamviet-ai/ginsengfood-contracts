@@ -81,9 +81,32 @@ paths:
   /v1/inventory/stock-alerts:
     get:
       summary: List stock alerts
-      description: "Lists stock alert contracts for ops-core planning. TODO: source documents do not lock final alert filter fields."
+      description: Lists stock alert contracts for ops-core planning. FGSA-01 scope is SKU + warehouse aggregate; batch/location evidence is optional and channel-specific policy is deferred.
       operationId: listStockAlertsV1
       tags: [inventory]
+      parameters:
+        - name: skuId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: warehouseId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [STOCK_OK, STOCK_YELLOW_ALERT, STOCK_RED_ALERT, STOCKOUT_RISK, STOCK_ZERO_OR_NOT_SELLABLE]
+        - name: from
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+        - name: to
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
       responses:
         "200":
           description: Stock alerts wrapped in the common envelope.

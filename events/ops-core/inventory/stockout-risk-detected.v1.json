@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "events/ops-core/inventory/stockout-risk-detected.v1.json",
   "title": "Stockout Risk Detected Event v1",
-  "description": "Published when stockout risk is detected. It may feed demand review but cannot bypass Sale Lock, Recall, Hold, MRP, or owner approval.",
-  "$comment": "Sources: PACK-03 Demand/MRP guards; PACK-01 Stock Gate.",
+  "description": "Published after a SKU + warehouse stockout-risk alert event is persisted. It may feed demand review but cannot bypass Sale Lock, Recall, Hold, MRP, or owner approval.",
+  "$comment": "Sources: PACK-03 Demand/MRP guards; PACK-01 Stock Gate; OD-FGSA-001/005/012.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -57,6 +57,7 @@
           "required": [
             "stock_alert_id",
             "sku_id",
+            "warehouse_id",
             "status",
             "stockout_risk_threshold"
           ]

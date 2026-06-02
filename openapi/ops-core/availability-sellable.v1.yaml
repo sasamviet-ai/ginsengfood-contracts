@@ -78,6 +78,10 @@ components:
         sku_id:
           type: string
           minLength: 1
+        warehouse_id:
+          type: string
+          minLength: 1
+          description: Optional warehouse scope. FGSA-01 default availability scope is SKU + warehouse aggregate.
         batch_id:
           type: string
           minLength: 1

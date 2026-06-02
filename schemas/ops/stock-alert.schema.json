@@ -2,18 +2,42 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/ops/v1/stock-alert.schema.json",
   "title": "Stock Alert",
-  "description": "Stock Alert v1 contract for SKU stock warning levels and Production Demand trigger.",
-  "$comment": "Sources: Muc canh bao ton kho san pham and PACK-03 Stock Alert.",
+  "description": "Stock Alert v1 contract for SKU + warehouse stock warning levels, guard evidence, and optional Production Demand linkage.",
+  "$comment": "Sources: Muc canh bao ton kho san pham, PACK-03 Stock Alert, and OD-FGSA-001..015 owner approvals.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "stock_alert_id": { "type": "string", "minLength": 1, "description": "Stock alert identifier." },
     "sku_id": { "type": "string", "minLength": 1, "description": "SKU being monitored." },
+    "warehouse_id": { "type": "string", "minLength": 1, "description": "Warehouse scope for FGSA policy/evaluation. Product derives from SKU; channel scope is deferred." },
+    "warehouse_location_id": { "type": "string", "minLength": 1, "description": "Optional location/bin snapshot for evidence and trace only." },
     "status": { "type": "string", "description": "Stock alert status. Prefer enums/ops/stock-alert-status.yaml." },
     "available_stock": { "$ref": "../common/quantity.schema.json" },
+    "stock_ok_reference_quantity": { "$ref": "../common/quantity.schema.json" },
     "yellow_threshold": { "$ref": "../common/quantity.schema.json" },
     "red_threshold": { "$ref": "../common/quantity.schema.json" },
     "stockout_risk_threshold": { "$ref": "../common/quantity.schema.json" },
+    "zero_stock_threshold": { "$ref": "../common/quantity.schema.json" },
+    "alert_reason": { "type": "string", "description": "Reason/evaluation label captured by the stock-alert evaluator." },
+    "available_stock_breakdown": {
+      "type": "object",
+      "description": "Sellable-eligible availability evidence. Must exclude reserved/allocation/hold/recall/sale-lock/quality-hold/not-sellable quantities when populated.",
+      "additionalProperties": true
+    },
+    "guard_block_reasons": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Fail-closed sellable guard blockers such as recall, sale-lock, quality hold, not-sellable, or zero stock."
+    },
+    "risk_calculation": {
+      "type": "object",
+      "description": "Composite STOCKOUT_RISK evidence, including fixed floor and lead-time coverage when available.",
+      "additionalProperties": true
+    },
+    "lead_time_days": { "type": "integer", "minimum": 1, "description": "Lead time from owner-approved SKU + warehouse planning policy, not service hardcode." },
+    "coverage_days": { "type": "number", "minimum": 0, "description": "Coverage-days result used by composite risk evaluation when available." },
+    "source_stock_balance_id": { "type": "string", "minLength": 1, "description": "Optional source balance/projection record used as evaluation evidence." },
+    "source_ledger_entry_id": { "type": "string", "minLength": 1, "description": "Optional last source ledger entry used as evaluation evidence." },
     "recommended_action": { "type": "string", "description": "Recommended action from stock alert policy, e.g. create warning, create Production Demand, or activate Stock/Sellable Guard." },
     "demand_id": { "type": "string", "minLength": 1, "description": "Production Demand created from the alert when applicable." },
     "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
