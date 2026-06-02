@@ -19,6 +19,6 @@ values:
   - value: SALE_LOCK_ACCOUNTING_CONFIRMED
     description: Sale lock accounting checkpoint is confirmed.
   - value: MATERIAL_ISSUE_ACCOUNTING_CONFIRMED
-    description: OPF-12 material issue accounting form is confirmed.
+    description: FRM-14 material issue accounting form is confirmed.
 compatibility:
   breaking_change: Removing a checkpoint type used by accounting consumers is breaking.

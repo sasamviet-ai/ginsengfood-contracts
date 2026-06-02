@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Ops Core Operational Admin API
   version: 1.0.0
-  description: Internal/admin operational form, print, material planning, and MISA handoff API contract derived from the current appendices.
+  description: Internal/admin operational form, print, material planning, and MISA handoff API contract for canonical FRM-01 through FRM-27 forms. Existing source-specific admin routes remain examples of executable surfaces; OPF aliases are deprecated compatibility input only.
 servers:
   - url: https://api.example.local
     description: Placeholder only.
@@ -17,7 +17,7 @@ paths:
       summary: Create raw material inbound assessment form
       operationId: createRawMaterialInboundAssessmentV1
       tags: [operational-admin]
-      x-operational-form-type: RAW_MATERIAL_INBOUND_ASSESSMENT
+      x-operational-form-type: RAW_MATERIAL_INTAKE
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
   /v1/admin/operational/production-orders:
@@ -33,7 +33,7 @@ paths:
       summary: Create material issue request form
       operationId: createMaterialIssueRequestFormV1
       tags: [operational-admin]
-      x-operational-form-type: MATERIAL_ISSUE_REQUEST
+      x-operational-form-type: MATERIAL_REQUEST
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
   /v1/admin/operational/material-issue-approvals:
@@ -41,7 +41,7 @@ paths:
       summary: Create material issue approval form
       operationId: createMaterialIssueApprovalFormV1
       tags: [operational-admin]
-      x-operational-form-type: MATERIAL_ISSUE_APPROVAL
+      x-operational-form-type: MATERIAL_ACCEPTANCE_FOR_PRODUCTION
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
   /v1/admin/operational/workforce-checkins:
@@ -49,7 +49,7 @@ paths:
       summary: Create workforce check-in/check-out form
       operationId: createWorkforceCheckinCheckoutFormV1
       tags: [operational-admin]
-      x-operational-form-type: WORKFORCE_CHECKIN_CHECKOUT
+      x-operational-form-type: PERSONNEL_CHECKIN_CHECKOUT
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
   /v1/admin/operational/preprocess-tracking:
@@ -57,7 +57,7 @@ paths:
       summary: Create preprocess tracking form
       operationId: createPreprocessTrackingFormV1
       tags: [operational-admin]
-      x-operational-form-type: PREPROCESS_TRACKING
+      x-operational-form-type: PREPROCESSING_TRACKING
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
   /v1/admin/operational/freeze-dry-qc:
@@ -73,7 +73,7 @@ paths:
       summary: Create level 1 packing tracking form
       operationId: createPackingLevel1TrackingFormV1
       tags: [operational-admin]
-      x-operational-form-type: PACKING_LEVEL_1_TRACKING
+      x-operational-form-type: PACKAGING_LEVEL_1
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
   /v1/admin/operational/packing-level-2:
@@ -81,7 +81,7 @@ paths:
       summary: Create level 2 packing tracking form
       operationId: createPackingLevel2TrackingFormV1
       tags: [operational-admin]
-      x-operational-form-type: PACKING_LEVEL_2_TRACKING
+      x-operational-form-type: PACKAGING_LEVEL_2
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
   /v1/admin/operational/finished-goods-qc:
@@ -97,7 +97,7 @@ paths:
       summary: Create finished goods receipt order
       operationId: createFinishedGoodsReceiptOrderV1
       tags: [operational-admin]
-      x-operational-form-type: FINISHED_GOODS_RECEIPT_ORDER
+      x-operational-form-type: FINISHED_GOODS_WAREHOUSE_RECEIPT
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
   /v1/admin/operational/material-issue-accounting:
@@ -273,5 +273,5 @@ components:
     Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
-    UnprocessableEntity: { description: Validation, mapping, permission, evidence, or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: "Validation, mapping, permission, evidence, or guard failure.", content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

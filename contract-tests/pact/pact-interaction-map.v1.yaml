@@ -23,8 +23,8 @@ interactions:
     consumer: ops-admin-ui
     contract:
       openapi: ../../openapi/ops-core/operational-admin.v1.yaml
-      fixture: ../fixtures/operational-form-opf-01.v1.fixture.json
-    expected_boundary: Admin UI may submit OPF payloads through ops-core-owned routes only.
+      fixture: ../fixtures/operational-form-frm-09.v1.fixture.json
+    expected_boundary: Admin UI may submit canonical FRM payloads through ops-core-owned routes only. Deprecated OPF aliases are compatibility input only.
   - name: printer-adapter-receives-print-job
     provider: ops-core
     consumer: printer-adapter

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Ops Core Operational Evidence API
   version: 1.0.0
-  description: Operational Evidence and Operational Form v1 API contract for evidence-bound operational records and generated forms.
+  description: Operational Evidence and canonical FRM-01 through FRM-27 Operational Form v1 API contract for evidence-bound operational records and generated forms.
 servers:
   - url: https://api.example.local
     description: Placeholder only.

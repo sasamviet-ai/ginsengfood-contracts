@@ -8,7 +8,7 @@ Sources:
 
 Scope:
 
-This state machine applies to the shared OPF-01 through OPF-12 operational form envelope. Per-form restrictions may be stricter.
+This state machine applies to the shared canonical `FRM-01` through `FRM-27` operational form envelope. Deprecated `OPF-01` through `OPF-12` aliases may be normalized at compatibility boundaries only. Per-form restrictions may be stricter.
 
 States:
 
@@ -65,4 +65,3 @@ Compatibility:
 - Re-entering generated/inherited fields manually when the source requires auto-pull is breaking.
 - Transitioning without required confirmation, permission, evidence, or audit is breaking.
 - MISA/accounting states must not expose price/accounting data to workshop-only forms unless the source allows it.
-

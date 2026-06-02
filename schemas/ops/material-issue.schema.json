@@ -3,7 +3,7 @@
   "$id": "schemas/ops/v1/material-issue.schema.json",
   "title": "Material Issue",
   "description": "Material Issue v1 contract for issuing only eligible raw material lots into production. Lots must be QC_PASS and READY_FOR_PRODUCTION.",
-  "$comment": "Sources: PACK-01 Material Issue guard and appendix OPF-03/OPF-04/OPF-12 forms. TODO: exact material issue state machine is not fully specified.",
+  "$comment": "Sources: PACK-01 Material Issue guard and canonical FRM-12, FRM-13, and FRM-14 forms. TODO: exact material issue state machine is not fully specified.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

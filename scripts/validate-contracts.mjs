@@ -19,7 +19,7 @@ const eventEnvelopeFields = [
 const allowedMetaSources = new Set(["docs/source-map.md"]);
 const sourceMapDocumentPaths = new Set();
 const placeholderFileName = ["cc", "md"].join(".");
-const legacyFormCodePattern = new RegExp("\\b" + ["FR", "M-"].join("") + "[0-9A-Za-z_-]+");
+const unsupportedDeprecatedOpfPattern = /\bOPF-(?:00|1[3-9]|[2-9][0-9A-Za-z_-]*)/;
 const techHandoffId = ["TECH", "-13"].join("");
 const staleTechHandoffPattern = new RegExp(`${techHandoffId}.{0,80}blocked|blocked.{0,80}${techHandoffId}`, "i");
 const requiredPhase8SrsPaths = [
@@ -298,8 +298,8 @@ function checkLegacySourcePath(filePath, text) {
   if (legacy) {
     errors.push(`${relative}: legacy docs/documents path remains (${legacy[0]})`);
   }
-  if (legacyFormCodePattern.test(text)) {
-    errors.push(`${relative}: legacy form code remains`);
+  if (unsupportedDeprecatedOpfPattern.test(text)) {
+    errors.push(`${relative}: unsupported deprecated OPF form code remains`);
   }
   if (staleTechHandoffPattern.test(text)) {
     errors.push(`${relative}: stale handoff-source blocked wording remains`);

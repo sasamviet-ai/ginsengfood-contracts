@@ -2,14 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/ops/v1/operational-form-payload.schema.json",
   "title": "Operational Form Payload",
-  "description": "Per-form payload contract for OPF-01 through OPF-12. It records generated fields, operator-entered fields, action constraints, and status constraints without embedding workflow business logic.",
-  "$comment": "Sources: docs/documents/0. appendices/01-OPERATIONAL-FORMS.md and docs/documents/0. appendices/02-AUTO-GENERATED-FORM-RULES.md.",
+  "description": "Per-form payload contract for FRM-01 through FRM-27. It records generated fields, operator-entered fields, action constraints, and status constraints without embedding workflow business logic.",
+  "$comment": "Sources: docs/documents/0. appendices/01-OPERATIONAL-FORMS.md, docs/documents/0. appendices/02-AUTO-GENERATED-FORM-RULES.md, and docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "form_code": {
       "type": "string",
-      "pattern": "^OPF-(0[1-9]|1[0-2])$"
+      "pattern": "^FRM-(0[1-9]|1[0-9]|2[0-7])$"
+    },
+    "deprecated_form_code_alias": {
+      "type": "string",
+      "pattern": "^OPF-(0[1-9]|1[0-2])$",
+      "description": "Optional deprecated OPF compatibility alias supplied by a legacy consumer. The canonical payload key remains form_code."
     },
     "payload_version": {
       "type": "string",

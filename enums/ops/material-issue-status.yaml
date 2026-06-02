@@ -11,7 +11,7 @@ values:
     source: Operational forms draft behavior.
   - value: REQUESTED
     description: Material issue requested.
-    source: Operational Forms OPF-03.
+    source: Operational Forms FRM-12.
   - value: LOT_READY_CHECKING
     description: Lot readiness guard is being checked.
     source: PACK-01 requires QC_PASS plus READY_FOR_PRODUCTION.

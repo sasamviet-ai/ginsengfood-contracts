@@ -6,7 +6,7 @@ This folder contains Operational Core v1 JSON Schemas for `ginsengfood-ops-core`
 
 - Source origin, supplier, raw material receipt/lot/QC, demand, MRP, material requirement, procurement suppression.
 - Production order, Production BOM Snapshot, material issue/receipt, production execution, personnel check, batch, packaging, QC, batch release, warehouse, inventory, traceability, recall, sale lock, sellable status, and public trace.
-- Operational appendices: OPF-01 through OPF-12, auto-generated form payloads, print payload/job, material code registry, packaging yield policy, material planning policy, MISA checkpoint, and MISA handoff.
+- Operational appendices: FRM-01 through FRM-27, auto-generated form payloads, print payload/job, material code registry, packaging yield policy, material planning policy, MISA checkpoint, and MISA handoff. OPF-01 through OPF-12 remain deprecated compatibility aliases only.
 - Contract surfaces only. No implementation code, database migration, algorithm, or business calculation belongs here.
 
 ## Source Basis

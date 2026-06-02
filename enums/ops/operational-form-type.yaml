@@ -1,49 +1,132 @@
 version: v1
 name: operational-form-type
 title: Operational Form Type
-description: Required operational forms from the current appendices. Codes are contract identifiers, not UI labels.
+description: Canonical operational form types for FRM-01 through FRM-27. Codes are contract identifiers, not UI labels. OPF-01 through OPF-12 remain deprecated aliases only for legacy compatibility.
 source_documents:
   - docs/documents/0. appendices/01-OPERATIONAL-FORMS.md
   - docs/documents/0. appendices/02-AUTO-GENERATED-FORM-RULES.md
   - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
+  - docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md
 values:
-  - value: RAW_MATERIAL_INBOUND_ASSESSMENT
-    form_code: OPF-01
-    description: Raw material assessment and inbound receipt form.
+  - value: PRODUCTION_PLAN_DEMAND
+    form_code: FRM-01
+    description: Production plan or production demand form.
+  - value: DEMAND_BOARD_RECORD
+    form_code: FRM-02
+    description: Demand board record derived from production demand.
+  - value: FORMULA_RESOLUTION_BOM_SNAPSHOT
+    form_code: FRM-03
+    description: Formula resolution and production BOM snapshot record.
+  - value: MRP_RUN_MATERIAL_REQUIREMENT_BOARD
+    form_code: FRM-04
+    description: MRP run and material requirement board.
+  - value: PROCUREMENT_SUPPRESSION_RESULT
+    form_code: FRM-05
+    description: Procurement suppression decision/result.
+  - value: PURCHASE_REQUIREMENT
+    form_code: FRM-06
+    description: Raw material or operating material purchase requirement.
+  - value: HARVEST_REQUIREMENT
+    form_code: FRM-07
+    description: Sâm Savigin harvest requirement.
+  - value: PACKAGING_PROCUREMENT_REQUIREMENT
+    form_code: FRM-08
+    description: Packaging and packaging-material procurement requirement.
+  - value: RAW_MATERIAL_INTAKE
+    form_code: FRM-09
+    description: Raw material assessment and intake form.
+  - value: PACKAGING_INTAKE
+    form_code: FRM-10
+    description: Packaging and packaging-material intake form.
   - value: PRODUCTION_ORDER
-    form_code: OPF-02
-    description: Production order.
-  - value: MATERIAL_ISSUE_REQUEST
-    form_code: OPF-03
-    description: Material issue request for production.
-  - value: MATERIAL_ISSUE_APPROVAL
-    form_code: OPF-04
-    description: Approval for materials allowed into production.
-  - value: WORKFORCE_CHECKIN_CHECKOUT
-    form_code: OPF-05
-    description: Workforce check-in/check-out by production order, batch, and step.
-  - value: PREPROCESS_TRACKING
-    form_code: OPF-06
-    description: Preprocess tracking form.
-  - value: FREEZE_DRY_QC
-    form_code: OPF-07
-    description: Freeze-dry quality check form.
-  - value: PACKING_LEVEL_1_TRACKING
-    form_code: OPF-08
-    description: Level 1 packing tracking form.
-  - value: PACKING_LEVEL_2_TRACKING
-    form_code: OPF-09
-    description: Level 2 packing tracking form.
-  - value: FINISHED_GOODS_QC
-    form_code: OPF-10
-    description: Finished goods QC form.
-  - value: FINISHED_GOODS_RECEIPT_ORDER
-    form_code: OPF-11
-    description: Finished goods warehouse receipt order.
-  - value: MATERIAL_ISSUE_ACCOUNTING
-    form_code: OPF-12
+    form_code: FRM-11
+    description: Production order form.
+  - value: MATERIAL_REQUEST
+    form_code: FRM-12
+    description: Material request for production.
+  - value: MATERIAL_ACCEPTANCE_FOR_PRODUCTION
+    form_code: FRM-13
+    description: Material acceptance form before production use.
+  - value: ACCOUNTING_MATERIAL_ISSUE
+    form_code: FRM-14
     description: Accounting material issue form for production.
+  - value: PERSONNEL_CHECKIN_CHECKOUT
+    form_code: FRM-15
+    description: Personnel check-in/check-out by production order, batch, and step.
+  - value: PREPROCESSING_TRACKING
+    form_code: FRM-16
+    description: Pre-processing tracking form.
+  - value: FREEZE_DRY_QC
+    form_code: FRM-17
+    description: Freeze-dry quality check form.
+  - value: PACKAGING_LEVEL_1
+    form_code: FRM-18
+    description: Level 1 packaging tracking form.
+  - value: PACKAGING_LEVEL_2
+    form_code: FRM-19
+    description: Level 2 packaging and QR tracking form.
+  - value: FINISHED_GOODS_QC
+    form_code: FRM-20
+    description: Finished goods QC form.
+  - value: BATCH_RELEASE
+    form_code: FRM-21
+    description: Batch release form.
+  - value: FINISHED_GOODS_WAREHOUSE_RECEIPT
+    form_code: FRM-22
+    description: Finished goods warehouse receipt form.
+  - value: DISPOSAL_REQUEST
+    form_code: FRM-23
+    description: Disposal/write-off request form.
+  - value: INVENTORY_WRITE_OFF
+    form_code: FRM-24
+    description: Inventory write-off form.
+  - value: MISA_ACCOUNTING_HANDOFF_RECORD
+    form_code: FRM-25
+    description: MISA accounting handoff record created from an eligible checkpoint.
+  - value: OPERATIONAL_EVIDENCE_PACKET
+    form_code: FRM-26
+    description: Operational evidence packet/dossier aggregate.
+  - value: OPERATIONAL_SMOKE_RUN_RECORD
+    form_code: FRM-27
+    description: Operational smoke run record.
 compatibility:
-  breaking_change: Removing or changing an OPF code is breaking for operational form routes, examples, and state machines.
-todos:
-  - Decide whether the optional production planning form should be OPF-00 or a separate planning contract.
+  canonical_form_code_pattern: "^FRM-(0[1-9]|1[0-9]|2[0-7])$"
+  deprecated_alias_policy: OPF aliases are accepted only as compatibility input and must be normalized to the canonical FRM code before persistence or downstream handoff.
+  deprecated_aliases:
+    - alias: OPF-01
+      canonical_form_code: FRM-09
+      legacy_description: Raw material assessment and inbound receipt form.
+    - alias: OPF-02
+      canonical_form_code: FRM-11
+      legacy_description: Production order.
+    - alias: OPF-03
+      canonical_form_code: FRM-12
+      legacy_description: Material issue request for production.
+    - alias: OPF-04
+      canonical_form_code: FRM-13
+      legacy_description: Approval for materials allowed into production.
+    - alias: OPF-05
+      canonical_form_code: FRM-15
+      legacy_description: Workforce check-in/check-out.
+    - alias: OPF-06
+      canonical_form_code: FRM-16
+      legacy_description: Preprocess tracking form.
+    - alias: OPF-07
+      canonical_form_code: FRM-17
+      legacy_description: Freeze-dry quality check form.
+    - alias: OPF-08
+      canonical_form_code: FRM-18
+      legacy_description: Level 1 packaging tracking form.
+    - alias: OPF-09
+      canonical_form_code: FRM-19
+      legacy_description: Level 2 packaging tracking form.
+    - alias: OPF-10
+      canonical_form_code: FRM-20
+      legacy_description: Finished goods QC form.
+    - alias: OPF-11
+      canonical_form_code: FRM-22
+      legacy_description: Finished goods warehouse receipt order.
+    - alias: OPF-12
+      canonical_form_code: FRM-14
+      legacy_description: Accounting material issue form for production.
+  breaking_change: Removing a canonical FRM code or persisting a deprecated OPF alias as the authoritative form code is breaking for operational form routes, examples, and state machines.

@@ -3,7 +3,7 @@
   "$id": "events/ops-core/misa/accounting-handoff-created.v1.json",
   "title": "Accounting Handoff Created Event v1",
   "description": "Published when an accounting handoff contract is created from a valid operational checkpoint. It does not modify Operational Truth.",
-  "$comment": "Sources: PACK-04 MISA Handoff and appendix OPF-12 accounting material issue form.",
+  "$comment": "Sources: PACK-04 MISA Handoff and canonical FRM-14 accounting material issue / FRM-25 handoff record.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

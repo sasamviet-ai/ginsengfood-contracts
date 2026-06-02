@@ -1893,7 +1893,7 @@ Supplier allowlist evidence nếu purchased.
 
 Company source verification evidence nếu self-grown.
 
-Evidence scan status nếu có file đính kèm.
+File admission metadata theo `OD-UPLOAD-001` nếu có file đính kèm; không dùng malware scan lifecycle làm điều kiện nghiệp vụ.
 
 Owner review record.
 

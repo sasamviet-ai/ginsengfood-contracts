@@ -1,7 +1,8 @@
 {
-  "operational_form_id": "opf-01-20260521-001",
-  "form_code": "OPF-01",
-  "form_type": "RAW_MATERIAL_INBOUND_ASSESSMENT",
+  "operational_form_id": "frm-09-20260521-001",
+  "form_code": "FRM-09",
+  "deprecated_form_code_alias": "OPF-01",
+  "form_type": "RAW_MATERIAL_INTAKE",
   "status": "GENERATED",
   "source_object": {
     "sourceId": "raw-material-receipt-20260521-001",

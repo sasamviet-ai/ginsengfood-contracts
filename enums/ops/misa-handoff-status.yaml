@@ -1,7 +1,7 @@
 version: v1
 name: misa-handoff-status
 title: MISA Handoff Status
-description: MISA handoff mapping, sync, and reconcile status values for OPF-12/accounting boundaries and PACK-04.
+description: MISA handoff mapping, sync, and reconcile status values for FRM-14/FRM-25 accounting boundaries and PACK-04.
 source_documents:
   - docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md
   - docs/documents/0. appendices/04-MISA-MAPPING-RULES.md

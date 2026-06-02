@@ -1,7 +1,7 @@
 version: v1
 name: operational-form-status
 title: Operational Form Status
-description: Operational Form v1 status values for generated and operator-confirmed OPF-01 through OPF-12 forms.
+description: Operational Form v1 status values for generated and operator-confirmed FRM-01 through FRM-27 forms.
 source_documents:
   - docs/documents/0. appendices/01-OPERATIONAL-FORMS.md
   - docs/documents/0. appendices/02-AUTO-GENERATED-FORM-RULES.md
@@ -73,4 +73,4 @@ values:
 compatibility:
   breaking_change: Allowing transitions without required confirmations/evidence is breaking.
 todos:
-  - Define per-form state machines for OPF-01 through OPF-12 if the implementation needs stricter per-form transition matrices.
+  - Define per-form state machines for FRM-01 through FRM-27 if the implementation needs stricter per-form transition matrices.

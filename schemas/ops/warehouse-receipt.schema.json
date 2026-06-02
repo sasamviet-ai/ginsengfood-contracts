@@ -3,7 +3,7 @@
   "$id": "schemas/ops/v1/warehouse-receipt.schema.json",
   "title": "Warehouse Receipt",
   "description": "Warehouse Receipt v1 contract. Inventory increases only at Warehouse Receipt Confirmed and only for RELEASED batches.",
-  "$comment": "Sources: PACK-01 warehouse receipt and inventory boundary; appendix OPF-11 finished goods warehouse receipt order.",
+  "$comment": "Sources: PACK-01 warehouse receipt and inventory boundary; canonical FRM-22 finished goods warehouse receipt.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

@@ -3,7 +3,7 @@
   "$id": "schemas/ops/v1/batch-release.schema.json",
   "title": "Batch Release",
   "description": "Batch Release v1 contract. Batch RELEASED is a separate decision after QC; QC_PASS cannot auto-release a batch.",
-  "$comment": "Sources: PACK-01/TECH-03 QC_PASS vs RELEASED boundary and appendix OPF-10 finished goods QC / OPF-11 warehouse receipt order.",
+  "$comment": "Sources: PACK-01/TECH-03 QC_PASS vs RELEASED boundary and canonical FRM-20 finished goods QC / FRM-22 warehouse receipt.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

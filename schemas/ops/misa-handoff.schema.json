@@ -3,7 +3,7 @@
   "$id": "schemas/ops/v1/misa-handoff.schema.json",
   "title": "MISA Handoff",
   "description": "MISA Handoff v1 contract. MISA receives only valid operational checkpoints with mapping, sync status, reconcile status, audit, evidence, and idempotency.",
-  "$comment": "Sources: docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md, docs/documents/0. appendices/04-MISA-MAPPING-RULES.md, and appendix OPF-12 accounting form rules. Exact MISA target module and payload fields remain integration-specific.",
+  "$comment": "Sources: docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md, docs/documents/0. appendices/04-MISA-MAPPING-RULES.md, and canonical FRM-14/FRM-25 accounting handoff rules. Exact MISA target module and payload fields remain integration-specific.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -22,7 +22,7 @@
       ],
       "description": "Checkpoint type. Prefer enums/ops/misa-checkpoint-type.yaml."
     },
-    "source_form_id": { "type": "string", "minLength": 1, "description": "Source operational form, usually OPF-12 or another valid accounting checkpoint form." },
+    "source_form_id": { "type": "string", "minLength": 1, "description": "Source operational form, usually FRM-14 or another valid accounting checkpoint form. FRM-25 represents the accounting handoff record itself." },
     "source_object": { "$ref": "../common/source-ref.schema.json" },
     "mapping_status": {
       "type": "string",

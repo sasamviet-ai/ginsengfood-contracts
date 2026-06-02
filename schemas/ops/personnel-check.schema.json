@@ -3,7 +3,7 @@
   "$id": "schemas/ops/v1/personnel-check.schema.json",
   "title": "Personnel Check",
   "description": "Personnel Check v1 contract for production check-in/check-out and labor traceability.",
-  "$comment": "Sources: appendix OPF-05 workforce check-in/check-out and PACK-01 personnel trace. TODO: personnel role/status taxonomy is not finalized.",
+  "$comment": "Sources: canonical FRM-15 personnel check-in/check-out and PACK-01 personnel trace. TODO: personnel role/status taxonomy is not finalized.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

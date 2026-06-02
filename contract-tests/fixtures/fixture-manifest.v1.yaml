@@ -37,12 +37,12 @@ fixtures:
     validates_against:
       - ../../schemas/common/envelope.schema.json
       - ../../schemas/commerce/availability-check.schema.json
-  - file: operational-form-opf-01.v1.fixture.json
+  - file: operational-form-frm-09.v1.fixture.json
     contract_area: operational-form
     provider: ops-core
     consumers:
       - ops-admin-ui
-    source_example: ../../examples/api/operational-form-opf-01.request.json
+    source_example: ../../examples/api/operational-form-frm-09.request.json
     validates_against:
       - ../../schemas/ops/operational-form.schema.json
   - file: print-job-created.v1.fixture.json

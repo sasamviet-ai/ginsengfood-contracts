@@ -55,7 +55,7 @@ Status: implemented for the main gaps identified in the current pass.
 Outputs:
 
 - common foundation contracts for User, Role, Permission, RBAC Matrix, Auth Session, Evidence Registry, P0 Stop Point, Release Status Registry, and Runtime Config;
-- OPF form and payload contracts for OPF-01 through OPF-12 boundaries;
+- FRM form and payload contracts for FRM-01 through FRM-27 boundaries, with OPF-01 through OPF-12 documented only as deprecated compatibility aliases;
 - print payload/job contracts and status enum;
 - material planning policy, material code registry, packaging yield policy, material group/family, suppression reason, and planning policy enums;
 - MISA checkpoint, handoff, checkpoint type, mapping status, sync status, and reconcile status contracts.
@@ -75,7 +75,7 @@ Outputs:
 - ops-core admin/internal OpenAPI for operational forms, print/reprint, MISA sync/reconcile, and material planning policy;
 - `/v1` consumer boundaries remain read/check oriented;
 - evidence/release events use the shared event envelope;
-- OPF, print, evidence, P0, release, batch/QC/warehouse/recall/sale-lock state-machine docs are present where source-backed.
+- FRM, print, evidence, P0, release, batch/QC/warehouse/recall/sale-lock state-machine docs are present where source-backed.
 
 Gate:
 
@@ -89,7 +89,7 @@ Status: implemented as planning-grade fixtures and examples.
 
 Outputs:
 
-- API examples for OPF, print, MISA handoff, material planning policy, and existing availability/trace flows;
+- API examples for FRM, print, MISA handoff, material planning policy, and existing availability/trace flows;
 - event examples for MISA, evidence, release, sale-lock, sellable, order, payment, ads, and IVR;
 - fixture manifest with provider/consumer boundaries;
 - Pact interaction planning map without assuming a broker or Pact registry.

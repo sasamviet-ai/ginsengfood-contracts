@@ -60,7 +60,7 @@ API phuc vu ops-core frontend:
 - Inventory ledger, stock balance, stock alert read APIs
 - Trace chain internal API
 - Operational Evidence/Form APIs
-- Operational Admin APIs for OPF-01 through OPF-12, controlled print/reprint, material planning policy, and MISA sync requests
+- Operational Admin APIs for canonical `FRM-01` through `FRM-27`, controlled print/reprint, material planning policy, and MISA sync requests. Deprecated `OPF-01` through `OPF-12` aliases may be accepted only at compatibility boundaries and must normalize to `FRM-*`.
 - MISA handoff create/read APIs
 
 High-risk APIs:
