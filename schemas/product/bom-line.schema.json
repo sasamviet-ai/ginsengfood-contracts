@@ -11,6 +11,8 @@
     "line_type": { "type": "string", "enum": ["ANCHOR_RICE", "INGREDIENT", "PACKAGING", "MATERIAL", "OUTPUT"], "description": "Line type used by formula, MRP, and packaging calculations." },
     "ingredient_id": { "type": "string", "minLength": 1, "description": "Ingredient/material identifier for this line." },
     "material_group": { "type": "string", "enum": ["A1", "A2", "A3", "B1", "B2", "B3"], "description": "Material group if the line participates in MRP or stock policy." },
+    "material_planning_policy_id": { "type": "string", "minLength": 1, "description": "Owner-approved material planning policy reference when this line participates in MRP or stock policy." },
+    "usage_role": { "type": "string", "description": "Line-level usage role for canonical materials that appear in multiple recipe/BOM roles. The canonical ingredient/material identity remains ingredient_id." },
     "quantity": { "$ref": "../common/quantity.schema.json" },
     "standardized_quantity": { "$ref": "../common/quantity.schema.json" },
     "ratio_to_rice": { "type": "string", "description": "Ratio calculated as standardized quantity / standardized rice quantity * 100%. Required by policy for Group A pilot formula ingredients when applicable." },
