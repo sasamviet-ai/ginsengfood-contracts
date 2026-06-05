@@ -44,6 +44,75 @@ Activation fail nếu:
 4. Product active bị code dùng như sellable.
 5. Formula active bị code dùng như released.
 6. Seed tự mở vận hành hoặc production.
+
+## 5. Activation guard input
+
+| Input | Source | Required |
+| --- | --- | --- |
+| SKU baseline | P1-02 | SKU thuộc 20 SKU hoặc extension approved |
+| Formula G1 | P1-03 | Header + lines + version + source refs |
+| Material canonical | P1-02/P1-05 | Không alias, không duplicate usage role |
+| UOM/conversion | P1-02 | Đủ cho scale/snapshot |
+| Packaging profile | P1-02/P1-05 | B1/B2/B3 đủ nếu Phase 2 consume |
+| Threshold policy | P1-05 | Có policy code hoặc owner pending rõ |
+| Dietary claim result | P1-03 | Fail-closed nếu có line động vật |
+| Owner approval | Governance/evidence | Bắt buộc trước production-active |
+| Evidence refs | P1-06 | Submitted/accepted tách rõ |
+
+## 6. Activation result model
+
+| Field | Ý nghĩa |
+| --- | --- |
+| `guard_result` | PASS/BLOCK/WARN_OWNER_REVIEW |
+| `activation_state` | DRAFT/ACTIVE_BASELINE/ACTIVE/BLOCKED/INACTIVE |
+| `phase2_consumable` | true chỉ khi Phase 2 được phép đọc projection |
+| `sellable_allowed` | Luôn false trong Phase 1 |
+| `production_ready_claim` | Luôn false nếu chưa có owner sign-off/evidence accepted |
+| `blocked_reason_codes` | Mã blocker cụ thể |
+| `owner_decision_refs` | Ref approval/pending |
+| `evaluated_at/evaluated_by` | Audit |
+
+## 7. State transition
+
+```text
+DRAFT -> ACTIVE_BASELINE -> ACTIVE
+```
+
+Nhánh chặn:
+
+```text
+DRAFT/ACTIVE_BASELINE/ACTIVE -> BLOCKED -> ACTIVE_BASELINE hoặc INACTIVE
+```
+
+`ACTIVE_BASELINE` dùng cho review/seed/projection. `ACTIVE` chỉ là active nội bộ master data, không có nghĩa sản xuất/release/bán.
+
+## 8. Block reason codes
+
+| Code | Khi nào |
+| --- | --- |
+| `SKU_MISSING` | SKU không tồn tại trong baseline/extension |
+| `FORMULA_G1_MISSING` | Thiếu formula G1 |
+| `FORMULA_NOT_APPROVED` | Formula chưa owner-approved |
+| `FORMULA_LINE_GROUPED` | Có dòng gom nhóm không material cụ thể |
+| `MATERIAL_NOT_CANONICAL` | Formula line trỏ alias/chưa canonical |
+| `UOM_CONVERSION_MISSING` | Scale cần conversion nhưng chưa có |
+| `DIETARY_CLAIM_BLOCKED` | Claim thuần chay có line động vật |
+| `PACKAGING_PROFILE_MISSING` | Thiếu B1/B2/B3/output profile |
+| `THRESHOLD_POLICY_MISSING` | Thiếu threshold/material policy |
+| `EVIDENCE_MISSING` | Thiếu evidence refs |
+| `DOWNSTREAM_SCOPE_VIOLATION` | Code dùng activation như sellable/released |
+
+## 9. Projection boundary
+
+Phase 1 chỉ export:
+
+1. Product/SKU master projection.
+2. Formula/BOM projection.
+3. Material/UOM projection.
+4. Packaging/threshold projection.
+5. Activation guard projection.
+
+Phase 1 không export raw lot, batch, release, finished goods, sale lock hoặc MISA synced state.
 ---
 
 ## PHỤ LỤC NỘI DUNG CŨ TRƯỚC REWRITE - 04-P1-2C-ACTIVATION-GUARD.md

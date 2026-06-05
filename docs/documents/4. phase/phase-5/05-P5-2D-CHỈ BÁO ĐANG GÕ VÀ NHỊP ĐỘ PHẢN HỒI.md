@@ -116,3 +116,90 @@ Mỗi outbound cần:
 `LIMITED_IMPLEMENTATION_REPORT_ONLY`
 
 `DELIVERY_PACING_REQUIRES_EVIDENCE`
+
+## 10. SRS hardening addendum - Delivery Pacing
+
+### 10.1. Delivery command contract
+
+```yaml
+GatewayDeliveryCommand:
+  delivery_command_id: required
+  decision_id: required
+  target_surface: public_comment|messenger_private|page_inbox
+  target_ref: required_redacted
+  rendered_text_hash: required
+  rendered_text_redacted: required_for_evidence
+  message_kind: safe_ack|private_advice|handoff_notice|support_notice|crm_delivery|system_notice
+  final_guard_trace_id: required_unless_system_notice
+  suppression_decision_id: required
+  rate_limit_bucket: required
+  pacing_policy_id: required
+  max_chunks: integer
+  retry_policy_id: required
+  correlation_id: required
+```
+
+### 10.2. Pacing policy
+
+| Surface | Typing indicator | Minimum behavior | Forbidden |
+| --- | --- | --- | --- |
+| Public comment | Usually unsupported | No fake typing; one short safe reply when allowed. | Multi-chunk sales reply, repeated bump, final price. |
+| Messenger private | Supported if platform allows | Typing on -> delay bounded -> send chunked response. | Instant long bot-like response if policy requires pacing. |
+| Page inbox/system notice | Depends on provider | Respect same rate-limit and suppression. | Sending without guard when customer-facing. |
+| Human handoff | Not automated reply | Notify internal queue and pause automation. | Continuing automated sales messages during human takeover. |
+
+### 10.3. State machine
+
+```text
+DELIVERY_CREATED
+-> DELIVERY_SUPPRESSION_CHECKED
+-> DELIVERY_RATE_LIMIT_CHECKED
+-> DELIVERY_TYPING_STARTED
+-> DELIVERY_DELAY_WAITING
+-> DELIVERY_SEND_PENDING
+-> DELIVERY_SENT
+-> DELIVERY_EVIDENCE_WRITTEN
+
+DELIVERY_CREATED -> DELIVERY_BLOCKED
+DELIVERY_SEND_PENDING -> DELIVERY_RETRY_WAITING
+DELIVERY_RETRY_WAITING -> DELIVERY_SEND_PENDING
+DELIVERY_RETRY_WAITING -> DELIVERY_DEAD_LETTERED
+DELIVERY_TYPING_STARTED -> DELIVERY_CANCELED_BY_NEW_CUSTOMER_MESSAGE
+```
+
+### 10.4. Retry rules
+
+| Failure | Retry? | Required handling |
+| --- | --- | --- |
+| Rate limited | Yes, bounded and delayed. | No immediate retry storm. |
+| Transient provider error | Yes, bounded. | Preserve idempotency key. |
+| Invalid permission/App Review | No. | Mark blocked and surface admin evidence gap. |
+| Suppression active | No. | Block/defer according to suppression. |
+| Guard fail | No. | Block and route human if needed. |
+| Customer sends new message while typing | No for old command. | Cancel old command and recompute context. |
+
+### 10.5. Chunking rules
+
+1. Public comments should be one safe acknowledgement unless owner policy explicitly allows more.
+2. Messenger private may split long text only if every chunk individually passes public/private and PII redaction rules.
+3. No chunk may contain standalone bank/payment/order success unless owner runtime ref exists.
+4. Chunk order must be stable and idempotent.
+5. If one chunk fails guard, the whole response is blocked or recomputed.
+
+### 10.6. Evidence requirements
+
+```yaml
+DeliveryPacingEvidence:
+  delivery_command_id: required
+  pacing_policy_id: required
+  typing_supported: boolean
+  typing_started_at: nullable
+  send_scheduled_at: timestamp
+  send_attempts: integer
+  final_provider_status: sent|failed|blocked|dead_lettered|canceled
+  cancellation_reason: nullable
+  rate_limit_snapshot_ref: required
+  redaction_status: pass|fail
+```
+
+No delivery evidence, no `DELIVERY_PACING_PASS`.

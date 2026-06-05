@@ -11,7 +11,7 @@ File nay duoc rewrite cho PHASE theo ranh gioi MASTER/PACK/TECH hien hanh.
 
 ## Noi Dung Rewrite
 
-PHASE-03-COMMERCE-RUNTIME/05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.docx
+PHASE-03-COMMERCE-RUNTIME/05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md
 
 ## 27.2. Prompt tiếp theo
 
@@ -370,7 +370,7 @@ READY_WITH_điểm chặn_FOR_OWNER_DECISION.
 
 ## BLOCKED_CART_DRAFT_CONFIRMATION_P0_RULE_FAILED.
 
-NEXT FILE: PHASE-03-COMMERCE-RUNTIME/05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.docx
+NEXT FILE: PHASE-03-COMMERCE-RUNTIME/05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md
 
 ĐIỀU KIỆN CHUYỂN TIẾP: Chỉ chuyển sang P3.2D sau khi Cart / Order Draft / Customer Confirmation đạt DONE GATE, không có order_code trong P3.2C, confirmation idempotent, QuoteSnapshot active được validate, expired quote bị reject, accepted confirmation chỉ tạo handoff_ready_for_official_order và owner đồng ý handoff.
 
@@ -612,15 +612,15 @@ Không có ORDER_VERIFIED thì không final commission, không verified ROAS, kh
 
 Chỉ được thực hiện prompt này nếu đã hoàn tất:
 
-## 00-P3-ANALYSIS-ONLY.docx.
+## 00-P3-ANALYSIS-ONLY.md.
 
-## 01-P3-1-TECHNICAL-DESIGN-ONLY.docx.
+## 01-P3-1-TECHNICAL-DESIGN-ONLY.md.
 
-## 02-P3-2A-SELLABLE-GATE-RUNTIME.docx.
+## 02-P3-2A-SELLABLE-GATE-RUNTIME.md.
 
-## 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.docx.
+## 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md.
 
-## 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.docx.
+## 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md.
 
 Sellable Gate đạt DONE GATE.
 

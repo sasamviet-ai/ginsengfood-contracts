@@ -23,7 +23,7 @@ Thiết kế không được biến PHASE-03.1 thành nguồn thay thế PHASE-0
 
 ## 3. Input bắt buộc
 
-- Report từ `00-PHÂN-TÍCH-HIỆN-TRẠNG-GIAI-ĐOẠN-3-1.md`.
+- Report từ `00-PHAN-TICH-HIEN-TRANG-GIAI-DOAN-3-1.md`.
 - 6 tài liệu nguồn trong `5. bo sung/`.
 - `TÀI LIỆU TRIỂN KHAI DIAMOND HOA HỒNG, THƯỞNG MỚI.md`.
 - PHASE-03 Commerce Runtime.

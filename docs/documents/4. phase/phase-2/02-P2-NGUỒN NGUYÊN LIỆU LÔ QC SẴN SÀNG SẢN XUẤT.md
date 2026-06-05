@@ -103,6 +103,10 @@ Khi Phase 4 cấp phát nguyên liệu, lot selection phải ưu tiên lot `READ
 | `EVD-P2-DISPOSAL` | Disposal/write-off | Qty không còn usable, có accounting handoff nếu cần |
 ---
 
+## PHỤ LỤC NGUỒN ĐÃ NHẬP - DANH MỤC PHÂN NHÓM NGUYÊN LIỆU VẬT TƯ.md
+
+> Phụ lục này giữ nội dung nguồn cũ để không mất bảng, số liệu, field hoặc rule khi bỏ file nguồn riêng. Phần rewrite chuẩn hóa ở đầu file là nguồn chính; phụ lục dùng để trace và đối chiếu số liệu.
+
 ## 11. Material packaging taxonomy đầy đủ
 
 # MATERIAL PACKAGING TAXONOMY

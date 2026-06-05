@@ -168,3 +168,93 @@ Phase 5 chỉ đủ handoff khi:
 `P5_GATEWAY_RUNTIME_LOCK_REWRITTEN`
 
 `PRODUCTION_BLOCKED`
+
+## 14. SRS hardening addendum - Runtime invariants
+
+### 14.1. Absolute invariants
+
+| Invariant ID | Invariant |
+| --- | --- |
+| P5-LOCK-001 | Gateway never creates business truth. |
+| P5-LOCK-002 | Public surface never leaks private data, final quote, payment, order state, health-sensitive detail, internal SKU, ROAS or commission. |
+| P5-LOCK-003 | Messenger private never bypasses AI Final Response Guard, QuoteSnapshot, suppression or owner runtime checks. |
+| P5-LOCK-004 | Any active sale lock, recall, opt-out, open complaint, human takeover, App Review block or rate-limit block wins over delivery. |
+| P5-LOCK-005 | Duplicate webhook/event never creates duplicate side effects. |
+| P5-LOCK-006 | Handoff fail never produces public wording that says handoff was sent. |
+| P5-LOCK-007 | Evidence with token/secret/raw PII is invalid evidence. |
+| P5-LOCK-008 | Documentation complete is not production ready. |
+
+### 14.2. Production status state machine
+
+```text
+SPEC_DRAFT
+-> SPEC_REVIEWED
+-> IMPLEMENTATION_WAITING
+-> IMPLEMENTATION_IN_PROGRESS
+-> IMPLEMENTATION_COMPLETE_ONLY
+-> LOCAL_SMOKE_WAITING
+-> LOCAL_SMOKE_PASS_WITH_BLOCKERS
+-> STAGING_EVIDENCE_WAITING
+-> STAGING_EVIDENCE_ACCEPTED
+-> PILOT_OWNER_REVIEW
+-> PILOT_ALLOWED
+-> PRODUCTION_REVIEW_WAITING
+-> PRODUCTION_APPROVED_SCOPED
+```
+
+Forbidden jumps:
+
+- `SPEC_REVIEWED -> PRODUCTION_APPROVED_SCOPED`.
+- `LOCAL_SMOKE_PASS_WITH_BLOCKERS -> PRODUCTION_APPROVED_SCOPED`.
+- `PILOT_ALLOWED -> GLOBAL_PRODUCTION_READY`.
+
+### 14.3. Kill-switch matrix
+
+| Flag | Default | Effect |
+| --- | --- | --- |
+| `facebook_gateway_enabled` | false | Blocks all runtime processing except admin/dry-run. |
+| `facebook_gateway_webhook_ingest_enabled` | false | Blocks Meta webhook side effects. |
+| `facebook_gateway_public_reply_enabled` | false | Blocks public replies. |
+| `facebook_gateway_comment_to_messenger_enabled` | false | Blocks private handoff. |
+| `facebook_gateway_messenger_delivery_enabled` | false | Blocks Messenger delivery. |
+| `facebook_gateway_ai_handoff_enabled` | false | Blocks AI calls. |
+| `facebook_gateway_crm_delivery_enabled` | false | Blocks CRM/proactive delivery. |
+| `facebook_gateway_ads_attribution_enabled` | false | Blocks ads attribution writes beyond raw event quarantine. |
+| `facebook_gateway_diamond_attribution_enabled` | false | Blocks referral attribution writes. |
+| `facebook_gateway_production_allowed` | false | Blocks production status regardless of sub-flags. |
+
+### 14.4. Conflict resolution ladder
+
+When rules disagree:
+
+1. Legal/privacy/platform/App Review block wins.
+2. Master release/evidence gate wins.
+3. Canonical CRM/Finance/Evidence wins for CRM/commission/release.
+4. Commerce owner wins for quote/order/payment/verified revenue.
+5. Ops/Product/Sale Lock wins for sellable/recall/sale lock.
+6. PACK-05/TECH-05 wins for AI behavior and Final Response Guard.
+7. PACK-06/TECH-06 wins for Gateway/channel mechanics.
+8. Supplementary business/ads/live files inform but do not override runtime owners.
+
+### 14.5. Done vs release
+
+| Status | Allowed meaning |
+| --- | --- |
+| `SRS_COMPLETE` | Documents are strict enough for dev analysis. |
+| `IMPLEMENTATION_COMPLETE_ONLY` | Code path exists, not necessarily smoke/evidence pass. |
+| `LOCAL_SMOKE_PASS_WITH_BLOCKERS` | Local tests pass but external/app/evidence gates pending. |
+| `PILOT_ALLOWED` | Scoped owner approval for pilot only. |
+| `PRODUCTION_APPROVED_SCOPED` | Only a release/go-live owner can set, with accepted evidence. |
+| `PRODUCTION_READY` | Not claimable by Phase 5 local docs alone. |
+
+### 14.6. Final lock
+
+The safe final statement for this documentation pack is:
+
+```text
+PHASE_5_SRS_READY_FOR_DEV_ANALYSIS
+GATEWAY_PRODUCTION_BLOCKED
+NOT_RELEASE_READY
+```
+
+Any stronger statement requires runtime implementation, smoke, App Review/permission evidence, production-scope owner decision and global evidence acceptance.

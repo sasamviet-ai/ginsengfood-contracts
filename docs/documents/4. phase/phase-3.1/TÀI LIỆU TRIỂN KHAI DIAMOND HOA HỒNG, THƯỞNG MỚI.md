@@ -19,7 +19,7 @@ GIAI ĐOẠN 03.1 là giai đoạn bổ sung nối tiếp PHASE-03 Commerce Runt
 
 Trạng thái cuối của bộ tài liệu: `GIAI ĐOẠN 3.1 LÀ NGUỒN BÀN GIAO TRIỂN KHAI - CHƯA RELEASE READY`.
 
-Không file nào trong PHASE-03.1 được phép tự gọi `Production Ready`, `Release Ready`, `Go-live Approved` hoặc `Gateway Open`.
+Không file nào trong PHASE-03.1 được phép tự gọi các trạng thái release/gateway positive khi chưa có owner sign-off và evidence accepted.
 
 Canonical cleanup 2026-06-05: các rule giá/giờ/chính sách trong tài liệu này dùng `PRICE_POLICY_V2026_06_CANONICAL_001`, `GOLDEN_HOUR_POLICY_V2026_06_CANONICAL_001` và `DIAMOND_COMMISSION_POLICY_V2026_06_CANONICAL_001`. Các giá trị nháp cũ trước cleanup không còn là runtime active.
 
@@ -52,7 +52,7 @@ Canonical cleanup 2026-06-05: các rule giá/giờ/chính sách trong tài liệ
 
 | Thứ tự | File chính thức | Mục đích |
 | --- | --- | --- |
-| 00 | `00-PHÂN-TÍCH-HIỆN-TRẠNG-GIAI-ĐOẠN-3-1.md` | Đọc codebase/tài liệu, lập current-state/gap/conflict/blocker trước khi thiết kế. |
+| 00 | `00-PHAN-TICH-HIEN-TRANG-GIAI-DOAN-3-1.md` | Đọc codebase/tài liệu, lập current-state/gap/conflict/blocker trước khi thiết kế. |
 | 01 | `01-THIẾT-KẾ-KỸ-THUẬT-GIAI-ĐOẠN-3-1.md` | Khóa kiến trúc, owner truth, resolver/guard, contract, DB/API/UI/job/evidence. |
 | 02 | `02-THÀNH-VIÊN-GIÁ-CHƯƠNG-TRÌNH-24-7-GIỜ-VÀNG.md` | Member tier, benefit, 24/7, Golden Hour, early access, QuoteSnapshot. |
 | 03 | `03-DIAMOND-GIỚI-THIỆU-HOA-HỒNG-ĐỐI-SOÁT.md` | Diamond referral, buyer benefit, commission, reversal, dispute, audit. |

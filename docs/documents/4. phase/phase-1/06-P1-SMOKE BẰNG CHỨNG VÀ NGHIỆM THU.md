@@ -38,6 +38,53 @@ Phase 1 chỉ được coi là handoff-ready khi:
 3. Conflict vegan/common broth đã normalize fail-closed: không claim thuần chay khi formula còn dòng động vật.
 4. Formula G1, material, packaging, threshold đủ để Phase 2 snapshot.
 5. Không gọi Production Ready hoặc Go-live.
+
+## 4. Exact source coverage
+
+| Evidence ID | File nguồn cũ | File Phase 1/2 chứa payload | Expected |
+| --- | --- | --- | --- |
+| `EVD-P1-APP-001` | `BẢNG PHIẾU LỆNH SẢN XUẤT.md` | P2-03 | Field production consumer được phản ánh vào P1 projection/P2 dossier |
+| `EVD-P1-APP-002` | `BỘ KHÓA 5 BƯỚC.md` | P1-03, P2-06 | BOM map/version/no-manual/trace không mất |
+| `EVD-P1-APP-003` | `CÔNG THỨC VẬN HÀNH 20 SKU MỚI.MD` | P1-02, P1-03, P2-03 | 20 formula G1 và định lượng nguyên liệu tồn tại |
+| `EVD-P1-APP-004` | `DANH MỤC PHÂN NHÓM NGUYÊN LIỆU VẬT TƯ.md` | P1-02, P1-05, P2-02 | A/B groups, threshold, disposal/write-off không mất |
+| `EVD-P1-APP-005` | `PHIẾU TỰ SINH, IN, KẾ TOÁN, HOẠCH TOÁN.md` | P2-01, P2-06 | Click/tự hiện/nhập tay, print/accounting boundary không mất |
+
+## 5. Evidence map theo file con Phase 1
+
+| File | Evidence bắt buộc | Expected |
+| --- | --- | --- |
+| P1-00 | `EVD-P1-SCOPE`, `EVD-P1-SOURCE-MAP`, `EVD-P1-CONFLICT` | Nguồn/phạm vi/conflict rõ |
+| P1-01 | `EVD-P1-DESIGN`, `EVD-P1-CONTRACT`, `EVD-P1-PROJECTION` | Data contract đủ cho implementation |
+| P1-02 | `EVD-P1-SKU-020`, `EVD-P1-MATERIAL`, `EVD-P1-UOM`, `EVD-P1-PACKAGING` | Master data đủ |
+| P1-03 | `EVD-P1-FML-G1`, `EVD-P1-BOM-LINE`, `EVD-P1-SCALING`, `EVD-P1-VERSION` | Formula/BOM đủ và versioned |
+| P1-04 | `EVD-P1-ACTIVATION`, `EVD-P1-DOWNSTREAM-BLOCK` | Active không sellable/released |
+| P1-05 | `EVD-P1-SEED`, `EVD-P1-THRESHOLD`, `EVD-P1-EXTENSION` | Seed idempotent, threshold governable |
+| P1-06 | `EVD-P1-COVERAGE`, `EVD-P1-NO-GOLIVE` | Nghiệm thu coverage và không claim quá scope |
+
+## 6. Smoke case tối thiểu
+
+1. Seed 20 SKU không thiếu/trùng.
+2. Query SKU A1/B1/C2/C3 trả về claim suppressed, không vegan-approved.
+3. Query formula G1 trả full material lines, không dòng gom nhóm.
+4. Query formula G0 nếu tồn tại trả research/pilot, không production-active.
+5. Scale theo gạo thiếu conversion thì block.
+6. Material alias không được xuất hiện trong Phase 2 BOM snapshot.
+7. Packaging profile trả 7.200 gói, 1.800 hộp, 300 thùng baseline hoặc owner profile mới.
+8. Threshold policy không hardcode trong business logic.
+9. Activation guard block nếu thiếu owner approval/evidence.
+10. Phase 2 projection không cần mở 5 file nguồn cũ.
+
+## 7. Blocker phải giữ lại
+
+| Blocker | Không được tự vượt |
+| --- | --- |
+| Owner chưa approve Formula G1 | Không active production |
+| Formula có line động vật nhưng claim thuần chay | Suppress claim |
+| UOM/density thiếu | Không scale/issue |
+| Packaging profile thiếu | Không handoff Phase 2 packaging |
+| Evidence submitted chưa accepted | Không close |
+| Seed tạo duplicate | Không nghiệm thu |
+| Source coverage thiếu marker | Không bỏ 5 file cũ |
 ---
 
 ## PHỤ LỤC NỘI DUNG CŨ TRƯỚC REWRITE - 06-P1-2E-SMOKE-EVIDENCE-REPORT.md

@@ -11,7 +11,7 @@ File nay duoc rewrite cho PHASE theo ranh gioi MASTER/PACK/TECH hien hanh.
 
 ## Noi Dung Rewrite
 
-PHASE-03-COMMERCE-RUNTIME/00-P3-ANALYSIS-ONLY.docx
+PHASE-03-COMMERCE-RUNTIME/00-P3-ANALYSIS-ONLY.md
 
 ## PROMPT-P3 - COMMERCE RUNTIME / SELLABLE GATE / QUOTE SNAPSHOT / CART / ORDER / PAYMENT / SHIPPING / VERIFIED REVENUE ANALYSIS HANDOFF
 
@@ -871,407 +871,407 @@ Ghi chú
 
 Product active
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Chỉ là điều kiện nền, không phải Sellable
 
 SKU active
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không được thay Sellable
 
 Recipe active
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không được thay Sellable
 
 Listed price active
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Bắt buộc trước QuoteSnapshot
 
 Stock available
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Phải dựa trên finished goods/warehouse confirmed
 
 Batch RELEASED
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 QC_PASS chưa đủ
 
 Warehouse receipt confirmed
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Điểm tăng tồn finished goods
 
 Recall lock
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Phải thắng Commerce
 
 Sale lock
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Phải thắng Commerce
 
 Quality hold
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Chặn sellable
 
 Channel suppression
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Chặn theo kênh
 
 Runtime policy available
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Unavailable phải fail-safe
 
 Sellable Gate
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Runtime gate riêng
 
 Program eligibility
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không hardcode
 
 Member benefit eligibility
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Runtime resolve
 
 Diamond referral eligibility
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Runtime resolve
 
 QuoteSnapshot
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Nguồn sự thật giá cuối
 
 Cart
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không đồng nghĩa Order
 
 Order Draft
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không đồng nghĩa Official Order
 
 Customer Confirmation
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Bắt buộc trước Official Order
 
 Official Order
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Phải có order_code
 
 Payment selected
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không đồng nghĩa Paid
 
 Paid status
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Do Payment Core confirmation
 
 Shipping runtime
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không hardcode
 
 VAT/tax runtime
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không hardcode
 
 Verified Revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Sau ORDER_VERIFIED
 
 Commission handoff
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Chưa verified thì không final
 
 ROAS handoff
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Chưa verified thì không verified ROAS
 
 Payout handoff
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Chưa verified thì không payout
 
@@ -1415,9 +1415,9 @@ Evidence cần có
 
 Sellable là runtime gate riêng
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1429,9 +1429,9 @@ Code map + design note
 
 Không dùng Product Active thay Sellable
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1443,9 +1443,9 @@ Code reference
 
 Không dùng SKU Active thay Sellable
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1457,9 +1457,9 @@ Code reference
 
 Listed price active bắt buộc
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1471,9 +1471,9 @@ Price evidence
 
 Stock available từ warehouse confirmed
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1485,9 +1485,9 @@ Inventory evidence
 
 Recall/Sale Lock thắng Commerce
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1499,9 +1499,9 @@ Recall evidence
 
 QuoteSnapshot là nguồn giá cuối
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1513,9 +1513,9 @@ Quote evidence
 
 Không có QuoteSnapshot thì không final price
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1527,9 +1527,9 @@ API evidence
 
 Cart không phải Order
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1541,9 +1541,9 @@ State evidence
 
 Order Draft không phải Official Order
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1555,9 +1555,9 @@ State evidence
 
 Customer Confirmation trước Official Order
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1569,9 +1569,9 @@ Confirmation evidence
 
 order_code mới là official marker
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1583,9 +1583,9 @@ Order evidence
 
 Payment selected không phải Paid
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1597,9 +1597,9 @@ Payment evidence
 
 COD không tự thêm phí nếu chưa khóa policy
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1611,9 +1611,9 @@ Policy evidence
 
 Shipping fee runtime
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1625,9 +1625,9 @@ Shipping evidence
 
 VAT/tax runtime
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1639,9 +1639,9 @@ Tax evidence
 
 Verified Revenue sau ORDER_VERIFIED
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1651,9 +1651,9 @@ Revenue evidence
 
 ## P3-GAP-018
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1663,9 +1663,9 @@ Finance evidence
 
 ## P3-GAP-019
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 
@@ -1677,9 +1677,9 @@ Ads evidence
 
 AI/Gateway chỉ consume runtime
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P0
 

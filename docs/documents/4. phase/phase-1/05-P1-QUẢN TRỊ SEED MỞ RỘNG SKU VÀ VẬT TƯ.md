@@ -58,6 +58,62 @@ Fail nếu:
 3. Seed tự active production/sellable.
 4. Seed bỏ qua owner confirm cho UOM/threshold/packaging.
 5. Material canonical trùng vì khác usage_role.
+
+## 6. Seed package bắt buộc
+
+| Seed package | Nội dung | Idempotency key |
+| --- | --- | --- |
+| `uom_seed` | kg/g/l/ml/gói/hộp/thùng/lọ/hũ/cuộn + conversion baseline | normalized UOM code |
+| `material_seed` | A1/A2/A3/B1/B2/B3 material canonical | material canonical slug |
+| `material_alias_seed` | alias từ nguồn cũ về canonical | alias_text + material_id |
+| `product_sku_seed` | 20 product/SKU baseline | internal_sku_code |
+| `formula_header_seed` | 20 Formula G1 headers | formula_id + version |
+| `formula_line_seed` | full line nguyên liệu G1 | formula_id + version + line hash |
+| `packaging_profile_seed` | output 7.200/1.800/300 và B1/B2/B3 refs | sku_id + profile version |
+| `threshold_policy_seed` | A/B threshold policies | threshold_policy_code |
+| `activation_seed` | DRAFT/ACTIVE_BASELINE/BLOCKED theo guard | sku_id + formula_version |
+| `evidence_seed` | evidence refs/source coverage | evidence_id |
+
+## 7. Seed không được làm
+
+1. Không tự chuyển SKU sang sellable.
+2. Không tự tạo raw lot/tồn kho thật.
+3. Không tự tạo production order.
+4. Không tự mark formula owner-approved nếu chưa có approval.
+5. Không hard delete dữ liệu đã dùng trong formula.
+6. Không dùng source file cũ làm runtime dependency sau rewrite.
+
+## 8. Extension governance
+
+| Extension | Yêu cầu trước khi merge |
+| --- | --- |
+| SKU mới | Product/SKU master, formula version, packaging profile, activation guard, smoke |
+| Material mới | Canonical name, UOM, group, source type, QC/readiness, threshold |
+| Formula version mới | Change reason, diff từ version cũ, owner approval, effective date |
+| Packaging profile mới | Output, B1/B2/B3 refs, print payload impact |
+| Threshold override | Reason, director/owner approval nếu vượt ngưỡng |
+| Dietary claim change | Formula sạch động vật + evidence + owner approval |
+
+## 9. Rollback và supersede
+
+Không rollback bằng xóa dòng seed đã chạy. Cách xử lý:
+
+1. Nếu seed sai nhưng chưa downstream dùng: tạo correction migration có audit.
+2. Nếu formula đã được Phase 2 snapshot: tạo version mới, không sửa version cũ.
+3. Nếu material canonical sai: deprecate/merge alias, giữ trace.
+4. Nếu packaging profile sai: tạo profile version mới.
+5. Nếu threshold sai: tạo threshold policy version mới.
+
+## 10. Owner approval matrix
+
+| Miền | Owner cần xác nhận |
+| --- | --- |
+| Formula G1 | Công thức, tỷ lệ, UOM, sơ chế, effective date |
+| Material | Tên canonical, source type, QC/readiness |
+| Packaging | Output, B1/B2/B3, print payload |
+| Threshold | +5%, +7%, 5 mẻ/20 mẻ/15 mẻ policy |
+| Activation | Có cho Phase 2 consume không |
+| Dietary claim | Có được public claim không |
 ---
 
 ## PHỤ LỤC NGUỒN ĐÃ NHẬP - DANH MỤC PHÂN NHÓM NGUYÊN LIỆU VẬT TƯ.md

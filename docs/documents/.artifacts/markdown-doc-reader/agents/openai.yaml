@@ -1,4 +1,0 @@
-interface:
-  display_name: "Markdown Doc Reader"
-  short_description: "Map, read, and review Markdown docs"
-  default_prompt: "Use $markdown-doc-reader to map this Markdown documentation set and review its links, structure, and evidence gaps."

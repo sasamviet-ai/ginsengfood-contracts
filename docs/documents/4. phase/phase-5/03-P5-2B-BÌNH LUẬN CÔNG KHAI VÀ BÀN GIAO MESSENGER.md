@@ -126,3 +126,99 @@ Public chỉ được nói đã chuyển/gửi khi `handoff_status=SENT`. Nếu 
 `LIMITED_IMPLEMENTATION_REPORT_ONLY`
 
 `PUBLIC_PRIVATE_GATEWAY_PRODUCTION_BLOCKED`
+
+## 10. SRS hardening addendum - Public Comment và Comment-to-Messenger
+
+### 10.1. Scope
+
+File này khóa xử lý inbound public comment, live comment và private handoff. Mục tiêu là chống leak, chống spam và chống chốt đơn công khai, không phải tối đa hóa số lượng reply.
+
+### 10.2. Normalized comment event
+
+```yaml
+NormalizedCommentEvent:
+  normalized_event_id: required
+  page_registry_id: required
+  surface: public_comment|live_comment
+  post_id: optional
+  live_session_id: optional
+  comment_id: required
+  parent_comment_id: optional
+  commenter_channel_ref: required_redacted
+  event_text_redacted: required
+  event_text_hash: required
+  contains_pii: boolean
+  contains_health_sensitive: boolean
+  contains_price_or_buy_intent: boolean
+  contains_complaint: boolean
+  contains_spam_or_abuse: boolean
+  source_campaign_ref: optional
+  idempotency_key: required
+  received_at: timestamp
+```
+
+### 10.3. Public action matrix
+
+| Intent | Public action | Private/human action | Forbidden |
+| --- | --- | --- | --- |
+| Hỏi giá/mua/chốt | Safe acknowledgement only. | Private handoff if permitted; otherwise human/support route. | Final price, bank info, order confirmation. |
+| Hỏi sản phẩm chung | Short public-safe answer using approved product public knowledge. | Private if advice is deep/personal. | Health claim, internal formula, off-board SKU. |
+| Có số điện thoại/địa chỉ | Do not repeat PII. | Private/human route. | Echo phone/address. |
+| Bệnh nền/nhạy cảm sức khỏe | Safe disclaimer/ack if allowed. | Human/private support. | Medical conclusion or dosage promise. |
+| Complaint/quality/refund | Acknowledge support route. | Human/CSKH; suppress sales. | Sales reply or blame assignment. |
+| Spam/troll/abuse | No sales lead; moderation route. | Human only if escalation policy requires. | Arguing publicly or private sales handoff. |
+| Duplicate webhook | No new side effect. | None unless original failed and retry policy allows. | Duplicate reply/handoff. |
+
+### 10.4. Handoff state model
+
+```text
+HANDOFF_NOT_REQUIRED
+HANDOFF_ELIGIBILITY_CHECK
+-> HANDOFF_ALLOWED
+-> HANDOFF_SEND_PENDING
+-> HANDOFF_SENT
+-> MESSENGER_SESSION_PENDING
+-> MESSENGER_SESSION_BOUND
+
+HANDOFF_ELIGIBILITY_CHECK -> HANDOFF_BLOCKED
+HANDOFF_SEND_PENDING -> HANDOFF_FAILED
+HANDOFF_SENT -> HANDOFF_DELIVERY_UNKNOWN
+```
+
+Invalid transitions:
+
+- `HANDOFF_BLOCKED -> PUBLIC_SAYS_SENT`.
+- `HANDOFF_FAILED -> PUBLIC_SAYS_SENT`.
+- `HANDOFF_NOT_REQUIRED -> MESSENGER_SESSION_BOUND`.
+- Duplicate comment -> second `HANDOFF_SEND_PENDING`.
+
+### 10.5. Acceptance requirements
+
+| Requirement ID | Requirement |
+| --- | --- |
+| P5-2B-SRS-001 | Webhook signature and idempotency pass before classifier or handoff. |
+| P5-2B-SRS-002 | Public safe reply must be generated from a public-safe template or AI response already guard-pass for public surface. |
+| P5-2B-SRS-003 | If private handoff cannot be sent, public wording must not imply it was sent. |
+| P5-2B-SRS-004 | Each comment can create at most one active handoff per target session unless the prior handoff is explicitly canceled. |
+| P5-2B-SRS-005 | Comment evidence must include source page, live session if any, classifier decision, policy decision and handoff status. |
+| P5-2B-SRS-006 | Spam/troll/abuse must not enter AI sales flow by default. |
+| P5-2B-SRS-007 | Complaint opens suppression for sales reply in the affected conversation scope. |
+
+### 10.6. Evidence payload
+
+```yaml
+CommentHandoffEvidence:
+  evidence_id: required
+  normalized_event_id: required
+  page_registry_id: required
+  classifier_result: required
+  public_policy_result: required
+  handoff_status: not_required|allowed|sent|failed|blocked
+  public_reply_status: not_sent|sent|blocked
+  private_reply_status: not_sent|sent|failed|blocked
+  blocked_reasons: list
+  redaction_status: pass|fail
+  created_at: timestamp
+```
+
+No evidence, no `PUBLIC_PRIVATE_GATEWAY_PASS`.

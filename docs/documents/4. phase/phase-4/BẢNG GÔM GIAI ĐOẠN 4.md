@@ -98,7 +98,7 @@ AI Advisor != Finance
 | --- | --- |
 | `docs/documents/4. phase/phase-5/10-P5-PHỤ LỤC KHÓA RUNTIME GATEWAY FACEBOOK VÀ NHẮN TIN.md` | Gateway boundary: delivery only, public/private, handoff, guard, P0 smoke. |
 | `docs/documents/4. phase/phase-5/TÀI LIỆU BỔ SUNG/AI_ADVISOR_FACEBOOK_COMPLETION_REPORT.md` | Completion report gate; không tự PASS. |
-| `docs/documents/4. phase/phase-5/TÀI LIỆU BỔ SUNG/DANH SÁCH FACEBOOK (AI).md` | Page registry baseline; cần normalize trước production. |
+| `docs/documents/4. phase/phase-5/TÀI LIỆU BỔ SUNG/DANH-SACH-FACEBOOK-AI.md` | Page registry baseline; cần normalize trước production. |
 | `docs/documents/4. phase/phase-5/TÀI LIỆU BỔ SUNG/Khóa AI Channel đủ điều kiện trước Gateway - CHANNEL FACEBOOK.md` | AI Channel readiness trước Gateway. |
 | `docs/documents/4. phase/phase-5/TÀI LIỆU BỔ SUNG/*ADS*`, `*LIVE*`, `*FINANCIAL*` | Business baseline cho Ads/Live/Finance; không dùng làm runtime quote trực tiếp. |
 
@@ -286,7 +286,7 @@ Fail-closed:
 ```yaml
 CustomerAdvisoryContext:
   identity:
-    customer_type: guest | new_unregistered_buyer | registered_new | returning_buyer | member | diamond | agency_candidate | unknown
+    customer_type: guest | new_unregistered_buyer | registered_new | returning_buyer | member | diamond | bulk_buyer_candidate | corporate_gift_buyer | distributor_candidate | agency_candidate | unknown
     verified_contact_level: none | channel_only | phone_verified | account_verified
     channel_identity: required
   purchase_memory:
@@ -308,6 +308,8 @@ CustomerAdvisoryContext:
     opt_out_status: opted_in | opted_out | unknown
     open_case_status: none | complaint | refund | payment | privacy | quality | unknown
     dietary_allergy_flags: list
+    bulk_purchase_signal: none | family_bulk | corporate_gift | distributor_or_agency | unknown
+    primary_user_profile: self | spouse | parent_elderly | child | family | gift_recipient | unknown
 ```
 
 Rules:
@@ -316,6 +318,7 @@ Rules:
 - Khách cũ: chỉ nhắc lịch sử ở private channel và public-safe.
 - Member/Diamond: chỉ nói quyền lợi từ runtime.
 - Open case hoặc opt-out: dừng sales/CRM, route support/human.
+- Mua nhiều/corporate gift không đồng nghĩa đại lý hoặc nhà phân phối; phải tách bằng BulkBuyIntentResolver, DistributorIntentGuard và BulkQuoteResolver trước khi báo giá/chuyển tuyến.
 
 ### 7.5. ProductRoleMatrix
 
@@ -340,6 +343,10 @@ ProductRoleMatrixItem:
     female_context: optional_public_safe
     male_context: optional_public_safe
     elderly_context: optional_public_safe
+  gender_age_self_addon:
+    female_self_context: optional_public_safe
+    male_self_context: optional_public_safe
+    elderly_calcium_mineral_context: optional_public_safe
   eastern_effectiveness_summary: required_public_safe
   taste_sensory_summary: optional
   avoid_if: list
@@ -352,6 +359,10 @@ Rules:
 - Không có ProductRoleMatrix thì AI không được tự đoán role của sản phẩm.
 - Vegan/chay phải có dietary proof; nếu conflict thì block.
 - Trẻ em, người già, thai kỳ, bệnh nền, dị ứng phải qua HealthSafetyGuard.
+- Nữ hỏi cho bản thân: chỉ được đề xuất thêm nhóm dưỡng mô/sắc vóc/bồi bổ nhẹ nhàng khi ProductRoleMatrix và HealthSafetyGuard pass; không claim điều trị/nội tiết.
+- Nam hỏi cho bản thân: chỉ được đề xuất thêm nhóm trợ dương/sinh lực public-safe khi ProductRoleMatrix và HealthSafetyGuard pass; không nói chữa yếu sinh lý, tăng testosterone hoặc cam kết hiệu quả.
+- Người già/ba mẹ/người lớn tuổi: chỉ được đề xuất thêm nhóm canxi/khoáng hóa/chăm sóc xương khớp public-safe khi có proof; không nói chữa loãng xương hoặc thay thuốc.
+- Nếu chưa rõ người dùng chính là ai, AI hỏi một câu ngắn hoặc bỏ qua add-on; không đoán giới tính/tuổi từ tên, giọng văn hoặc món đang hỏi.
 
 ### 7.6. QuoteSnapshotConsumerView
 
@@ -517,15 +528,17 @@ Thứ tự quyết định bắt buộc:
 6. Apply health/child/pregnancy/allergy/dietary guard.
 7. Resolve DailySalesContext.
 8. Resolve ProductRoleMatrix.
-9. Filter by sellable/sale-lock/recall/channel suppression.
-10. Rank by customer need, product role, public-safe effectiveness, taste, history, channel fit.
-11. Suggest 1 product or 2-3 item combo only with reason.
-12. If price/buy/quote intent: request QuoteSnapshot.
-13. If customer confirms: render Order Draft and CustomerConfirmation path.
-14. If order/payment/shipping/status question: consume runtime state only.
-15. If CRM/after-sales: check opt-out, quiet hours, frequency cap, open case.
-16. Apply Final Response Guard.
-17. Emit DecisionEnvelope and evidence.
+9. Resolve GenderAgeAddOnRule nếu đã biết người dùng chính là nữ/nam/người già.
+10. Resolve BulkDistributorIntentRule nếu có tín hiệu mua nhiều, quà công ty, mua sỉ, đại lý hoặc nhà phân phối.
+11. Filter by sellable/sale-lock/recall/channel suppression.
+12. Rank by customer need, product role, public-safe effectiveness, taste, history, channel fit.
+13. Suggest 1 product or 2-3 item combo only with reason.
+14. If price/buy/quote intent: request QuoteSnapshot.
+15. If customer confirms: render Order Draft and CustomerConfirmation path.
+16. If order/payment/shipping/status question: consume runtime state only.
+17. If CRM/after-sales: check opt-out, quiet hours, frequency cap, open case.
+18. Apply Final Response Guard.
+19. Emit DecisionEnvelope and evidence.
 
 Priority:
 
@@ -549,6 +562,9 @@ Inventory priority and campaign urgency never override safety, privacy, dietary 
 | --- | --- |
 | Health concern / disease / medicine | Use health-sensitive template, no treatment claim, recommend consulting professional when needed. |
 | Gift for parents/elderly | Use ProductRoleMatrix elderly/gift/public-safe effectiveness, no medical guarantee. |
+| Female self-care | If the user is female and buying for herself, add dưỡng mô/sắc vóc only from ProductRoleMatrix proof; no treatment or hormone claim. |
+| Male self-care | If the user is male and buying for himself, add trợ dương/sinh lực only in public-safe wording; no sexual-health diagnosis or guaranteed effect. |
+| Elderly calcium/mineral | For elderly/parents context, add canxi/khoáng hóa/chăm sóc xương khớp only with proof; no osteoporosis/treatment claim. |
 | Child / student | Child-sensitive guard; only approved products; no adult dosage or medical claim. |
 | Office worker | Suggest convenient, light, nourishing roles if sellable and public-safe. |
 | Overseas / international student / travel | Check shipping/export eligibility; do not promise international shipping if not approved. |
@@ -560,6 +576,7 @@ Inventory priority and campaign urgency never override safety, privacy, dietary 
 | Usage / storage | Use approved product usage data; no invented instructions. |
 | Return/refund | Route support/policy; no promise outside runtime. |
 | Order edit / VAT | Consume editable fields and invoice/tax runtime; no public PII. |
+| Bulk buy / corporate gift / distributor | Family bulk/corporate gift uses bulk quote/corporate support flow; đại lý/nhà phân phối/mua sỉ routes distributor guard/human, not normal retail quote. |
 | Privacy / opt-out | Stop CRM and open privacy/support route if required. |
 | Fake goods / anti-counterfeit | Route anti-counterfeit/human support; no public accusation. |
 
@@ -853,6 +870,7 @@ Evidence cannot be a narrative statement only. It needs artifact/log/fixture/tra
 | `07-P4-2F-CẦU NỐI BÀN GIAO KÊNH MESSENGER LIVE CRM.md` | Handoff bridge. | ChannelContext, Gateway boundary, typing/pacing, CRM/Live handoff. |
 | `08-P4-2G-BÁO CÁO KIỂM THỬ KHÓI VÀ BẰNG CHỨNG.md` | Smoke/evidence/report only. | P0 gates, evidence object, status vocabulary, owner review. |
 | `10-P4-PHỤ LỤC KHÓA RUNTIME THỰC CHIẾN AI ADVISOR.md` | Practical runtime addendum. | Compact lock for dev before implementation. |
+| `11-P4-MA TRẬN SRS VÀ BÀN GIAO TRIỂN KHAI.md` | SRS/dev handoff. | Requirement traceability, NFR, work packages, implementation guardrails. |
 
 ## 18. Phase 4 P0 gates
 
@@ -907,13 +925,14 @@ Phase 4 chỉ được gọi `EVIDENCE_SUBMITTED_FOR_OWNER_REVIEW` khi:
 
 1. Bảng Gôm canonical này là file đọc đầu tiên.
 2. Chỉ mục bàn giao trỏ đúng về Bảng Gôm và đúng thứ tự chạy.
-3. File 00-08 khớp Bảng Gôm này hoặc có blocker cập nhật rõ ràng.
-4. P4-GATE-001 đến P4-GATE-015 có evidence item.
-5. Smoke P4-SMK-001 đến P4-SMK-022 có kết quả `PASS` / `FAIL` / `BLOCKED` / `PENDING` rõ ràng.
-6. Không có P0 fail bị che thành "known limitation".
-7. Owner decision từ MASTER-08 được chọn kèm policy version hoặc được carry như blocker.
-8. Gateway vẫn `PRODUCTION_BLOCKED`.
-9. Không tuyên bố Release/Go-live.
+3. `11-P4-MA TRẬN SRS VÀ BÀN GIAO TRIỂN KHAI.md` được dùng để tạo SRS/RTM trước implementation.
+4. File 00-08 khớp Bảng Gôm này hoặc có blocker cập nhật rõ ràng.
+5. P4-GATE-001 đến P4-GATE-015 có evidence item.
+6. Smoke P4-SMK-001 đến P4-SMK-022 có kết quả `PASS` / `FAIL` / `BLOCKED` / `PENDING` rõ ràng.
+7. Không có P0 fail bị che thành "known limitation".
+8. Owner decision từ MASTER-08 được chọn kèm policy version hoặc được carry như blocker.
+9. Gateway vẫn `PRODUCTION_BLOCKED`.
+10. Không tuyên bố Release/Go-live.
 
 ## 21. Fail gate
 
@@ -947,7 +966,29 @@ Phase 4 FAIL nếu có bất kỳ điều nào sau đây:
 | `MISA-PAYOUT-DECISION-001` | No payout/MISA wording beyond safe pending/finance review. |
 | `IVR-ATTEMPT-POLICY-DECISION-001` | No IVR real-call readiness claim. |
 
-## 23. Handoff to Phase 5
+## 23. SRS and implementation handoff
+
+Phase 4 đủ để giao dev phân tích sang SRS khi dev dùng đúng các file sau theo thứ tự:
+
+1. `BẢNG GÔM GIAI ĐOẠN 4.md`.
+2. `10-P4-PHỤ LỤC KHÓA RUNTIME THỰC CHIẾN AI ADVISOR.md`.
+3. `11-P4-MA TRẬN SRS VÀ BÀN GIAO TRIỂN KHAI.md`.
+4. `00-P4-PHÂN TÍCH HIỆN TRẠNG.md`.
+5. `01-P4-THIẾT KẾ KỸ THUẬT.md`.
+6. File 02-08 theo work package.
+
+Dev phải tạo SRS/RTM trước khi code. SRS tối thiểu phải map:
+
+- `P4-SRS-FR-001` đến `P4-SRS-FR-020`.
+- `P4-SRS-NFR-001` đến `P4-SRS-NFR-010`.
+- `P4-GATE-001` đến `P4-GATE-015`.
+- `P4-SMK-001` đến `P4-SMK-022`.
+- Owner decisions còn pending.
+- Evidence artifact và smoke command/test reference.
+
+Implementation chỉ được bóc theo work package sau khi SRS được review/accepted hoặc codebase hiện hữu chứng minh map tương đương. Nếu chưa có SRS accepted, dev chỉ được làm analysis, SRS, design hoặc gap report.
+
+## 24. Handoff to Phase 5
 
 Phase 5 may start planning only after Phase 4 owner review accepts:
 
@@ -977,10 +1018,12 @@ NO_RELEASE_READY
 NO_PRODUCTION_READY
 ```
 
-## 24. Final status
+## 25. Final status
 
 ```text
 PHASE_4_CANONICAL_REWRITE_COMPLETE_FOR_OWNER_REVIEW
+PHASE_4_DEV_SRS_HANDOFF_READY
+SRS_REQUIRED_BEFORE_CODE_IMPLEMENTATION
 AI_ADVISOR_RUNTIME_BOUNDARY_LOCKED
 PENDING_OWNER_DECISIONS
 PENDING_EVIDENCE

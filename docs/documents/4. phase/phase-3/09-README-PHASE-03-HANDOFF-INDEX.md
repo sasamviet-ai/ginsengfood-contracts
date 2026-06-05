@@ -1,5 +1,27 @@
 # P3 - README HANDOFF INDEX
 
+## Update 2026-06-05 - SRS handoff / ChatGPT approval gate
+
+Trước khi đưa Phase 3 lên ChatGPT, sếp, dev lead hoặc đội triển khai, bắt buộc đọc thêm:
+
+- `11-GÓI-CHUẨN-DUYỆT-SRS-TRIỂN-KHAI-GIAI-ĐOẠN-3.md`
+
+File này là cổng chuẩn duyệt để Phase 3 được dùng làm nguồn phân tích SRS. File này không thêm rule nghiệp vụ mới, chỉ khóa cách đọc, cách review, cách phân biệt Phase 3 với Phase 3.1 bổ sung, checklist SRS, owner decision, P0 fail gate và trạng thái không được gọi quá mức.
+
+Trạng thái đúng sau khi đọc bộ Phase 3:
+
+```text
+PHASE 3 DOCUMENTATION/SRS-HANDOFF READY
+IMPLEMENTATION NOT EXECUTED
+EVIDENCE NOT ACCEPTED
+OWNER SIGN-OFF REQUIRED
+GATEWAY BLOCKED
+NOT RELEASE READY
+NOT PRODUCTION READY
+```
+
+Lưu ý đặt tên: trong folder này `P3.1 Technical Design` là bước thiết kế kỹ thuật của Phase 3 gốc; không được nhầm với folder `phase-3.1`, là phase bổ sung nối tiếp Phase 3 cho Diamond/member/CRM/AI policy.
+
 ## Update 2026-05-22 - Plan tiep Phase 3
 
 Dung thu muc chinh thuc: `docs/documents/4. phase/phase-3/`.
@@ -19,19 +41,21 @@ Global Gateway tiep tuc `BLOCKED` trong toan Phase 3. Khong mo Gateway, khong tu
 Thu tu thuc thi tiep theo:
 
 0. `10-P3-ADDENDUM-CUSTOMER-TO-CASH-RUNTIME-LOCK.md`: đọc trước khi implement để khóa DailySalesContext, QuoteSnapshot, order/payment/shipping state bridge, verified revenue, Diamond/Finance handoff và P0 smoke sau vòng bổ sung CRM/Member/Gateway.
-1. `00-P3-ANALYSIS-ONLY.md`: inspect backend that, map module/API/schema/test voi TECH-04, TECH-11/12/13 va PACK-10.
-2. `01-P3-1-TECHNICAL-DESIGN-ONLY.md`: khoa contract, API/DTO/state machine/event can doi; moi API/DTO change phai bao frontend repo cap nhat.
-3. `02-P3-2A-SELLABLE-GATE-RUNTIME.md`: COM-BLG-001, Operational blocked -> Commerce blocked; Product Active khong dong nghia Sellable.
-4. `03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md`: COM-BLG-002/003, khong co QuoteSnapshot thi khong bao final price.
-5. `04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md`: COM-BLG-004, Cart/Order Draft khong phai Official Order va khong tao order_code som.
-6. `05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md`: COM-BLG-005/006, chi tao Official Order sau customer confirmation hop le.
-7. `06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.md`: COM-BLG-007/008, payment proof khong phai PAID; COD pending khong phai revenue.
-8. `07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.md`: COM-BLG-009/010/011, Verified Revenue chi tu order/payment verified; bank account khong hardcode.
-9. `08-P3-2G-SMOKE-EVIDENCE-REPORT.md`: COM-BLG-012, nop report 14 muc, evidence submitted only, owner review.
+1. `11-GÓI-CHUẨN-DUYỆT-SRS-TRIỂN-KHAI-GIAI-ĐOẠN-3.md`: đọc trước khi đưa ChatGPT/sếp/dev review để khóa SRS handoff, approval prompt, owner decision và trạng thái không release-ready.
+2. `00-P3-ANALYSIS-ONLY.md`: inspect backend that, map module/API/schema/test voi TECH-04, TECH-11/12/13 va PACK-10.
+3. `01-P3-1-TECHNICAL-DESIGN-ONLY.md`: khoa contract, API/DTO/state machine/event can doi; moi API/DTO change phai bao frontend repo cap nhat.
+4. `02-P3-2A-SELLABLE-GATE-RUNTIME.md`: COM-BLG-001, Operational blocked -> Commerce blocked; Product Active khong dong nghia Sellable.
+5. `03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md`: COM-BLG-002/003, khong co QuoteSnapshot thi khong bao final price.
+6. `04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md`: COM-BLG-004, Cart/Order Draft khong phai Official Order va khong tao order_code som.
+7. `05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md`: COM-BLG-005/006, chi tao Official Order sau customer confirmation hop le.
+8. `06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.md`: COM-BLG-007/008, payment proof khong phai PAID; COD pending khong phai revenue.
+9. `07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.md`: COM-BLG-009/010/011, Verified Revenue chi tu order/payment verified; bank account khong hardcode.
+10. `08-P3-2G-SMOKE-EVIDENCE-REPORT.md`: COM-BLG-012, nop report 14 muc, evidence submitted only, owner review.
 
 Dieu kien toi thieu de chuyen tiep Phase 4:
 
 - Đã đọc và map P3 addendum Customer-to-Cash vào implementation boundary.
+- Đã đọc `11-GÓI-CHUẨN-DUYỆT-SRS-TRIỂN-KHAI-GIAI-ĐOẠN-3.md` và tạo SRS trước khi code.
 - COM-BLG-002 QuoteSnapshot boundary co evidence.
 - COM-BLG-004 Order Draft boundary co evidence.
 - Khong con P0 Commerce blocker.
@@ -48,7 +72,7 @@ File nay duoc rewrite cho PHASE theo ranh gioi MASTER/PACK/TECH hien hanh.
 
 ## Noi Dung Rewrite
 
-PHASE-03-COMMERCE-RUNTIME/README-PHASE-03-HANDOFF-INDEX.docx
+PHASE-03-COMMERCE-RUNTIME/README-PHASE-03-HANDOFF-INDEX.md
 
 ## README - PHASE-03 COMMERCE RUNTIME HANDOFF INDEX / EXECUTION ORDER / GATEWAY LOCK
 
@@ -223,16 +247,16 @@ Security implementation.
 ## 5. CẤU TRÚC FILE PHASE 3
 
 PHASE-03-COMMERCE-RUNTIME/
-├── README-PHASE-03-HANDOFF-INDEX.docx
-├── 00-P3-ANALYSIS-ONLY.docx
-├── 01-P3-1-TECHNICAL-DESIGN-ONLY.docx
-├── 02-P3-2A-SELLABLE-GATE-RUNTIME.docx
-├── 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.docx
-├── 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.docx
-├── 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.docx
-├── 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.docx
-├── 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.docx
-└── 08-P3-2G-SMOKE-EVIDENCE-REPORT.docx
+├── README-PHASE-03-HANDOFF-INDEX.md
+├── 00-P3-ANALYSIS-ONLY.md
+├── 01-P3-1-TECHNICAL-DESIGN-ONLY.md
+├── 02-P3-2A-SELLABLE-GATE-RUNTIME.md
+├── 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md
+├── 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md
+├── 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md
+├── 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.md
+├── 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.md
+└── 08-P3-2G-SMOKE-EVIDENCE-REPORT.md
 
 ## 6. THỨ TỰ THỰC THI BẮT BUỘC
 
@@ -248,7 +272,7 @@ Mục đích
 
 Có được sửa code không
 
-README-PHASE-03-HANDOFF-INDEX.docx
+README-PHASE-03-HANDOFF-INDEX.md
 
 Handoff Index
 
@@ -256,7 +280,7 @@ Handoff Index
 
 Không
 
-## 00-P3-ANALYSIS-ONLY.docx
+## 00-P3-ANALYSIS-ONLY.md
 
 ## ANALYSIS ONLY
 
@@ -264,7 +288,7 @@ Phân tích codebase thật
 
 Không
 
-## 01-P3-1-TECHNICAL-DESIGN-ONLY.docx
+## 01-P3-1-TECHNICAL-DESIGN-ONLY.md
 
 ## TECHNICAL DESIGN ONLY
 
@@ -272,7 +296,7 @@ Thiết kế workstream/boundary
 
 Không
 
-## 02-P3-2A-SELLABLE-GATE-RUNTIME.docx
+## 02-P3-2A-SELLABLE-GATE-RUNTIME.md
 
 ## LIMITED IMPLEMENTATION
 
@@ -280,7 +304,7 @@ Sellable Gate Runtime
 
 Có giới hạn
 
-## 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.docx
+## 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md
 
 ## LIMITED IMPLEMENTATION
 
@@ -288,7 +312,7 @@ Giá/chương trình/member/QuoteSnapshot
 
 Có giới hạn
 
-## 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.docx
+## 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md
 
 ## LIMITED IMPLEMENTATION
 
@@ -296,7 +320,7 @@ Cart/Draft/Confirmation
 
 Có giới hạn
 
-## 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.docx
+## 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md
 
 ## LIMITED IMPLEMENTATION
 
@@ -304,7 +328,7 @@ Official Order/order_code/state
 
 Có giới hạn
 
-## 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.docx
+## 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.md
 
 ## LIMITED IMPLEMENTATION
 
@@ -312,7 +336,7 @@ Payment/Shipping/Invoice/Tax
 
 Có giới hạn
 
-## 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.docx
+## 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.md
 
 ## LIMITED IMPLEMENTATION
 
@@ -320,7 +344,7 @@ Verified Revenue/Commission/ROAS
 
 Có giới hạn
 
-## 08-P3-2G-SMOKE-EVIDENCE-REPORT.docx
+## 08-P3-2G-SMOKE-EVIDENCE-REPORT.md
 
 ## VALIDATION / SMOKE / EVIDENCE REPORT ONLY
 
@@ -492,7 +516,7 @@ Không được gọi Go-live Decision.
 
 ## 8. FILE INDEX CHI TIẾT
 
-## 8.1. 00-P3-ANALYSIS-ONLY.docx
+## 8.1. 00-P3-ANALYSIS-ONLY.md
 
 Mode: ANALYSIS ONLY
 Mục tiêu: Phân tích codebase thật, không sửa file.
@@ -545,7 +569,7 @@ Không tạo test.
 
 Không mở Gateway.
 
-## 8.2. 01-P3-1-TECHNICAL-DESIGN-ONLY.docx
+## 8.2. 01-P3-1-TECHNICAL-DESIGN-ONLY.md
 
 Mode: TECHNICAL DESIGN ONLY
 Mục tiêu: Thiết kế workstream, owner boundary, API/DTO/entity/service/guard/test/evidence.
@@ -592,7 +616,7 @@ Không test.
 
 Không mở Gateway.
 
-## 8.3. 02-P3-2A-SELLABLE-GATE-RUNTIME.docx
+## 8.3. 02-P3-2A-SELLABLE-GATE-RUNTIME.md
 
 Mode: LIMITED IMPLEMENTATION
 Mục tiêu: Triển khai Sellable Gate Runtime.
@@ -645,7 +669,7 @@ Không Verified Revenue.
 
 Không Gateway.
 
-## 8.4. 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.docx
+## 8.4. 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md
 
 Mode: LIMITED IMPLEMENTATION
 Mục tiêu: Triển khai giá/runtime benefit/QuoteSnapshot.
@@ -696,7 +720,7 @@ Không Verified Revenue.
 
 Không Commission final.
 
-## 8.5. 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.docx
+## 8.5. 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md
 
 Mode: LIMITED IMPLEMENTATION
 Mục tiêu: Triển khai Cart / Order Draft / Customer Confirmation.
@@ -747,7 +771,7 @@ Không Shipping Request.
 
 Không Verified Revenue.
 
-## 8.6. 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.docx
+## 8.6. 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md
 
 Mode: LIMITED IMPLEMENTATION
 Mục tiêu: Tạo Official Order từ Customer Confirmation accepted.
@@ -802,7 +826,7 @@ Không Verified Revenue.
 
 Không commission/ROAS/payout.
 
-## 8.7. 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.docx
+## 8.7. 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.md
 
 Mode: LIMITED IMPLEMENTATION
 Mục tiêu: Triển khai Payment / Shipping / Invoice / Tax.
@@ -859,7 +883,7 @@ Không verified ROAS.
 
 Không payout.
 
-## 8.8. 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.docx
+## 8.8. 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.md
 
 Mode: LIMITED IMPLEMENTATION
 Mục tiêu: Triển khai ORDER_VERIFIED / Verified Revenue / Commission / ROAS Handoff.
@@ -912,7 +936,7 @@ Không Release Readiness.
 
 Không Production Readiness.
 
-## 8.9. 08-P3-2G-SMOKE-EVIDENCE-REPORT.docx
+## 8.9. 08-P3-2G-SMOKE-EVIDENCE-REPORT.md
 
 Mode: VALIDATION / SMOKE / EVIDENCE REPORT ONLY
 Mục tiêu: Chạy smoke tổng hợp, gom evidence, lập report.
@@ -1211,23 +1235,23 @@ Không được gọi Completion Decision / Release Readiness / Production Readi
 
 Chạy đúng thứ tự:
 
-## 00-P3-ANALYSIS-ONLY.docx
+## 00-P3-ANALYSIS-ONLY.md
 
-## 01-P3-1-TECHNICAL-DESIGN-ONLY.docx
+## 01-P3-1-TECHNICAL-DESIGN-ONLY.md
 
-## 02-P3-2A-SELLABLE-GATE-RUNTIME.docx
+## 02-P3-2A-SELLABLE-GATE-RUNTIME.md
 
-## 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.docx
+## 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md
 
-## 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.docx
+## 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md
 
-## 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.docx
+## 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md
 
-## 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.docx
+## 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.md
 
-## 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.docx
+## 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.md
 
-## 08-P3-2G-SMOKE-EVIDENCE-REPORT.docx
+## 08-P3-2G-SMOKE-EVIDENCE-REPORT.md
 
 Không được nhảy phase.
 
@@ -1379,4 +1403,4 @@ Các P0 điểm chặn đã xử lý hoặc được phân loại rõ.
 
 Gateway vẫn bị chặn cho đến khi có quyết định riêng.
 
-NEXT ACTION: Giao dev/Codex/Copilot đọc README này, sau đó bắt đầu từ 00-P3-ANALYSIS-ONLY.docx.
+NEXT ACTION: Giao dev/Codex/Copilot đọc README này, sau đó bắt đầu từ 00-P3-ANALYSIS-ONLY.md.

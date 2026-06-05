@@ -92,10 +92,10 @@ Không được sửa câu trên thành `PRODUCTION_READY: YES` nếu chưa có 
 | `TÀI LIỆU BỔ SUNG/00. GINSENGFOOD — BUSINESS & ADS FINANCIAL BASELINE LOCK.md` | Business/ads financial baseline. | Internal planning; không customer-facing quote. |
 | `TÀI LIỆU BỔ SUNG/01. FILE FACEBOOK ADS & LIVE COMMERCE OPERATING MODEL.md` | Đang rỗng. | Không được dùng làm source PASS; ghi blocker nếu cần operating model chính thức. |
 | `TÀI LIỆU BỔ SUNG/AI_ADVISOR_FACEBOOK_COMPLETION_REPORT.md` | AI Channel/Gateway completion report baseline. | Chỉ là report source; PASS phải có evidence accepted. |
-| `TÀI LIỆU BỔ SUNG/DANH SÁCH FACEBOOK (AI).md` | Page/Profile/ID baseline. | Normalize vào Page Registry; không dùng raw list để bật production. |
+| `TÀI LIỆU BỔ SUNG/DANH-SACH-FACEBOOK-AI.md` | Page/Profile/ID baseline. | Normalize vào Page Registry; không dùng raw list để bật production. |
 | `TÀI LIỆU BỔ SUNG/GINSENGFOOD — ADS COST MODEL - LIVE COMMERCE SCALE MODEL.md` | Ads/live cost and scale model. | Internal scale gate; không tạo official ROAS nếu revenue chưa verified. |
-| `TÀI LIỆU BỔ SUNG/GINSENGFOOD — MÔ HÌNH GIÁ - GIỜ VÀNG TRI ÂN - DOANH THU LIVE - ADS - DIAMOND.md` | Golden Hour, live revenue, ads, Diamond business model. | Policy baseline; runtime price/benefit vẫn từ Commerce/QuoteSnapshot. |
-| `TÀI LIỆU BỔ SUNG/PHÂN TÍCH MÔ HÌNH TÀI CHÍNH.md` | Financial scenario analysis. | Internal finance planning; không làm quote/payment/revenue truth. |
+| `TÀI LIỆU BỔ SUNG/GINSENGFOOD - MO HINH GIA - GIO VANG TRI AN - DOANH THU LIVE - ADS - DIAMOND.md` | Golden Hour, live revenue, ads, Diamond business model. | Policy baseline; runtime price/benefit vẫn từ Commerce/QuoteSnapshot. |
+| `TÀI LIỆU BỔ SUNG/PHAN TICH MO HINH TAI CHINH.md` | Financial scenario analysis. | Internal finance planning; không làm quote/payment/revenue truth. |
 | `TÀI LIỆU BỔ SUNG/Khóa AI Channel đủ điều kiện trước Gateway - CHANNEL FACEBOOK.md` | AI channel entry gate trước Gateway. | Gateway blocked until AI completion/evidence gates pass. |
 | `TÀI LIỆU BỔ SUNG/TRÌNH TỰ TRIỂN KHAI TIẾP THEO.md` | Deployment sequence. | Dùng làm rollout sequence, nhưng vẫn phải qua Master evidence/release gate. |
 
@@ -584,7 +584,7 @@ Rollback PASS khi có evidence cho:
 | --- | --- |
 | `BẢNG GÔM GIAI ĐOẠN 5.md` | Canonical reading hub, conflict/source/evidence lock. |
 | `10-P5-PHỤ LỤC KHÓA RUNTIME GATEWAY FACEBOOK VÀ NHẮN TIN.md` | Practical runtime lock and production block. |
-| `00-P5-PHÂN TÍCH HIỆN TRẠNG.md` | Analysis/gap/current-state report, không sửa code. |
+| `00-P5-PHAN-TICH-HIEN-TRANG.md` | Analysis/gap/current-state report, không sửa code. |
 | `01-P5-THIẾT KẾ KỸ THUẬT.md` | Gateway architecture, API, DB, event, feature flags. |
 | `02-P5-2A-ĐỊNH DANH KÊNH VÀ NGỮ CẢNH PAGE.md` | Meta App/Page Registry/token governance. |
 | `03-P5-2B-BÌNH LUẬN CÔNG KHAI VÀ BÀN GIAO MESSENGER.md` | Webhook normalization, live comment, public/private, handoff. |

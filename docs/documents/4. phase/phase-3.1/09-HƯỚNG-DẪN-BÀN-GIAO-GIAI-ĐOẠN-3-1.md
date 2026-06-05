@@ -6,6 +6,8 @@ Tài liệu này là chỉ mục bàn giao chính thức cho GIAI ĐOẠN 3.1.
 
 Mục tiêu là để ChatGPT, sếp, dev hoặc Codex đọc đúng thứ tự, hiểu đúng nguồn, không bỏ sót tài liệu bổ sung và không conflict với phase khác.
 
+Nếu dev đang chuyển Phase 3 sang SRS hoặc chuẩn bị implementation, phải đọc `../phase-3/11-GÓI-CHUẨN-DUYỆT-SRS-TRIỂN-KHAI-GIAI-ĐOẠN-3.md` trước khi dùng Giai đoạn 3.1 làm supplement.
+
 ## 2. Thư mục chính thức
 
 `docs/documents/4. phase/phase-3.1/`
@@ -19,7 +21,7 @@ Mục tiêu là để ChatGPT, sếp, dev hoặc Codex đọc đúng thứ tự,
 | Thứ tự đọc | File | Vai trò |
 | --- | --- | --- |
 | 0 | `TÀI LIỆU TRIỂN KHAI DIAMOND HOA HỒNG, THƯỞNG MỚI.md` | Bảng gom nguồn chính Giai đoạn 3.1. |
-| 1 | `00-PHÂN-TÍCH-HIỆN-TRẠNG-GIAI-ĐOẠN-3-1.md` | Phân tích hiện trạng. |
+| 1 | `00-PHAN-TICH-HIEN-TRANG-GIAI-DOAN-3-1.md` | Phân tích hiện trạng. |
 | 2 | `01-THIẾT-KẾ-KỸ-THUẬT-GIAI-ĐOẠN-3-1.md` | Thiết kế kỹ thuật. |
 | 3 | `02-THÀNH-VIÊN-GIÁ-CHƯƠNG-TRÌNH-24-7-GIỜ-VÀNG.md` | Member/price/program. |
 | 4 | `03-DIAMOND-GIỚI-THIỆU-HOA-HỒNG-ĐỐI-SOÁT.md` | Diamond/referral/commission. |

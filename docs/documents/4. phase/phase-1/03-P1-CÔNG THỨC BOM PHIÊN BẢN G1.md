@@ -56,6 +56,88 @@ Phase 2 chỉ consume công thức qua `ProductionBOMSnapshot`, gồm:
 6. Evidence/owner approval refs.
 
 Production user không được chọn tay nguyên liệu.
+
+## 6. Formula header schema
+
+| Field | Rule |
+| --- | --- |
+| `formula_id` | `FML-<SKU_SHORT>-G1`, duy nhất theo SKU/version |
+| `sku_id` | Trỏ SKU canonical P1-02 |
+| `formula_version` | G1 cho nguồn vận hành 20 SKU mới |
+| `formula_status` | `OWNER_REVIEW_REQUIRED`, `APPROVED_BASELINE`, `SUPERSEDED`, `BLOCKED` |
+| `effective_from/effective_to` | Chỉ set khi owner approve |
+| `anchor_material_id` | Gạo (lúa - tôm) nếu scale theo gạo |
+| `output_profile_ref` | Mẻ 400 hoặc profile owner-approved |
+| `source_document_ref` | `CÔNG THỨC VẬN HÀNH 20 SKU MỚI.MD` và `BỘ KHÓA 5 BƯỚC.md` |
+| `owner_approval_ref` | Bắt buộc trước production-active |
+
+## 7. Formula line schema
+
+| Field | Rule |
+| --- | --- |
+| `formula_line_id` | Duy nhất trong formula version |
+| `line_group` | `A1_QTTS`, `A2_BASE`, `A2_BROTH`, `A3_SEASONING`, `B1_PACK`, `B2_PACK`, `B3_AUX` |
+| `material_id` | Canonical, không alias |
+| `material_name_snapshot` | Lưu tên nguồn để trace |
+| `quantity` | Số lượng/mẻ hoặc quantity theo anchor |
+| `uom` | kg/lít/ml/gói/hộp/thùng theo allowlist |
+| `ratio_to_anchor` | Bắt buộc nếu line scale theo gạo |
+| `preprocess_note` | Rửa/ngâm/hấp/sấy/nướng/cắt/thái... từ nguồn |
+| `is_required` | true nếu bắt buộc trong BOM |
+| `dietary_risk_flag` | true nếu line động vật hoặc ảnh hưởng claim |
+| `source_row_ref` | Ref file/section/table nguồn |
+
+## 8. Bộ 20 formula G1 phải có
+
+| Nhóm | SKU | Formula |
+| --- | --- | --- |
+| A | A1/CS/DM/HS, A2/CS/BASA, A3/CS/CAHOI, A4/CS/LUON, A5/CS/CUU | FML-A1-G1 đến FML-A5-G1 |
+| B | B1/CS/RM/ĐX, B2/CS/DHA, B3/CS/CACOM, B4/CS/COLAGEN, B5/CS/SINHLUC, B6/CS/GAAC | FML-B1-G1 đến FML-B6-G1 |
+| C | C1/CS/BAONGU, C2/CS/DONGTRUNG, C3/CS/NAMDONGCO, C4/CS/CUABIEN, C5/CS/CANGU, C6/CS/TOM/RONGBIEN, C7/CS/THITGA, C8/CS/THITHEO, C9/CS/THITBO | FML-C1-G1 đến FML-C9-G1 |
+
+## 9. Anchor rice scaling
+
+Nguồn đang dùng mẻ 400 với gạo `(lúa - tôm)` làm anchor 195 kg ở nhiều công thức. Scaling policy:
+
+1. Scale chỉ tạo calculation snapshot, không sửa formula version.
+2. Không scale nếu line thiếu ratio/UOM.
+3. Không ép lít/ml sang kg nếu thiếu density.
+4. Rounding phải lưu trong snapshot.
+5. Phase 2 Production BOM Snapshot phải lưu planned quantity + calculated quantity.
+
+## 10. Nhóm công thức
+
+| Phần | Line group | Runtime use |
+| --- | --- | --- |
+| Quân - Thần - Tá - Sứ | A1_QTTS | Dược liệu/đặc thù SKU |
+| Nguyên liệu nền dinh dưỡng | A2_BASE | Gạo, rau củ, nền |
+| Rau củ chiết dịch/nước hầm | A2_BROTH | Broth/dietary guard |
+| Nêm và tạo hương vị | A3_SEASONING | Nêm vị/hương |
+| Bao bì/vật tư | B1/B2/B3 | Packaging profile, không trộn vào nutrition formula |
+
+## 11. Deviation và versioning
+
+| Thay đổi | Cách xử lý |
+| --- | --- |
+| Đổi nguyên liệu | Formula version mới |
+| Đổi tỷ lệ/hàm lượng | Formula version mới |
+| Đổi UOM/conversion | Owner approval + version nếu ảnh hưởng quantity |
+| Đổi sơ chế ảnh hưởng chất lượng | Formula version mới hoặc process profile version |
+| Đổi output packaging | Packaging profile version |
+| Chỉ đổi planned batch size theo anchor | Calculation snapshot, không đổi G1 |
+
+## 12. Snapshot handoff cho Phase 2
+
+P1-03 phải cung cấp cho P2-03:
+
+1. Header formula.
+2. Full line formula.
+3. Material canonical refs.
+4. UOM và conversion.
+5. Ratio/anchor.
+6. Packaging/output profile.
+7. Dietary claim guard result.
+8. Source refs và owner approval refs.
 ---
 
 ## PHỤ LỤC NGUỒN ĐÃ NHẬP - BỘ KHÓA 5 BƯỚC.md

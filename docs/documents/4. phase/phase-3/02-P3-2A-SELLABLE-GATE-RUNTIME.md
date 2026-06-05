@@ -11,7 +11,7 @@ File nay duoc rewrite cho PHASE theo ranh gioi MASTER/PACK/TECH hien hanh.
 
 ## Noi Dung Rewrite
 
-PHASE-03-COMMERCE-RUNTIME/02-P3-2A-SELLABLE-GATE-RUNTIME.docx
+PHASE-03-COMMERCE-RUNTIME/02-P3-2A-SELLABLE-GATE-RUNTIME.md
 
 ## 24.2. Prompt tiếp theo
 
@@ -65,7 +65,7 @@ Sao chép nguyên khối prompt dưới đây để giao dev/Codex/Copilot.
 
 Bạn đang thực hiện PHASE-03 - COMMERCE RUNTIME cho dự án Ginsengfood.
 
-Nhiệm vụ của bạn là thiết kế kỹ thuật dựa trên output của 00-P3-ANALYSIS-ONLY.docx.
+Nhiệm vụ của bạn là thiết kế kỹ thuật dựa trên output của 00-P3-ANALYSIS-ONLY.md.
 
 Không được sửa file.
 Không được tạo migration.
@@ -285,11 +285,11 @@ READY_WITH_điểm chặn_FOR_OWNER_DECISION.
 
 ## BLOCKED_NEED_CODEBASE_CLEANUP_BEFORE_IMPLEMENTATION.
 
-NEXT FILE: PHASE-03-COMMERCE-RUNTIME/02-P3-2A-SELLABLE-GATE-RUNTIME.docx
+NEXT FILE: PHASE-03-COMMERCE-RUNTIME/02-P3-2A-SELLABLE-GATE-RUNTIME.md
 
 ĐIỀU KIỆN CHUYỂN TIẾP: Chỉ chuyển sang P3.2A sau khi dev/Codex/Copilot hoàn tất report P3.1 đủ 14 mục, không sửa file, thiết kế rõ Sellable Gate owner/boundary/dependency/guard/smoke/evidence và owner đồng ý cho bước implementation giới hạn.
 
-PHASE-03-COMMERCE-RUNTIME/02-P3-2A-SELLABLE-GATE-RUNTIME.docx
+PHASE-03-COMMERCE-RUNTIME/02-P3-2A-SELLABLE-GATE-RUNTIME.md
 
 ## PROMPT-P3.2A - SELLABLE GATE RUNTIME LIMITED IMPLEMENTATION HANDOFF
 
@@ -513,9 +513,9 @@ AI/Gateway/Ads/Live/CRM/IVR chỉ consume sellable_status.
 
 Chỉ được thực hiện prompt này nếu đã hoàn tất:
 
-## 00-P3-ANALYSIS-ONLY.docx.
+## 00-P3-ANALYSIS-ONLY.md.
 
-## 01-P3-1-TECHNICAL-DESIGN-ONLY.docx.
+## 01-P3-1-TECHNICAL-DESIGN-ONLY.md.
 
 P3.1 report đủ 14 mục.
 

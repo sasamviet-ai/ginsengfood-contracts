@@ -101,3 +101,90 @@ MUST NOT:
 `LIMITED_IMPLEMENTATION_REPORT_ONLY`
 
 `GLOBAL_GATEWAY_PRODUCTION_BLOCKED`
+
+## 9. SRS hardening addendum - Page Registry và Channel Identity
+
+### 9.1. Mục tiêu SRS
+
+File này là SRS slice cho Page Registry. Dev phải dùng nó để thiết kế bảng, API admin, import/normalize dữ liệu bổ sung và gate production theo từng Page. Raw list từ tài liệu bổ sung không được dùng trực tiếp để bật webhook hoặc outbound.
+
+### 9.2. Entity resolution rules
+
+| Rule ID | Rule |
+| --- | --- |
+| P5-2A-R001 | Mỗi Meta object phải có `meta_object_type`; Page/Profile/Business/App không được trộn vào cùng một semantics. |
+| P5-2A-R002 | `meta_object_id` chỉ là external id, không phải primary key nội bộ. |
+| P5-2A-R003 | Page dùng production phải có `page_registry_id`, `business_id_ref`, `app_id_ref`, `token_secret_ref`, permission evidence và owner approval. |
+| P5-2A-R004 | Unknown object hoặc object không khớp owner role phải `quarantined`, không `production_enabled`. |
+| P5-2A-R005 | Commerce Hub là Page nhận chốt private chính; spoke page chỉ chuyển/handoff nếu policy cho phép. |
+| P5-2A-R006 | Test page chỉ dùng staging/dry-run; mọi production outbound từ test page là P0 fail. |
+| P5-2A-R007 | Audience spoke chỉ được preserve attribution nếu chưa có permission delivery. |
+
+### 9.3. Registry schema
+
+```yaml
+FacebookPageRegistryEntry:
+  page_registry_id: string
+  meta_object_id: string
+  meta_object_type: page|profile|business|app|unknown
+  display_name: string
+  canonical_name: string
+  owner_department: marketing|sales|cskh|operations|test|unknown
+  page_role: commerce_hub|live_spoke|cskh_spoke|audience_spoke|test|unknown
+  commerce_hub_page_registry_id: nullable
+  business_id_ref: nullable
+  app_id_ref: nullable
+  token_secret_ref: nullable
+  verify_token_secret_ref: nullable
+  webhook_subscribed_fields: list
+  permission_status: missing|pending|approved|rejected|expired|unknown
+  app_review_status: not_required|pending|approved|rejected|unknown
+  public_reply_allowed: boolean
+  private_reply_allowed: boolean
+  live_allowed: boolean
+  crm_delivery_allowed: boolean
+  ads_attribution_allowed: boolean
+  production_status: blocked|pilot|enabled|disabled
+  quarantine_reason: nullable
+  evidence_refs: list
+  owner_decision_refs: list
+```
+
+### 9.4. Validation matrix
+
+| Scenario | Required result |
+| --- | --- |
+| Page ID known, permission approved, app review approved, owner pilot approved | `production_status=pilot` hoặc `enabled` theo owner decision. |
+| Page ID known nhưng token ref thiếu | `production_status=blocked`; dry-run only. |
+| Page ID known nhưng object type là profile | Không gửi page outbound; yêu cầu owner normalize. |
+| Page spoke comment hỏi giá | Resolve spoke + hub; public safe ack; private handoff nếu permitted. |
+| Unknown Page ID | Quarantine event; no reply. |
+| Same display name, different ID | Không merge tự động; owner review. |
+| Same ID, different display name | Keep ID stable; update display name with audit. |
+
+### 9.5. Admin workflows
+
+| Workflow ID | Steps | Acceptance |
+| --- | --- | --- |
+| P5-2A-W001 | Import raw Page list -> classify object type -> assign owner role -> review unknown. | No raw row bypasses registry validation. |
+| P5-2A-W002 | Add page token ref -> attach permission evidence -> set delivery flags. | Secret never displayed; evidence ref required. |
+| P5-2A-W003 | Enable pilot for one page. | Requires owner decision, app review/permission status and smoke plan. |
+| P5-2A-W004 | Disable page. | Immediately blocks outbound and records reason. |
+| P5-2A-W005 | Map spoke to commerce hub. | Handoff preserves source page and hub page. |
+
+### 9.6. Production lock
+
+Production enablement requires all:
+
+1. `meta_object_type=page`.
+2. `page_role` not `unknown`.
+3. `permission_status=approved`.
+4. `app_review_status=approved` or documented `not_required`.
+5. `token_secret_ref` exists for delivery.
+6. Webhook subscribed fields are documented.
+7. Owner decision ref exists.
+8. Smoke evidence ref exists.
+9. Public/private policy for page role exists.
+10. Kill-switch exists.
+
+If any condition is missing, output stays `GLOBAL_GATEWAY_PRODUCTION_BLOCKED`.

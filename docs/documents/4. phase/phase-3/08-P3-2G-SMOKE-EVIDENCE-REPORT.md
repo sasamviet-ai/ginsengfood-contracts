@@ -11,7 +11,7 @@ File nay duoc rewrite cho PHASE theo ranh gioi MASTER/PACK/TECH hien hanh.
 
 ## Noi Dung Rewrite
 
-PHASE-03-COMMERCE-RUNTIME/08-P3-2G-SMOKE-EVIDENCE-REPORT.docx
+PHASE-03-COMMERCE-RUNTIME/08-P3-2G-SMOKE-EVIDENCE-REPORT.md
 
 ## 28.2. Prompt tiếp theo
 
@@ -371,11 +371,11 @@ READY_WITH_điểm chặn_FOR_OWNER_DECISION.
 
 ## BLOCKED_VERIFIED_REVENUE_COMMISSION_ROAS_P0_RULE_FAILED.
 
-NEXT FILE: PHASE-03-COMMERCE-RUNTIME/08-P3-2G-SMOKE-EVIDENCE-REPORT.docx
+NEXT FILE: PHASE-03-COMMERCE-RUNTIME/08-P3-2G-SMOKE-EVIDENCE-REPORT.md
 
 ĐIỀU KIỆN CHUYỂN TIẾP: Chỉ chuyển sang P3.2G sau khi Verified Revenue / Commission / ROAS Handoff đạt DONE GATE, paid/delivered/invoice không tự tạo Verified Revenue, Verified Revenue chỉ sau ORDER_VERIFIED, commission/ROAS/payout bị chặn nếu chưa Verified Revenue, reversal path rõ nếu implemented, evidence submitted đầy đủ và owner đồng ý handoff.
 
-PHASE-03-COMMERCE-RUNTIME/08-P3-2G-SMOKE-EVIDENCE-REPORT.docx
+PHASE-03-COMMERCE-RUNTIME/08-P3-2G-SMOKE-EVIDENCE-REPORT.md
 
 ## PROMPT-P3.2G - COMMERCE RUNTIME SMOKE / EVIDENCE / RELEASE-GATE REPORT ONLY
 
@@ -573,21 +573,21 @@ Operational smoke không đồng nghĩa Release Readiness.
 
 ## 4.5. PHASE 3 implementation files
 
-## 00-P3-ANALYSIS-ONLY.docx.
+## 00-P3-ANALYSIS-ONLY.md.
 
-## 01-P3-1-TECHNICAL-DESIGN-ONLY.docx.
+## 01-P3-1-TECHNICAL-DESIGN-ONLY.md.
 
-## 02-P3-2A-SELLABLE-GATE-RUNTIME.docx.
+## 02-P3-2A-SELLABLE-GATE-RUNTIME.md.
 
-## 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.docx.
+## 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md.
 
-## 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.docx.
+## 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md.
 
-## 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.docx.
+## 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md.
 
-## 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.docx.
+## 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.md.
 
-## 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.docx.
+## 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.md.
 
 ## 5. ENTRY CONDITION
 
@@ -993,13 +993,13 @@ Product active nhưng missing listed price
 
 ## NOT_SELLABLE
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2A-002
 
@@ -1009,13 +1009,13 @@ SKU active nhưng no released stock
 
 ## NOT_SELLABLE
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2A-003
 
@@ -1025,13 +1025,13 @@ Batch QC_PASS chưa RELEASED
 
 ## NOT_SELLABLE
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2A-004
 
@@ -1041,13 +1041,13 @@ Warehouse receipt chưa confirmed
 
 ## NOT_SELLABLE
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2A-005
 
@@ -1057,13 +1057,13 @@ Recall active
 
 ## NOT_SELLABLE
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2A-006
 
@@ -1073,13 +1073,13 @@ Sale lock active
 
 ## NOT_SELLABLE
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2A-007
 
@@ -1089,13 +1089,13 @@ Channel suppression active
 
 ## NOT_SELLABLE
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2A-008
 
@@ -1105,13 +1105,13 @@ Runtime policy unavailable
 
 ## NOT_SELLABLE
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2A-009
 
@@ -1121,13 +1121,13 @@ All conditions pass
 
 ## SELLABLE
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2B-001
 
@@ -1137,13 +1137,13 @@ No QuoteSnapshot
 
 No final price
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2B-002
 
@@ -1153,13 +1153,13 @@ SKU not sellable
 
 No QuoteSnapshot
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2B-003
 
@@ -1169,13 +1169,13 @@ Listed price missing
 
 Reject final quote
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2B-004
 
@@ -1185,13 +1185,13 @@ Program eligible
 
 Snapshot discount
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2B-005
 
@@ -1201,13 +1201,13 @@ Program conflict
 
 Resolve priority
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2B-006
 
@@ -1217,13 +1217,13 @@ Member eligible
 
 Snapshot benefit
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2B-007
 
@@ -1233,13 +1233,13 @@ Identity missing
 
 No member inference
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2B-008
 
@@ -1249,13 +1249,13 @@ Diamond referral valid
 
 Eligibility snapshot only
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2B-009
 
@@ -1265,13 +1265,13 @@ Quote expired
 
 Cannot use downstream
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2B-010
 
@@ -1281,13 +1281,13 @@ Immutable snapshot
 
 Cannot mutate
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2C-001
 
@@ -1297,13 +1297,13 @@ Cart created
 
 No order_code
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2C-002
 
@@ -1313,13 +1313,13 @@ Not sellable cannot cart
 
 Reject/block
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2C-003
 
@@ -1329,13 +1329,13 @@ Draft without QuoteSnapshot
 
 Reject
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2C-004
 
@@ -1345,13 +1345,13 @@ Expired quote
 
 Reject
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2C-005
 
@@ -1361,13 +1361,13 @@ Draft created
 
 No Official Order
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2C-006
 
@@ -1377,13 +1377,13 @@ Valid confirmation
 
 Accepted
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2C-007
 
@@ -1393,13 +1393,13 @@ Duplicate confirmation
 
 No duplicate
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2C-008
 
@@ -1409,13 +1409,13 @@ Recall/Sale Lock before confirmation
 
 Reject
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2D-001
 
@@ -1425,13 +1425,13 @@ Confirmed draft
 
 Official Order + order_code
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2D-002
 
@@ -1441,13 +1441,13 @@ Unconfirmed draft
 
 Reject
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2D-003
 
@@ -1457,13 +1457,13 @@ Expired quote
 
 Reject
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2D-004
 
@@ -1473,13 +1473,13 @@ order_code generated once
 
 Unique/stable
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2D-005
 
@@ -1489,13 +1489,13 @@ Idempotent retry
 
 Same order
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2D-006
 
@@ -1505,13 +1505,13 @@ Concurrent duplicate
 
 One order only
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2D-007
 
@@ -1521,13 +1521,13 @@ Official Order created
 
 Not Paid
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2D-008
 
@@ -1537,13 +1537,13 @@ Official Order created
 
 Not Verified Revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-001
 
@@ -1553,13 +1553,13 @@ COD selected
 
 Not Paid
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-002
 
@@ -1569,13 +1569,13 @@ Bank transfer selected
 
 Not Paid
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-003
 
@@ -1585,13 +1585,13 @@ Valid payment confirmation
 
 Paid
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-004
 
@@ -1601,13 +1601,13 @@ Payment selected
 
 No revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-005
 
@@ -1617,13 +1617,13 @@ Paid
 
 No Verified Revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-006
 
@@ -1633,13 +1633,13 @@ COD policy no fee
 
 No COD fee auto-added
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-007
 
@@ -1649,13 +1649,13 @@ Shipping fee
 
 Runtime policy
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-008
 
@@ -1665,13 +1665,13 @@ Shipping request
 
 Does not set paid
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-009
 
@@ -1681,13 +1681,13 @@ Delivered
 
 No Verified Revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-010
 
@@ -1697,13 +1697,13 @@ Tax quote
 
 Runtime policy
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2E-011
 
@@ -1713,13 +1713,13 @@ Invoice request
 
 No revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-001
 
@@ -1729,13 +1729,13 @@ Paid
 
 Not Verified Revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-002
 
@@ -1745,13 +1745,13 @@ Delivered
 
 Not Verified Revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-003
 
@@ -1761,13 +1761,13 @@ Invoice issued
 
 Not Verified Revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-004
 
@@ -1777,13 +1777,13 @@ Revenue
 
 Checkpoint created
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-005
 
@@ -1793,13 +1793,13 @@ ORDER_VERIFIED exists
 
 Verified Revenue created
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-006
 
@@ -1809,13 +1809,13 @@ No ORDER_VERIFIED
 
 Revenue bị chặn
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-007
 
@@ -1825,13 +1825,13 @@ No Verified Revenue
 
 Commission final bị chặn
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-008
 
@@ -1841,13 +1841,13 @@ Valid referral + Verified Revenue
 
 Eligibility/handoff only
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-009
 
@@ -1857,13 +1857,13 @@ Self-purchase
 
 bị chặn
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-010
 
@@ -1873,13 +1873,13 @@ No Verified Revenue
 
 ROAS bị chặn
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-011
 
@@ -1889,13 +1889,13 @@ Verified Revenue + attribution
 
 ROAS handoff
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## P3-SMK-2F-012
 
@@ -1905,13 +1905,13 @@ Revenue reversed
 
 Adjust downstream
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## 13. BUILD VALIDATION MATRIX
 
@@ -1931,147 +1931,147 @@ Status
 
 Backend restore
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Backend build
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Backend test
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Backend lint/format
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Pass hoặc documented
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Frontend install
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Pass nếu applicable
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Frontend build
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Pass nếu applicable
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Frontend test
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Pass nếu applicable
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 OpenAPI generation
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Pass nếu applicable
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Worker build
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Pass nếu applicable
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Migration validation
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Seed validation
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## 14. MIGRATION VALIDATION MATRIX
 
@@ -2091,133 +2091,133 @@ Sellable migration
 
 No auto sellable true
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 QuoteSnapshot migration
 
 Immutable snapshot support
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Cart/Draft migration
 
 No official order/order_code
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Official Order migration
 
 Unique order_code
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Payment migration
 
 Selected != Paid
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Shipping migration
 
 No revenue side effect
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Tax/Invoice migration
 
 No revenue side effect
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Verified Revenue migration
 
 Requires ORDER_VERIFIED
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Commission migration
 
 No final without Verified Revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ROAS migration
 
 No unverified value
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Payout migration
 
 No payout execution unless approved
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## 15. SEED VALIDATION MATRIX
 
@@ -2237,181 +2237,181 @@ Product/SKU seed
 
 Auto sellable true
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Price seed
 
 Hardcoded final price
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Program seed
 
 Hardcoded channel discount outside policy
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Quote seed
 
 Fake final quote without QuoteSnapshot
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Cart/Draft seed
 
 Official order created early
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Order seed
 
 Paid by default
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Payment seed
 
 Payment selected set paid
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 COD seed
 
 COD fee auto-added without policy
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Shipping seed
 
 Delivered creates revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Invoice seed
 
 Invoice creates revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Revenue seed
 
 Verified revenue without ORDER_VERIFIED
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Commission seed
 
 Final commission without verified revenue
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ROAS seed
 
 ROAS from unverified order value
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Payout seed
 
 Payout executed
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Gateway seed/config
 
 Gateway opened
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 ## 16. SECURITY / GOVERNANCE VALIDATION
 
@@ -2587,9 +2587,9 @@ Local build
 
 Có thể PASS/FAIL
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không đồng nghĩa Release Readiness
 
@@ -2597,9 +2597,9 @@ Local unit test
 
 Có thể PASS/FAIL
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không đồng nghĩa Global Smoke
 
@@ -2607,9 +2607,9 @@ Local integration test
 
 Có thể PASS/FAIL
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không đồng nghĩa Production Readiness
 
@@ -2617,9 +2617,9 @@ Local smoke
 
 Có thể PASS/FAIL
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không đồng nghĩa Global Smoke Pass
 
@@ -2627,9 +2627,9 @@ Evidence submitted
 
 Có thể SUBMITTED
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Chưa phải ACCEPTED
 
@@ -2637,9 +2637,9 @@ Evidence accepted
 
 Không tự set
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Owner/reviewer quyết định
 
@@ -2647,9 +2647,9 @@ Owner review
 
 ## WAITING
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Bắt buộc
 
@@ -2657,9 +2657,9 @@ Security review
 
 WAITING nếu applicable
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Bắt buộc nếu có sensitive flow
 
@@ -2667,9 +2667,9 @@ Release decision
 
 ## WAITING
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không tự gọi
 
@@ -2677,9 +2677,9 @@ Gateway status
 
 bị chặn
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không mở trong P3.2G
 
@@ -2687,9 +2687,9 @@ Production Readiness
 
 KHONG
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không gọi
 
@@ -2697,9 +2697,9 @@ Go-live Decision
 
 KHONG
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
-## TBD
+## CHỜ DEV ĐIỀN BẰNG EVIDENCE THẬT KHI CHẠY
 
 Không gọi
 
@@ -3419,27 +3419,27 @@ Quay lại file
 
 Sellable điểm chặn
 
-## 02-P3-2A-SELLABLE-GATE-RUNTIME.docx
+## 02-P3-2A-SELLABLE-GATE-RUNTIME.md
 
 Quote điểm chặn
 
-## 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.docx
+## 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md
 
 Cart/Draft/Confirmation điểm chặn
 
-## 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.docx
+## 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md
 
 Official Order điểm chặn
 
-## 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.docx
+## 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md
 
 Payment/Shipping/Tax điểm chặn
 
-## 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.docx
+## 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.md
 
 Revenue/Commission/ROAS điểm chặn
 
-## 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.docx
+## 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.md
 
 Governance/Gateway điểm chặn
 

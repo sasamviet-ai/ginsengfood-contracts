@@ -59,9 +59,9 @@ Ma trận này là bước đọc đầu tiên trước MASTER-09 và các adden
 | Nhóm source | File nguồn |
 | --- | --- |
 | Financial baseline | `4. phase/phase-5/TÀI LIỆU BỔ SUNG/00. GINSENGFOOD — BUSINESS & ADS FINANCIAL BASELINE LOCK.md` |
-| Pricing / Golden Hour / Diamond model mới | `4. phase/phase-5/TÀI LIỆU BỔ SUNG/GINSENGFOOD — MÔ HÌNH GIÁ - GIỜ VÀNG TRI ÂN - DOANH THU LIVE - ADS - DIAMOND.md` |
+| Pricing / Golden Hour / Diamond model mới | `4. phase/phase-5/TÀI LIỆU BỔ SUNG/GINSENGFOOD - MO HINH GIA - GIO VANG TRI AN - DOANH THU LIVE - ADS - DIAMOND.md` |
 | Gateway completion gate | `4. phase/phase-5/TÀI LIỆU BỔ SUNG/AI_ADVISOR_FACEBOOK_COMPLETION_REPORT.md` |
-| Facebook page list | `4. phase/phase-5/TÀI LIỆU BỔ SUNG/DANH SÁCH FACEBOOK (AI).md` |
+| Facebook page list | `4. phase/phase-5/TÀI LIỆU BỔ SUNG/DANH-SACH-FACEBOOK-AI.md` |
 | Facebook implementation sequence | `4. phase/phase-5/TÀI LIỆU BỔ SUNG/TRÌNH TỰ TRIỂN KHAI TIẾP THEO.md` |
 | Member / 24/7 / Golden Hour policy cũ | `4. phase/phase-3.1/5. bo sung/4. chính sách và hoa hồng thành viên.md` |
 | Product / formula / vegan source | `4. phase/phase-1/BỘ KHÓA 5 BƯỚC.md` và `4. phase/phase-1/CÔNG THỨC VẬN HÀNH 20 SKU MỚI.MD` |

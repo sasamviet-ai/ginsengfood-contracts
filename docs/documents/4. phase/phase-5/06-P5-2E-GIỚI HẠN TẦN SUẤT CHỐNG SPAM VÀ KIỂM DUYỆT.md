@@ -120,3 +120,85 @@ Runbook phải cover:
 `LIMITED_IMPLEMENTATION_REPORT_ONLY`
 
 `SECURITY_AND_MODERATION_EVIDENCE_REQUIRED`
+
+## 10. SRS hardening addendum - Rate Limit, Anti-spam, Moderation, Security
+
+### 10.1. Rate-limit buckets
+
+| Bucket | Scope | Default behavior |
+| --- | --- | --- |
+| `page_public_reply` | page + post/live + time window | Prevent repeated public replies from same page. |
+| `thread_private_reply` | page + thread + customer + time window | Prevent Messenger spam. |
+| `comment_handoff` | comment id + target thread | One active handoff per comment. |
+| `crm_delivery` | customer + campaign/lifecycle + time window | Honor opt-out/frequency cap/quiet hour. |
+| `provider_api` | app/page/provider token | Backoff on provider limit. |
+| `duplicate_event` | idempotency key | No repeated side effects. |
+
+Exact numeric limits are owner-configured; missing config defaults to stricter mode: block or dry-run.
+
+### 10.2. Moderation taxonomy
+
+| Category | Examples | Action |
+| --- | --- | --- |
+| `SPAM_DUPLICATE` | Repeated same content/link/comment flood. | No sales lead, rate-limit/quarantine. |
+| `ABUSE_TROLL` | Chửi bới, phá live, xúc phạm. | Moderate; human if policy requires. |
+| `COMPLAINT_REAL` | Khiếu nại chất lượng, giao hàng, hoàn tiền. | Human/CSKH, suppress sales. |
+| `SCAM_COUNTERFEIT_ACCUSATION` | Tố hàng giả/lừa đảo. | Human/QA/legal route; no auto sales. |
+| `PII_PUBLIC` | Phone, address, payment details. | Redact; private/human route. |
+| `HEALTH_SENSITIVE` | Bệnh nền, liều dùng, điều trị. | Safe ack + human/private advice guard. |
+| `POLICY_BLOCKED_CONTENT` | Nội dung platform cấm. | Block delivery; evidence. |
+
+### 10.3. Security controls
+
+| Control ID | Control | P0 fail if |
+| --- | --- | --- |
+| P5-2E-SEC-001 | Meta signature validation. | Webhook accepted without validation. |
+| P5-2E-SEC-002 | Verify token by secret ref. | Raw token in docs/log/evidence. |
+| P5-2E-SEC-003 | Page Access Token in secret store only. | Token stored in DB plain text or markdown. |
+| P5-2E-SEC-004 | Replay protection. | Same webhook creates duplicate reply. |
+| P5-2E-SEC-005 | Admin RBAC for page/config/evidence. | Non-admin can enable production or read secrets. |
+| P5-2E-SEC-006 | Evidence redaction. | Screenshot/log contains token, secret or raw PII. |
+| P5-2E-SEC-007 | App Review/permission gate. | Production outbound enabled with missing permission evidence. |
+
+### 10.4. App Review evidence package
+
+```yaml
+MetaAppReviewEvidence:
+  evidence_id: required
+  app_id_ref: required_redacted
+  page_registry_id: required
+  permission_name: required
+  requested_use_case: required
+  approved_status: pending|approved|rejected|not_required|unknown
+  approval_artifact_ref: required_unless_not_required
+  subscribed_fields: list
+  reviewer_notes_ref: optional
+  expires_or_review_after: optional
+  redaction_status: pass
+```
+
+`approved_status=unknown|pending|rejected` means production outbound remains blocked.
+
+### 10.5. Requirements
+
+| Requirement ID | Requirement |
+| --- | --- |
+| P5-2E-SRS-001 | Rate-limit check occurs after suppression/guard and before provider send. |
+| P5-2E-SRS-002 | Duplicate webhook must not create duplicate public reply, private handoff, delivery command or CRM command. |
+| P5-2E-SRS-003 | Real complaint must never be classified as sales opportunity by default. |
+| P5-2E-SRS-004 | Abuse/spam may be logged, but must not be pushed into AI sales flow. |
+| P5-2E-SRS-005 | Missing security/App Review evidence blocks production, even if local smoke passes. |
+| P5-2E-SRS-006 | Admin override requires reason, owner and expiry; no permanent silent bypass. |
+
+### 10.6. Evidence
+
+Every smoke run must attach:
+
+1. Signature validation proof.
+2. Duplicate/idempotency proof.
+3. Rate-limit bucket decision proof.
+4. Moderation decision proof.
+5. App Review/permission status proof.
+6. Redaction proof.
+
+Without these artifacts, final status remains `SECURITY_AND_MODERATION_EVIDENCE_REQUIRED`.

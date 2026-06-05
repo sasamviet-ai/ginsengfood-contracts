@@ -1,4 +1,4 @@
-# P6 - Analysis Only
+# Phase 6 - Consolidated Handoff Index
 
 **PROMPT-P6 - ADS MEASUREMENT / ATTRIBUTION / ROAS / SCALE GATE ANALYSIS HANDOFF**
 

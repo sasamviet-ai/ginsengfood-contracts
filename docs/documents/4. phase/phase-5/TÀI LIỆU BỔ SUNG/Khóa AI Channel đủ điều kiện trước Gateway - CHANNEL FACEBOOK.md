@@ -3604,6 +3604,9 @@ AI_CHANNEL_DEV_BRIEF_STATUS:
 documentation_status: READY_FOR_DEV_TASK_BREAKDOWN  
 gateway_dev_planning: ALLOWED_AFTER_OWNER_REVIEW  
 gateway_production: BLOCKED_UNTIL_COMPLETION_REPORT_PASS  
+gateway_pass_claim: NOT_ALLOWED_WITHOUT_EVIDENCE_ACCEPTED
+production_ready_claim: NOT_ALLOWED
+status_note: READY_FOR_DEV_TASK_BREAKDOWN chỉ cho phép bóc task kỹ thuật có kiểm soát; không phải Gateway PASS, Release Ready hoặc Production Ready.
 next_document: "MC_AI_VIDEO_SEGMENT_REGISTRY_CONTRACT"
 
 **HẾT TÀI LIỆU - AI_CHANNEL_DEV_IMPLEMENTATION_BRIEF_V2.4**

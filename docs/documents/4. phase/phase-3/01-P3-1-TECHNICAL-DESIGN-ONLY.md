@@ -11,7 +11,7 @@ File nay duoc rewrite cho PHASE theo ranh gioi MASTER/PACK/TECH hien hanh.
 
 ## Noi Dung Rewrite
 
-PHASE-03-COMMERCE-RUNTIME/01-P3-1-TECHNICAL-DESIGN-ONLY.docx
+PHASE-03-COMMERCE-RUNTIME/01-P3-1-TECHNICAL-DESIGN-ONLY.md
 
 ## 20.2. Prompt tiếp theo
 
@@ -299,11 +299,11 @@ READY_WITH_điểm chặn_FOR_OWNER_DECISION.
 
 ## BLOCKED_NEED_CODEBASE_CLEANUP_BEFORE_DESIGN.
 
-NEXT FILE: PHASE-03-COMMERCE-RUNTIME/01-P3-1-TECHNICAL-DESIGN-ONLY.docx
+NEXT FILE: PHASE-03-COMMERCE-RUNTIME/01-P3-1-TECHNICAL-DESIGN-ONLY.md
 
 ĐIỀU KIỆN SANG FILE TIẾP THEO: Chỉ chuyển sang P3.1 sau khi dev/Codex/Copilot chạy prompt Analysis Only này, trả report đủ 14 mục, không sửa file, xác định rõ điểm chặn/gap/conflict/evidence/smoke đề xuất và owner đồng ý dùng report đó làm nền thiết kế kỹ thuật.
 
-PHASE-03-COMMERCE-RUNTIME/01-P3-1-TECHNICAL-DESIGN-ONLY.docx
+PHASE-03-COMMERCE-RUNTIME/01-P3-1-TECHNICAL-DESIGN-ONLY.md
 
 ## PROMPT-P3.1 - COMMERCE RUNTIME TECHNICAL DESIGN / WORKSTREAM / TASK / CONTRACT / EVIDENCE / SMOKE HANDOFF
 
@@ -313,7 +313,7 @@ PHASE-03-COMMERCE-RUNTIME/01-P3-1-TECHNICAL-DESIGN-ONLY.docx
 
 Tài liệu này là prompt thiết kế kỹ thuật cho PHASE-03 - Commerce Runtime.
 
-Mục tiêu của file này là chuyển kết quả phân tích từ 00-P3-ANALYSIS-ONLY.docx thành thiết kế workstream, boundary, task, contract, smoke và evidence để chuẩn bị cho các prompt triển khai giới hạn tiếp theo.
+Mục tiêu của file này là chuyển kết quả phân tích từ 00-P3-ANALYSIS-ONLY.md thành thiết kế workstream, boundary, task, contract, smoke và evidence để chuẩn bị cho các prompt triển khai giới hạn tiếp theo.
 
 Đây không phải prompt sửa code.
 
@@ -463,7 +463,7 @@ Evidence submitted nếu chưa được accepted.
 
 ## 5. ENTRY CONDITION
 
-Chỉ được chạy prompt này khi đã có output của 00-P3-ANALYSIS-ONLY.docx.
+Chỉ được chạy prompt này khi đã có output của 00-P3-ANALYSIS-ONLY.md.
 
 ## 5.1. Điều kiện đầu vào bắt buộc
 
@@ -1455,7 +1455,7 @@ Integration evidence AI/Gateway consume sellable only.
 
 ## 14.1.8. Handoff file
 
-NEXT IMPLEMENTATION FILE: 02-P3-2A-SELLABLE-GATE-RUNTIME.docx
+NEXT IMPLEMENTATION FILE: 02-P3-2A-SELLABLE-GATE-RUNTIME.md
 
 ## 14.2. WS-P3-B - PRICE / PROGRAM / MEMBER BENEFIT / DIAMOND REFERRAL / QUOTE SNAPSHOT
 
@@ -1635,7 +1635,7 @@ AI/Gateway integration evidence.
 
 ## 14.2.9. Handoff file
 
-NEXT IMPLEMENTATION FILE: 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.docx
+NEXT IMPLEMENTATION FILE: 03-P3-2B-PRICE-PROGRAM-MEMBER-BENEFIT-QUOTE-SNAPSHOT.md
 
 ## 14.3. WS-P3-C - CART / ORDER DRAFT / CUSTOMER CONFIRMATION
 
@@ -1791,7 +1791,7 @@ Duplicate prevention evidence.
 
 ## 14.3.9. Handoff file
 
-NEXT IMPLEMENTATION FILE: 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.docx
+NEXT IMPLEMENTATION FILE: 04-P3-2C-CART-ORDER-DRAFT-CUSTOMER-CONFIRMATION.md
 
 ## 14.4. WS-P3-D - OFFICIAL ORDER / ORDER CODE / ORDER STATE MACHINE
 
@@ -1937,7 +1937,7 @@ Negative test evidence.
 
 ## 14.4.8. Handoff file
 
-NEXT IMPLEMENTATION FILE: 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.docx
+NEXT IMPLEMENTATION FILE: 05-P3-2D-OFFICIAL-ORDER-ORDER-CODE-STATE-MACHINE.md
 
 ## 14.5. WS-P3-E - PAYMENT / SHIPPING / INVOICE / TAX
 
@@ -2055,7 +2055,7 @@ Audit/evidence registry link.
 
 ## 14.5.8. Handoff file
 
-NEXT IMPLEMENTATION FILE: 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.docx
+NEXT IMPLEMENTATION FILE: 06-P3-2E-PAYMENT-SHIPPING-INVOICE-TAX.md
 
 ## 14.6. WS-P3-F - VERIFIED REVENUE / COMMISSION / ROAS HANDOFF
 
@@ -2171,7 +2171,7 @@ Audit/evidence registry link.
 
 ## 14.6.8. Handoff file
 
-NEXT IMPLEMENTATION FILE: 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.docx
+NEXT IMPLEMENTATION FILE: 07-P3-2F-VERIFIED-REVENUE-COMMISSION-ROAS-HANDOFF.md
 
 ## 14.7. WS-P3-G - SECURITY / RBAC / AUDIT / IDEMPOTENCY / EVIDENCE
 
@@ -3021,7 +3021,7 @@ Xác nhận:
 
 Step 2 - Read P3 Analysis Report
 
-Đọc đầy đủ report từ 00-P3-ANALYSIS-ONLY.docx.
+Đọc đầy đủ report từ 00-P3-ANALYSIS-ONLY.md.
 
 Nếu chưa có report, dừng.
 
@@ -3271,7 +3271,7 @@ Thiết kế smoke required.
 
 Thiết kế evidence required.
 
-Có handoff rõ sang 02-P3-2A-SELLABLE-GATE-RUNTIME.docx.
+Có handoff rõ sang 02-P3-2A-SELLABLE-GATE-RUNTIME.md.
 
 Report đủ 14 mục.
 

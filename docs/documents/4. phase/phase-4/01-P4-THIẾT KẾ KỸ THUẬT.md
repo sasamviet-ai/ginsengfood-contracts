@@ -2,7 +2,7 @@
 
 ## Khối nguồn bắt buộc đã nhập vào file này
 
-File này tự chứa nội dung nguồn liên quan của Phase 4. Không yêu cầu đọc Bảng Gôm hoặc tài liệu ngoài để hiểu các khóa dưới đây. Nếu sau này chỉ còn bộ file Phase 4, các rule trong khối này vẫn là nền bắt buộc để phân tích, thiết kế, kiểm thử và review.
+File này có khối nguồn bắt buộc để chạy lẻ, nhưng khi bàn giao Phase 4 phải đọc BẢNG GÔM GIAI ĐOẠN 4.md, 10-P4-PHỤ LỤC KHÓA RUNTIME THỰC CHIẾN AI ADVISOR.md và 11-P4-MA TRẬN SRS VÀ BÀN GIAO TRIỂN KHAI.md trước. Nếu nội dung file này khác Bảng Gôm/phụ lục/SRS handoff, áp dụng Bảng Gôm/phụ lục/SRS handoff và xử lý fail-closed.
 
 ### A. Nội dung nguồn đã nhập
 
@@ -48,7 +48,7 @@ File hiện tại: 01-P4-THIẾT KẾ KỸ THUẬT.docx
 
 Mode: Technical Design Only
 
-Điểm bắt đầu: Sau khi hoàn tất 00-P4-PHÂN TÍCH HIỆN TRẠNG ở mức báo cáo phân tích, chưa phải implementation complete.
+Điểm bắt đầu: Sau khi hoàn tất 00-P4-PHÂN TÍCH HIỆN TRẠNG.md ở mức báo cáo phân tích, chưa phải implementation complete.
 
 Điểm kết thúc: Có thiết kế boundary / contract / flow / guard đủ rõ để chuyển sang P4-2A Limited Implementation.
 
@@ -82,7 +82,7 @@ Nguồn: AI Advisor / Channel locked rules; Vai trò trong Phase 4: Khóa custom
 
 ## 5. ENTRY CONDITION
 
-Chỉ được chuyển sang thiết kế kỹ thuật khi đã có đầu vào phân tích tối thiểu từ 00-P4-PHÂN TÍCH HIỆN TRẠNG. Nếu chưa có phân tích codebase thật, tài liệu này vẫn được dùng để khóa chuẩn thiết kế mục tiêu, nhưng không được ghi là đã xác nhận hiện trạng code.
+Chỉ được chuyển sang thiết kế kỹ thuật khi đã có đầu vào phân tích tối thiểu từ 00-P4-PHÂN TÍCH HIỆN TRẠNG.md. Nếu chưa có phân tích codebase thật, tài liệu này vẫn được dùng để khóa chuẩn thiết kế mục tiêu, nhưng không được ghi là đã xác nhận hiện trạng code.
 
 Đã xác định repository / module / service liên quan đến AI Advisor, Channel, Commerce Runtime và Product Knowledge.
 
@@ -592,7 +592,7 @@ Smoke code: P4-SMK-015; Kịch bản: Khách cũ có member tier trong memory nh
 
 ## 26. EXECUTION STEPS - TECHNICAL DESIGN ONLY
 
-## 1. Đọc báo cáo 00-P4-PHÂN TÍCH HIỆN TRẠNG và xác định các module/service/file hiện có liên quan đến AI Advisor.
+## 1. Đọc báo cáo 00-P4-PHÂN TÍCH HIỆN TRẠNG.md và xác định các module/service/file hiện có liên quan đến AI Advisor.
 
 ## 2. Map từng truth AI đang cần sang owner Phase 1/2/3; đánh dấu mọi chỗ AI đang tự tính là conflict.
 

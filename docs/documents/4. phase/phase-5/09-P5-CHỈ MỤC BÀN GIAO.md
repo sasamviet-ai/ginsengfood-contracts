@@ -10,7 +10,7 @@
 
 1. `BẢNG GÔM GIAI ĐOẠN 5.md`
 2. `10-P5-PHỤ LỤC KHÓA RUNTIME GATEWAY FACEBOOK VÀ NHẮN TIN.md`
-3. `00-P5-PHÂN TÍCH HIỆN TRẠNG.md`
+3. `00-P5-PHAN-TICH-HIEN-TRANG.md`
 4. `01-P5-THIẾT KẾ KỸ THUẬT.md`
 5. `02-P5-2A-ĐỊNH DANH KÊNH VÀ NGỮ CẢNH PAGE.md`
 6. `03-P5-2B-BÌNH LUẬN CÔNG KHAI VÀ BÀN GIAO MESSENGER.md`
@@ -89,7 +89,7 @@ File `01. FILE FACEBOOK ADS & LIVE COMMERCE OPERATING MODEL.md` hiện rỗng.
 | --- | --- | --- | --- |
 | 0 | `BẢNG GÔM GIAI ĐOẠN 5.md` | Reading hub | Hiểu toàn bộ Gateway boundary và business/financial/channel locks. |
 | 1 | `10-P5-PHỤ LỤC KHÓA RUNTIME GATEWAY FACEBOOK VÀ NHẮN TIN.md` | Runtime lock | Gateway không tự quote/order/CRM/commission, production blocked. |
-| 2 | `00-P5-PHÂN TÍCH HIỆN TRẠNG.md` | Analysis | Current state/gap/risk/owner decisions, không sửa code. |
+| 2 | `00-P5-PHAN-TICH-HIEN-TRANG.md` | Analysis | Current state/gap/risk/owner decisions, không sửa code. |
 | 3 | `01-P5-THIẾT KẾ KỸ THUẬT.md` | Design | API/DB/event/feature flag design. |
 | 4 | `02-P5-2A...` | Page Registry | Meta App/Page/Token governance. |
 | 5 | `03-P5-2B...` | Webhook/live/comment | Normalized event, public/private, handoff. |
@@ -133,4 +133,86 @@ Chỉ scale khi:
 `GATEWAY_PRODUCTION_BLOCKED`
 
 `NOT_RELEASE_READY`
+
+## 9. SRS hardening addendum - Dev handoff map
+
+### 9.1. Reading order for dev
+
+| Order | File | Purpose |
+| --- | --- | --- |
+| 1 | `09-P5-CHỈ MỤC BÀN GIAO.md` | Scope, reading order, boundary, status vocabulary. |
+| 2 | `00-P5-PHAN-TICH-HIEN-TRANG.md` | Analysis checklist and conflict taxonomy. |
+| 3 | `10-P5-PHỤ LỤC KHÓA RUNTIME GATEWAY FACEBOOK VÀ NHẮN TIN.md` | Runtime invariants and production lock. |
+| 4 | `01-P5-THIẾT KẾ KỸ THUẬT.md` | Overall module/API/DB/state contract. |
+| 5 | `02-P5-2A-ĐỊNH DANH KÊNH VÀ NGỮ CẢNH PAGE.md` | Page Registry and permission model. |
+| 6 | `03-P5-2B-BÌNH LUẬN CÔNG KHAI VÀ BÀN GIAO MESSENGER.md` | Public comment and handoff. |
+| 7 | `04-P5-2C-NGỮ CẢNH MESSENGER VÀ CHẶN PHẢN HỒI CUỐI.md` | Messenger and Final Response Guard. |
+| 8 | `05-P5-2D-CHỈ BÁO ĐANG GÕ VÀ NHỊP ĐỘ PHẢN HỒI.md` | Delivery pacing and retry. |
+| 9 | `06-P5-2E-GIỚI HẠN TẦN SUẤT CHỐNG SPAM VÀ KIỂM DUYỆT.md` | Rate limit, moderation, security. |
+| 10 | `07-P5-2F-CHẶN GỬI TỪ CHỐI NHẬN VÀ BÀN GIAO NGƯỜI THẬT.md` | Suppression, opt-out, human handoff, attribution. |
+| 11 | `08-P5-2G-BÁO CÁO KIỂM THỬ KHÓI VÀ BẰNG CHỨNG GATEWAY.md` | Smoke/evidence gate. |
+
+### 9.2. Traceability matrix
+
+| Requirement group | Owner file | Upstream/downstream guard |
+| --- | --- | --- |
+| P5-SRS-PAGE | 02-P5-2A | PACK-06, TECH-06, schemas/channel. |
+| P5-SRS-WEBHOOK | 03-P5-2B, 06-P5-2E | TECH-06, idempotency standard, evidence registry. |
+| P5-SRS-PUBLIC | 03-P5-2B | PACK-05 public comment rules, TECH-06. |
+| P5-SRS-MESSENGER | 04-P5-2C, 05-P5-2D | PACK-05/TECH-05 AI guard, TECH-06. |
+| P5-SRS-DELIVERY | 05-P5-2D, 06-P5-2E | Platform policy, rate-limit, App Review. |
+| P5-SRS-SUPPRESSION | 07-P5-2F | Canonical CRM, sale-lock/recall state machines. |
+| P5-SRS-ATTRIBUTION | 07-P5-2F, 08-P5-2G | PACK-07/Ads schemas, Finance/Diamond canonical. |
+| P5-SRS-EVIDENCE | 08-P5-2G | Master evidence gate, canonical evidence. |
+| P5-SRS-RELEASE | 09-P5, 10-P5 | Master release/go-live control. |
+
+### 9.3. Backlog decomposition
+
+```yaml
+phase_5_backlog:
+  epics:
+    - P5-E01 Page Registry and Meta App Governance
+    - P5-E02 Webhook Intake and Event Normalization
+    - P5-E03 Public Comment Policy and Comment-to-Messenger
+    - P5-E04 Messenger Session and AI Guard Consumer
+    - P5-E05 Delivery Pacing, Retry, Rate Limit
+    - P5-E06 Moderation, Security, App Review
+    - P5-E07 Suppression, Human Handoff, Attribution
+    - P5-E08 Evidence, Smoke, Release Gate
+  cross_cutting:
+    - idempotency
+    - redaction
+    - RBAC
+    - audit/evidence
+    - kill-switch
+    - owner decision registry
+```
+
+### 9.4. Required dev outputs
+
+Dev handoff is incomplete unless implementation analysis produces:
+
+1. SRS requirement list with IDs mapped to P5 files.
+2. OpenAPI/internal API delta.
+3. DB migration plan.
+4. Event/schema payloads.
+5. State machine diagrams or transition tables.
+6. Service/module ownership.
+7. Test matrix by P0 smoke ID.
+8. Seed/config plan for Page Registry without real secrets.
+9. Evidence collection plan.
+10. Release blocker register.
+
+### 9.5. Scope lock
+
+Dev must not turn Phase 5 into:
+
+- AI Advisor rewrite.
+- Commerce quote/order/payment service.
+- CRM lifecycle engine.
+- Ads optimizer/ROAS source.
+- Diamond commission/payout runtime.
+- Generic chatbot webhook.
+
+Final status remains `GATEWAY_PRODUCTION_BLOCKED` and `NOT_RELEASE_READY` until evidence gates explicitly move it.
 

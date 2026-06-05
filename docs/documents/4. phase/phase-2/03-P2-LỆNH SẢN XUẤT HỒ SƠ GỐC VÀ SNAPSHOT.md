@@ -119,6 +119,10 @@ BLOCKED / REJECTED / CANCELLED / SUPERSEDED_BY_APPROVED_DEVIATION
 7. Không gọi lệnh sản xuất là production ready hoặc sellable.
 ---
 
+## PHỤ LỤC NGUỒN ĐÃ NHẬP - BẢNG PHIẾU LỆNH SẢN XUẤT.md
+
+> Phụ lục này giữ nội dung nguồn cũ để không mất bảng, số liệu, field hoặc rule khi bỏ file nguồn riêng. Phần rewrite chuẩn hóa ở đầu file là nguồn chính; phụ lục dùng để trace và đối chiếu số liệu.
+
 ## 10. Operational forms - phiếu và lệnh vận hành bắt buộc
 
 # OPERATIONAL FORMS
@@ -962,6 +966,8 @@ Hạch toán hoàn tất
 Chưa hoàn tất
 
 ---
+
+## PHỤ LỤC NGUỒN ĐÃ NHẬP - CÔNG THỨC VẬN HÀNH 20 SKU MỚI.MD
 
 ## 11. Công thức vận hành 20 SKU dùng cho snapshot
 

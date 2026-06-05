@@ -102,3 +102,114 @@ Gateway chỉ delivery `SEND_MESSAGE` khi guard pass.
 `LIMITED_IMPLEMENTATION_REPORT_ONLY`
 
 `FINAL_RESPONSE_GUARD_REQUIRED`
+
+## 10. SRS hardening addendum - Messenger Context và Final Response Guard
+
+### 10.1. Messenger session binding
+
+Messenger private chỉ được coi là private-safe khi thread được bind đúng page, customer/channel ref và source event.
+
+```yaml
+MessengerSession:
+  messenger_session_id: required
+  page_registry_id: required
+  thread_ref: required_redacted
+  customer_channel_ref: required_redacted
+  source_event_id: optional
+  source_surface: public_comment|live_comment|messenger_private|page_inbox
+  source_comment_id: optional
+  source_campaign_ref: optional
+  private_context_status: not_started|created|bound|active|expired|blocked|closed
+  human_takeover_status: none|requested|active|released
+  last_customer_message_at: timestamp
+  expires_at: timestamp
+```
+
+### 10.2. AI handoff request
+
+Gateway gửi AI Advisor request, nhưng request phải chỉ là context và không chứa quyền tạo truth.
+
+```yaml
+AiAdvisorChannelRequest:
+  request_id: required
+  channel_context_id: required
+  surface: messenger_private
+  page_role: required
+  customer_channel_ref: redacted
+  source_comment_summary: optional_redacted
+  product_scope_refs: list
+  quote_snapshot_ref: optional
+  order_context_ref: optional
+  sale_lock_status: pass|blocked|unknown
+  recall_status: pass|blocked|unknown
+  suppression_status: pass|blocked|deferred
+  allowed_response_modes:
+    - public_safe_ack
+    - private_advice
+    - quote_handoff
+    - order_handoff
+    - human_handoff
+  forbidden_actions:
+    - self_price
+    - self_order
+    - self_payment
+    - self_commission
+    - public_pii
+```
+
+### 10.3. Final Response Guard output
+
+```yaml
+FinalResponseGuardResult:
+  guard_trace_id: required
+  ai_response_id: required
+  surface: messenger_private|public_comment
+  claim_guard_status: pass|fail|blocked
+  public_private_scope_status: pass|fail|blocked
+  quote_snapshot_status: not_required|present|missing|stale
+  order_confirmation_status: not_required|present|missing|stale
+  payment_disclosure_status: pass|blocked
+  pii_redaction_status: pass|fail
+  suppression_status: pass|blocked|deferred
+  final_guard_status: pass|fail|blocked|pending
+  allowed_delivery: boolean
+  blocked_reasons: list
+```
+
+### 10.4. Guard truth table
+
+| Condition | Delivery result |
+| --- | --- |
+| `final_guard_status=pass` and suppression pass | Delivery may proceed through pacing/rate-limit. |
+| Quote wording but `quote_snapshot_status=missing|stale` | Block final price; ask for quote generation/human route. |
+| Order success wording but confirmation/order_code missing | Block; no order success claim. |
+| Payment wording without payment owner confirmation | Block payment claim. |
+| PII in public view | Block public delivery; route private/human. |
+| Sale lock/recall active | Block sales answer; support/human only. |
+| Human takeover active | Automation paused. |
+
+### 10.5. Requirements
+
+| Requirement ID | Requirement |
+| --- | --- |
+| P5-2C-SRS-001 | Gateway cannot deliver AI text without guard trace id. |
+| P5-2C-SRS-002 | Public and private renderers must be separate. |
+| P5-2C-SRS-003 | Messenger thread mismatch blocks automated answer. |
+| P5-2C-SRS-004 | Stale quote/order refs are treated as missing. |
+| P5-2C-SRS-005 | Handoff to human must preserve context, source event, last AI decision and blocked reason. |
+| P5-2C-SRS-006 | Ads/campaign/referral context is internal metadata; not customer-facing unless owner-approved public wording exists. |
+
+### 10.6. Evidence requirements
+
+Every sent Messenger response must have:
+
+1. Messenger session id.
+2. Channel context id.
+3. AI response id.
+4. Final guard trace id.
+5. Suppression decision id.
+6. Delivery command id.
+7. Redacted rendered text hash.
+8. Provider delivery result or dead-letter id.
+
+Without these, status remains `FINAL_RESPONSE_GUARD_REQUIRED`.

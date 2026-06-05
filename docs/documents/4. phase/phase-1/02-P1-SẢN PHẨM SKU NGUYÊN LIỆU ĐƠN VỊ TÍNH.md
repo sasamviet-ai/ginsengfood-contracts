@@ -72,6 +72,82 @@ Material Master phải tách:
 4. Không public SKU internal code nếu channel không được duyệt.
 5. SKU chỉ được gắn vegan claim khi material/formula sạch động vật; mặc định fail-closed nếu còn `lòng trắng trứng`, `xương heo`, thịt/cá/hải sản.
 6. Sâm Savigin không đi vào purchase requirement mặc định.
+
+## 6. Product/SKU field chi tiết
+
+| Field | Bắt buộc | Rule |
+| --- | --- | --- |
+| `internal_sku_code` | Có | Dạng nguồn như A1/CS/DM/HS, không tự public nếu chưa duyệt |
+| `public_product_name` | Có | Tên tiếng Việt sạch, không chứa code nội bộ |
+| `product_group` | Có | Theo mùa/Chức năng/Bổ dưỡng |
+| `formula_id` | Có | `FML-*-G1`, không dùng G0 production |
+| `formula_version` | Có | G1 baseline hoặc owner pending |
+| `classification_state` | Có | `SAVORY`, `NON_VEGAN`, `VEGAN_CLAIM_APPROVED`, `CLAIM_SUPPRESSED` |
+| `activation_state` | Có | DRAFT/ACTIVE_BASELINE/ACTIVE/BLOCKED/INACTIVE |
+| `output_profile_ref` | Có | Mẻ 400 hoặc owner-approved profile |
+| `packaging_profile_ref` | Có trước Phase 2 | B1/B2/B3 refs |
+| `source_refs` | Có | 5 file nguồn liên quan |
+
+## 7. Material Master field chi tiết
+
+| Field | Rule |
+| --- | --- |
+| `material_id` | Mã canonical nội bộ, không lấy alias làm khóa |
+| `material_name` | Tên chuẩn tiếng Việt |
+| `material_group` | A1/A2/A3/B1/B2/B3 |
+| `usage_roles` | Cho phép nhiều role: dược liệu, nền, nước hầm, nêm, bao bì |
+| `source_type` | COMPANY_SOURCE, SUPPLIER_SOURCE, MIXED_SOURCE, OWNER_DEFINED |
+| `uom_base` | kg/g/l/ml/gói/hộp/thùng/lọ/hũ/cuộn |
+| `qc_required` | Nguyên liệu sản xuất mặc định true, B3 theo policy |
+| `readiness_required` | A/B dùng cho sản xuất phải true nếu cần lot |
+| `threshold_policy_code` | Một trong policy file 05 |
+| `dietary_risk_flag` | true nếu động vật/allergen hoặc ảnh hưởng claim |
+| `costing_scope` | Có thể tính giá nội bộ nhưng không sync MISA ở Phase 1 |
+
+## 8. UOM và conversion
+
+| Nhóm UOM | UOM nguồn | UOM chuẩn | Gate |
+| --- | --- | --- | --- |
+| Khối lượng | kg, g, gram | kg | Có factor chuẩn |
+| Thể tích | lít, ml | lít hoặc ml | Không đổi sang kg nếu thiếu density |
+| Bao bì cấp 1 | gói, lọ, hũ, cuộn | đơn vị packaging profile | Theo SKU/profile |
+| Bao bì cấp 2 | hộp, thùng | hộp/thùng | Theo output profile |
+| Hương/liquid nhỏ | ml | ml | Không round thô làm sai công thức |
+
+Nếu công thức chứa `Lít` và material issue cần kg, Phase 2 phải dùng density policy owner-approved. Phase 1 không tự đoán density.
+
+## 9. Packaging/output baseline
+
+| Output | Baseline nguồn | Rule |
+| --- | --- | --- |
+| Gói/phần ăn | 7.200/mẻ 400 | Dùng cho B1 và trace/print planning |
+| Hộp | 1.800/mẻ 400 | Dùng cho B2 box |
+| Thùng | 300/mẻ 400 | Dùng cho B2 carton |
+| B1 buffer | +7%, 7.704 gói quy đổi/mẻ | Planning/threshold, không sửa actual batch output |
+| B2 box buffer | 1.926 hộp/mẻ | Planning/threshold |
+| B2 carton buffer | 321 thùng/mẻ | Planning/threshold |
+
+## 10. Dietary claim fail-closed
+
+| SKU | Trạng thái canonical hiện tại | Lý do |
+| --- | --- | --- |
+| A1/CS/DM/HS | Không thuần chay/claim suppressed | G1 có lòng trắng trứng |
+| B1/CS/RM/ĐX | Không thuần chay/claim suppressed | G1 có lòng trắng trứng |
+| C2/CS/DONGTRUNG | Không thuần chay/claim suppressed | G1 có lòng trắng trứng |
+| C3/CS/NAMDONGCO | Không thuần chay/claim suppressed | G1 có lòng trắng trứng |
+
+Không seed public claim thuần chay cho các SKU này cho đến khi có formula version mới sạch động vật, owner approval và evidence accepted.
+
+## 11. Validation bắt buộc
+
+1. Đủ đúng 20 SKU, không duplicate code.
+2. Mỗi SKU có Formula G1.
+3. Mỗi Formula G1 có material lines cụ thể.
+4. Mọi material line trỏ về material canonical.
+5. Mọi UOM có trong allowlist hoặc conversion policy.
+6. Mọi packaging material B1/B2/B3 có threshold policy.
+7. Sâm Savigin dùng Company Source/strategic reserve.
+8. Không dùng material alias trong production projection.
 ---
 
 ## PHỤ LỤC NGUỒN ĐÃ NHẬP - CÔNG THỨC VẬN HÀNH 20 SKU MỚI.MD

@@ -21,10 +21,11 @@ Sau vòng gộp bổ sung CRM/Member, Diamond/Finance, Facebook Gateway, AI Advi
 3. `documents/4. phase/phase-3/10-P3-ADDENDUM-CUSTOMER-TO-CASH-RUNTIME-LOCK.md`
 4. `documents/4. phase/phase-4/BẢNG GÔM GIAI ĐOẠN 4.md`
 5. `documents/4. phase/phase-4/10-P4-PHỤ LỤC KHÓA RUNTIME THỰC CHIẾN AI ADVISOR.md`
-6. `documents/4. phase/phase-5/10-P5-PHỤ LỤC KHÓA RUNTIME GATEWAY FACEBOOK VÀ NHẮN TIN.md`
-7. `documents/6. canonical/01-CANONICAL-CRM-MEMBER-LIFECYCLE-RUNTIME.md`
-8. `documents/6. canonical/02-CANONICAL-FINANCE-DIAMOND-COMMISSION-PAYOUT-RUNTIME.md`
-9. `documents/4. phase/phase-8/IVR-21-attempt-policy-cleanup-decision.md`
-10. `documents/6. canonical/03-CANONICAL-EVIDENCE-SMOKE-GATE-CUSTOMER-TO-CASH-CARE.md`
+6. `documents/4. phase/phase-4/11-P4-MA TRẬN SRS VÀ BÀN GIAO TRIỂN KHAI.md`
+7. `documents/4. phase/phase-5/10-P5-PHỤ LỤC KHÓA RUNTIME GATEWAY FACEBOOK VÀ NHẮN TIN.md`
+8. `documents/6. canonical/01-CANONICAL-CRM-MEMBER-LIFECYCLE-RUNTIME.md`
+9. `documents/6. canonical/02-CANONICAL-FINANCE-DIAMOND-COMMISSION-PAYOUT-RUNTIME.md`
+10. `documents/4. phase/phase-8/IVR-21-attempt-policy-cleanup-decision.md`
+11. `documents/6. canonical/03-CANONICAL-EVIDENCE-SMOKE-GATE-CUSTOMER-TO-CASH-CARE.md`
 
 Các tài liệu này khóa boundary và smoke/evidence. Chúng không tự gọi Gateway PASS, Release Ready hoặc Production Ready.

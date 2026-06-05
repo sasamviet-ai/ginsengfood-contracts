@@ -203,3 +203,96 @@ Release verdict tối đa khi chưa đủ PASS:
 `PHASE_5_VALIDATION_REPORT_ONLY`
 
 `NOT_RELEASE_READY`
+
+## 11. SRS hardening addendum - Smoke and Evidence Gate
+
+### 11.1. Evidence verdict vocabulary
+
+| Verdict | Meaning | Can claim release? |
+| --- | --- | --- |
+| `NOT_RUN` | Smoke not executed. | No. |
+| `BLOCKED` | Missing dependency/config/evidence. | No. |
+| `FAIL` | Executed and failed. | No. |
+| `PASS_LOCAL_ONLY` | Local/staging pass, no production proof. | No. |
+| `PASS_WITH_EVIDENCE` | Required artifact exists and redacted. | Still not release unless global gate accepts. |
+| `ACCEPTED_BY_OWNER` | Owner signed specific evidence and risk. | Only for scoped gate. |
+
+No Phase 5 local file may call `GLOBAL_SMOKE_PASS`, `COMPLETION_PASS`, `RELEASE_READY` or `PRODUCTION_READY` alone.
+
+### 11.2. P0 smoke matrix
+
+| Smoke ID | Scenario | Required proof |
+| --- | --- | --- |
+| P5-GW-P0-001 | Unknown Page ID inbound event | Event quarantined, no reply. |
+| P5-GW-P0-002 | Missing/invalid webhook signature | Rejected, no side effect. |
+| P5-GW-P0-003 | Duplicate webhook retry | One normalized event/effect only. |
+| P5-GW-P0-004 | Public comment asks price | Safe ack/private handoff, no final price public. |
+| P5-GW-P0-005 | Public comment contains phone/address | PII not repeated; private/human route. |
+| P5-GW-P0-006 | Handoff fails | Public does not say sent. |
+| P5-GW-P0-007 | Messenger thread mismatch/stale | Block/human route. |
+| P5-GW-P0-008 | AI response lacks guard trace | No delivery. |
+| P5-GW-P0-009 | Quote missing QuoteSnapshot | No final price. |
+| P5-GW-P0-010 | Order success missing order_code/confirmation | No order success claim. |
+| P5-GW-P0-011 | Sale lock/recall active | Sales reply blocked. |
+| P5-GW-P0-012 | Customer opt-out | CRM/proactive outbound blocked. |
+| P5-GW-P0-013 | Complaint/refund case open | Human/CSKH route; sales suppressed. |
+| P5-GW-P0-014 | Provider rate-limit | Bounded retry/backoff, no spam. |
+| P5-GW-P0-015 | App Review/permission pending | Production blocked. |
+| P5-GW-P0-016 | Token/secret in evidence attempt | Evidence rejected/redacted. |
+| P5-GW-P0-017 | Ads-origin lead | Attribution preserved; no ROAS PASS from lead. |
+| P5-GW-P0-018 | Diamond referral before verified order | Referral preserved; no commission calculation. |
+| P5-GW-P0-019 | Human takeover active | Automation paused. |
+| P5-GW-P0-020 | Kill-switch active | No outbound. |
+
+### 11.3. Evidence package schema
+
+```yaml
+GatewaySmokeEvidencePackage:
+  package_id: required
+  phase: phase-5
+  environment: local|staging|pilot|production
+  run_started_at: timestamp
+  run_finished_at: timestamp
+  source_revision_ref: required
+  config_snapshot_ref: required_redacted
+  page_registry_snapshot_ref: required
+  app_review_snapshot_ref: required
+  smoke_results:
+    - smoke_id: required
+      result: pass|fail|blocked|not_run
+      artifact_refs: list
+      blocker_reason: optional
+      redaction_status: pass|fail
+  p0_summary:
+    pass: integer
+    fail: integer
+    blocked: integer
+    not_run: integer
+  owner_decisions: list
+  final_verdict: NOT_RELEASE_READY|EVIDENCE_SUBMITTED_ONLY|SCOPED_PASS_WITH_BLOCKERS
+```
+
+### 11.4. Artifact requirements
+
+| Artifact | Required for | Redaction rule |
+| --- | --- | --- |
+| Webhook signature/idempotency logs | P5-GW-P0-001..003 | No raw token/signature secret. |
+| Page Registry snapshot | Page identity and permission tests | No token. |
+| Public/private rendered text sample | Public/private boundary tests | No raw PII. |
+| Handoff state trace | Comment-to-Messenger tests | Redacted thread/customer refs. |
+| AI guard trace | AI/Messenger tests | No hidden prompt/secrets. |
+| Suppression decision trace | Opt-out/open case/sale lock tests | Redacted customer refs. |
+| Rate-limit trace | Anti-spam tests | No provider secret. |
+| Owner decision log | Any accepted risk | Decision id, owner, scope, expiry. |
+
+### 11.5. Release verdict rules
+
+`PHASE_5_VALIDATION_REPORT_ONLY` remains the maximum verdict unless:
+
+1. All P0 smoke tests pass with redacted artifacts.
+2. App Review/permission status is approved or explicitly not required with evidence.
+3. Production page set is scoped and owner-approved.
+4. Global evidence gate accepts the package.
+5. Release/go-live owner signs the release decision.
+
+If any item is missing, final remains `NOT_RELEASE_READY`.

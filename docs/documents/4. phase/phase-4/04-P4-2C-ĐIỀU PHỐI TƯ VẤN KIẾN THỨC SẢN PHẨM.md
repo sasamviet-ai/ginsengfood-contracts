@@ -2,7 +2,7 @@
 
 ## Khối nguồn bắt buộc đã nhập vào file này
 
-File này tự chứa nội dung nguồn liên quan của Phase 4. Không yêu cầu đọc Bảng Gôm hoặc tài liệu ngoài để hiểu các khóa dưới đây. Nếu sau này chỉ còn bộ file Phase 4, các rule trong khối này vẫn là nền bắt buộc để phân tích, thiết kế, kiểm thử và review.
+File này có khối nguồn bắt buộc để chạy lẻ, nhưng khi bàn giao Phase 4 phải đọc BẢNG GÔM GIAI ĐOẠN 4.md, 10-P4-PHỤ LỤC KHÓA RUNTIME THỰC CHIẾN AI ADVISOR.md và 11-P4-MA TRẬN SRS VÀ BÀN GIAO TRIỂN KHAI.md trước. Nếu nội dung file này khác Bảng Gôm/phụ lục/SRS handoff, áp dụng Bảng Gôm/phụ lục/SRS handoff và xử lý fail-closed.
 
 ### A. Nội dung nguồn đã nhập
 
@@ -84,7 +84,7 @@ Nhóm sự thật: Claim/public wording; Owner: Safety / Public Wording / Claim 
 
 ## 4. ENTRY CONDITION
 
-## 00-P4-PHÂN TÍCH HIỆN TRẠNG đã hoàn tất report phân tích hoặc có kết quả current state đủ để triển khai có kiểm soát.
+## 00-P4-PHÂN TÍCH HIỆN TRẠNG.md đã hoàn tất report phân tích hoặc có kết quả current state đủ để triển khai có kiểm soát.
 
 ## 01-P4-THIẾT KẾ KỸ THUẬT đã khóa boundary tổng thể của AI Advisor Runtime.
 
