@@ -52,6 +52,8 @@ MASTER-00 không thiết kế chi tiết database, API, DTO, service, UI, worker
 | MASTER-05 | Evidence, smoke, completion gate standard | Resolver/guard | Evidence/smoke standard |
 | MASTER-06 | Reserved and future integration governance | Release and source rules | Activation gate cho scope tương lai |
 | MASTER-07 | Release and go-live control | Evidence/smoke standard | Release review model |
+| MASTER-08 | Cross-system decision log | Source baseline mới + conflict register | Owner decision IDs + fail-closed runtime stance |
+| MASTER-09 | Cross-phase runtime lock addendum | MASTER-08 + source baseline mới | Runtime chain + addendum sequence + implementation block map |
 
 ## Chuỗi Dependency Cốt Lõi
 
@@ -108,7 +110,7 @@ Commerce Runtime, CRM, Admin UI, Security Runtime và Landing Page có thể đ�
 
 | Cụm | Thứ tự | Ghi chú |
 | --- | --- | --- |
-| MASTER | MASTER-00 đến MASTER-07 | Đọc trước PACK |
+| MASTER | MASTER-00 đến MASTER-09 | Đọc trước PACK; MASTER-08/09 điều phối source bổ sung và conflict P0 |
 | PACK | PACK-01 đến PACK-10 | Theo registry canonical |
 | PHASE-01 | P1 analysis, design, limited implementation, smoke | Product truth |
 | PHASE-02 | P2 analysis, design, operational handoff, smoke | Operational truth |

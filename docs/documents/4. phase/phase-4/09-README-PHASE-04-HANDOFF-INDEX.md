@@ -10,6 +10,14 @@ Phase 4 chi duoc bat dau khi Phase 3 co evidence toi thieu cho QuoteSnapshot va 
 
 Global Gateway tiep tuc `BLOCKED` trong toan Phase 4 cho den TECH-10/global release review rieng. Phase 4 smoke pass khong dong nghia release-ready.
 
+## Update 2026-06-05 - P4 Practical Runtime Lock Addendum
+
+Đã bổ sung `10-P4-ADDENDUM-AI-ADVISOR-PRACTICAL-RUNTIME-LOCK.md` làm bản khóa thực chiến hợp nhất cho AI bán hàng, CRM vòng đời, member lifecycle, quote/order/payment/shipping và UX hội thoại.
+
+Addendum này phải được đọc trước mọi correction/implementation sau của P4-2A đến P4-2F. Nó không thay thế các file 00-08, không mở Gateway, không gọi Completion Decision và không gọi Production Readiness.
+
+Nếu rule trong addendum chưa có contract/resolver/guard/smoke/evidence tương ứng, ghi blocker `P4-PRACTICAL-GAP-*` và quay lại file P4 tương ứng, không để dev tự suy luận nghiệp vụ.
+
 Nguyen tac khoa:
 
 - AI chi consume Product Knowledge approved/public-safe.
@@ -22,6 +30,7 @@ Nguyen tac khoa:
 
 Thu tu thuc thi tiep theo:
 
+0. `10-P4-ADDENDUM-AI-ADVISOR-PRACTICAL-RUNTIME-LOCK.md`: đọc bắt buộc trước khi chạy/correction/implementation các file 00-08 nếu phạm vi chạm AI bán hàng thực chiến, CRM, member lifecycle, quote/order/payment/shipping hoặc UX hội thoại.
 1. `00-P4-ANALYSIS-ONLY.md`: chi inspect backend/runtime hien co, khong sua file.
 2. `01-P4-1-TECHNICAL-DESIGN-ONLY.md`: khoa runtime consumer contract, API/DTO/event/state neu can doi; moi API/DTO change phai bao frontend repo cap nhat.
 3. `02-P4-2A-RUNTIME-CONSUMER-CONTRACT.md`: AIA-BLG-001, khoa consumer boundary cho Product/Commerce/Payment/Shipping/Suppression.
@@ -232,6 +241,8 @@ File: 06-P4-2E-SAFETY-PUBLIC-WORDING-CLAIM-GUARD; Mode: LIMITED IMPLEMENTATION D
 File: 07-P4-2F-CHANNEL-HANDOFF-MESSENGER-LIVE-CRM-BRIDGE; Mode: LIMITED IMPLEMENTATION DESIGN; Mục tiêu: Khóa bridge giữa AI Advisor và Messenger/Live/CRM.; Done condition: Public/private boundary đúng; quote/order ở private khi cần; CRM tôn trọng sellable/recall/sale lock.; Fail nếu: Live/CRM hardcode giá, spam, nhắn sai kênh, tư vấn SKU bị lock hoặc mở Gateway.
 
 File: 08-P4-2G-SMOKE-EVIDENCE-REPORT; Mode: SMOKE/EVIDENCE/REPORT; Mục tiêu: Chạy smoke toàn Phase 4 và lập report 14 mục.; Done condition: Evidence đủ, pass/fail rõ, điểm chặn rõ, Gateway vẫn bị chặn.; Fail nếu: Thiếu evidence nhưng ghi pass; gọi Release Readiness/Go-live Decision.
+
+File: 10-P4-ADDENDUM-AI-ADVISOR-PRACTICAL-RUNTIME-LOCK; Mode: GOVERNANCE / CONTRACT / PRACTICAL RULE LOCK; Mục tiêu: Hợp nhất rule thực chiến về bối cảnh thương mại trong ngày, customer/member lifecycle, recommendation 3 trụ, situation routing, business intent routing, quote/order/payment/shipping, CRM message immutable, public wording và typing indicator.; Done condition: Rule được map vào P4-2A..P4-2G bằng contract/resolver/guard/smoke/evidence rõ ràng.; Fail nếu: Dùng addendum để mở Gateway, gọi Production Ready hoặc để dev tự suy luận nghiệp vụ khi thiếu contract.
 
 ## 6. STRATEGIC LOCK CỦA PHASE 4
 
