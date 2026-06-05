@@ -18,6 +18,7 @@ Global Gateway tiep tuc `BLOCKED` trong toan Phase 3. Khong mo Gateway, khong tu
 
 Thu tu thuc thi tiep theo:
 
+0. `10-P3-ADDENDUM-CUSTOMER-TO-CASH-RUNTIME-LOCK.md`: đọc trước khi implement để khóa DailySalesContext, QuoteSnapshot, order/payment/shipping state bridge, verified revenue, Diamond/Finance handoff và P0 smoke sau vòng bổ sung CRM/Member/Gateway.
 1. `00-P3-ANALYSIS-ONLY.md`: inspect backend that, map module/API/schema/test voi TECH-04, TECH-11/12/13 va PACK-10.
 2. `01-P3-1-TECHNICAL-DESIGN-ONLY.md`: khoa contract, API/DTO/state machine/event can doi; moi API/DTO change phai bao frontend repo cap nhat.
 3. `02-P3-2A-SELLABLE-GATE-RUNTIME.md`: COM-BLG-001, Operational blocked -> Commerce blocked; Product Active khong dong nghia Sellable.
@@ -30,6 +31,7 @@ Thu tu thuc thi tiep theo:
 
 Dieu kien toi thieu de chuyen tiep Phase 4:
 
+- Đã đọc và map P3 addendum Customer-to-Cash vào implementation boundary.
 - COM-BLG-002 QuoteSnapshot boundary co evidence.
 - COM-BLG-004 Order Draft boundary co evidence.
 - Khong con P0 Commerce blocker.

@@ -1858,9 +1858,9 @@ o | MAX_ATTEMPT = 2
 
 o | ATTEMPT_1 = T0
 
-o | ATTEMPT_2 = T0 + 2_MINUTES_30_SECONDS
+o | ATTEMPT_2 = T0 + 5_MINUTES
 
-o | WINDOW_EXPIRES = T0 + 5_MINUTES
+o | WINDOW_EXPIRES = T0 + 10_MINUTES
 
 - TWENTY_FOUR_SEVEN:
 
@@ -1980,7 +1980,7 @@ Rule Giờ Vàng:
 
 ## MAX_ATTEMPT = 2
 
-## ATTEMPT_INTERVAL = 2_MINUTES_30_SECONDS
+## ATTEMPT_INTERVAL = 5_MINUTES
 
 Lịch gọi:
 
@@ -1990,11 +1990,11 @@ T0 = thời điểm đơn cần xác nhận IVR
 
 ATTEMPT_2 = T0 + 5 phút
 
-WINDOW_EXPIRES = T0 + 5 phút
+WINDOW_EXPIRES = T0 + 10 phút
 
 Giờ Vàng có cửa sổ xác nhận ngắn vì quote/giá/chương trình có tính thời điểm.
 
-IVR không được gọi sau 5 phút rồi vẫn coi đơn là xác nhận trong phiên.
+IVR không được gọi sau 10 phút rồi vẫn coi đơn là xác nhận trong phiên.
 
 ## 22.2. Mapping kết quả Giờ Vàng
 
@@ -2016,13 +2016,13 @@ Cuộc 2 không nghe | IVR_NO_ANSWER_FINAL | Core hủy đơn theo rule
 
 Cuộc 2 lỗi kỹ thuật | IVR_TECHNICAL_EXCEPTION | Không tính là khách không nghe, chuyển Admin Review
 
-Hết 5 phút chưa xác nhận hợp lệ | IVR_CONFIRMATION_WINDOW_EXPIRED | Core hủy đơn / quote hết hiệu lực
+Hết 10 phút chưa xác nhận hợp lệ | IVR_CONFIRMATION_WINDOW_EXPIRED | Core hủy đơn / quote hết hiệu lực
 
 ## 22.3. Giờ Vàng không được gọi dồn cuối phiên
 
 Trong Giờ Vàng, scheduler không được dồn toàn bộ cuộc gọi cuối phiên.
 
-Không được để hàng trăm call job nằm chờ rồi đến cuối 5 phút mới gọi.
+Không được để hàng trăm call job nằm chờ rồi đến cuối 10 phút mới gọi.
 
 Nếu call job không thể thực hiện trong window, phải đánh dấu theo rule capacity/deadline.
 
@@ -2998,7 +2998,7 @@ Không nghe tạm thời | ATTEMPT_1_NO_ANSWER / ATTEMPT_2_NO_ANSWER / ATTEMPT_3
 
 Không nghe cuối | IVR_NO_ANSWER_FINAL | Hết attempts theo program, không có xác nhận hợp lệ
 
-Hết thời gian | IVR_CONFIRMATION_WINDOW_EXPIRED | Hết window 5 phút hoặc 15 phút
+Hết thời gian | IVR_CONFIRMATION_WINDOW_EXPIRED | Hết window 10 phút hoặc 15 phút
 
 Sai số / không gọi được | IVR_INVALID_PHONE_FINAL | Số điện thoại không hợp lệ nếu rule xác nhận
 
@@ -3608,7 +3608,7 @@ Số SIM | Năng lực 45 phút
 
 - Không dồn toàn bộ cuộc gọi cuối phiên.
 
-- Không lấy capacity 45 phút để hợp thức hóa window 5 phút.
+- Không lấy capacity 45 phút để hợp thức hóa window 10 phút.
 
 - Đơn Giờ Vàng vẫn phải theo window 10 phút của từng order.
 
@@ -5710,9 +5710,9 @@ Mục tiêu | Kiểm tra Giờ Vàng 10 phút, 2 attempts, cách 5 phút
 
 Input | Order thuộc GOLDEN_HOUR
 
-Expected result | Attempt 1 tại T0, attempt 2 tại T0 + 2:30, hết T0 + 5:00
+Expected result | Attempt 1 tại T0, attempt 2 tại T0 + 5:00, hết T0 + 10:00
 
-Negative path | Attempt 2 sai thời gian, gọi sau 5 phút, có attempt 3
+Negative path | Attempt 2 sai thời gian, gọi sau window 10 phút, có attempt 3
 
 Fail condition | Xác nhận sau window vẫn được coi hợp lệ; Giờ Vàng có attempt 3
 

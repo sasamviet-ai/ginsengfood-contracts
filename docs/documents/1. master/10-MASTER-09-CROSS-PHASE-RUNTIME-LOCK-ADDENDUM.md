@@ -11,11 +11,11 @@ Tài liệu này khóa hướng đọc, ranh giới source baseline so với tec
 MASTER-09 không:
 
 1. Viết code, API, DTO, database hoặc worker.
-2. Tự thay owner decision trong MASTER-08.
+2. Tự thay policy decision trong MASTER-08.
 3. Mở Gateway production.
 4. Gọi Completion Report PASS.
 5. Thực hiện Meta App setup, token, webhook thật, MISA sync thật hoặc payout thật.
-6. Sửa trực tiếp giá, giờ live, formula, Page ID hoặc evidence nếu owner chưa ký.
+6. Sửa trực tiếp giá, giờ live, formula, Page ID hoặc evidence ngoài policy refs đã khóa.
 
 ## Trạng Thái Toàn Hệ Sau Addendum
 
@@ -23,10 +23,10 @@ MASTER-09 không:
 | --- | --- |
 | Business model clarity | STRONG |
 | Source baseline coverage | STRONG_BUT_DISTRIBUTED |
-| Technical spec readiness | PARTIAL |
-| Direct implementation readiness | NOT_READY_FOR_FULL_IMPLEMENTATION |
+| Technical spec readiness | CLEAN_FOR_LIMITED_HANDOFF |
+| Direct implementation readiness | LIMITED_IMPLEMENTATION_HANDOFF_ALLOWED_WITH_EVIDENCE_GATES |
 | Gateway production | BLOCKED |
-| Required next gate | OWNER_DECISION + ADDENDUM + EVIDENCE |
+| Required next gate | EVIDENCE_ACCEPTANCE + COMPLETION_REVIEW + RELEASE_SIGNOFF |
 
 ## Source Baseline Vs Technical Spec
 
@@ -39,7 +39,7 @@ Các tài liệu mới phải được phân loại trước khi dev đọc:
 | AIA-FB-GATE | Completion Report, Evidence Package, Dev Brief | Không tự mở Gateway. Là gate/evidence spec. |
 | PHASE/PACK chính thức | MASTER, PACK, PHASE addendum đã sạch | Có thể làm handoff dev sau khi conflict P0 được xử lý. |
 
-Quy tắc: source baseline có quyền mô tả nghiệp vụ, nhưng implementation chỉ được bắt đầu từ PACK/PHASE/addendum sạch có owner decision và evidence gate rõ.
+Quy tắc: source baseline có quyền mô tả nghiệp vụ, nhưng implementation chỉ được bắt đầu từ PACK/PHASE/addendum sạch có policy ref và evidence gate rõ.
 
 ## Business Engine Lock
 
@@ -74,13 +74,13 @@ Rule nền:
 | Product / SKU / dietary | Product Master / Formula governance | AI, Gateway, Live, Ads, CRM, Commerce | SKU active không đồng nghĩa sellable; vegan claim phải khớp ingredient/formula. |
 | Formula / BOM / Operational Config | Product + Operational source | Production, MRP, MISA, Costing | G0 không dùng production; G1 chỉ production khi approved. |
 | Sellable availability | Operational / Inventory / Sale Lock | Commerce, AI, Ads, Live, CRM | Recall/Sale Lock/Quality Hold thắng mọi kênh bán. |
-| Pricing / Program | Commerce Pricing Core | AI, Gateway, CRM, Live, Ads | PRICE-POLICY và GOLDEN-HOUR decision phải chốt. |
+| Pricing / Program | Commerce Pricing Core | AI, Gateway, CRM, Live, Ads | Dùng `PRICE_POLICY_V2026_06_CANONICAL_001` và `GOLDEN_HOUR_POLICY_V2026_06_CANONICAL_001`; evidence phải trace được policy ref. |
 | QuoteSnapshot | Commerce Runtime | AI, Gateway, Order, CRM | Không QuoteSnapshot thì không final price. |
 | Order Verified | Order / Payment / Shipping Core | Ads, ROAS, CRM, Diamond, Finance | Chỉ verified order/revenue mới đi downstream. |
 | Ads / ROAS | Ads Measurement | Owner, Dashboard | Không scale nếu attribution/ROAS/order verified chưa PASS. |
 | CRM / Member | CRM / Member Lifecycle Core | AI, Messenger, Outbound | Suppression, quiet hours, frequency cap, member policy priority. |
 | Diamond | Diamond Referral / Commission Core | Finance, CRM, Dashboard | Referral bind + eligible order + payout policy. |
-| MISA / Finance | Accounting Handoff | Finance review | Mapping ACTIVE + checkpoint + evidence; không sync thật nếu owner inputs thiếu. |
+| MISA / Finance | Accounting Handoff | Finance review | Mapping ACTIVE + Finance checkpoint + evidence; không sync thật nếu Finance/MISA inputs thiếu. |
 | Completion | Evidence Registry | Release review | P0 smoke/evidence + owner sign-off. |
 
 ## Facebook Hub-Spoke Runtime Lock
@@ -108,34 +108,34 @@ Rule bắt buộc:
 
 | Artifact | Vị trí đề xuất | Nội dung khóa | Input chặn |
 | --- | --- | --- | --- |
-| COMMERCE-ADDENDUM | Phase 3 | 24/7, Giờ Vàng, Quote Hold, VAT, ship, COD, Diamond candidate, Order Verified | PRICE-POLICY-DECISION-001, GOLDEN-HOUR-TIME-DECISION-001 |
-| AI-ADVISOR-ADDENDUM | Phase 4 | Customer360, Product Triad, Vegan Guard, segment routing, QuoteSnapshot-only pricing, no SKU wording | VEGAN-FORMULA-DECISION-001, Commerce Addendum |
-| FACEBOOK-GATEWAY FB-00 -> FB-08 | Phase 5 | README, Page Registry, webhook normalization, Live/Handoff, Messenger routing, Ads attribution, Diamond referral, ROAS dashboard, security/app review/test/pilot/release | FB-PAGE-REGISTRY-CLEAN-001, Gateway Completion P0 evidence |
+| COMMERCE-ADDENDUM | Phase 3 | 24/7, Giờ Vàng, Quote Hold, VAT, ship, COD, Diamond candidate, Order Verified | `PRICE_POLICY_V2026_06_CANONICAL_001`, `GOLDEN_HOUR_POLICY_V2026_06_CANONICAL_001`, evidence trace |
+| AI-ADVISOR-ADDENDUM | Phase 4 | Customer360, Product Triad, Vegan Guard, segment routing, QuoteSnapshot-only pricing, no SKU wording | `DIETARY_POLICY_V2026_06_CANONICAL_001`, Commerce Addendum |
+| FACEBOOK-GATEWAY FB-00 -> FB-08 | Phase 5 | README, Page Registry, webhook normalization, Live/Handoff, Messenger routing, Ads attribution, Diamond referral, ROAS dashboard, security/app review/test/pilot/release | `FB_PAGE_REGISTRY_LOCK_V2026_06_CANONICAL_001`, Gateway Completion P0 evidence |
 | ADS-ADDENDUM | Phase 6 | Verified revenue only, CPA/ROAS, scale gate, dashboard evidence | Commerce Order Verified + Ads attribution evidence |
 | MC-AI-LIVE-ADDENDUM | Phase 7 | Daily Live Board, script, segment evidence, claim guard, no non-board SKU | Product/Claim/Vegan/GoldenHour policy |
-| OPERATIONAL-CONFIG-ADDENDUM | Phase 1-2 | G1/G0, BOM/Recipe Map, packaging, print, QC, release, trace, recall, no manual ingredient selection | FORMULA-VERSION-DECISION-001, VEGAN-FORMULA-DECISION-001 |
-| FINANCE-CANONICAL-REGISTRY | Phase 3.1 / PACK-04 | Diamond commission, PIT, payout, verified revenue, MISA handoff | DIAMOND-SELF-PURCHASE-DECISION-001, MISA-PAYOUT-DECISION-001 |
-| EVIDENCE-SMOKE-MATRIX | PACK-10 / TECH-10 | P0 smoke/evidence for QuoteSnapshot, Order Verified, Gateway, CRM suppression, duplicate/idempotency, ROAS, owner sign-off | All P0 decisions and affected addendums |
-| IVR-ADDENDUM | Phase 8 / PACK-09 | Final Golden Hour schedule alignment, attempt policy, queue/capacity, Order Core callback | GOLDEN-HOUR-TIME-DECISION-001, IVR-ATTEMPT-POLICY-DECISION-001 |
+| OPERATIONAL-CONFIG-ADDENDUM | Phase 1-2 | G1/G0, BOM/Recipe Map, packaging, print, QC, release, trace, recall, no manual ingredient selection | `FORMULA_POLICY_V2026_06_CANONICAL_001`, `DIETARY_POLICY_V2026_06_CANONICAL_001` |
+| FINANCE-CANONICAL-REGISTRY | Phase 3.1 / PACK-04 | Diamond commission, PIT, payout, verified revenue, MISA handoff | `DIAMOND_SELF_PURCHASE_POLICY_V2026_06_CANONICAL_001`, `MISA_PAYOUT_POLICY_V2026_06_CANONICAL_001` |
+| EVIDENCE-SMOKE-MATRIX | PACK-10 / TECH-10 | P0 smoke/evidence for QuoteSnapshot, Order Verified, Gateway, CRM suppression, duplicate/idempotency, ROAS, release sign-off | All P0 policy refs and affected addendums |
+| IVR-ADDENDUM | Phase 8 / PACK-09 | Final Golden Hour schedule alignment, attempt policy, queue/capacity, Order Core callback | `GOLDEN_HOUR_POLICY_V2026_06_CANONICAL_001`, `IVR_ATTEMPT_POLICY_V2026_06_CANONICAL_001` |
 
 ## Clean Handoff Sequence
 
 ```text
-1. MASTER-08 Owner Decision Log
-2. MASTER-09 Cross-Phase Runtime Lock
-3. Operational Config Addendum
-4. Commerce Addendum
-5. AI Advisor Addendum
-6. Facebook Gateway FB-00 -> FB-08
-7. Ads / MC AI Live / CRM / Finance Addendums
-8. IVR alignment if Golden Hour timing changes
-9. Evidence / Smoke Matrix
+1. MASTER-08 System-wide Gap / Impact Matrix + Policy Decision Log
+2. MASTER-09 Cross-Phase Runtime Lock Addendum
+3. Phase 3 Customer-to-Cash Runtime Addendum
+4. Phase 4 AI Advisor Practical Runtime Addendum
+5. Phase 5 Facebook Gateway / Messaging Delivery Addendum
+6. CRM / Member Lifecycle Canonical
+7. Finance / Diamond Commission / Payout Canonical
+8. IVR Attempt Policy Cleanup Decision
+9. Evidence / Smoke Gate toàn hệ
 10. Completion Report evidence review
-11. Owner sign-off
+11. Evidence acceptance / release sign-off
 12. Release / Go-live review
 ```
 
-Không được đảo thứ tự bằng cách code Gateway trước khi owner decision, QuoteSnapshot, Order Verified, CRM suppression, duplicate/idempotency và evidence gate chưa rõ.
+Không được đảo thứ tự bằng cách code Gateway production trước khi policy ref, QuoteSnapshot, Order Verified, CRM suppression, duplicate/idempotency và evidence gate chưa rõ.
 
 ## Phase-Specific Runtime Locks
 
@@ -152,7 +152,7 @@ Không được đảo thứ tự bằng cách code Gateway trước khi owner d
 
 1. Commerce owns pricing, program, quote, order, payment, shipping, verified revenue.
 2. QuoteSnapshot là nguồn sự thật cho final price.
-3. Quote Hold: Giờ Vàng 5 phút, 24/7 15 phút, nhưng chỉ áp dụng sau khi policy version chốt.
+3. Quote Hold: Giờ Vàng 5 phút, 24/7 15 phút, áp dụng theo selected policy refs và phải trace trong QuoteSnapshot.
 4. Order Verified là điều kiện để Ads, CRM, Diamond và Finance dùng doanh thu.
 5. Không cộng dồn quyền lợi nếu policy priority chưa rõ.
 
@@ -184,14 +184,14 @@ Không được đảo thứ tự bằng cách code Gateway trước khi owner d
 1. IVR chỉ xác nhận đơn hàng.
 2. IVR không bán hàng, không CRM, không tư vấn sản phẩm.
 3. SIM Gateway không cập nhật order trực tiếp.
-4. Attempt policy hiện hành phải được re-check sau khi Golden Hour schedule chốt.
+4. Attempt policy hiện hành dùng `IVR_ATTEMPT_POLICY_V2026_06_CANONICAL_001` và Golden Hour schedule đã chọn trong MASTER-08.
 5. Real customer call vẫn bị chặn nếu thiếu smoke/evidence/security/owner sign-off.
 
 ## Evidence Matrix Bắt Buộc
 
 | Evidence group | Bắt buộc chứng minh |
 | --- | --- |
-| Decision evidence | P0 decision ID có owner sign-off và policy version. |
+| Decision evidence | P0 policy ref có selected option, effective context và trace evidence. |
 | Quote evidence | QuoteSnapshot có price/program/member/shipping/tax/final và expiry. |
 | Order evidence | OrderDraft, CustomerConfirmation, order_code, verified state. |
 | Gateway evidence | Channel context, public/private boundary, Messenger handoff, duplicate/idempotency. |
@@ -207,7 +207,7 @@ MASTER-09 đạt yêu cầu khi:
 
 1. Source baseline và technical spec được tách rõ.
 2. Runtime chain từ Product/Operational đến Finance/Evidence không còn mơ hồ.
-3. P0 conflicts đều route về MASTER-08.
+3. P0 conflicts đã được resolve trong MASTER-08 bằng policy refs hoặc fail-closed evidence gate.
 4. Phase addendum sequence rõ cho dev.
 5. Gateway production vẫn BLOCKED cho đến khi evidence thật PASS.
 6. Không có câu nào gọi toàn hệ Production Ready.
@@ -221,17 +221,13 @@ SYSTEM DOCUMENT STATUS:
 STRONG BUSINESS + TECHNICAL FOUNDATION
 
 DIRECT IMPLEMENTATION STATUS:
-NOT READY FOR FULL IMPLEMENTATION
+LIMITED HANDOFF ALLOWED WITH EVIDENCE GATES
 
 GLOBAL GATEWAY:
 BLOCKED
 
 NEXT REQUIRED WORK:
-OWNER DECISIONS
-COMMERCE ADDENDUM
-AI ADVISOR ADDENDUM
-FACEBOOK GATEWAY FB-00 -> FB-08
-OPERATIONAL CONFIG ADDENDUM
-FINANCE CANONICAL REGISTRY
-EVIDENCE / SMOKE MATRIX
+RUNTIME EVIDENCE
+COMPLETION REPORT REVIEW
+RELEASE SIGNOFF
 ```

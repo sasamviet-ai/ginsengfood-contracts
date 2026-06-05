@@ -4,7 +4,8 @@
 
 Hệ thống: AI Advisor Ginsengfood  
 Phạm vi: Giá bán, Giờ Vàng Tri Ân, Quote Runtime, Member Rights, Diamond Commission, Shipping, VAT, Live Revenue Model, Ads Foundation, Combo Strategy, Facebook/Meta-safe wording.  
-Trạng thái: OWNER ALIGNMENT DRAFT - FOUNDATION BEFORE FACEBOOK CHANNEL GATEWAY & ADS TECHNICAL IMPLEMENTATION
+Trạng thái: CURRENT_CANONICAL_BUSINESS_POLICY - FOUNDATION BEFORE FACEBOOK CHANNEL GATEWAY & ADS TECHNICAL IMPLEMENTATION
+Policy refs: `PRICE_POLICY_V2026_06_CANONICAL_001`, `GOLDEN_HOUR_POLICY_V2026_06_CANONICAL_001`, `DIAMOND_COMMISSION_POLICY_V2026_06_CANONICAL_001`
 
 **0\. KẾT LUẬN CHIẾN LƯỢC**
 
@@ -154,6 +155,8 @@ hoặc:
 | --------- | ------------- |
 | Phiên 1   | 12h00 - 12h45 |
 | Phiên 2   | 20h00 - 20h45 |
+
+Member/Diamond buyer trong Giờ Vàng chỉ nhận early access theo policy. Không cộng thêm member discount hoặc Diamond buyer discount vào giá Giờ Vàng nếu QuoteSnapshot không có policy exception riêng.
 
 **3.4. Quote Hold**
 
