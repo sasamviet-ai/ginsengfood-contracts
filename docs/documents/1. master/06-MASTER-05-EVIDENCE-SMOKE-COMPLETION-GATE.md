@@ -6,6 +6,10 @@ MASTER-05 khóa chuẩn evidence, smoke và completion gate cho toàn bộ hệ 
 
 MASTER-05 không tự xác nhận sản phẩm đã sẵn sàng vận hành thật. File này chỉ định nghĩa cách chứng minh và cách review.
 
+## AI Review Boundary
+
+Khi reviewer AI chấm bộ tài liệu Phase 1-8 để giao dev triển khai, MASTER-05 được dùng làm chuẩn thiết kế evidence/smoke sau triển khai. Việc chưa có runtime artifact không làm fail dev-readiness nếu tài liệu đã nêu rõ smoke case, evidence packet, owner review và fail gate cần thu thập sau khi dev làm.
+
 ## Nguyên Tắc Evidence
 
 1. Evidence phải là artifact cụ thể, không phải lời mô tả.

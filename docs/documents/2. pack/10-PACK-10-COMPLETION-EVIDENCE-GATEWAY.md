@@ -56,7 +56,13 @@ PACK-10 là lớp khóa cuối để trả lời câu hỏi:
 
 “Toàn bộ hệ thống đã đủ điều kiện chạy thật chưa?”
 
-Câu trả lời chỉ được là CÓ khi có đầy đủ evidence, smoke pass, security pass, P0 STOP_POINTS cleared, owner sign-off, release decision và go-live approval.
+Câu hỏi trên chỉ được dùng sau khi dev đã triển khai và đã có artifact runtime. Câu trả lời chỉ được là CÓ khi có đầy đủ evidence, smoke pass, security pass, P0 STOP_POINTS cleared, owner sign-off, release decision và go-live approval.
+
+Trong vòng reviewer AI chấm bộ tài liệu Phase 1-8 để giao dev, câu hỏi đúng là:
+
+“Bộ tài liệu đã đủ chuẩn để dev triển khai có kiểm soát và biết cần chứng minh gì sau khi triển khai chưa?”
+
+Nếu source-of-truth, scope, dependency, smoke/evidence plan, owner gate và task handoff đã rõ thì được kết luận `DEV_IMPLEMENTATION_DOCUMENTATION_READY: YES`, đồng thời vẫn phải giữ `PRODUCTION_READY: NO` cho đến khi có evidence thật.
 
 ## 2. NGUYÊN TẮC CỐT LÕI CỦA PACK-10
 

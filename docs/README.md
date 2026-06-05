@@ -6,6 +6,12 @@ Người dùng chính là team `ginsengfood-ops-core`, team `ginsengfood-busines
 
 Ví dụ file trong thư mục này: `api-design-standard.md`, `event-design-standard.md`, `compatibility-policy.md`, `release-checklist.md`. Khi tài liệu mô tả API/event/schema cụ thể, phải nhắc rõ version và impact compatibility.
 
+## AI Review Target For Phase 1-8
+
+Khi gom bộ `documents/4. phase/phase-1` đến `phase-8` để ChatGPT hoặc reviewer AI đánh giá, câu hỏi cần chấm là: tài liệu đã đủ chuẩn để giao dev triển khai có kiểm soát hay chưa.
+
+Đọc `documents/00-AI-EVALUATION-DEV-READINESS.md` trước toàn bộ Phase. Các trạng thái `NOT_RELEASE_READY`, `NOT_PRODUCTION_READY`, `GLOBAL_GATEWAY_BLOCKED`, `PRODUCTION_BLOCKED`, smoke/evidence/owner sign-off pending là guard đúng cho runtime sau triển khai. Chúng không phải lỗi của vòng đánh giá dev-readiness và không được hiểu thành production approval.
+
 ## Ops-core External Boundary With ginsengfood-business-platform
 
 `ops-core-business-platform-boundary.md` là tài liệu boundary chung cho phần ops-core expose/consume với `ginsengfood-business-platform`.
@@ -19,9 +25,9 @@ Sau vòng gộp bổ sung CRM/Member, Diamond/Finance, Facebook Gateway, AI Advi
 1. `documents/1. master/09-MASTER-08-CROSS-SYSTEM-DECISION-LOG.md`
 2. `documents/1. master/10-MASTER-09-CROSS-PHASE-RUNTIME-LOCK-ADDENDUM.md`
 3. `documents/4. phase/phase-3/10-P3-ADDENDUM-CUSTOMER-TO-CASH-RUNTIME-LOCK.md`
-4. `documents/4. phase/phase-4/BẢNG GÔM GIAI ĐOẠN 4.md`
-5. `documents/4. phase/phase-4/10-P4-PHỤ LỤC KHÓA RUNTIME THỰC CHIẾN AI ADVISOR.md`
-6. `documents/4. phase/phase-4/11-P4-MA TRẬN SRS VÀ BÀN GIAO TRIỂN KHAI.md`
+4. `documents/4. phase/phase-4/12-BẢNG GOM GIAI ĐOẠN 4.md`
+5. `documents/4. phase/phase-4/10-PHỤ LỤC KHÓA THỜI GIAN CHẠY THỰC CHIẾN CỐ VẤN AI.md`
+6. `documents/4. phase/phase-4/11-MA TRẬN SRS VÀ BÀN GIAO TRIỂN KHAI.md`
 7. `documents/4. phase/phase-5/10-P5-PHỤ LỤC KHÓA RUNTIME GATEWAY FACEBOOK VÀ NHẮN TIN.md`
 8. `documents/6. canonical/01-CANONICAL-CRM-MEMBER-LIFECYCLE-RUNTIME.md`
 9. `documents/6. canonical/02-CANONICAL-FINANCE-DIAMOND-COMMISSION-PAYOUT-RUNTIME.md`

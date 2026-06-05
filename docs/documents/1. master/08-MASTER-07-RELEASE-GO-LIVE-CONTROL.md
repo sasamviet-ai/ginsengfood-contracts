@@ -6,6 +6,10 @@ MASTER-07 khóa cơ chế xét release và go-live cho Ginsengfood. Tài liệu 
 
 MASTER-07 không tự cấp quyền vận hành thật. File này chỉ định nghĩa điều kiện để owner hoặc release authority review.
 
+## AI Review Boundary
+
+Khi reviewer AI chấm bộ tài liệu Phase 1-8 để giao dev triển khai, MASTER-07 được dùng để kiểm tra tài liệu có phân biệt đúng dev handoff, release và go-live hay không. `NOT_RELEASE_READY` hoặc `NOT_PRODUCTION_READY` là trạng thái guard hợp lệ trong vòng tài liệu; không được coi là lý do phủ định `DEV_IMPLEMENTATION_DOCUMENTATION_READY` nếu tài liệu đã đủ để dev bóc task và biết release gate sau triển khai.
+
 ## Nguyên Tắc Release
 
 1. Documentation ready không đồng nghĩa production ready.

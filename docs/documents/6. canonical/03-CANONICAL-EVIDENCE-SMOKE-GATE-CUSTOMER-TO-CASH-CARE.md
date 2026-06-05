@@ -41,6 +41,10 @@ Không được dùng status cao hơn khi status thấp chưa pass.
 | ESM-P0-012 | IVR | Attempt policy canonical; technical retry không tăng customer attempt; no real call nếu release gate fail. |
 | ESM-P0-013 | Idempotency | Webhook/comment/confirmation/payment/callback retry không tạo duplicate. |
 | ESM-P0-014 | Evidence | Correlation id, resolver trace, guard trace, state transition và owner decision ref đầy đủ. |
+| ESM-P0-015 | Gender/age add-on | Female self/male self/elderly calcium add-ons đúng context, có ProductRoleMatrix proof và no treatment claim. |
+| ESM-P0-016 | Bulk/distributor | Bulk buyer/corporate gift/distributor intent split pass; no self discount, no false distributor routing. |
+| ESM-P0-017 | Order success care | order_code_created render approved success/care template; no paid/shipped wording ngoài runtime. |
+| ESM-P0-018 | Runtime providers | DailySalesContext, ProductRoleMatrix, QuoteSnapshot, OrderDraft, ShippingState, CRMJobLog và guard trace có provider evidence thật. |
 
 ## 4. Evidence packet tối thiểu
 
@@ -58,6 +62,17 @@ EvidencePacket:
     resolver_trace_id: required
     guard_trace_id: required
     decision_ids: list
+  runtime_provider_refs:
+    daily_sales_context_ref: required_if_lane_ai_sales
+    product_role_matrix_ref: required_if_lane_ai_product
+    quote_snapshot_ref: required_if_quote
+    order_draft_ref: required_if_order
+    shipping_state_ref: required_if_shipping
+    crm_job_log_ref: required_if_crm
+    final_response_guard_ref: required_if_customer_output
+  source_line_refs: list
+  message_registry_refs: list
+  normalized_message_hashes: required_if_crm_message
   result:
     status: pass | fail | blocked | skipped_with_reason
     reviewer_status: pending | accepted | rejected
@@ -76,12 +91,16 @@ Evidence không được là câu kết luận tài liệu. Phải có log, fixt
 | CRM language guard fail | CRM auto-send PASS |
 | Finance approval hoặc MISA mapping active missing | Payout/MISA Production Ready |
 | IVR attempt smoke/evidence missing | IVR implementation ready / real customer call |
+| Gender/age add-on proof missing | AI Product Consultation PASS |
+| Bulk/distributor split proof missing | Bulk quote / distributor routing PASS |
+| Order success template registry/evidence missing | Order success / post-purchase care PASS |
+| Runtime provider refs missing | Global Smoke Pass, P4 Evidence Submitted |
 
 ## 6. Done gate toàn hệ
 
 Toàn hệ chỉ đạt khi:
 
-1. Mọi P0 gate ESM-P0-001 đến ESM-P0-014 có evidence accepted.
+1. Mọi P0 gate ESM-P0-001 đến ESM-P0-018 có evidence accepted.
 2. Mọi policy refs trong MASTER-08 có selected option và evidence trace hoặc blocker fail-closed rõ.
 3. Gateway Completion Report chuyển từ PENDING_EVIDENCE sang accepted bằng proof thật.
 4. Không có source conflict chưa phân loại trong Phase 3/4/5/CRM/Finance/IVR.
