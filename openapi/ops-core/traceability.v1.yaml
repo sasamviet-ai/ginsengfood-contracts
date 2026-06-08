@@ -40,7 +40,7 @@ paths:
   /v1/trace/public/{qrCode}:
     get:
       summary: Get public trace by QR code
-      description: Returns public-safe trace payload for QR/public trace. Must not expose internal operational data, supplier details, cost, QC internals, MISA, or private evidence.
+      description: Returns the closed whitelist-only public trace payload for QR/public trace. Must not expose restricted operational data outside the public schema.
       operationId: getPublicTraceByQrCodeV1
       tags: [traceability]
       parameters:
