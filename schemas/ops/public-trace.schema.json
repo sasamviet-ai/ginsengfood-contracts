@@ -81,6 +81,38 @@
         }
       }
     },
+    "originProofs": {
+      "type": "array",
+      "description": "Public-safe origin image/proof entries. Public URL must be sanitized by ops-core and must not expose storage paths or internal identifiers.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "proofType": {
+            "type": "string",
+            "enum": ["FIELD_PHOTO", "FIELD_VIDEO", "CERTIFICATE_DOC", "LAB_REPORT", "OTHER"],
+            "description": "Public-safe proof type."
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Public-safe proof title."
+          },
+          "publicUrl": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://",
+            "description": "Public HTTPS URL for the origin proof asset."
+          },
+          "mimeType": {
+            "type": "string",
+            "enum": ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/quicktime", "application/pdf"],
+            "description": "Public-safe media MIME type."
+          }
+        },
+        "required": ["proofType", "publicUrl"]
+      }
+    },
     "messages": {
       "type": "array",
       "description": "Public-safe messages for unavailable or invalid traces.",
@@ -101,5 +133,5 @@
       }
     }
   },
-  "required": ["schemaVersion", "traceStatus", "qr", "product", "batch", "source", "messages"]
+  "required": ["schemaVersion", "traceStatus", "qr", "product", "batch", "source", "originProofs", "messages"]
 }
