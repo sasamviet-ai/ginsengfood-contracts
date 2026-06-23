@@ -1,5 +1,7 @@
 # 06-P2 - TRUY XUẤT QR THU HỒI VÀ KHÓA BÁN
 
+> ⚠️ HISTORICAL / SUPERSEDED (owner decision OD-M10-004, 2026-06-22): Thứ tự đặt **Packaging Level 2 + Print SAU Warehouse Receipt** trong tài liệu này KHÔNG còn là canonical. Thứ tự canonical: **Production process → Packaging/Printing/QR → Finished QC → Batch Release → Warehouse FG Receipt** (xem `docs/software-specs/modules/10_PACKAGING_PRINTING.md` OD-M10-004 và `docs/software-specs/workflows/05_CANONICAL_OPERATIONAL_FLOW.md`). Phần còn lại của tài liệu (QR lifecycle, recall, sale-lock, public trace whitelist) vẫn dùng để tham khảo lịch sử.
+
 Trạng thái: `TRACEABILITY_QR_RECALL_SALE_LOCK_CANONICAL`  
 Mode: `LIMITED IMPLEMENTATION HANDOFF`  
 Mục tiêu: khóa trace chain, QR/public trace, recall và sale lock để downstream không bán SKU/lô bị chặn.
