@@ -11,15 +11,30 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Content-Type", "value": "application/json" }
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}", "type": "text" }
         ],
         "url": "{{baseUrl}}/v1/availability/check",
         "description": "Expected contract response: common v1 envelope with sellable or availability data; standard error envelope for 400/401/403/404/409/422/500.",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"sku_id\": \"sku-gf-rice-001\",\n  \"requested_quantity\": {\n    \"value\": 2,\n    \"unit\": \"pack\"\n  }\n}"
+          "raw": "{\n  \"sku_id\": \"{{skuId}}\",\n  \"requested_quantity\": {\n    \"value\": \"2\",\n    \"unit\": \"pack\"\n  },\n  \"channel_context\": {\n    \"sourceId\": \"business-platform\",\n    \"sourceType\": \"RUNTIME_DECISION_SOURCE\"\n  }\n}"
         }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Common v1 envelope', function () { const json = pm.response.json(); pm.expect(json.schemaVersion).to.eql('v1'); pm.expect(json.data).to.have.property('sellable_status_id'); });",
+              "pm.test('Public no-leak', function () { const raw = pm.response.text(); ['evidence_refs','resolvedAt','supplier','costing','qc_defect','personnel','audit','formula'].forEach(function (field) { pm.expect(raw).not.to.include(field); }); });",
+              "pm.test('No store', function () { pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'); });"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "Get Public SKU",

@@ -10,9 +10,11 @@ paths:
   /v1/availability/check:
     post:
       summary: Check availability and sellable status
-      description: "Checks ops-core sellable/availability state for a SKU or batch. This endpoint is a read/guard check for business-platform and does not mutate inventory, recall, sale lock, trace, batch, or warehouse truth. TODO: source documents do not define a dedicated availability-check request schema for ops-core OpenAPI."
+      description: "Checks ops-core sellable/availability state for a SKU or batch. This endpoint is a read/guard check for business-platform and does not mutate inventory, recall, sale lock, trace, batch, warehouse, or sellable-status truth. channel_context is consumer context only and is not an authorization or sellable-decision input."
       operationId: checkAvailabilityV1
       tags: [availability-sellable]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -48,7 +50,9 @@ paths:
         - name: sellableStatusId
           in: path
           required: true
-          schema: { type: string, minLength: 1 }
+          schema: { type: string, format: uuid }
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Sellable status wrapped in the common envelope.
@@ -77,14 +81,14 @@ components:
       properties:
         sku_id:
           type: string
-          minLength: 1
+          format: uuid
         warehouse_id:
           type: string
-          minLength: 1
+          format: uuid
           description: Optional warehouse scope. FGSA-01 default availability scope is SKU + warehouse aggregate.
         batch_id:
           type: string
-          minLength: 1
+          format: uuid
         requested_quantity:
           $ref: "../../schemas/common/quantity.schema.json"
         channel_context:
@@ -107,3 +111,8 @@ components:
     Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

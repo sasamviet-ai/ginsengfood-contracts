@@ -36,7 +36,7 @@ fixtures:
     source_example: ../../examples/api/availability-check.response.json
     validates_against:
       - ../../schemas/common/envelope.schema.json
-      - ../../schemas/commerce/availability-check.schema.json
+      - ../../schemas/ops/sellable-status.schema.json
   - file: operational-form-frm-09.v1.fixture.json
     contract_area: operational-form
     provider: ops-core

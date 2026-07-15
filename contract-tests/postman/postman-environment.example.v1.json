@@ -6,6 +6,18 @@
       "value": "https://api.example.local",
       "type": "default",
       "enabled": true
+    },
+    {
+      "key": "accessToken",
+      "value": "replace-with-provider-proof-bearer-token",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "skuId",
+      "value": "a1000000-0000-4000-8000-000000000001",
+      "type": "default",
+      "enabled": true
     }
   ],
   "_postman_variable_scope": "environment",
