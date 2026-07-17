@@ -71,7 +71,7 @@ paths:
   /v1/sale-locks:
     post:
       summary: Create sale lock
-      description: Creates Sale Lock / Stop Sale contract record. This is a high-risk command; business-platform must consume its effect through availability/sellable checks and must not mutate it.
+      description: Creates a durable Sale Lock / Stop Sale contract record. Per OD-RCL-03, every successful durable activation must enqueue both ops-core.recall.sale-lock-activated.v1 and ops-core.recall.stop-sale-required.v1 for the same scope in the same outbox transaction; recall-case creation alone does not emit stop-sale. This is a high-risk command; business-platform must consume its effect through availability/sellable checks and must not mutate it.
       operationId: createSaleLockV1
       tags: [recall-sale-lock]
       requestBody:

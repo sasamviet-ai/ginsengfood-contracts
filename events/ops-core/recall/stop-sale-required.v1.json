@@ -3,7 +3,7 @@
   "$id": "events/ops-core/recall/stop-sale-required.v1.json",
   "title": "Stop Sale Required Event v1",
   "description": "Published when stop-sale is required for a scope. This is a high-risk suppression signal and must not be ignored by consumer channels.",
-  "$comment": "Sources: PACK-01 Recall Stop-Sale Gate; MASTER-07 stop-sale governance.",
+  "$comment": "Sources: PACK-01 Recall Stop-Sale Gate; MASTER-07 stop-sale governance; OD-RCL-03 (2026-07-17). Emit for every durable SaleLockActivated with the same sale_lock_id, scope_type, scope_id and correlation/causation chain; recall-case creation alone does not emit this event.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

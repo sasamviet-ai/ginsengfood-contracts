@@ -3,7 +3,7 @@
   "$id": "events/ops-core/recall/sale-lock-activated.v1.json",
   "title": "Sale Lock Activated Event v1",
   "description": "Published when sale lock becomes active. Payload includes sale-lock scope needed for business-platform to stop quote, order, AI, CRM, Ads, and Live flows for the affected scope.",
-  "$comment": "Sources: PACK-01 Sale Lock / Stop Sale; TECH-03 Consumer suppression.",
+  "$comment": "Sources: PACK-01 Sale Lock / Stop Sale; TECH-03 Consumer suppression; OD-RCL-03 (2026-07-17). Every durable activation is paired with ops-core.recall.stop-sale-required.v1 for the same scope in the same outbox transaction; recall-case creation alone is not this trigger.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
