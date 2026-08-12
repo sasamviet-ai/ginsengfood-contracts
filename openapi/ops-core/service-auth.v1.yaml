@@ -1,0 +1,126 @@
+openapi: 3.1.0
+info:
+  title: Ops Core Service Authentication API
+  version: 1.0.0
+  description: >-
+    Client-credentials bootstrap for approved machine consumers of ops-core root /v1 APIs.
+    The endpoint issues a short-lived bearer token, never a user/admin session, and does not
+    expose a refresh token. Unknown clients, invalid secrets, disabled/expired credentials,
+    and principals without an allowed service permission all return the same INVALID_CLIENT
+    response to prevent credential and permission enumeration.
+servers:
+  - url: https://api.example.local
+    description: Placeholder only.
+paths:
+  /v1/service-tokens:
+    post:
+      summary: Issue a short-lived service access token
+      description: >-
+        Exchanges an approved service principal client_id and client_secret for a bearer token
+        used on authorized root /v1 adapters such as POST /v1/availability/check. The request is
+        anonymous by necessity, protected by an authentication-sensitive rate limit, and must be
+        sent as application/json. Credentials and returned tokens must not be logged or cached.
+      operationId: issueServiceTokenV1
+      tags: [service-auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceTokenRequest"
+      responses:
+        "200":
+          description: Short-lived service bearer token. No refresh token is issued.
+          headers:
+            Cache-Control:
+              description: Token responses are never cacheable.
+              required: true
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceTokenResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/InvalidClient"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  schemas:
+    ServiceTokenRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        client_id:
+          type: string
+          minLength: 1
+          description: Approved ops-core service principal code.
+        client_secret:
+          type: string
+          minLength: 1
+          writeOnly: true
+          description: Service credential secret. Never log, persist in plaintext, or echo it.
+      required: [client_id, client_secret]
+    ServiceTokenResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        access_token:
+          type: string
+          minLength: 1
+          description: Short-lived JWT bearer for the service principal's allowed root /v1 permissions.
+        token_type:
+          type: string
+          const: Bearer
+        expires_in:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Remaining lifetime in seconds at issuance.
+        expires_at:
+          type: string
+          format: date-time
+      required: [access_token, token_type, expires_in, expires_at]
+    ErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/common/envelope.schema.json"
+        - type: object
+          properties:
+            error:
+              $ref: "../../schemas/common/error.schema.json"
+  responses:
+    BadRequest:
+      description: Malformed JSON request. Missing or invalid credentials use the generic 401 response.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    InvalidClient:
+      description: >-
+        Generic INVALID_CLIENT response for every credential, principal-status, expiry, or
+        allowed-permission failure. The response must not reveal which check failed.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    UnsupportedMediaType:
+      description: Request Content-Type is not application/json.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    TooManyRequests:
+      description: Authentication-sensitive rate limit exceeded.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    InternalServerError:
+      description: Internal server error with no credential or token disclosure.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }

@@ -22,6 +22,7 @@ API groups:
 - Operational Evidence / Forms: `operational-evidence.v1.yaml`
 - Operational Admin / Appendix Forms / Print / MISA: `operational-admin.v1.yaml`
 - MISA Handoff: `misa-handoff.v1.yaml`
+- Service Authentication: `service-auth.v1.yaml`
 
 ## Ops-core External Boundary With ginsengfood-business-platform
 
@@ -37,6 +38,7 @@ Ops-core expose API:
 | Trace Public API | `traceability.v1.yaml` | Whitelist-only public fields. |
 | Recall Status API | `recall-sale-lock.v1.yaml` | Recall blocks downstream flow where applicable. |
 | Sale Lock Status API | `recall-sale-lock.v1.yaml` | Sale Lock wins every downstream selling flow. |
+| Service Token API | `service-auth.v1.yaml` | Client credentials only; short-lived bearer, no refresh token, generic invalid-client failure. |
 
 Boundary locks:
 
@@ -45,6 +47,7 @@ Boundary locks:
 - Ops-core chỉ lưu reference key nếu cần: `order_id`, `order_item_id`, `customer_id`, `shipment_id`.
 
 API phuc vu business-platform:
+- `POST /v1/service-tokens`
 - `POST /v1/availability/check`
 - `GET /v1/skus/{skuId}/public`
 - `GET /v1/skus/{skuId}/operational-status`
@@ -64,6 +67,7 @@ API phuc vu ops-core frontend:
 - MISA handoff create/read APIs
 
 High-risk APIs:
+- `POST /v1/service-tokens` (authentication-sensitive rate limit; client secret and access token must never be logged or cached)
 - `POST /v1/recall-cases`
 - `POST /v1/sale-locks`
 - `POST /v1/batch-releases`
@@ -75,6 +79,7 @@ High-risk APIs:
 - `POST /v1/admin/operational/misa-handoffs/{misaHandoffId}/sync`
 
 Boundary notes:
+- `/v1/service-tokens` is the M2M authentication bootstrap for approved root `/v1/*` consumers; it is not an internal user/admin login and does not issue refresh tokens.
 - business-platform may check sellable/availability but must not mutate ops-core truth.
 - Inventory Ledger is append-only and has no direct consumer mutation API in Phase 4.
 - Sale Lock / Recall wins over Product Activation, channels, quote/order, and field actions.
