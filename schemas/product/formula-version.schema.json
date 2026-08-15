@@ -8,7 +8,7 @@
   "additionalProperties": false,
   "properties": {
     "formula_version_id": { "type": "string", "minLength": 1, "description": "Formula Version identifier." },
-    "formula_code": { "type": "string", "minLength": 1, "description": "Formula code such as FML-A1-G1 from the 20 SKU catalog." },
+    "formula_code": { "type": "string", "minLength": 1, "description": "Formula code such as FML-A1-G1 from the current operational SKU catalog." },
     "sku_id": { "type": "string", "minLength": 1, "description": "SKU governed by this formula version." },
     "generation": { "type": "string", "enum": ["G0", "G1", "POST_G1"], "description": "G0 research/history, G1 operational, POST_G1 for later versions. TODO: define exact post-G1 labels." },
     "version_label": { "type": "string", "minLength": 1, "description": "Human-readable version label." },

@@ -12,7 +12,7 @@ Scope:
 Source basis:
 - PACK-02 Product Master / SKU / Ingredient / Recipe / Formula Version / Product Activation.
 - PACK-03 Demand / MRP / Formula Scaling / Material & Packaging Control where formula scaling and material groups affect product contracts.
-- 20 SKU operational formula catalog for G0/G1, formula codes, anchor rice, and ratio_to_rice concepts.
+- Current 19 SKU operational formula catalog for G1, formula codes, anchor rice, and ratio_to_rice concepts; historical 20-SKU source naming is preserved only as provenance.
 
 Compatibility:
 - All schemas are v1 and must stay backward compatible unless a compatibility note is added in a later phase.
