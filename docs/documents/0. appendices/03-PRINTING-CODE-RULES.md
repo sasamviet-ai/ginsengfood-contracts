@@ -14,7 +14,7 @@ cấp 2
 
 ### 0.2. Nguyên tắc cốt lõi
 
-Hệ thống Ginsengfood sinh dữ liệu in. Máy in chỉ nhận payload để in.
+Ops-core sinh và quản trị dữ liệu nghiệp vụ/identity; máy in chỉ nhận resolved render payload để in và trả trạng thái. Dữ liệu hệ thống quản trị không đồng nghĩa mọi field đều được render tại nhà máy.
 
 Máy in không được tự sinh:
 
@@ -26,9 +26,24 @@ ngày sản xuất
 
 hạn dùng
 
-barcode
+barcode nghiệp vụ hoặc render policy
 
 QR
+
+### 0.3. OWNER-DIRECTIVE-2026-08-14-SUPPLIER-PREPRINTED-GTIN
+
+Quyết định này supersede các câu cũ trong tài liệu yêu cầu factory in EAN-13 trên BOX/CARTON:
+
+- BOX/CARTON dùng approved artwork và registered `GTIN_13`/EAN-13 do supplier in sẵn.
+- Ops-core vẫn sở hữu Trade Item/GTIN registry, kiểm tra effective mapping và đối chiếu barcode tại FRM-10; supplier không tự cấp/đổi GTIN.
+- Factory chỉ in variable data: BOX = batch/lô + MFG/EXP + unique public trace QR; CARTON = batch/lô + MFG/EXP + số hộp/thùng, không public QR mặc định.
+- PACKET vẫn chỉ in MFG/EXP; directive này không tự áp dụng supplier-preprinted barcode cho PACKET.
+- GTIN được giữ trong immutable validation/audit context nhưng không được đưa vào render fields khi `barcode_application_mode=SUPPLIER_PREPRINTED`.
+- Policy được snapshot theo packaging material lot/intake để xử lý mixed legacy/preprinted stock. `FACTORY_PRINTED + FULL_LABEL` chỉ là controlled fallback cho legacy blank lot.
+- Reprint chỉ reprint variable data/QR được phép; không reprint supplier-preprinted EAN-13.
+- Baseline identity hiện hành là 19 SKU, 19 BOX `GTIN_13` và 19 CARTON `GTIN_13` (38 GTIN tổng); mọi assertion 20/40 cũ trong tài liệu này là historical và bị owner directive 2026-08-14 supersede.
+
+Nguồn quyết định: `docs/decisions/14-08-11-18-m10-supplier-preprinted-gtin-owner-decision.md` trong ops-core.
 
 ## 1. QUY TẮC SINH MÃ TRUNG TÂM
 
@@ -40,11 +55,11 @@ ngày sản xuất
 
 hạn dùng
 
-barcode data
+GTIN/barcode identity và expected value để validation/audit
 
 QR token / QR payload
 
-print payload theo cấp đóng gói
+resolved print payload theo cấp đóng gói, packaging lot và label profile
 
 ### 1.2. Máy in chỉ làm
 
@@ -150,17 +165,14 @@ hộp
 
 ### 4.2. Nội dung in cấp 2
 
-Phải in:
+Phải phân biệt nội dung đã có sẵn trên bao bì và nội dung factory render:
 
-lô sản xuất
+| Cấp | Supplier in sẵn | Factory render |
+| --- | --- | --- |
+| BOX | approved artwork + registered EAN-13 | lô, MFG, EXP, unique public trace QR |
+| CARTON | approved artwork + registered EAN-13 | lô, MFG, EXP, số hộp/thùng |
 
-ngày sản xuất
-
-hạn dùng
-
-mã vạch
-
-mã QR
+Không render lặp EAN-13 trên variable-data label. Generic QR có sẵn trong artwork không thay thế unique public trace QR của BOX.
 
 ### 4.3. Quy tắc sinh dữ liệu in cấp 2
 
@@ -172,13 +184,15 @@ tự xác định batch/lô
 
 tự xác định MFG/EXP
 
-tự sinh barcode
+tự lấy expected GTIN từ active Trade Item identifier và đối chiếu với barcode supplier-preprinted đã scan
 
 tự sinh QR
 
 tự cấp số thứ tự in nếu policy cần
 
 tự gửi payload xuống máy in
+
+resolve `barcode_application_mode`, `factory_label_profile`, template version và render allowlist từ approved packaging lot; operator không tự nhập các giá trị này
 
 ### 4.4. Cấm
 
@@ -193,6 +207,8 @@ QR
 ngày sản xuất
 
 hạn dùng trừ trường hợp override được phê duyệt riêng.
+
+Không cho operator yêu cầu render EAN-13 trong supplier-preprinted mode hoặc tự over-label barcode supplier bị sai/không đọc được. Trường hợp đó phải HOLD/REJECT/return hoặc đi deviation/rework được phê duyệt.
 
 ## 5. LIÊN KẾT GIỮA CÔNG THỨC, LỆNH SẢN XUẤT VÀ IN MÃ
 
@@ -242,9 +258,15 @@ Mỗi SKU phải biết:
 
 cấp 2 dùng đơn vị gì
 
-template cấp 2 là gì
+template/profile cấp 2 do server resolve là gì
 
-in lô/MFG/HSD/barcode/QR
+phần nào đã có trên artwork supplier và phần nào factory sẽ render
+
+BOX supplier-preprinted: factory render lô/MFG/HSD/QR, không EAN-13.
+
+CARTON supplier-preprinted: factory render lô/MFG/HSD/số hộp, không EAN-13 và không public QR mặc định.
+
+Legacy `FACTORY_PRINTED + FULL_LABEL` chỉ được sử dụng cho approved blank packaging lot, có reason/audit/effective window và physical scan acceptance.
 
 ### 6.3. Mapping theo SKU
 
@@ -263,9 +285,9 @@ Reprint có kiểm soát, mức kiểm soát nhẹ hơn.
 
 Reprint phải bị kiểm soát chặt vì liên quan:
 
-batch
+batch và immutable packaging-lot/label-policy lineage
 
-barcode
+GTIN validation context; không reprint supplier-preprinted barcode
 
 QR
 
@@ -309,7 +331,7 @@ batch/lô
 
 MFG/HSD
 
-barcode
+expected/scanned GTIN, barcode application mode, packaging lot, artwork revision và verification reference
 
 QR
 
@@ -325,9 +347,9 @@ reprint nếu có
 
 cấp 1 chỉ in MFG/HSD
 
-cấp 2 in đủ lô/MFG/HSD/barcode/QR
+cấp 2 resolve đúng policy: BOX in lô/MFG/HSD/QR; CARTON in lô/MFG/HSD/số hộp; supplier-preprinted mode không render lặp EAN-13
 
-hệ thống sinh toàn bộ dữ liệu in theo thời gian thực
+hệ thống sinh toàn bộ variable data/QR theo batch thật và giữ GTIN trong validation/audit context
 
 máy in chỉ in và trả trạng thái
 
@@ -335,7 +357,9 @@ có log đầy đủ
 
 reprint bị kiểm soát
 
-dữ liệu in bám đúng batch/lô và lệnh sản xuất thật
+dữ liệu in bám đúng batch/lô, packaging lot đã duyệt và lệnh sản xuất thật
+
+FRM-10 chứng minh expected/scanned GTIN match, barcode readable và artwork revision được duyệt trước khi lot `READY_FOR_PACKAGING`
 
 ### 9.2. Chưa đạt khi
 
@@ -345,8 +369,10 @@ không có log in
 
 không có log reprint
 
-barcode/QR không gắn với batch thật
+GTIN verification/QR không gắn với packaging lot hoặc batch thật
 
 không phân biệt cấp 1 và cấp 2
 
 người vận hành phải nhập tay mã in cấp 2
+
+supplier-preprinted mode vẫn render GTIN/EAN-13, hoặc dùng barcode supplier sai/không đọc được mà không HOLD/REJECT

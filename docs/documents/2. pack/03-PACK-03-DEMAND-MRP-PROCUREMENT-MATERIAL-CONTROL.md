@@ -1,5 +1,7 @@
 # PACK-03 - DEMAND MRP PROCUREMENT MATERIAL CONTROL
 
+> **OWNER ADDENDUM 2026-08-14 — `OD-M10-SUPPLIER-PREPRINT-001`:** Với BOX/CARTON, mục kiểm “đúng mã in sẵn nếu có” trở thành hard gate có cấu trúc: phải đối chiếu expected/scanned `GTIN_13`, check digit/readability, approved artwork revision, supplier packaging lot và evidence trước `READY_FOR_PACKAGING`. Supplier in physical EAN-13; ops-core vẫn quản trị identity. Factory không in lặp barcode và chỉ render variable data theo resolved policy. Baseline thực thi là 19 SKU / 38 GTIN. Chi tiết tại `docs/documents/0. appendices/03-PRINTING-CODE-RULES.md` §0.3.
+
 ## DEMAND–MRP–FORMULA SCALING–PROCUREMENT–STOCK ALERT–MATERIAL–PACKAGING CONTROL PACK
 
 ## PHẦN 1/4 — GOVERNANCE FOUNDATION / DEMAND PRINCIPLES / PILOT-TO-G1 FORMULA SCALING / PRODUCTION DEMAND BOARD

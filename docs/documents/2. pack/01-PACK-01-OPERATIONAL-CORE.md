@@ -1,5 +1,7 @@
 # PACK-01 - OPERATIONAL CORE
 
+> **OWNER OVERRIDE 2026-08-14 — `OD-M10-SUPPLIER-PREPRINT-001`:** Các câu trong PACK-01 yêu cầu BOX/CARTON được factory/system in barcode bị supersede. BOX/CARTON dùng approved artwork + registered EAN-13 do supplier in sẵn; ops-core vẫn quản trị/đối chiếu GTIN, còn factory chỉ in variable data (BOX: batch/MFG/EXP/public trace QR; CARTON: batch/MFG/EXP/box count, không public QR mặc định). Thiếu/sai/không đọc được supplier code phải HOLD/REJECT, không tự over-label. GTIN identity/uniqueness, QR lifecycle, public trace, audit, QC/release/inventory boundary giữ nguyên. Baseline có hiệu lực là 19 SKU / 38 GTIN; số 20/40 cũ chỉ còn giá trị lịch sử. Chi tiết tại `docs/documents/0. appendices/03-PRINTING-CODE-RULES.md` §0.3 và ops-core decision `docs/decisions/14-08-11-18-m10-supplier-preprinted-gtin-owner-decision.md`.
+
 ## PRODUCTION–WAREHOUSE–INVENTORY–TRACE–RECALL–SELLABLE CONTROL PACK
 
 ## PHẦN 1/4 — OPERATIONAL CORE PRINCIPLES / FIELD OPERATIONS APP / OWNER BOUNDARY / PRODUCT TRUTH MODEL
