@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/recall-case-create-request.schema.json",
+  "title": "Create Recall Case Request",
+  "description": "External v1 request for creating a Recall Case. Response-owned identifiers and statuses are not accepted.",
+  "$comment": "Sources: PACK-01 Recall; canonical M13; OD-M13-RCL-STATUS-002 and OD-M13-RCL-SCOPE-003.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "severity": { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"] },
+    "reason_text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "scope_type": { "type": "string", "enum": ["SKU", "BATCH", "LOT", "TRACE_CHAIN"] },
+    "scope_id": { "type": "string", "format": "uuid" },
+    "incident_case_id": { "type": "string", "format": "uuid" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["severity", "reason_text", "scope_type", "scope_id"],
+  "examples": [
+    {
+      "severity": "HIGH",
+      "reason_text": "Trace review identified a batch that requires containment.",
+      "scope_type": "BATCH",
+      "scope_id": "30000000-0000-4000-8000-000000000001",
+      "incident_case_id": "50000000-0000-4000-8000-000000000001"
+    }
+  ]
+}

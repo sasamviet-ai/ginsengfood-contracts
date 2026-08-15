@@ -27,4 +27,7 @@ Source basis: TECH-03, PACK-03, sale lock schema, `sale-lock-status` enum.
 ## Notes
 
 - `ACTIVE` sale lock is sufficient for business-platform to stop quote, order, AI recommendation, CRM, Ads, and Live selling flows.
-- TODO: Source documents mention warning/pre-lock ideas but do not define official v1 warning transitions.
+- External create v1 accepts only `SKU`, `BATCH`, `LOT`, `TRACE_CHAIN`.
+- Every v1 identifier is a UUID. For `TRACE_CHAIN`, `scope_id` must equal `recall_case_id` and covers that case's complete versioned historical impact union.
+- A scope outside that allowlist is rejected before registry, audit transition, or outbox event side effects.
+- Warning/pre-lock and wider scope capabilities are not silently accepted through v1; they require an approved additive contract or a new version.

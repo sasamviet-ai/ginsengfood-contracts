@@ -1,30 +1,45 @@
-# Recall State Machine v1
+# Recall State Projection v1
 
 Owner: ops-core
 
-Source basis: TECH-03, recall schema, traceability contracts, `recall-status` enum.
+Source basis: canonical M13 internal state machine, TECH-03, recall schemas, `recall-status` enum, `OD-M13-RCL-STATUS-002`.
 
-## Allowed Transitions
+The internal granular `recall_status` remains operational truth. This document defines the deterministic external `/v1/*` projection; it does not create a second persisted state machine.
 
-| From | To | Guard |
-| --- | --- | --- |
-| OPEN | UNDER_REVIEW | Recall case is opened with trace-chain evidence. |
-| UNDER_REVIEW | ACTIVE | Owner or quality decision activates recall action. |
-| ACTIVE | RECOVERY_IN_PROGRESS | Recovery or field action starts. |
-| RECOVERY_IN_PROGRESS | CLOSED | Closure evidence and owner decision are attached. |
-| Any active state | BLOCKED | Required trace, evidence, or owner decision is missing. |
+## Internal-to-external mapping
 
-## Blocked Transitions
+| Internal state | External status | Additional response rule |
+|---|---|---|
+| `OPEN` | `OPEN` | — |
+| `IMPACT_ANALYSIS` | `UNDER_REVIEW` | — |
+| `HOLD_ACTIVE` | `ACTIVE` | — |
+| `SALE_LOCK_ACTIVE` | `ACTIVE` | — |
+| `NOTIFICATION_REQUESTED` | `ACTIVE` | — |
+| `RECOVERY` | `RECOVERY_IN_PROGRESS` | — |
+| `DISPOSITION` | `RECOVERY_IN_PROGRESS` | — |
+| `CAPA` | `RECOVERY_IN_PROGRESS` | — |
+| `CLOSED` | `CLOSED` | `close_type=CLOSED`, `residual_risk=false` |
+| `CLOSED_WITH_RESIDUAL_RISK` | `CLOSED` | `close_type=CLOSED_WITH_RESIDUAL_RISK`, `residual_risk=true`; internal residual note is not exposed |
+| `CANCELLED` | `CANCELLED` | Additive external enum value |
 
-| From | To | Reason |
-| --- | --- | --- |
-| OPEN | CLOSED | Review, action, and closure evidence cannot be skipped. |
-| UNDER_REVIEW | CLOSED | Recall case cannot close without active decision or documented no-action decision. |
-| ACTIVE | CLOSED | Recovery or closure evidence is required. |
-| Any state | Separate trace chain | Recall must use the operational trace chain, not a separate recall chain. |
-| ACTIVE | Commerce available | Active recall must suppress sellable/quote/order/channel flows through sale lock or stop-sale controls. |
+## `BLOCKED` overlay
 
-## Notes
+`BLOCKED` is a derived non-persisted overlay for a non-terminal case with a real fail-safe blocker, including:
 
-- Recall is a high-risk operational command and must be evidence-backed.
-- TODO: Source documents do not fully define recall severity, no-action closure, or external reporting transitions.
+- `TRACE_GAP_DETECTED`;
+- `POST_RECEIPT_IMPACT_ACK_REQUIRED`;
+- `BATCH_RELEASE_REVOKE_PENDING`;
+- `APPROVAL_POLICY_VIOLATION`;
+- `OWNER_DECISION_REQUIRED`;
+- evidence blocker at close-readiness.
+
+A `BLOCKED` response requires `blocked_from_status` and non-empty `blocking_error_codes`. Expected active/recovery phases and an active restriction by themselves are not reasons to project `BLOCKED`.
+
+Unknown internal state fails closed to `BLOCKED` with `blocked_from_status=UNKNOWN` and `CONTRACT_STATUS_UNMAPPED`; the provider records telemetry/error and never returns the raw value.
+
+## Invariants
+
+- Projection does not mutate persisted state, append an internal transition, or emit an event.
+- `OPEN`, `UNDER_REVIEW`, `ACTIVE`, and `RECOVERY_IN_PROGRESS` cannot project directly to `CLOSED` without the canonical internal close gate.
+- Active Recall/Sale Lock/Not Sellable wins every downstream commerce flow.
+- Recall reuses the operational trace chain and must not create a parallel recall trace truth.

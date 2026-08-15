@@ -1,0 +1,18 @@
+{
+  "positive": [
+    { "recall_case_id": "recall-open-001", "status": "OPEN" },
+    { "recall_case_id": "recall-review-001", "status": "UNDER_REVIEW" },
+    { "recall_case_id": "recall-active-001", "status": "ACTIVE" },
+    { "recall_case_id": "recall-recovery-001", "status": "RECOVERY_IN_PROGRESS" },
+    { "recall_case_id": "recall-closed-001", "status": "CLOSED", "close_type": "CLOSED", "residual_risk": false },
+    { "recall_case_id": "recall-residual-001", "status": "CLOSED", "close_type": "CLOSED_WITH_RESIDUAL_RISK", "residual_risk": true },
+    { "recall_case_id": "recall-cancelled-001", "status": "CANCELLED" },
+    { "recall_case_id": "recall-blocked-001", "status": "BLOCKED", "blocked_from_status": "ACTIVE", "blocking_error_codes": ["TRACE_GAP_DETECTED"] },
+    { "recall_case_id": "recall-unmapped-001", "status": "BLOCKED", "blocked_from_status": "UNKNOWN", "blocking_error_codes": ["CONTRACT_STATUS_UNMAPPED"] }
+  ],
+  "negative": [
+    { "case": "blocked-without-source-or-errors", "payload": { "recall_case_id": "invalid-001", "status": "BLOCKED" } },
+    { "case": "closed-without-close-fields", "payload": { "recall_case_id": "invalid-002", "status": "CLOSED" } },
+    { "case": "raw-internal-status", "payload": { "recall_case_id": "invalid-003", "status": "CAPA" } }
+  ]
+}

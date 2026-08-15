@@ -3,7 +3,7 @@
   "$id": "events/ops-core/recall/sale-lock-released.v1.json",
   "title": "Sale Lock Released Event v1",
   "description": "Published when sale lock is released after owner-approved recovery. Consumers must re-check sellable status before reopening commerce flows.",
-  "$comment": "Sources: PACK-01 Sale Lock release boundary. TODO: final sale-lock release transition model is not specified; event only signals the release record.",
+  "$comment": "Sources: PACK-01 Sale Lock release boundary; canonical M13 explicit release command. The event carries the original effective_from and release effective_to.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

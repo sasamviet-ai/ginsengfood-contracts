@@ -57,7 +57,12 @@
           "required": [
             "recall_case_id",
             "status"
-          ]
+          ],
+          "properties": {
+            "status": {
+              "const": "OPEN"
+            }
+          }
         }
       ]
     }

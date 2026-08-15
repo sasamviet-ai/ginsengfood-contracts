@@ -10,15 +10,17 @@ paths:
   /v1/recall-cases:
     post:
       summary: Create recall case
-      description: "Creates a Recall Case contract record. This is a high-risk command and requires permission, owner/evidence/audit, and idempotency where applicable. TODO: source documents do not lock the full recall severity and transition model."
+      description: Creates a Recall Case through an authenticated high-risk command. The response status is the external projection defined by OD-M13-RCL-STATUS-002; provider-owned ID/status fields are not accepted in the request.
       operationId: createRecallCaseV1
       tags: [recall-sale-lock]
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "../../schemas/ops/recall-case.schema.json"
+              $ref: "../../schemas/ops/recall-case-create-request.schema.json"
       responses:
         "201":
           description: Recall case created and wrapped in the common envelope.
@@ -41,14 +43,14 @@ paths:
   /v1/recall-cases/{recallCaseId}:
     get:
       summary: Get recall case
-      description: Returns one Recall Case record.
+      description: Returns one Recall Case external projection. BLOCKED is a derived overlay with blocked_from_status and blocking_error_codes; unknown internal state fails closed with CONTRACT_STATUS_UNMAPPED and is never exposed raw.
       operationId: getRecallCaseV1
       tags: [recall-sale-lock]
       parameters:
         - name: recallCaseId
           in: path
           required: true
-          schema: { type: string, minLength: 1 }
+          schema: { type: string, format: uuid }
       responses:
         "200":
           description: Recall case wrapped in the common envelope.
@@ -71,15 +73,17 @@ paths:
   /v1/sale-locks:
     post:
       summary: Create sale lock
-      description: Creates a durable Sale Lock / Stop Sale contract record. Per OD-RCL-03, every successful durable activation must enqueue both ops-core.recall.sale-lock-activated.v1 and ops-core.recall.stop-sale-required.v1 for the same scope in the same outbox transaction; recall-case creation alone does not emit stop-sale. This is a high-risk command; business-platform must consume its effect through availability/sellable checks and must not mutate it.
+      description: Creates a durable Sale Lock / Stop Sale contract record for SKU, BATCH, LOT, or TRACE_CHAIN only. All identifiers are UUIDs; TRACE_CHAIN uses scope_id equal to recall_case_id and covers the complete versioned historical impact union for that case. Unsupported or mismatched scope fails validation before side effects. Per OD-RCL-03, every successful durable activation enqueues both ops-core.recall.sale-lock-activated.v1 and ops-core.recall.stop-sale-required.v1 for the same scope in the same outbox transaction; Recall Case creation alone does not emit stop-sale.
       operationId: createSaleLockV1
       tags: [recall-sale-lock]
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "../../schemas/ops/sale-lock.schema.json"
+              $ref: "../../schemas/ops/sale-lock-create-request.schema.json"
       responses:
         "201":
           description: Sale lock created and wrapped in the common envelope.
@@ -102,14 +106,14 @@ paths:
   /v1/sale-locks/{saleLockId}:
     get:
       summary: Get sale lock
-      description: Returns one Sale Lock record.
+      description: Returns one Sale Lock record. ACTIVE remains authoritative until an approved release is effective; consumers must not infer commerce availability from a release request.
       operationId: getSaleLockV1
       tags: [recall-sale-lock]
       parameters:
         - name: saleLockId
           in: path
           required: true
-          schema: { type: string, minLength: 1 }
+          schema: { type: string, format: uuid }
       responses:
         "200":
           description: Sale lock wrapped in the common envelope.
@@ -130,6 +134,16 @@ paths:
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
         "500": { $ref: "#/components/responses/InternalServerError" }
 components:
+  parameters:
+    IdempotencyKey:
+      name: X-Idempotency-Key
+      in: header
+      required: true
+      description: Stable client-generated idempotency key for the high-risk command.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
   schemas:
     ErrorEnvelope:
       allOf:

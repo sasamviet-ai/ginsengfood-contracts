@@ -20,10 +20,12 @@ values:
   - value: CLOSED
     description: Recall case is closed after required evidence and sign-off.
     source: PACK-01 recovery evidence/sign-off.
+  - value: CANCELLED
+    description: Recall case was cancelled before irreversible containment/recovery side effects under the internal cancellation policy.
+    source: OD-M13-RCL-STATUS-002 additive external mapping.
   - value: BLOCKED
-    description: Recall flow is blocked by missing trace, evidence, or owner decision.
-    source: PACK-01 negative paths.
+    description: Derived non-persisted response overlay for a real fail-safe blocker; requires blocked_from_status and non-empty blocking_error_codes.
+    source: PACK-01 negative paths and OD-M13-RCL-STATUS-002.
 compatibility:
-  breaking_change: Closing recall without recovery evidence/sign-off is breaking.
-todos:
-  - Define official recall transitions and severity values in Phase 7.
+  breaking_change: Closing recall without recovery evidence/sign-off or treating BLOCKED as a persisted internal state is breaking.
+  additive_change: CANCELLED is additive but exhaustive-enum consumers must be notified before candidate freeze.

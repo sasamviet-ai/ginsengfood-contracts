@@ -1,0 +1,16 @@
+{
+  "eventId": "evt-recall-case-opened-20260813-001",
+  "eventType": "ops-core.recall.recall-case-opened.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-08-13T16:56:00+07:00",
+  "source": "ops-core",
+  "correlationId": "corr-recall-20260813-001",
+  "causationId": "incident-20260813-001",
+  "idempotencyKey": "external:recall-case-create:20260813-001",
+  "data": {
+    "recall_case_id": "recall-case-20260813-001",
+    "trace_chain_id": "trace-chain-20260813-001",
+    "severity": "HIGH",
+    "status": "OPEN"
+  }
+}

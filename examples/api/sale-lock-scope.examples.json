@@ -1,0 +1,16 @@
+{
+  "positive": [
+    { "recall_case_id": "10000000-0000-4000-8000-000000000001", "scope_type": "SKU", "scope_id": "20000000-0000-4000-8000-000000000001", "reason": "Stop sale." },
+    { "recall_case_id": "10000000-0000-4000-8000-000000000002", "scope_type": "BATCH", "scope_id": "30000000-0000-4000-8000-000000000001", "reason": "Stop sale." },
+    { "recall_case_id": "10000000-0000-4000-8000-000000000003", "scope_type": "LOT", "scope_id": "40000000-0000-4000-8000-000000000001", "reason": "Stop sale." },
+    { "recall_case_id": "10000000-0000-4000-8000-000000000004", "scope_type": "TRACE_CHAIN", "scope_id": "10000000-0000-4000-8000-000000000004", "reason": "Stop sale for the complete historical impact union." }
+  ],
+  "negative": [
+    { "recall_case_id": "10000000-0000-4000-8000-000000000005", "scope_type": "WAREHOUSE", "scope_id": "60000000-0000-4000-8000-000000000001", "reason": "Unsupported v1 scope." },
+    { "recall_case_id": "10000000-0000-4000-8000-000000000006", "scope_type": "LOCATION", "scope_id": "60000000-0000-4000-8000-000000000002", "reason": "Unsupported v1 scope." },
+    { "recall_case_id": "10000000-0000-4000-8000-000000000007", "scope_type": "CHANNEL", "scope_id": "60000000-0000-4000-8000-000000000003", "reason": "Unsupported v1 scope." },
+    { "recall_case_id": "10000000-0000-4000-8000-000000000008", "scope_type": "PROGRAM", "scope_id": "60000000-0000-4000-8000-000000000004", "reason": "Unsupported v1 scope." },
+    { "recall_case_id": "10000000-0000-4000-8000-000000000009", "scope_type": "TRACE_CHAIN", "scope_id": "70000000-0000-4000-8000-000000000001", "reason": "TRACE_CHAIN must use recall_case_id as its identity." }
+  ],
+  "negative_side_effect_expectation": "Validation fails before sale-lock registry, audit transition, or outbox event write."
+}

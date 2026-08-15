@@ -22,5 +22,4 @@ values:
     source: PACK-01 negative paths.
 compatibility:
   breaking_change: Ignoring ACTIVE sale lock is breaking.
-todos:
-  - Confirm whether WARNING or PRE_LOCK states are required.
+  scope_policy: External v1 accepts only SKU, BATCH, LOT, and TRACE_CHAIN; wider scopes require a new approved contract version or additive capability decision.

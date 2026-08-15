@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-recall-20260813-001",
+    "sourceSystem": "ops-core",
+    "timestamp": "2026-08-13T16:56:00+07:00"
+  },
+  "data": {
+    "recall_case_id": "recall-case-20260813-001",
+    "trace_chain_id": "trace-chain-20260813-001",
+    "severity": "HIGH",
+    "status": "ACTIVE",
+    "sale_lock_id": "sale-lock-20260813-001"
+  }
+}

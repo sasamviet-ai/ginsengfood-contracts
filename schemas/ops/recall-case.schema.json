@@ -1,24 +1,71 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/ops/v1/recall-case.schema.json",
-  "title": "Recall Case",
-  "description": "Recall Case v1 contract for impact, hold, sale lock, recovery, disposition, and CAPA based on the trace chain.",
-  "$comment": "Sources: PACK-01 Recall/Recovery/Disposition/CAPA. TODO: full recall severity and transition model is not finalized.",
+  "title": "Recall Case Response",
+  "description": "External Recall Case v1 response. Status is a deterministic projection of internal operational truth; BLOCKED is a derived overlay, not a persisted state.",
+  "$comment": "Sources: PACK-01 Recall/Recovery/Disposition/CAPA; canonical M13 state machine; OD-M13-RCL-STATUS-002 (2026-08-13).",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "recall_case_id": { "type": "string", "minLength": 1, "description": "Recall case identifier." },
-    "trace_chain_id": { "type": "string", "minLength": 1, "description": "Trace chain used for recall." },
-    "sku_id": { "type": "string", "minLength": 1, "description": "Affected SKU." },
+    "trace_chain_id": { "type": "string", "minLength": 1, "description": "Operational trace chain used for recall." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "Affected SKU when available." },
     "batch_id": { "type": "string", "minLength": 1, "description": "Affected batch when scoped to batch." },
-    "status": { "type": "string", "description": "Recall status. Prefer enums/ops/recall-status.yaml." },
-    "impact_snapshot": { "type": "object", "additionalProperties": true, "description": "Impact snapshot. TODO: define exact exposure fields from trace/commerce documents." },
+    "severity": { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"], "description": "Canonical Recall severity." },
+    "status": {
+      "type": "string",
+      "enum": ["OPEN", "UNDER_REVIEW", "ACTIVE", "RECOVERY_IN_PROGRESS", "CLOSED", "CANCELLED", "BLOCKED"],
+      "description": "External projected status. BLOCKED requires blocker details and is not persisted."
+    },
+    "close_type": { "type": "string", "enum": ["CLOSED", "CLOSED_WITH_RESIDUAL_RISK"], "description": "Internal close outcome exposed without residual-risk note." },
+    "residual_risk": { "type": "boolean", "description": "True only for CLOSED_WITH_RESIDUAL_RISK." },
+    "blocked_from_status": {
+      "type": "string",
+      "enum": ["OPEN", "UNDER_REVIEW", "ACTIVE", "RECOVERY_IN_PROGRESS", "UNKNOWN"],
+      "description": "External status before the derived BLOCKED overlay; UNKNOWN is the safe marker for an unmapped internal value."
+    },
+    "blocking_error_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Non-empty fail-safe blocker codes when status is BLOCKED."
+    },
+    "impact_snapshot": { "type": "object", "additionalProperties": true, "description": "Public-safe/service-authorized impact projection; internal sensitive detail remains excluded." },
     "sale_lock_id": { "type": "string", "minLength": 1, "description": "Sale lock created from this recall when applicable." },
-    "recovery_status": { "type": "string", "description": "Recovery status. TODO: define official values." },
-    "disposition_status": { "type": "string", "description": "Disposition status. PACK-03 disposal statuses may apply to material/write-off flows." },
+    "recovery_status": { "type": "string", "minLength": 1, "description": "Safe recovery summary when exposed by service policy." },
+    "disposition_status": { "type": "string", "minLength": 1, "description": "Safe disposition summary when exposed by service policy." },
     "capa_ref": { "type": "string", "minLength": 1, "description": "CAPA reference when applicable." },
     "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
     "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
   },
-  "required": ["recall_case_id"]
+  "required": ["recall_case_id", "status"],
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "CLOSED" } }, "required": ["status"] },
+      "then": { "required": ["close_type", "residual_risk"] }
+    },
+    {
+      "if": { "properties": { "close_type": { "const": "CLOSED" } }, "required": ["close_type"] },
+      "then": { "properties": { "residual_risk": { "const": false } } }
+    },
+    {
+      "if": { "properties": { "close_type": { "const": "CLOSED_WITH_RESIDUAL_RISK" } }, "required": ["close_type"] },
+      "then": { "properties": { "residual_risk": { "const": true } } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "BLOCKED" } }, "required": ["status"] },
+      "then": { "required": ["blocked_from_status", "blocking_error_codes"] }
+    }
+  ],
+  "examples": [
+    { "recall_case_id": "recall-open-001", "status": "OPEN", "severity": "HIGH" },
+    { "recall_case_id": "recall-review-001", "status": "UNDER_REVIEW", "severity": "HIGH" },
+    { "recall_case_id": "recall-active-001", "status": "ACTIVE", "severity": "CRITICAL" },
+    { "recall_case_id": "recall-recovery-001", "status": "RECOVERY_IN_PROGRESS", "severity": "HIGH" },
+    { "recall_case_id": "recall-closed-001", "status": "CLOSED", "close_type": "CLOSED", "residual_risk": false },
+    { "recall_case_id": "recall-cancelled-001", "status": "CANCELLED" },
+    { "recall_case_id": "recall-blocked-001", "status": "BLOCKED", "blocked_from_status": "ACTIVE", "blocking_error_codes": ["TRACE_GAP_DETECTED"] },
+    { "recall_case_id": "recall-unmapped-001", "status": "BLOCKED", "blocked_from_status": "UNKNOWN", "blocking_error_codes": ["CONTRACT_STATUS_UNMAPPED"] }
+  ]
 }

@@ -1,0 +1,7 @@
+{
+  "severity": "HIGH",
+  "reason_text": "Trace review identified a batch that requires containment.",
+  "scope_type": "BATCH",
+  "scope_id": "30000000-0000-4000-8000-000000000001",
+  "incident_case_id": "50000000-0000-4000-8000-000000000001"
+}

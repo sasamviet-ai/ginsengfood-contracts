@@ -90,6 +90,15 @@ fixtures:
     source_example: ../../examples/events/sale-lock-activated.v1.example.json
     validates_against:
       - ../../events/ops-core/recall/sale-lock-activated.v1.json
+  - file: recall-case-opened.v1.fixture.json
+    contract_area: recall
+    provider: ops-core
+    consumers:
+      - business-platform
+    source_example: ../../examples/events/recall-case-opened.v1.example.json
+    validates_against:
+      - ../../events/ops-core/recall/recall-case-opened.v1.json
+      - ../../schemas/ops/recall-case.schema.json
   - file: order-confirmed.v1.fixture.json
     contract_area: order
     provider: business-platform
