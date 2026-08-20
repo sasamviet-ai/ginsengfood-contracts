@@ -144,7 +144,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: "../../schemas/ops/print-job.schema.json" }
+            schema: { $ref: "../../schemas/ops/print-job-create-request.schema.json" }
       responses: { "201": { $ref: "#/components/responses/PrintJobCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
   /v1/admin/operational/print-jobs/{printJobId}/reprint:
     post:

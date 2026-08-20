@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/print-job-create-request.schema.json",
+  "title": "Print Job Create Request",
+  "description": "External v1 command for queuing a system-generated print job against an existing packaging unit and an explicitly selected printer.",
+  "$comment": "The request contains only references needed by ops-core to generate the immutable payload. print_job_id, status, payload and render policy remain server-owned response fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "packaging_unit_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Existing packaging unit to print."
+    },
+    "qr_registry_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Existing QR registry row for BOX print jobs; omitted where the packaging policy does not render QR."
+    },
+    "trade_item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Trade item whose immutable packaging/label policy is used to generate the payload."
+    },
+    "printer_device_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Registered printer identifier. Exactly one printer target must be supplied."
+    },
+    "printer_device_code": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Registered printer code. Exactly one printer target must be supplied."
+    }
+  },
+  "required": [
+    "packaging_unit_id",
+    "trade_item_id"
+  ],
+  "oneOf": [
+    {
+      "required": ["printer_device_id"],
+      "not": { "required": ["printer_device_code"] }
+    },
+    {
+      "required": ["printer_device_code"],
+      "not": { "required": ["printer_device_id"] }
+    }
+  ]
+}
