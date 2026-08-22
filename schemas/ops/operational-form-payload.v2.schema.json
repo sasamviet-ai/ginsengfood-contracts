@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/operational-form-payload.v2.schema.json",
+  "title": "Operational Form Payload v2",
+  "description": "Per-form v2 payload using form_key as the only canonical identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "form_key": { "$ref": "operational-form-key.v2.schema.json" },
+    "payload_version": { "type": "string", "minLength": 1 },
+    "source_object": { "$ref": "../common/source-ref.schema.json" },
+    "generated_fields": { "type": "object", "additionalProperties": true },
+    "operator_fields": { "type": "object", "additionalProperties": true },
+    "action_constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["GENERATE", "SUBMIT", "CONFIRM", "APPROVE", "REJECT", "RETURN_FOR_FIX", "LOCK", "CANCEL", "REOPEN", "SYNC_TO_MISA", "PRINT", "REPRINT"]
+          },
+          "requires_permission": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$" },
+          "requires_evidence": { "type": "boolean" },
+          "requires_audit": { "type": "boolean" },
+          "requires_p0_clearance": { "type": "boolean" }
+        },
+        "required": ["action"]
+      }
+    },
+    "status_constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": { "type": "string" },
+          "allowed_next_statuses": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "terminal": { "type": "boolean" }
+        },
+        "required": ["status"]
+      }
+    },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["form_key", "payload_version"]
+}

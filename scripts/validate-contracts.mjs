@@ -4,6 +4,9 @@ import path from "node:path";
 const root = process.cwd();
 const errors = [];
 const warnings = [];
+const validationScope = process.argv
+  .find(argument => argument.startsWith("--scope="))
+  ?.slice("--scope=".length) ?? "all";
 
 const ignoredDirs = new Set([".git", ".codex-doc-memory", ".artifacts", "node_modules"]);
 const textExtensions = new Set([".md", ".json", ".yaml", ".yml"]);
@@ -182,11 +185,22 @@ function checkOpenApi(filePath, text) {
   if (!/^openapi:\s*3\.1\.0/m.test(text)) {
     errors.push(`${relative}: OpenAPI files must declare openapi: 3.1.0`);
   }
-  if (!/^\s+version:\s*1\.0\.0/m.test(text)) {
-    errors.push(`${relative}: OpenAPI info.version must be 1.0.0`);
+
+  const fileVersion = relative.match(/\.v(?<major>\d+)\.ya?ml$/i)?.groups?.major;
+  if (!fileVersion) {
+    errors.push(`${relative}: OpenAPI file name must contain a .vN major version suffix`);
+    return;
   }
-  if (!/\/v1\//.test(text) && !/\/v1[\s:{]/.test(text)) {
-    warnings.push(`${relative}: no /v1 path detected`);
+
+  const expectedInfoVersion = `${fileVersion}.0.0`;
+  const infoVersionPattern = new RegExp(`^\\s+version:\\s*${expectedInfoVersion.replaceAll(".", "\\.")}$`, "m");
+  if (!infoVersionPattern.test(text)) {
+    errors.push(`${relative}: OpenAPI info.version must be ${expectedInfoVersion}`);
+  }
+
+  const pathVersionPattern = new RegExp(`/v${fileVersion}(?:/|[\\s:{])`);
+  if (!pathVersionPattern.test(text)) {
+    warnings.push(`${relative}: no /v${fileVersion} path detected`);
   }
 }
 
@@ -252,7 +266,7 @@ function checkSourceDocuments(filePath, text) {
   }
 }
 
-function checkSourceMap() {
+function checkSourceMap({ validateTargets = true } = {}) {
   const sourceMap = path.join(root, "docs", "source-map.md");
   if (!fs.existsSync(sourceMap)) {
     errors.push("docs/source-map.md: missing");
@@ -265,7 +279,7 @@ function checkSourceMap() {
     if (!match) continue;
     const documentPath = match[1].trim();
     sourceMapDocumentPaths.add(documentPath);
-    if (!existsRel(documentPath)) {
+    if (validateTargets && !existsRel(documentPath)) {
       errors.push(`docs/source-map.md: document_file target does not exist: ${documentPath}`);
     }
   }
@@ -446,20 +460,28 @@ function checkFixtureRequiredFields(fixtureFile, schemaFile, fixtureJson, schema
   }
 }
 
-function checkFixtureManifest() {
-  const manifest = path.join(root, "contract-tests", "fixtures", "fixture-manifest.v1.yaml");
-  if (!fs.existsSync(manifest)) return;
+function fixtureManifestFiles() {
+  const fixtureDir = path.join(root, "contract-tests", "fixtures");
+  if (!fs.existsSync(fixtureDir)) return [];
+  return fs.readdirSync(fixtureDir)
+    .filter(fileName => /^fixture-manifest\.v\d+\.yaml$/i.test(fileName))
+    .map(fileName => path.join(fixtureDir, fileName))
+    .sort();
+}
+
+function checkFixtureManifest(manifest) {
+  const manifestRelative = rel(manifest);
   const entries = parseFixtureManifestEntries(read(manifest));
 
   for (const entry of entries) {
     if (!entry.file) {
-      errors.push("contract-tests/fixtures/fixture-manifest.v1.yaml: fixture entry missing file");
+      errors.push(`${manifestRelative}: fixture entry missing file`);
       continue;
     }
 
     const fixtureFile = resolveFrom(manifest, entry.file);
     if (!fs.existsSync(fixtureFile)) {
-      errors.push(`contract-tests/fixtures/fixture-manifest.v1.yaml: fixture target does not exist: ${entry.file}`);
+      errors.push(`${manifestRelative}: fixture target does not exist: ${entry.file}`);
       continue;
     }
 
@@ -472,18 +494,18 @@ function checkFixtureManifest() {
     }
 
     if (entry.source_example && !fs.existsSync(resolveFrom(manifest, entry.source_example))) {
-      errors.push(`contract-tests/fixtures/fixture-manifest.v1.yaml: source_example target does not exist: ${entry.source_example}`);
+      errors.push(`${manifestRelative}: source_example target does not exist: ${entry.source_example}`);
     }
 
     if (!Array.isArray(entry.validates_against) || entry.validates_against.length === 0) {
-      errors.push(`contract-tests/fixtures/fixture-manifest.v1.yaml: ${entry.file} must validate against at least one contract`);
+      errors.push(`${manifestRelative}: ${entry.file} must validate against at least one contract`);
       continue;
     }
 
     for (const target of entry.validates_against) {
       const schemaFile = resolveFrom(manifest, target);
       if (!fs.existsSync(schemaFile)) {
-        errors.push(`contract-tests/fixtures/fixture-manifest.v1.yaml: validates_against target does not exist: ${target}`);
+        errors.push(`${manifestRelative}: validates_against target does not exist: ${target}`);
         continue;
       }
       if (!target.endsWith(".json")) continue;
@@ -497,6 +519,256 @@ function checkFixtureManifest() {
       checkFixtureRequiredFields(fixtureFile, schemaFile, fixtureJson, schemaJson);
     }
   }
+}
+
+function extractYamlObjectValues(text, listKey, propertyKey) {
+  const lines = text.split(/\r?\n/);
+  const values = [];
+  let inList = false;
+  let listIndent = 0;
+
+  for (const line of lines) {
+    if (!inList) {
+      const listMatch = line.match(new RegExp(`^(\\s*)${listKey}:\\s*$`));
+      if (!listMatch) continue;
+      inList = true;
+      listIndent = listMatch[1].length;
+      continue;
+    }
+
+    const indent = line.match(/^(\s*)/)?.[1].length ?? 0;
+    if (line.trim() && indent <= listIndent && !/^\s*-/.test(line)) break;
+    const valueMatch = line.match(new RegExp(`^\\s*-\\s+${propertyKey}:\\s+(.+?)\\s*$`));
+    if (valueMatch) values.push(stripQuotes(valueMatch[1]));
+  }
+
+  return values;
+}
+
+function extractYamlObjectList(text, listKey) {
+  const lines = text.split(/\r?\n/);
+  const entries = [];
+  let inList = false;
+  let listIndent = 0;
+  let current = null;
+
+  for (const line of lines) {
+    if (!inList) {
+      const listMatch = line.match(new RegExp(`^(\\s*)${listKey}:\\s*$`));
+      if (!listMatch) continue;
+      inList = true;
+      listIndent = listMatch[1].length;
+      continue;
+    }
+
+    const indent = line.match(/^(\s*)/)?.[1].length ?? 0;
+    if (line.trim() && indent <= listIndent && !/^\s*-/.test(line)) break;
+    const firstProperty = line.match(/^\s*-\s+([A-Za-z0-9_]+):\s+(.+?)\s*$/);
+    if (firstProperty) {
+      current = { [firstProperty[1]]: stripQuotes(firstProperty[2]) };
+      entries.push(current);
+      continue;
+    }
+    const property = line.match(/^\s+([A-Za-z0-9_]+):\s+(.+?)\s*$/);
+    if (property && current) current[property[1]] = stripQuotes(property[2]);
+  }
+
+  return entries;
+}
+
+function checkOperationalFormV2() {
+  const requiredFiles = [
+    "openapi/ops-core/operational-forms.v2.yaml",
+    "schemas/ops/operational-form-key.v2.schema.json",
+    "schemas/ops/operational-form.v2.schema.json",
+    "schemas/ops/operational-form-payload.v2.schema.json",
+    "schemas/ops/operational-form-create-request.v2.schema.json",
+    "enums/ops/operational-form-key.v2.yaml",
+    "enums/ops/operational-form-status.v2.yaml",
+    "state-machines/ops/operational-form-state.v2.md",
+    "docs/documents/0. appendices/06-OPERATIONAL-FORM-KEY-V2-OWNER-ADDENDUM.md",
+    "examples/api/operational-form-material-intake.v2.request.json",
+    "contract-tests/fixtures/operational-form-material-intake.v2.fixture.json",
+    "contract-tests/fixtures/fixture-manifest.v2.yaml",
+    "compatibility/operational-form-v1-to-v2-migration.md"
+  ];
+
+  for (const relative of requiredFiles) {
+    if (!existsRel(relative)) errors.push(`Operational Form v2 required file missing: ${relative}`);
+  }
+  if (requiredFiles.some(relative => !existsRel(relative))) return;
+
+  const keySchemaPath = path.join(root, toFsPath("schemas/ops/operational-form-key.v2.schema.json"));
+  const createSchemaPath = path.join(root, toFsPath("schemas/ops/operational-form-create-request.v2.schema.json"));
+  const formSchemaPath = path.join(root, toFsPath("schemas/ops/operational-form.v2.schema.json"));
+  const payloadSchemaPath = path.join(root, toFsPath("schemas/ops/operational-form-payload.v2.schema.json"));
+  const enumPath = path.join(root, toFsPath("enums/ops/operational-form-key.v2.yaml"));
+  const statusV1Path = path.join(root, toFsPath("enums/ops/operational-form-status.yaml"));
+  const statusV2Path = path.join(root, toFsPath("enums/ops/operational-form-status.v2.yaml"));
+  const addendumPath = path.join(root, toFsPath("docs/documents/0. appendices/06-OPERATIONAL-FORM-KEY-V2-OWNER-ADDENDUM.md"));
+  const openApiPath = path.join(root, toFsPath("openapi/ops-core/operational-forms.v2.yaml"));
+  const v1AdminPath = path.join(root, toFsPath("openapi/ops-core/operational-admin.v1.yaml"));
+  const v1EvidencePath = path.join(root, toFsPath("openapi/ops-core/operational-evidence.v1.yaml"));
+  const v1FormSchemaPath = path.join(root, toFsPath("schemas/ops/operational-form.schema.json"));
+  const v1PayloadSchemaPath = path.join(root, toFsPath("schemas/ops/operational-form-payload.schema.json"));
+
+  const keySchema = readJson(keySchemaPath);
+  const createSchema = readJson(createSchemaPath);
+  const formSchema = readJson(formSchemaPath);
+  const payloadSchema = readJson(payloadSchemaPath);
+  const enumText = read(enumPath);
+  const enumValues = extractYamlObjectValues(enumText, "values", "value");
+  const enumEntries = extractYamlObjectList(enumText, "values");
+  const keys = keySchema.enum ?? [];
+
+  if (keys.length !== 30 || new Set(keys).size !== 30) {
+    errors.push("schemas/ops/operational-form-key.v2.schema.json: must contain exactly 30 unique form_key values");
+  }
+  if (JSON.stringify(keys) !== JSON.stringify(enumValues)) {
+    errors.push("Operational Form v2 form_key JSON Schema and YAML enum values must match in canonical order");
+  }
+  const retiredEntries = enumEntries.filter(entry => entry.status === "RETIRED");
+  if (
+    retiredEntries.length !== 1 ||
+    retiredEntries[0]?.value !== "AFTER_DRYING_QC" ||
+    retiredEntries[0]?.replacement_form_key !== "FREEZE_DRYING_LOG"
+  ) {
+    errors.push("enums/ops/operational-form-key.v2.yaml: exactly AFTER_DRYING_QC must be RETIRED with replacement FREEZE_DRYING_LOG");
+  }
+
+  const addendumMappings = [...read(addendumPath).matchAll(
+    /^\|\s*(FRM-\d{2})\s*\|\s*[^|]+\|\s*([A-Z0-9_]+)\s*\|/gm
+  )].map(match => ({ legacy_form_code: match[1], value: match[2] }));
+  const enumMappings = enumEntries.map(entry => ({
+    legacy_form_code: entry.legacy_form_code,
+    value: entry.value
+  }));
+  if (addendumMappings.length !== 30 || JSON.stringify(addendumMappings) !== JSON.stringify(enumMappings)) {
+    errors.push("Operational Form v2 owner addendum and YAML enum must contain the same exact 30 legacy-code/form_key mappings");
+  }
+
+  const statusV1Values = extractYamlObjectValues(read(statusV1Path), "values", "value");
+  const statusV2Values = extractYamlObjectValues(read(statusV2Path), "values", "value");
+  if (JSON.stringify(statusV1Values) !== JSON.stringify(statusV2Values)) {
+    errors.push("Operational Form v2 status values must remain exactly compatible with v1");
+  }
+
+  const createFormKey = JSON.stringify(createSchema.properties?.form_key ?? {});
+  if (!createFormKey.includes("AFTER_DRYING_QC") || !createFormKey.includes("not")) {
+    errors.push("schemas/ops/operational-form-create-request.v2.schema.json: must explicitly exclude retired AFTER_DRYING_QC");
+  }
+
+  for (const [relative, schema] of [
+    ["schemas/ops/operational-form.v2.schema.json", formSchema],
+    ["schemas/ops/operational-form-payload.v2.schema.json", payloadSchema],
+    ["schemas/ops/operational-form-create-request.v2.schema.json", createSchema]
+  ]) {
+    if (!schema.required?.includes("form_key")) errors.push(`${relative}: form_key must be required`);
+    for (const legacyField of ["form_code", "deprecated_form_code_alias", "form_type"]) {
+      if (Object.hasOwn(schema.properties ?? {}, legacyField)) {
+        errors.push(`${relative}: v2 must not expose legacy field ${legacyField}`);
+      }
+    }
+  }
+
+  const openApi = read(openApiPath);
+  for (const legacyToken of ["form_code", "form_type", "x-operational-form-type"]) {
+    if (openApi.includes(legacyToken)) errors.push(`openapi/ops-core/operational-forms.v2.yaml: legacy token ${legacyToken} is not allowed`);
+  }
+  for (const requiredRoute of [
+    "/v2/admin/operational/freezing-log:",
+    "/v2/admin/operational/freeze-drying-log:",
+    "/v2/admin/operational/packing-level-3:",
+    "/v2/admin/operational/forms/{formId}/status:",
+    "/v2/operational-forms/{formId}:"
+  ]) {
+    if (!openApi.includes(requiredRoute)) errors.push(`openapi/ops-core/operational-forms.v2.yaml: missing route ${requiredRoute}`);
+  }
+  if (openApi.includes("/v2/admin/operational/freeze-dry-qc:")) {
+    errors.push("openapi/ops-core/operational-forms.v2.yaml: retired freeze-dry-qc create route must not exist");
+  }
+  const extensionValues = [...openApi.matchAll(/^\s+x-operational-form-key:\s+([A-Z0-9_]+)\s*$/gm)]
+    .map(match => match[1]);
+  if (extensionValues.length !== 14 || extensionValues.some(value => !keys.includes(value) || value === "AFTER_DRYING_QC")) {
+    errors.push("openapi/ops-core/operational-forms.v2.yaml: expected 14 active source-specific form_key extensions from the canonical allowlist");
+  }
+  const requestConstValues = [...openApi.matchAll(/form_key:\s*\{\s*const:\s*([A-Z0-9_]+)\s*\}/g)]
+    .map(match => match[1]);
+  if (
+    requestConstValues.length !== 14 ||
+    JSON.stringify([...requestConstValues].sort()) !== JSON.stringify([...extensionValues].sort())
+  ) {
+    errors.push("openapi/ops-core/operational-forms.v2.yaml: each source-specific create operation must constrain request form_key to its extension value");
+  }
+
+  const v1Admin = read(v1AdminPath);
+  const v1Evidence = read(v1EvidencePath);
+  if ((v1Admin.match(/^\s+deprecated:\s+true\s*$/gm) ?? []).length !== 13) {
+    errors.push("openapi/ops-core/operational-admin.v1.yaml: exactly 12 form-create operations plus the status operation must be deprecated; unrelated routes stay active");
+  }
+  if ((v1Evidence.match(/^\s+deprecated:\s+true\s*$/gm) ?? []).length !== 1) {
+    errors.push("openapi/ops-core/operational-evidence.v1.yaml: exactly the Operational Form read operation must be deprecated");
+  }
+  if (!/^\s+x-operational-form-type:\s+ACCOUNTING_MATERIAL_ISSUE\s*$/m.test(v1Admin)) {
+    errors.push("openapi/ops-core/operational-admin.v1.yaml: FRM-14 extension must match v1 enum ACCOUNTING_MATERIAL_ISSUE");
+  }
+
+  const v1FormSchema = readJson(v1FormSchemaPath);
+  const v1PayloadSchema = readJson(v1PayloadSchemaPath);
+  if (
+    JSON.stringify(v1FormSchema.required) !== JSON.stringify(["operational_form_id", "form_code", "form_type"]) ||
+    JSON.stringify(v1PayloadSchema.required) !== JSON.stringify(["form_code", "payload_version"])
+  ) {
+    errors.push("Operational Form v1 required identity fields must remain frozen during v2 migration");
+  }
+}
+
+function checkTargetedOperationalFormV2Files() {
+  const targetPrefixes = [
+    "openapi/ops-core/operational-forms.v2.yaml",
+    "schemas/ops/operational-form",
+    "enums/ops/operational-form",
+    "contract-tests/fixtures/fixture-manifest.v2.yaml"
+  ];
+  for (const filePath of walk(root)) {
+    const relative = rel(filePath);
+    if (!targetPrefixes.some(prefix => relative.startsWith(prefix))) continue;
+    const extension = path.extname(filePath).toLowerCase();
+    const text = read(filePath);
+    checkRefs(filePath, text);
+    if (extension === ".json") checkJson(filePath);
+    if (relative.startsWith("openapi/") && (extension === ".yaml" || extension === ".yml")) checkOpenApi(filePath, text);
+    if (extension === ".yaml" || extension === ".yml") {
+      checkSourceDocuments(filePath, text);
+      checkKnownYamlPathFields(filePath, text);
+    }
+  }
+}
+
+function printResultAndExit() {
+  for (const warning of warnings) console.warn(`WARN ${warning}`);
+  if (errors.length > 0) {
+    for (const error of errors) console.error(`ERROR ${error}`);
+    console.error(`Contract validation failed with ${errors.length} error(s) and ${warnings.length} warning(s).`);
+    process.exit(1);
+  }
+  console.log(`Contract validation passed with ${warnings.length} warning(s).`);
+}
+
+if (validationScope === "operational-form-v2") {
+  checkSourceMap({ validateTargets: false });
+  checkOperationalFormV2();
+  checkTargetedOperationalFormV2Files();
+  for (const manifest of fixtureManifestFiles().filter(filePath => rel(filePath).endsWith(".v2.yaml"))) {
+    checkFixtureManifest(manifest);
+  }
+  printResultAndExit();
+  process.exit(0);
+}
+
+if (validationScope !== "all") {
+  errors.push(`Unknown validation scope: ${validationScope}`);
+  printResultAndExit();
 }
 
 checkSourceMap();
@@ -524,18 +796,5 @@ for (const filePath of files) {
   }
 }
 
-checkFixtureManifest();
-
-for (const warning of warnings) {
-  console.warn(`WARN ${warning}`);
-}
-
-if (errors.length > 0) {
-  for (const error of errors) {
-    console.error(`ERROR ${error}`);
-  }
-  console.error(`Contract validation failed with ${errors.length} error(s) and ${warnings.length} warning(s).`);
-  process.exit(1);
-}
-
-console.log(`Contract validation passed with ${warnings.length} warning(s).`);
+for (const manifest of fixtureManifestFiles()) checkFixtureManifest(manifest);
+printResultAndExit();

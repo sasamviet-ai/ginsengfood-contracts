@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/operational-form.v2.schema.json",
+  "title": "Operational Form v2",
+  "description": "Operational Form v2 read/history contract. form_key is the only canonical form identity; flow placement is independent metadata. Retired keys remain readable for historical records.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "operational_form_id": { "type": "string", "minLength": 1 },
+    "form_key": { "$ref": "operational-form-key.v2.schema.json" },
+    "status": { "type": "string", "description": "Operational Form v2 status. Prefer enums/ops/operational-form-status.v2.yaml." },
+    "source_object": { "$ref": "../common/source-ref.schema.json" },
+    "previous_form_id": { "type": "string", "minLength": 1 },
+    "previous_form_key": { "$ref": "operational-form-key.v2.schema.json" },
+    "flow_stage": { "type": "string", "minLength": 1, "description": "Display/workflow grouping. It is not part of form identity." },
+    "flow_sequence": { "type": "integer", "minimum": 1, "description": "Mutable display/workflow order. Consumers must not infer it from form_key or a legacy code." },
+    "production_profile_id": { "type": "string", "minLength": 1 },
+    "auto_generated_fields": { "type": "object", "additionalProperties": true },
+    "manual_fields": { "type": "object", "additionalProperties": true },
+    "allowed_actions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "confirmations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "actor": { "$ref": "../common/actor.schema.json" },
+          "confirmation_status": { "type": "string" },
+          "confirmed_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "misa_checkpoint": { "type": "boolean" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["operational_form_id", "form_key"]
+}

@@ -1,6 +1,6 @@
-# API Version Matrix v1
+# API Version Matrix
 
-All OpenAPI contracts use OpenAPI 3.1.0 and v1 paths. `info.version` remains `1.0.0` for the current contract generation.
+All OpenAPI contracts use OpenAPI 3.1.0. File major, `info.version`, and `/vN` path must agree. Most APIs remain v1; Operational Forms now has an isolated v2 replacement.
 
 ## ops-core APIs
 
@@ -21,6 +21,8 @@ All OpenAPI contracts use OpenAPI 3.1.0 and v1 paths. `info.version` remains `1.
 | Traceability | `openapi/ops-core/traceability.v1.yaml` | v1 | consumers, business-platform | Public trace must exclude internal operational data. |
 | Recall / sale lock | `openapi/ops-core/recall-sale-lock.v1.yaml` | v1 | ops-core frontend, business-platform consumers | High-risk commands; active locks block commerce/channel flows. |
 | Operational evidence | `openapi/ops-core/operational-evidence.v1.yaml` | v1 | ops-core frontend | Evidence references must remain auditable. |
+| Operational Forms compatibility | `openapi/ops-core/operational-admin.v1.yaml`, form read in `operational-evidence.v1.yaml` | v1 deprecated | ops-admin-ui / ops-core frontend | Frozen FRM/type identity; no FRM-28 through FRM-30 representation; remains usable until separately approved removal. |
+| Operational Forms semantic identity | `openapi/ops-core/operational-forms.v2.yaml` | v2 | ops-admin-ui / ops-core frontend | Canonical `form_key`; 30-key read/history vocabulary, retired-key create exclusion, and only the source-specific create routes listed in OpenAPI; provider runtime availability needs separate evidence. |
 | MISA handoff | `openapi/ops-core/misa-handoff.v1.yaml` | v1 | ops-core, integration consumers | MISA handoff does not modify operational truth. |
 
 ## business-platform APIs

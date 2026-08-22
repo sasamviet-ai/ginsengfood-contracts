@@ -1,8 +1,8 @@
 # openapi/ops-core
 
-## Phase 4 - Ops Core OpenAPI v1
+## Ops Core OpenAPI
 
-Thu muc nay chua OpenAPI 3.1.0 v1 contracts cho `ginsengfood-ops-core`. Cac file chi mo ta API contract giua systems/frontend; khong chua implementation code, client SDK, database migration, service logic hoac business logic.
+Thu muc nay chua OpenAPI 3.1.0 contracts cho `ginsengfood-ops-core`. Phần lớn surface hiện ở v1; Operational Forms có replacement v2 riêng. Cac file chi mo ta API contract giua systems/frontend; khong chua implementation code, client SDK, database migration, service logic hoac business logic.
 
 API groups:
 - Product Master: `product-master.v1.yaml`
@@ -21,6 +21,7 @@ API groups:
 - Recall / Sale Lock: `recall-sale-lock.v1.yaml`
 - Operational Evidence / Forms: `operational-evidence.v1.yaml`
 - Operational Admin / Appendix Forms / Print / MISA: `operational-admin.v1.yaml`
+- Operational Forms v2 (`form_key`, không major-version print/MISA/material planning): `operational-forms.v2.yaml`
 - MISA Handoff: `misa-handoff.v1.yaml`
 - Service Authentication: `service-auth.v1.yaml`
 
@@ -62,8 +63,9 @@ API phuc vu ops-core frontend:
 - Production, Material Issue/Receipt, Batch/QC/Release, Warehouse APIs
 - Inventory ledger, stock balance, stock alert read APIs
 - Trace chain internal API
-- Operational Evidence/Form APIs
-- Operational Admin APIs for canonical `FRM-01` through `FRM-27`, controlled print/reprint, material planning policy, and MISA sync requests. Deprecated `OPF-01` through `OPF-12` aliases may be accepted only at compatibility boundaries and must normalize to `FRM-*`.
+- Operational Evidence/Form v1 APIs remain deprecated compatibility surfaces.
+- Operational Forms v2 APIs use canonical `form_key` and cover all 30 read/history keys; `AFTER_DRYING_QC` is read-only retired history.
+- Print/reprint, material planning policy, and MISA sync requests remain v1 and are not implicitly versioned by the Operational Forms v2 file.
 - MISA handoff create/read APIs
 
 High-risk APIs:

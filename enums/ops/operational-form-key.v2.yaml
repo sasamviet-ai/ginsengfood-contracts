@@ -1,0 +1,104 @@
+version: v2
+name: operational-form-key
+title: Operational Form Key v2
+description: Canonical order-independent identity for Operational Forms v2. legacy_form_code is migration metadata only and is not part of the v2 wire payload.
+source_documents:
+  - docs/documents/0. appendices/06-OPERATIONAL-FORM-KEY-V2-OWNER-ADDENDUM.md
+values:
+  - value: PRODUCTION_DEMAND_PLAN
+    legacy_form_code: FRM-01
+    status: ACTIVE
+  - value: PRODUCTION_DEMAND_BOARD
+    legacy_form_code: FRM-02
+    status: ACTIVE
+  - value: FORMULA_RESOLUTION
+    legacy_form_code: FRM-03
+    status: ACTIVE
+  - value: MRP_RUN
+    legacy_form_code: FRM-04
+    status: ACTIVE
+  - value: PURCHASE_CONTROL_RESULT
+    legacy_form_code: FRM-05
+    status: ACTIVE
+  - value: MATERIAL_PURCHASE_REQUEST
+    legacy_form_code: FRM-06
+    status: ACTIVE
+  - value: HARVEST_REQUEST
+    legacy_form_code: FRM-07
+    status: ACTIVE
+  - value: PACKAGING_PURCHASE_REQUEST
+    legacy_form_code: FRM-08
+    status: ACTIVE
+  - value: MATERIAL_INTAKE
+    legacy_form_code: FRM-09
+    status: ACTIVE
+  - value: PACKAGING_INTAKE
+    legacy_form_code: FRM-10
+    status: ACTIVE
+  - value: PRODUCTION_ORDER
+    legacy_form_code: FRM-11
+    status: ACTIVE
+  - value: MATERIAL_ISSUE_REQUEST
+    legacy_form_code: FRM-12
+    status: ACTIVE
+  - value: MATERIAL_RELEASE_APPROVAL
+    legacy_form_code: FRM-13
+    status: ACTIVE
+  - value: MATERIAL_ISSUE_ACCOUNTING
+    legacy_form_code: FRM-14
+    status: ACTIVE
+  - value: PERSONNEL_ATTENDANCE
+    legacy_form_code: FRM-15
+    status: ACTIVE
+  - value: PREPROCESSING_LOG
+    legacy_form_code: FRM-16
+    status: ACTIVE
+  - value: AFTER_DRYING_QC
+    legacy_form_code: FRM-17
+    status: RETIRED
+    replacement_form_key: FREEZE_DRYING_LOG
+    description: Historical identity only. Existing records remain readable; new creation is forbidden.
+  - value: PACKAGING_LEVEL1_LOG
+    legacy_form_code: FRM-18
+    status: ACTIVE
+  - value: PACKAGING_LEVEL2_LOG
+    legacy_form_code: FRM-19
+    status: ACTIVE
+  - value: FINISHED_GOODS_QC
+    legacy_form_code: FRM-20
+    status: ACTIVE
+  - value: BATCH_RELEASE
+    legacy_form_code: FRM-21
+    status: ACTIVE
+  - value: FINISHED_GOODS_RECEIPT
+    legacy_form_code: FRM-22
+    status: ACTIVE
+  - value: DISPOSAL_REQUEST
+    legacy_form_code: FRM-23
+    status: ACTIVE
+  - value: INVENTORY_WRITE_OFF
+    legacy_form_code: FRM-24
+    status: ACTIVE
+  - value: MISA_HANDOFF
+    legacy_form_code: FRM-25
+    status: ACTIVE
+  - value: EVIDENCE_PACKET
+    legacy_form_code: FRM-26
+    status: ACTIVE
+  - value: SMOKE_RUN
+    legacy_form_code: FRM-27
+    status: ACTIVE
+  - value: FREEZING_LOG
+    legacy_form_code: FRM-28
+    status: ACTIVE
+  - value: FREEZE_DRYING_LOG
+    legacy_form_code: FRM-29
+    status: ACTIVE
+  - value: PACKAGING_LEVEL3_LOG
+    legacy_form_code: FRM-30
+    status: ACTIVE
+compatibility:
+  canonical_identity_field: form_key
+  legacy_fields_not_in_v2_payload: [form_code, deprecated_form_code_alias, form_type]
+  order_policy: Consumers use flow_sequence for ordering and never infer order from a key or legacy code.
+  breaking_change: Renaming/removing a form_key or allowing creation of a RETIRED key is breaking.

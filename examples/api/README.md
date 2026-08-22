@@ -6,7 +6,7 @@ Current examples cover:
 
 - availability and sellable checks;
 - public trace and warehouse receipt read responses;
-- operational forms;
+- deprecated Operational Form v1 and canonical `form_key` v2 requests;
 - print job creation;
 - MISA handoff response;
 - material planning policy response.

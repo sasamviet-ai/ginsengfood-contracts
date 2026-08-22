@@ -71,8 +71,9 @@ paths:
   /v1/operational-forms/{formId}:
     get:
       summary: Get operational form
-      description: Returns an operational form contract record, including generated form code, source object, auto-generated fields, and evidence when available.
+      description: Deprecated Operational Form v1 read surface. Use GET /v2/operational-forms/{formId}; v1 remains usable during the reviewed compatibility period.
       operationId: getOperationalFormV1
+      deprecated: true
       tags: [operational-evidence]
       parameters:
         - name: formId

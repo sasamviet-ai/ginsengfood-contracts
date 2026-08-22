@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/operational-form-create-request.v2.schema.json",
+  "title": "Operational Form Create Request v2",
+  "description": "Create request for an active Operational Form v2. AFTER_DRYING_QC is a historical read-only identity and cannot be created.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "form_key": {
+      "allOf": [
+        { "$ref": "operational-form-key.v2.schema.json" },
+        { "not": { "const": "AFTER_DRYING_QC" } }
+      ]
+    },
+    "payload_version": { "type": "string", "minLength": 1 },
+    "source_object": { "$ref": "../common/source-ref.schema.json" },
+    "generated_fields": { "type": "object", "additionalProperties": true },
+    "operator_fields": { "type": "object", "additionalProperties": true },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+  },
+  "required": ["form_key", "payload_version"]
+}

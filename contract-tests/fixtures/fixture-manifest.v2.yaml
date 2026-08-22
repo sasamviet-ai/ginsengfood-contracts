@@ -1,0 +1,19 @@
+version: v2
+name: contract-test-fixture-manifest
+title: Contract Test Fixture Manifest v2
+description: Source-backed v2 fixtures for the canonical Operational Form form_key boundary.
+source_documents:
+  - docs/documents/0. appendices/06-OPERATIONAL-FORM-KEY-V2-OWNER-ADDENDUM.md
+fixtures:
+  - file: operational-form-material-intake.v2.fixture.json
+    contract_area: operational-form
+    provider: ops-core
+    consumers:
+      - ops-admin-ui
+    source_example: ../../examples/api/operational-form-material-intake.v2.request.json
+    validates_against:
+      - ../../schemas/ops/operational-form-create-request.v2.schema.json
+      - ../../schemas/ops/operational-form-payload.v2.schema.json
+compatibility:
+  v1_fixture_retained: operational-form-frm-09.v1.fixture.json
+  breaking_change: Renaming form_key, reintroducing legacy identity fields, or allowing retired-key creation requires a new major compatibility review.

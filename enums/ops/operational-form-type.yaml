@@ -1,7 +1,9 @@
 version: v1
 name: operational-form-type
 title: Operational Form Type
-description: Canonical operational form types for FRM-01 through FRM-27. Codes are contract identifiers, not UI labels. OPF-01 through OPF-12 remain deprecated aliases only for legacy compatibility.
+description: "DEPRECATED: Canonical v1 operational form types for FRM-01 through FRM-27. Values remain frozen for compatibility; new consumers use operational-form-key.v2.yaml."
+status: deprecated
+replacement: enums/ops/operational-form-key.v2.yaml
 source_documents:
   - docs/documents/0. appendices/01-OPERATIONAL-FORMS.md
   - docs/documents/0. appendices/02-AUTO-GENERATED-FORM-RULES.md

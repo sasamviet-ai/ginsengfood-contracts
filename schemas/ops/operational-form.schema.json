@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/ops/v1/operational-form.schema.json",
   "title": "Operational Form",
-  "description": "Operational Form v1 contract for the required FRM-01 through FRM-27 operational forms. Forms must carry canonical form code/type, source object, generated/inherited fields, confirmation, evidence, audit, and status. Deprecated OPF aliases are compatibility input only and must normalize to FRM before persistence.",
+  "description": "DEPRECATED: Operational Form v1 contract for FRM-01 through FRM-27. It remains usable for compatibility but new consumers use operational-form.v2.schema.json and canonical form_key. Existing v1 fields and meanings are frozen.",
   "$comment": "Sources: docs/documents/0. appendices/01-OPERATIONAL-FORMS.md, 02-AUTO-GENERATED-FORM-RULES.md, 05-MATERIAL-PACKAGING-TAXONOMY.md, and docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md. Per-form payloads remain bounded by this shared form envelope.",
   "type": "object",
   "additionalProperties": false,

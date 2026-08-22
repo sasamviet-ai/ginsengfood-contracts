@@ -8,6 +8,7 @@ source_documents:
   - docs/documents/0. appendices/03-PRINTING-CODE-RULES.md
   - docs/documents/0. appendices/04-MISA-MAPPING-RULES.md
   - docs/documents/0. appendices/05-MATERIAL-PACKAGING-TAXONOMY.md
+  - docs/documents/0. appendices/06-OPERATIONAL-FORM-KEY-V2-OWNER-ADDENDUM.md
   - docs/documents/1. master/02-MASTER-01-SOURCE-OF-TRUTH.md
   - docs/documents/1. master/03-MASTER-02-CROSS-PACK-DEPENDENCY.md
   - docs/documents/1. master/06-MASTER-05-EVIDENCE-SMOKE-COMPLETION-GATE.md
@@ -25,6 +26,13 @@ interactions:
       openapi: ../../openapi/ops-core/operational-admin.v1.yaml
       fixture: ../fixtures/operational-form-frm-09.v1.fixture.json
     expected_boundary: Admin UI may submit canonical FRM payloads through ops-core-owned routes only. Deprecated OPF aliases are compatibility input only.
+  - name: ops-admin-submits-operational-form-v2
+    provider: ops-core
+    consumer: ops-admin-ui
+    contract:
+      openapi: ../../openapi/ops-core/operational-forms.v2.yaml
+      fixture: ../fixtures/operational-form-material-intake.v2.fixture.json
+    expected_boundary: Admin UI sends canonical form_key only; schema availability does not claim that the provider runtime route is deployed.
   - name: printer-adapter-receives-print-job
     provider: ops-core
     consumer: printer-adapter

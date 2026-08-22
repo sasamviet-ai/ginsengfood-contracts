@@ -1,0 +1,17 @@
+{
+  "form_key": "MATERIAL_INTAKE",
+  "payload_version": "2.0.0",
+  "source_object": {
+    "sourceId": "raw-material-receipt-20260821-001",
+    "sourceType": "OPERATIONAL_STATE_SOURCE",
+    "ownerCore": "ops-core"
+  },
+  "generated_fields": {
+    "supplier_id": "supplier-001",
+    "material_code": "A1-GINSENG-ROOT"
+  },
+  "operator_fields": {
+    "operator_note": "Initial receipt assessment."
+  },
+  "evidence_refs": []
+}

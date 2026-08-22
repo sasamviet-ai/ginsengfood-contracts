@@ -16,6 +16,8 @@ paths:
     post:
       summary: Create raw material inbound assessment form
       operationId: createRawMaterialInboundAssessmentV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin]
       x-operational-form-type: RAW_MATERIAL_INTAKE
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -24,6 +26,8 @@ paths:
     post:
       summary: Create production order form
       operationId: createProductionOrderFormV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin]
       x-operational-form-type: PRODUCTION_ORDER
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -32,6 +36,8 @@ paths:
     post:
       summary: Create material issue request form
       operationId: createMaterialIssueRequestFormV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin]
       x-operational-form-type: MATERIAL_REQUEST
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -40,6 +46,8 @@ paths:
     post:
       summary: Create material issue approval form
       operationId: createMaterialIssueApprovalFormV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin]
       x-operational-form-type: MATERIAL_ACCEPTANCE_FOR_PRODUCTION
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -48,6 +56,8 @@ paths:
     post:
       summary: Create workforce check-in/check-out form
       operationId: createWorkforceCheckinCheckoutFormV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin]
       x-operational-form-type: PERSONNEL_CHECKIN_CHECKOUT
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -56,6 +66,8 @@ paths:
     post:
       summary: Create preprocess tracking form
       operationId: createPreprocessTrackingFormV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin]
       x-operational-form-type: PREPROCESSING_TRACKING
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -64,6 +76,8 @@ paths:
     post:
       summary: Create freeze-dry QC form
       operationId: createFreezeDryQcFormV1
+      deprecated: true
+      description: Deprecated historical v1 create surface. No v2 create route exists because AFTER_DRYING_QC is retired; use FREEZE_DRYING_LOG for the active workflow.
       tags: [operational-admin]
       x-operational-form-type: FREEZE_DRY_QC
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -72,6 +86,8 @@ paths:
     post:
       summary: Create level 1 packing tracking form
       operationId: createPackingLevel1TrackingFormV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin]
       x-operational-form-type: PACKAGING_LEVEL_1
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -80,6 +96,8 @@ paths:
     post:
       summary: Create level 2 packing tracking form
       operationId: createPackingLevel2TrackingFormV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin]
       x-operational-form-type: PACKAGING_LEVEL_2
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -88,6 +106,8 @@ paths:
     post:
       summary: Create finished goods QC form
       operationId: createFinishedGoodsQcFormV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin]
       x-operational-form-type: FINISHED_GOODS_QC
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -96,6 +116,8 @@ paths:
     post:
       summary: Create finished goods receipt order
       operationId: createFinishedGoodsReceiptOrderV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin]
       x-operational-form-type: FINISHED_GOODS_WAREHOUSE_RECEIPT
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
@@ -104,15 +126,18 @@ paths:
     post:
       summary: Create accounting material issue form
       operationId: createMaterialIssueAccountingFormV1
+      deprecated: true
+      description: Deprecated Operational Form v1 identity surface. Use the matching v2 operation with canonical form_key.
       tags: [operational-admin, operational-misa]
-      x-operational-form-type: MATERIAL_ISSUE_ACCOUNTING
+      x-operational-form-type: ACCOUNTING_MATERIAL_ISSUE
       requestBody: { $ref: "#/components/requestBodies/OperationalForm" }
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
   /v1/admin/operational/forms/{formId}/status:
     patch:
       summary: Update operational form status
-      description: Updates an operational form status when permission, evidence, source-object, and guard conditions allow the transition.
+      description: Deprecated Operational Form v1 identity surface. Use the v2 status operation with canonical form_key. Updates remain permission-, evidence-, source-object-, and guard-controlled during migration.
       operationId: updateOperationalFormStatusV1
+      deprecated: true
       tags: [operational-admin]
       parameters:
         - name: formId

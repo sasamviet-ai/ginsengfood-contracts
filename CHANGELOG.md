@@ -6,15 +6,16 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ### Added
 
-- Khởi tạo cấu trúc contract repo.
+- Operational Forms v2 OpenAPI, JSON Schemas, canonical 30-value `form_key` enum, status/state docs, example, fixture manifest, and migration note under owner decision `D1=A`.
+- Targeted zero-dependency validation scope `operational-form-v2` and version-discovered fixture manifest validation.
 
 ### Changed
 
-- Chưa có.
+- OpenAPI validation now derives major from `.vN.yaml` and checks matching `info.version` plus `/vN` paths.
 
 ### Deprecated
 
-- Chưa có.
+- Operational Form v1 create/status/read operations, v1 form schemas, and `operational-form-type.yaml`; they remain usable during migration and have no approved removal date.
 
 ### Removed
 
@@ -22,8 +23,8 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ### Fixed
 
-- Chưa có.
+- Corrected the v1 FRM-14 OpenAPI extension to the published v1 enum value `ACCOUNTING_MATERIAL_ISSUE`.
 
 ### Breaking Changes
 
-- Chưa có.
+- Operational Forms v2 replaces required v1 identity fields with canonical `form_key`. Consumers must opt into `/v2`; v1 is not silently changed or removed. See `compatibility/operational-form-v1-to-v2-migration.md`.

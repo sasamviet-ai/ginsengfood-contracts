@@ -72,14 +72,15 @@ Status: implemented at contract-surface level; future integration details remain
 
 Outputs:
 
-- ops-core admin/internal OpenAPI for operational forms, print/reprint, MISA sync/reconcile, and material planning policy;
+- ops-core admin/internal OpenAPI v1 for operational forms, print/reprint, MISA sync/reconcile, and material planning policy;
+- isolated Operational Forms v2 OpenAPI/schema/enum surface using canonical `form_key`, while v1 remains frozen and deprecated;
 - `/v1` consumer boundaries remain read/check oriented;
 - evidence/release events use the shared event envelope;
 - FRM, print, evidence, P0, release, batch/QC/warehouse/recall/sale-lock state-machine docs are present where source-backed.
 
 Gate:
 
-- OpenAPI declares `3.1.0`, `info.version: 1.0.0`, and `/v1`;
+- OpenAPI declares `3.1.0`; `info.version` and `/vN` paths match the `.vN.yaml` filename;
 - event schemas and examples include the standard event envelope;
 - state machines name permission, evidence, audit, and P0 guards where required.
 
@@ -89,7 +90,7 @@ Status: implemented as planning-grade fixtures and examples.
 
 Outputs:
 
-- API examples for FRM, print, MISA handoff, material planning policy, and existing availability/trace flows;
+- API examples for deprecated FRM v1, semantic-key Operational Forms v2, print, MISA handoff, material planning policy, and existing availability/trace flows;
 - event examples for MISA, evidence, release, sale-lock, sellable, order, payment, ads, and IVR;
 - fixture manifest with provider/consumer boundaries;
 - Pact interaction planning map without assuming a broker or Pact registry.

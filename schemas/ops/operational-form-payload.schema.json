@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/ops/v1/operational-form-payload.schema.json",
   "title": "Operational Form Payload",
-  "description": "Per-form payload contract for FRM-01 through FRM-27. It records generated fields, operator-entered fields, action constraints, and status constraints without embedding workflow business logic.",
+  "description": "DEPRECATED: Per-form v1 payload for FRM-01 through FRM-27. It remains usable for compatibility; new consumers use operational-form-payload.v2.schema.json and canonical form_key. Existing v1 fields and meanings are frozen.",
   "$comment": "Sources: docs/documents/0. appendices/01-OPERATIONAL-FORMS.md, docs/documents/0. appendices/02-AUTO-GENERATED-FORM-RULES.md, and docs/documents/2. pack/04-PACK-04-MISA-ACCOUNTING-HANDOFF.md.",
   "type": "object",
   "additionalProperties": false,

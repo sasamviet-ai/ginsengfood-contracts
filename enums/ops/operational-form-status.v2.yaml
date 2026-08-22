@@ -1,0 +1,31 @@
+version: v2
+name: operational-form-status
+title: Operational Form Status v2
+description: Operational Form v2 status values. Identity migrated to form_key; lifecycle semantics remain compatible with v1.
+source_documents:
+  - docs/documents/0. appendices/06-OPERATIONAL-FORM-KEY-V2-OWNER-ADDENDUM.md
+values:
+  - value: AUTO_GENERATED_DRAFT
+  - value: DRAFT
+  - value: PENDING_CONFIRMATION
+  - value: SUBMITTED
+  - value: CONFIRMED
+  - value: APPROVED
+  - value: PARTIALLY_APPROVED
+  - value: REJECTED
+  - value: IN_PROGRESS
+  - value: CHECKED_OUT
+  - value: APPROVED_FOR_PACKING
+  - value: APPROVED_FOR_WAREHOUSE
+  - value: COMPLETED
+  - value: ACCOUNTED
+  - value: SYNC_AWAITING_REVIEW
+  - value: SYNC_SUCCESS
+  - value: SYNC_ERROR
+  - value: REVIEW_REQUIRED
+  - value: BLOCKED
+  - value: CLOSED
+  - value: CANCELLED
+compatibility:
+  status_semantics: Same baseline status vocabulary as v1; only the form identity contract changes in v2.
+  breaking_change: Allowing transitions without required confirmations, permissions, evidence, or audit is breaking.

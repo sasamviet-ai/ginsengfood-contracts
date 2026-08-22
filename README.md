@@ -57,6 +57,12 @@ Boundary chung giữa hai hệ thống được chốt tại `docs/ops-core-busi
 - `contract-tests/`: định hướng và tài sản phục vụ contract tests.
 - `compatibility/`: chính sách compatibility, deprecation và version matrix.
 
+## Operational Forms v2
+
+Owner decision `D1=A` chọn `form_key` làm định danh canonical ở biên contract. Operational Forms v1 vẫn được giữ và đánh dấu deprecated; v2 được công bố riêng tại `openapi/ops-core/operational-forms.v2.yaml`, các schema `schemas/ops/operational-form*.v2.schema.json`, và enum `enums/ops/operational-form-key.v2.yaml`.
+
+Xem `compatibility/operational-form-v1-to-v2-migration.md` trước khi provider hoặc consumer chuyển version. Việc có schema v2 không tự chứng minh provider runtime đã triển khai `/v2`.
+
 ## Review Và Breaking Change
 
 Mọi thay đổi contract phải đi qua PR. Provider owner và consumer owner liên quan cần review, đặc biệt với breaking change. Breaking change phải có migration note, version mới và kế hoạch tương thích rõ ràng.
