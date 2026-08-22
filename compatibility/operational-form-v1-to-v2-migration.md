@@ -35,11 +35,13 @@ The shared create schema is an allowlist component, not a generic create endpoin
 3. Do not infer display/workflow order from a key or historical number.
 4. Tolerate a retired key on read/history and hide or disable its create action.
 5. Confirm that no local persisted cache treats the old enum as authoritative before switching traffic.
+6. Send `X-Idempotency-Key` on every v2 state-changing call (all create operations and the status update). The header is required in v2; a retry that reuses the same key with the same payload returns the original result instead of creating a duplicate form. Recommended format `<surface>:<actionCode>:<clientUuid>`, 1-200 characters.
 
 ## Failure and rollback behavior
 
 - Unknown `form_key` or retired-key create: fail closed with validation/business-rule failure; never coerce to a nearby form.
 - Provider v2 unavailable: consumer remains on v1; it must not translate FRM-28 through FRM-30 into a v1 value.
+- Missing or empty `X-Idempotency-Key` on a v2 state-changing call: fail closed with a validation failure; the provider must not silently generate a key on the consumer's behalf.
 - Partial rollout: version choice is per request. Do not send mixed v1/v2 identity fields.
 - Rollback: route traffic back to v1 for its supported 27 forms while retaining v2 data and historical identity; do not reverse-migrate keys into changed meanings.
 

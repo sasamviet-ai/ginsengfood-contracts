@@ -701,6 +701,24 @@ function checkOperationalFormV2() {
     errors.push("openapi/ops-core/operational-forms.v2.yaml: each source-specific create operation must constrain request form_key to its extension value");
   }
 
+  // Idempotency: moi operation LAM DOI TRANG THAI phai khai X-Idempotency-Key. Contract noi bo khai
+  // header nay o 296/310 mutating operation; v2 ra doi sau nen khong duoc thap chuan hon. Check nay
+  // co pham vi rieng file v2 - corpus v1 dang Deprecated, retrofit rieng neu owner quyet dinh.
+  const idempotencyParameterRef = '$ref: "#/components/parameters/IdempotencyKey"';
+  const idempotencyComponentPattern = /^ {4}IdempotencyKey:\r?\n {6}name: X-Idempotency-Key\r?\n {6}in: header\r?\n {6}required: true\b/m;
+  if (!idempotencyComponentPattern.test(openApi)) {
+    errors.push(
+      "openapi/ops-core/operational-forms.v2.yaml: components.parameters.IdempotencyKey must declare header X-Idempotency-Key as required"
+    );
+  }
+  const mutatingOperationCount = (openApi.match(/^ {4}(?:post|put|patch|delete):\s*$/gm) ?? []).length;
+  const idempotencyRefCount = openApi.split(idempotencyParameterRef).length - 1;
+  if (mutatingOperationCount !== idempotencyRefCount) {
+    errors.push(
+      `openapi/ops-core/operational-forms.v2.yaml: ${mutatingOperationCount} state-changing operation(s) but ${idempotencyRefCount} IdempotencyKey reference(s); every post/put/patch/delete must reference it and read-only operations must not`
+    );
+  }
+
   const v1Admin = read(v1AdminPath);
   const v1Evidence = read(v1EvidencePath);
   if ((v1Admin.match(/^\s+deprecated:\s+true\s*$/gm) ?? []).length !== 13) {

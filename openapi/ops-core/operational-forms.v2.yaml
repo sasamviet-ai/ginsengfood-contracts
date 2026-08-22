@@ -15,6 +15,8 @@ paths:
       operationId: createMaterialIntakeFormV2
       tags: [operational-forms]
       x-operational-form-key: MATERIAL_INTAKE
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/MaterialIntakeCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -24,6 +26,8 @@ paths:
       operationId: createProductionOrderFormV2
       tags: [operational-forms]
       x-operational-form-key: PRODUCTION_ORDER
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/ProductionOrderCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -33,6 +37,8 @@ paths:
       operationId: createMaterialIssueRequestFormV2
       tags: [operational-forms]
       x-operational-form-key: MATERIAL_ISSUE_REQUEST
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/MaterialIssueRequestCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -42,6 +48,8 @@ paths:
       operationId: createMaterialReleaseApprovalFormV2
       tags: [operational-forms]
       x-operational-form-key: MATERIAL_RELEASE_APPROVAL
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/MaterialReleaseApprovalCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -51,6 +59,8 @@ paths:
       operationId: createPersonnelAttendanceFormV2
       tags: [operational-forms]
       x-operational-form-key: PERSONNEL_ATTENDANCE
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/PersonnelAttendanceCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -60,6 +70,8 @@ paths:
       operationId: createPreprocessingLogFormV2
       tags: [operational-forms]
       x-operational-form-key: PREPROCESSING_LOG
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/PreprocessingLogCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -69,6 +81,8 @@ paths:
       operationId: createFreezingLogFormV2
       tags: [operational-forms]
       x-operational-form-key: FREEZING_LOG
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/FreezingLogCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -78,6 +92,8 @@ paths:
       operationId: createFreezeDryingLogFormV2
       tags: [operational-forms]
       x-operational-form-key: FREEZE_DRYING_LOG
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/FreezeDryingLogCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -87,6 +103,8 @@ paths:
       operationId: createPackagingLevel1LogFormV2
       tags: [operational-forms]
       x-operational-form-key: PACKAGING_LEVEL1_LOG
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/PackagingLevel1LogCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -96,6 +114,8 @@ paths:
       operationId: createPackagingLevel2LogFormV2
       tags: [operational-forms]
       x-operational-form-key: PACKAGING_LEVEL2_LOG
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/PackagingLevel2LogCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -105,6 +125,8 @@ paths:
       operationId: createPackagingLevel3LogFormV2
       tags: [operational-forms]
       x-operational-form-key: PACKAGING_LEVEL3_LOG
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/PackagingLevel3LogCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -114,6 +136,8 @@ paths:
       operationId: createFinishedGoodsQcFormV2
       tags: [operational-forms]
       x-operational-form-key: FINISHED_GOODS_QC
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/FinishedGoodsQcCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -123,6 +147,8 @@ paths:
       operationId: createFinishedGoodsReceiptFormV2
       tags: [operational-forms]
       x-operational-form-key: FINISHED_GOODS_RECEIPT
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/FinishedGoodsReceiptCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -132,6 +158,8 @@ paths:
       operationId: createMaterialIssueAccountingFormV2
       tags: [operational-forms]
       x-operational-form-key: MATERIAL_ISSUE_ACCOUNTING
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         $ref: "#/components/requestBodies/MaterialIssueAccountingCreate"
       responses: { "201": { $ref: "#/components/responses/OperationalFormCreated" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
@@ -141,6 +169,7 @@ paths:
       operationId: updateOperationalFormStatusV2
       tags: [operational-forms]
       parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
         - name: formId
           in: path
           required: true
@@ -172,6 +201,16 @@ paths:
           schema: { type: string, minLength: 1 }
       responses: { "200": { $ref: "#/components/responses/OperationalFormOk" }, "400": { $ref: "#/components/responses/BadRequest" }, "401": { $ref: "#/components/responses/Unauthorized" }, "403": { $ref: "#/components/responses/Forbidden" }, "404": { $ref: "#/components/responses/NotFound" }, "409": { $ref: "#/components/responses/Conflict" }, "422": { $ref: "#/components/responses/UnprocessableEntity" }, "500": { $ref: "#/components/responses/InternalServerError" } }
 components:
+  parameters:
+    IdempotencyKey:
+      name: X-Idempotency-Key
+      in: header
+      required: true
+      description: Stable client-generated idempotency key for the command. Recommended format <surface>:<actionCode>:<clientUuid>. Replaying the same key with the same payload returns the original result instead of creating a duplicate.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
   requestBodies:
     MaterialIntakeCreate:
       required: true
