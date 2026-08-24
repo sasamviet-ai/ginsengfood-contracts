@@ -53,6 +53,10 @@ values:
   - value: PREPROCESSING_LOG
     legacy_form_code: FRM-16
     status: ACTIVE
+  - value: COOKING_LOG
+    legacy_form_code: null
+    status: ACTIVE
+    description: Semantic-key-only cooking log inserted between preprocessing and freezing. No FRM-NN code is allocated.
   - value: AFTER_DRYING_QC
     legacy_form_code: FRM-17
     status: RETIRED
