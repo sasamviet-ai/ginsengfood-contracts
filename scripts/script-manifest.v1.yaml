@@ -9,7 +9,7 @@ active_scripts:
     purpose: Validate contract repository hygiene, JSON parseability, JSON Schema metadata, version-matched OpenAPI paths, local references, source-map paths, YAML source_documents, event envelopes, all versioned fixture manifests, fixture required fields, and Operational Forms v2 parity.
   - name: validate-operational-form-v2
     command: node scripts/validate-contracts.mjs --scope=operational-form-v2
-    purpose: Run a zero-dependency focused gate for the 30 canonical form_key values, retired-key create exclusion, v2 routes/fields, v1 deprecation, and v2 fixture references without mixing unrelated repository baseline failures.
+    purpose: Run a zero-dependency focused gate for order-independent exact parity across 32 canonical form_key values (30 legacy-code mappings plus 2 semantic-only keys), retired-key create exclusion, v2 routes/fields, v1 deprecation, and v2 fixture references without mixing unrelated repository baseline failures.
 future_scripts:
   - name: validate-openapi-strict
     purpose: Validate OpenAPI 3.1.0 semantics with an approved OpenAPI validator.

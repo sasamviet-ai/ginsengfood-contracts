@@ -1,8 +1,8 @@
 # Operational Form Key v2 — Owner Addendum
 
-Status: `ACCEPTED`
+Status: `ACCEPTED_BASELINE`; `EQUIPMENT_READINESS_CHECK` extension = `OWNER_ACCEPTED`
 
-Owner approval: `D1=A` on 2026-08-21. Additive owner approval on 2026-08-24 adds semantic-only `COOKING_LOG` without allocating a legacy code. At the cross-repository contract boundary, `form_key` is the canonical Operational Form identity.
+Owner approval: `D1=A` on 2026-08-21. Additive owner approvals on 2026-08-24 add semantic-only `COOKING_LOG` and accept `EQUIPMENT_READINESS_CHECK` option A without allocating legacy codes. Equipment readiness snapshots all ACTIVE equipment; critical rows are required; `DAY_LEADER` signs; evidence is optional; replacement equipment code is free text; the user chooses the conclusion and the server validates consistency. At the cross-repository contract boundary, `form_key` is the canonical Operational Form identity.
 
 ## Precedence and scope
 
@@ -11,7 +11,7 @@ This addendum supplements appendices 01, 02, and 05 for the Operational Forms v2
 - v1 remains a usable, deprecated compatibility surface for FRM-01 through FRM-27.
 - v2 uses only `form_key` for form identity. `form_code`, `deprecated_form_code_alias`, and `form_type` are not v2 wire fields.
 - A key is immutable and order-independent. `flow_sequence` and `flow_stage` are mutable placement metadata.
-- All 31 keys are valid for read/history. `AFTER_DRYING_QC` is retired and cannot be created.
+- All 32 keys are valid for read/history. `AFTER_DRYING_QC` is retired and cannot be created; 31 keys remain active for creation.
 - Historical `AFTER_DRYING_QC` records remain that identity. They must not be rewritten as `FREEZE_DRYING_LOG`.
 - No v1 removal date is approved. Removal needs a separately reviewed provider/consumer compatibility plan.
 
@@ -52,12 +52,13 @@ The table is ordered by the historical paper code only for migration lookup; it 
 | FRM-29 | none in v1 | FREEZE_DRYING_LOG | ACTIVE |
 | FRM-30 | none in v1 | PACKAGING_LEVEL3_LOG | ACTIVE |
 | — | none in v1 | COOKING_LOG | ACTIVE; semantic-key-only |
+| — | none in v1 | EQUIPMENT_READINESS_CHECK | ACTIVE; semantic-key-only |
 
 ## Current flow placement
 
-Consumers must use explicit placement metadata. The accepted order at this decision point is:
+Consumers must use explicit placement metadata. The owner-accepted current implementation order is below:
 
-`PRODUCTION_DEMAND_PLAN`, `PRODUCTION_DEMAND_BOARD`, `FORMULA_RESOLUTION`, `MRP_RUN`, `PURCHASE_CONTROL_RESULT`, `MATERIAL_PURCHASE_REQUEST`, `HARVEST_REQUEST`, `PACKAGING_PURCHASE_REQUEST`, `MATERIAL_INTAKE`, `PACKAGING_INTAKE`, `PRODUCTION_ORDER`, `MATERIAL_ISSUE_REQUEST`, `MATERIAL_RELEASE_APPROVAL`, `MATERIAL_ISSUE_ACCOUNTING`, `PREPROCESSING_LOG`, `COOKING_LOG`, `FREEZING_LOG`, `FREEZE_DRYING_LOG`, `AFTER_DRYING_QC` (retired historical slot), `PACKAGING_LEVEL1_LOG`, `PACKAGING_LEVEL2_LOG`, `PACKAGING_LEVEL3_LOG`, `FINISHED_GOODS_QC`, `BATCH_RELEASE`, `FINISHED_GOODS_RECEIPT`, `PERSONNEL_ATTENDANCE`, `DISPOSAL_REQUEST`, `INVENTORY_WRITE_OFF`, `MISA_HANDOFF`, `EVIDENCE_PACKET`, `SMOKE_RUN`.
+`PRODUCTION_DEMAND_PLAN`, `PRODUCTION_DEMAND_BOARD`, `FORMULA_RESOLUTION`, `MRP_RUN`, `PURCHASE_CONTROL_RESULT`, `MATERIAL_PURCHASE_REQUEST`, `HARVEST_REQUEST`, `PACKAGING_PURCHASE_REQUEST`, `MATERIAL_INTAKE`, `PACKAGING_INTAKE`, `PRODUCTION_ORDER`, `EQUIPMENT_READINESS_CHECK`, `MATERIAL_ISSUE_REQUEST`, `MATERIAL_RELEASE_APPROVAL`, `MATERIAL_ISSUE_ACCOUNTING`, `PREPROCESSING_LOG`, `COOKING_LOG`, `FREEZING_LOG`, `FREEZE_DRYING_LOG`, `AFTER_DRYING_QC` (retired historical slot), `PACKAGING_LEVEL1_LOG`, `PACKAGING_LEVEL2_LOG`, `PACKAGING_LEVEL3_LOG`, `FINISHED_GOODS_QC`, `BATCH_RELEASE`, `FINISHED_GOODS_RECEIPT`, `PERSONNEL_ATTENDANCE`, `DISPOSAL_REQUEST`, `INVENTORY_WRITE_OFF`, `MISA_HANDOFF`, `EVIDENCE_PACKET`, `SMOKE_RUN`.
 
 Changing this order does not change a key and does not require a new identity version. Provider data remains authoritative for the actual `flow_sequence` and `flow_stage` values.
 
@@ -65,7 +66,7 @@ Changing this order does not change a key and does not require a new identity ve
 
 1. Provider and consumer owners review the v2 contract PR.
 2. v1 fixtures and endpoints remain during migration and are marked deprecated, not deleted.
-3. v1 providers never represent FRM-28 through FRM-30 or `COOKING_LOG` by inventing v1 enum values/codes.
+3. v1 providers never represent FRM-28 through FRM-30, `COOKING_LOG`, or `EQUIPMENT_READINESS_CHECK` by inventing v1 enum values/codes.
 4. v2 create requests reject `AFTER_DRYING_QC`; v2 reads may return it for history.
 5. A consumer must not send both legacy identity fields and `form_key` in one v2 payload.
 6. Contract publication does not prove an implemented provider route; runtime status stays separate from schema status.

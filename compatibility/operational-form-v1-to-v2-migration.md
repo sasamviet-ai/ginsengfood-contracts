@@ -9,13 +9,13 @@ Owner decision `D1=A` selects `form_key` as the cross-repository Operational For
 | Capability | v1 | v2 |
 |---|---|---|
 | Canonical identity | `form_code` plus `form_type` | `form_key` |
-| Supported identity set | FRM-01 through FRM-27 | 30 keys for read/history; create schema excludes the one retired key, while exposed create routes remain limited to operations explicitly listed in OpenAPI |
+| Supported identity set | FRM-01 through FRM-27 | 32 keys for read/history; 31 active keys remain creatable by provider-owned flows, while exposed create routes remain limited to operations explicitly listed in OpenAPI |
 | Order | `form_sequence` maximum 27 | optional `flow_sequence`, minimum 1, no fixed maximum |
 | Stage | not canonical | optional `flow_stage` |
 | Retired history | v1 `FREEZE_DRY_QC` remains usable | `AFTER_DRYING_QC` readable, not creatable |
-| New process forms | not representable | `FREEZING_LOG`, `FREEZE_DRYING_LOG`, `PACKAGING_LEVEL3_LOG` |
+| New process forms | not representable | `FREEZING_LOG`, `FREEZE_DRYING_LOG`, `PACKAGING_LEVEL3_LOG`, `COOKING_LOG`, `EQUIPMENT_READINESS_CHECK` |
 
-The exact 27-value mapping and all 30 keys are defined in `docs/documents/0. appendices/06-OPERATIONAL-FORM-KEY-V2-OWNER-ADDENDUM.md` and `enums/ops/operational-form-key.v2.yaml`.
+The exact 30 legacy-code mappings, two semantic-only keys, and all 32 keys are defined in `docs/documents/0. appendices/06-OPERATIONAL-FORM-KEY-V2-OWNER-ADDENDUM.md` and `enums/ops/operational-form-key.v2.yaml`.
 
 ## Provider migration
 
@@ -50,6 +50,6 @@ The shared create schema is an allowlist component, not a generic create endpoin
 - Replacement: `openapi/ops-core/operational-forms.v2.yaml` and the v2 schemas/enums.
 - Provider: ops-core.
 - Known consumer: ops-admin-ui / ops-core frontend.
-- Reason: numbered paper codes and v1 types are not stable workflow identity and cannot represent the accepted 30-key catalog.
+- Reason: numbered paper codes and v1 types are not stable workflow identity and cannot represent the accepted 32-key catalog.
 - Tests retained: v1 example, v1 fixture manifest entry, v1 Pact planning interaction, and v1 schema checks.
 - Removal date: not approved. The repository has no owner-approved support window or release calendar; removal requires a new compatibility decision and provider/consumer sign-off.

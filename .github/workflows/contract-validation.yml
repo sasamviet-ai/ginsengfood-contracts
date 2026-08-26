@@ -29,4 +29,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: node scripts/validate-contracts.mjs
+      - name: Validate Operational Forms v2 parity
+        run: node scripts/validate-contracts.mjs --scope=operational-form-v2
+      - name: Validate complete contract baseline
+        run: node scripts/validate-contracts.mjs

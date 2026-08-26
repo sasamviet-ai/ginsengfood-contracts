@@ -24,7 +24,7 @@ node scripts\validate-contracts.mjs
 - Check fixture JSON includes top-level fields required by the referenced schema when the fixture shape is directly comparable.
 - Require the Phase 8 IVR contract surface to exist across enums, schemas, OpenAPI, events, AsyncAPI, state machines, examples, and fixtures.
 - Reject stale IVR wording that treats all programs as a two-attempt policy or references the old Phase 7 IVR handoff.
-- In targeted `operational-form-v2` scope, require the complete v2 artifact set, exact 30-key JSON/YAML parity, retired-key create exclusion, absence of legacy identity fields, required v2 routes, v1 deprecation markers, and the corrected frozen v1 enum extension.
+- In targeted `operational-form-v2` scope and the default validator, require the complete v2 artifact set, order-independent exact 32-key JSON/YAML set parity (30 legacy-code mappings plus 2 semantic-only keys), retired-key create exclusion, absence of legacy identity fields, required v2 routes, v1 deprecation markers, and the corrected frozen v1 enum extension.
 
 ## Required Local Gate
 
@@ -38,7 +38,7 @@ git diff --check
 
 ## CI Gate
 
-The official CI gate is the same Node command. CI must not silently generate SDKs or mutate contract files; generation remains a separate owner-approved workflow.
+The official CI gate runs the targeted Operational Forms v2 scope first and then the same default Node command, which also enforces Operational Forms v2 parity. CI must not silently generate SDKs or mutate contract files; generation remains a separate owner-approved workflow.
 
 ## Deferred Strict Toolchain
 

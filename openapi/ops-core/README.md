@@ -64,7 +64,7 @@ API phuc vu ops-core frontend:
 - Inventory ledger, stock balance, stock alert read APIs
 - Trace chain internal API
 - Operational Evidence/Form v1 APIs remain deprecated compatibility surfaces.
-- Operational Forms v2 APIs use canonical `form_key` and cover all 30 read/history keys; `AFTER_DRYING_QC` is read-only retired history.
+- Operational Forms v2 APIs use canonical `form_key` and cover all 32 read/history keys; 31 keys are active and `AFTER_DRYING_QC` is read-only retired history.
 - Print/reprint, material planning policy, and MISA sync requests remain v1 and are not implicitly versioned by the Operational Forms v2 file.
 - MISA handoff create/read APIs
 

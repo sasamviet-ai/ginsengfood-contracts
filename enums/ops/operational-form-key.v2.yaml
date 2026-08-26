@@ -38,6 +38,10 @@ values:
   - value: PRODUCTION_ORDER
     legacy_form_code: FRM-11
     status: ACTIVE
+  - value: EQUIPMENT_READINESS_CHECK
+    legacy_form_code: null
+    status: ACTIVE
+    description: Semantic-key-only readiness check created from a production order before work-order start. No FRM-NN code is allocated. Owner accepted option A on 2026-08-24.
   - value: MATERIAL_ISSUE_REQUEST
     legacy_form_code: FRM-12
     status: ACTIVE

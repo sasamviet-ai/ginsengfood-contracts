@@ -576,6 +576,17 @@ function extractYamlObjectList(text, listKey) {
   return entries;
 }
 
+function hasExactUniqueStringSet(actualValues, expectedValues) {
+  if (actualValues.length !== expectedValues.length) return false;
+  const actualSet = new Set(actualValues);
+  const expectedSet = new Set(expectedValues);
+  return (
+    actualSet.size === actualValues.length &&
+    expectedSet.size === expectedValues.length &&
+    actualValues.every(value => expectedSet.has(value))
+  );
+}
+
 function checkOperationalFormV2() {
   const requiredFiles = [
     "openapi/ops-core/operational-forms.v2.yaml",
@@ -620,12 +631,17 @@ function checkOperationalFormV2() {
   const enumValues = extractYamlObjectValues(enumText, "values", "value");
   const enumEntries = extractYamlObjectList(enumText, "values");
   const keys = keySchema.enum ?? [];
+  const expectedLegacyMappingCount = 30;
+  const expectedSemanticOnlyKeys = ["COOKING_LOG", "EQUIPMENT_READINESS_CHECK"];
+  const expectedKeyCount = expectedLegacyMappingCount + expectedSemanticOnlyKeys.length;
 
-  if (keys.length !== 30 || new Set(keys).size !== 30) {
-    errors.push("schemas/ops/operational-form-key.v2.schema.json: must contain exactly 30 unique form_key values");
+  if (keys.length !== expectedKeyCount || new Set(keys).size !== expectedKeyCount) {
+    errors.push(
+      `schemas/ops/operational-form-key.v2.schema.json: must contain exactly ${expectedKeyCount} unique form_key values`
+    );
   }
-  if (JSON.stringify(keys) !== JSON.stringify(enumValues)) {
-    errors.push("Operational Form v2 form_key JSON Schema and YAML enum values must match in canonical order");
+  if (!hasExactUniqueStringSet(keys, enumValues)) {
+    errors.push("Operational Form v2 form_key JSON Schema and YAML enum values must have exact order-independent set parity");
   }
   const retiredEntries = enumEntries.filter(entry => entry.status === "RETIRED");
   if (
@@ -639,12 +655,40 @@ function checkOperationalFormV2() {
   const addendumMappings = [...read(addendumPath).matchAll(
     /^\|\s*(FRM-\d{2})\s*\|\s*[^|]+\|\s*([A-Z0-9_]+)\s*\|/gm
   )].map(match => ({ legacy_form_code: match[1], value: match[2] }));
-  const enumMappings = enumEntries.map(entry => ({
-    legacy_form_code: entry.legacy_form_code,
-    value: entry.value
-  }));
-  if (addendumMappings.length !== 30 || JSON.stringify(addendumMappings) !== JSON.stringify(enumMappings)) {
-    errors.push("Operational Form v2 owner addendum and YAML enum must contain the same exact 30 legacy-code/form_key mappings");
+  const addendumSemanticOnlyKeys = [...read(addendumPath).matchAll(
+    /^\|\s*—\s*\|\s*none in v1\s*\|\s*([A-Z0-9_]+)\s*\|/gm
+  )].map(match => match[1]);
+  const enumMappings = enumEntries
+    .filter(entry => /^FRM-\d{2}$/.test(entry.legacy_form_code ?? ""))
+    .map(entry => ({
+      legacy_form_code: entry.legacy_form_code,
+      value: entry.value
+    }));
+  const enumSemanticOnlyKeys = enumEntries
+    .filter(entry => entry.legacy_form_code === "null")
+    .map(entry => entry.value);
+  const addendumMappingSet = addendumMappings.map(
+    entry => `${entry.legacy_form_code}:${entry.value}`
+  );
+  const enumMappingSet = enumMappings.map(
+    entry => `${entry.legacy_form_code}:${entry.value}`
+  );
+  if (
+    addendumMappings.length !== expectedLegacyMappingCount ||
+    enumMappings.length !== expectedLegacyMappingCount ||
+    !hasExactUniqueStringSet(addendumMappingSet, enumMappingSet)
+  ) {
+    errors.push(
+      `Operational Form v2 owner addendum and YAML enum must contain the same exact ${expectedLegacyMappingCount} legacy-code/form_key mappings regardless of order`
+    );
+  }
+  if (
+    !hasExactUniqueStringSet(addendumSemanticOnlyKeys, expectedSemanticOnlyKeys) ||
+    !hasExactUniqueStringSet(enumSemanticOnlyKeys, expectedSemanticOnlyKeys)
+  ) {
+    errors.push(
+      "Operational Form v2 owner addendum and YAML enum must contain exactly the semantic-only keys COOKING_LOG and EQUIPMENT_READINESS_CHECK"
+    );
   }
 
   const statusV1Values = extractYamlObjectValues(read(statusV1Path), "values", "value");
@@ -792,6 +836,7 @@ if (validationScope !== "all") {
 checkSourceMap();
 checkPhase8Sources();
 checkRequiredIvrContracts();
+checkOperationalFormV2();
 
 const files = walk(root);
 for (const filePath of files) {

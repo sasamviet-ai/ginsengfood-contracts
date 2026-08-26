@@ -6,7 +6,7 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ### Added
 
-- Operational Forms v2 OpenAPI, JSON Schemas, canonical 30-value `form_key` enum, status/state docs, example, fixture manifest, and migration note under owner decision `D1=A`.
+- Operational Forms v2 OpenAPI, JSON Schemas, canonical 32-value `form_key` enum (30 legacy-code mappings plus semantic-only `COOKING_LOG` and `EQUIPMENT_READINESS_CHECK`), status/state docs, example, fixture manifest, and migration note under owner decision `D1=A` plus additive owner approvals.
 - Targeted zero-dependency validation scope `operational-form-v2` and version-discovered fixture manifest validation.
 - Required `X-Idempotency-Key` header on every Operational Forms v2 state-changing operation (14 create + 1 status update), declared once as `components.parameters.IdempotencyKey`, plus a validation ratchet that fails when a `post`/`put`/`patch`/`delete` operation does not reference it or a read-only operation does.
 

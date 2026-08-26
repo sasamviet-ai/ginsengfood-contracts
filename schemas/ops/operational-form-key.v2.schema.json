@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "schemas/ops/operational-form-key.v2.schema.json",
   "title": "Operational Form Key v2",
-  "description": "Canonical, order-independent Operational Form identity for the v2 contract. AFTER_DRYING_QC is retained for historical reads but is retired for new form creation.",
+  "description": "Canonical, order-independent Operational Form identity for the v2 contract. AFTER_DRYING_QC is retained for historical reads but is retired for new form creation. EQUIPMENT_READINESS_CHECK option A was accepted by the owner on 2026-08-24.",
   "type": "string",
   "enum": [
     "PRODUCTION_DEMAND_PLAN",
@@ -16,6 +16,7 @@
     "MATERIAL_INTAKE",
     "PACKAGING_INTAKE",
     "PRODUCTION_ORDER",
+    "EQUIPMENT_READINESS_CHECK",
     "MATERIAL_ISSUE_REQUEST",
     "MATERIAL_RELEASE_APPROVAL",
     "MATERIAL_ISSUE_ACCOUNTING",
