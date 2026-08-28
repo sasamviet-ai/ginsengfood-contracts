@@ -10,7 +10,7 @@ paths:
   /v1/availability/check:
     post:
       summary: Check availability and sellable status
-      description: "Checks ops-core sellable/availability state for a SKU or batch. This endpoint is a read/guard check for business-platform and does not mutate inventory, recall, sale lock, trace, batch, warehouse, or sellable-status truth. channel_context is consumer context only and is not an authorization or sellable-decision input."
+      description: "Checks ops-core sellable/availability state for a SKU or batch. This endpoint is a read/guard check for business-platform and does not mutate inventory, recall, sale lock, trace, batch, warehouse, or sellable-status truth. channel_context is consumer context only and is not an authorization or sellable-decision input.\n\nThe `sellable_status_id` in this response is EPHEMERAL and is a correlation token, not a lookup key. This path evaluates without persisting, so the identifier is newly generated on every call and no matching record exists: `GET /v1/sellable-statuses/{sellableStatusId}` with an identifier taken from this response always returns 404. That is deliberate - persisting one row per read on the selling hot path buys nothing, because this response already carries the whole decision (`decision`, `block_reasons[]`, and the nine boolean gates). Resolvable identifiers come only from the `ops-core.sellable.*` event stream."
       operationId: checkAvailabilityV1
       tags: [availability-sellable]
       security:
@@ -43,7 +43,7 @@ paths:
   /v1/sellable-statuses/{sellableStatusId}:
     get:
       summary: Get sellable status
-      description: Returns a previously resolved sellable status record for audit/consumer traceability.
+      description: "Returns a previously PERSISTED sellable status record for audit/consumer traceability. Only identifiers carried by `ops-core.sellable.*` events resolve here. An identifier taken from a `POST /v1/availability/check` response is ephemeral and always returns 404 - see that operation's description."
       operationId: getSellableStatusV1
       tags: [availability-sellable]
       parameters:
