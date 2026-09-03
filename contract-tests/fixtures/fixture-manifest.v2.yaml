@@ -1,10 +1,56 @@
 version: v2
 name: contract-test-fixture-manifest
 title: Contract Test Fixture Manifest v2
-description: Source-backed v2 fixtures for the canonical Operational Form form_key boundary.
+description: Source-backed v2 fixtures for Availability / Sellable and the canonical Operational Form form_key boundary.
 source_documents:
   - docs/documents/0. appendices/06-OPERATIONAL-FORM-KEY-V2-OWNER-ADDENDUM.md
+  - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
+  - docs/documents/3. tech/04-TECH-03-OPERATIONAL-CORE-PRODUCTION-WAREHOUSE-INVENTORY-TRACEABILITY-RECALL-SALE-LOCK.md
+  - docs/documents/3. tech/05-TECH-04-COMMERCE-RUNTIME-SELLABLE-GATE-QUOTE-CART-ORDER-PAYMENT-SHIPPING.md
 fixtures:
+  - file: availability-check.v2.request.fixture.json
+    contract_area: availability
+    provider: ops-core
+    consumers:
+      - business-platform
+    source_example: ../../examples/api/availability-check.v2.request.json
+    validates_against:
+      - ../../schemas/ops/availability-check-request.v2.schema.json
+  - file: availability-check.v2.response.fixture.json
+    contract_area: availability
+    provider: ops-core
+    consumers:
+      - business-platform
+    source_example: ../../examples/api/availability-check.v2.response.json
+    validates_against:
+      - ../../schemas/common/envelope.schema.json
+      - ../../schemas/ops/availability-check-result.v2.schema.json
+  - file: availability-check.v2.existence-all.request.fixture.json
+    contract_area: availability
+    provider: ops-core
+    consumers:
+      - business-platform
+    source_example: ../../examples/api/availability-check.v2.existence-all.request.json
+    validates_against:
+      - ../../schemas/ops/availability-check-request.v2.schema.json
+  - file: availability-check.v2.existence-all.response.fixture.json
+    contract_area: availability
+    provider: ops-core
+    consumers:
+      - business-platform
+    source_example: ../../examples/api/availability-check.v2.existence-all.response.json
+    validates_against:
+      - ../../schemas/common/envelope.schema.json
+      - ../../schemas/ops/availability-check-result.v2.schema.json
+  - file: availability-check.v2.rate-limited.fixture.json
+    contract_area: availability
+    provider: ops-core
+    consumers:
+      - business-platform
+    source_example: ../../examples/errors/availability-check-v2-rate-limited.example.json
+    validates_against:
+      - ../../schemas/common/envelope.schema.json
+      - ../../schemas/ops/availability-check-error.v2.schema.json
   - file: operational-form-material-intake.v2.fixture.json
     contract_area: operational-form
     provider: ops-core
