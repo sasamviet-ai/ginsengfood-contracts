@@ -52,13 +52,13 @@ const responseProfiles = {
 };
 
 const operations = [
-  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/stock-balances", operationId: "listStockBalancesV1", permission: "INVENTORY_BALANCE_VIEW", schema: "external-stock-balance.schema.json", fixture: "stock-balances", resource: "inventory.stock-balances", responseProfile: "inventory", sort: "stockBalanceId ASC", tombstone: "SNAPSHOT_ONLY_NO_TOMBSTONE", filters: ["skuId", "materialId", "warehouseId", "itemType"], fields: ["stock_balance_id", "item_type", "sku_id", "material_id", "batch_id", "lot_code", "warehouse_id", "warehouse_location_id", "on_hand_quantity", "available_quantity", "reserved_quantity", "quality_hold_quantity", "recall_hold_quantity", "sale_lock_quantity", "as_of"] },
-  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/ledger", operationId: "listInventoryLedgerV1", permission: "INVENTORY_LEDGER_VIEW", schema: "external-inventory-ledger-entry.schema.json", fixture: "inventory-ledger", resource: "inventory.ledger", responseProfile: "inventory", sort: "occurredAt ASC, ledgerEntryId ASC", tombstone: "APPEND_ONLY_NO_TOMBSTONE", filters: [], fields: ["ledger_entry_id", "append_only", "movement_type", "item_type", "sku_id", "material_id", "batch_id", "lot_code", "warehouse_id", "warehouse_location_id", "quantity_delta", "source_object_type", "source_object_id", "source_object_no", "occurred_at"] },
-  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/stock-alerts", operationId: "listStockAlertsV1", permission: "STOCK_ALERT_VIEW", schema: "external-stock-alert.schema.json", fixture: "stock-alerts", resource: "inventory.stock-alerts", responseProfile: "inventory", sort: "occurredAt ASC, stockAlertId ASC", tombstone: "APPEND_ONLY_LIFECYCLE_NO_TOMBSTONE", filters: ["skuId", "warehouseId", "status", "from", "to"], fields: ["stock_alert_id", "sku_id", "warehouse_id", "status", "available_stock", "yellow_threshold", "red_threshold", "stockout_risk_threshold", "occurred_at", "resolved_at"] },
-  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/allocations", operationId: "listInventoryAllocationsV1", permission: "INVENTORY_ALLOCATION_VIEW", schema: "external-inventory-allocation.schema.json", fixture: "inventory-allocations", resource: "inventory.allocations", responseProfile: "inventory", sort: "requestedAt DESC, allocationId DESC", tombstone: "STATE_REVISION_NO_TOMBSTONE", filters: [], fields: ["allocation_id", "allocation_no", "warehouse_id", "warehouse_location_id", "item_type", "item_id", "lot_code", "unit", "source_object_type", "source_object_id", "source_object_no", "allocated_quantity", "status", "requested_at", "confirmed_at", "released_at"] },
-  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouses", operationId: "listWarehousesV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse.schema.json", fixture: "warehouses", resource: "warehouses", responseProfile: "warehouse", sort: "warehouseCode ASC, warehouseId ASC", tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_id", "warehouse_code", "warehouse_name", "warehouse_type", "status"] },
-  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-locations", operationId: "listWarehouseLocationsV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse-location.schema.json", fixture: "warehouse-locations", resource: "warehouse-locations", responseProfile: "warehouse", sort: "locationCode ASC, warehouseLocationId ASC", tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_location_id", "warehouse_id", "location_code", "location_name", "location_type", "status"] },
-  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-receipts", operationId: "listWarehouseReceiptsV1", permission: "WAREHOUSE_RECEIPT_VIEW", schema: "external-warehouse-receipt.schema.json", fixture: "warehouse-receipts", resource: "warehouse-receipts", responseProfile: "warehouse", sort: "createdAt DESC, warehouseReceiptId DESC", tombstone: "STATE_REVISION_NO_TOMBSTONE", filters: ["status", "batchId", "warehouseId", "fromDate", "toDate"], fields: ["warehouse_receipt_id", "warehouse_receipt_no", "status", "batch_id", "warehouse_id", "warehouse_location_id", "received_quantity", "received_at", "confirmed_at", "created_at"] },
+  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/stock-balances", operationId: "listStockBalancesV1", permission: "INVENTORY_BALANCE_VIEW", schema: "external-stock-balance.schema.json", fixture: "stock-balances", resource: "inventory.stock-balances", responseProfile: "inventory", sort: "stockBalanceId ASC", order: [["stock_balance_id", "ASC"]], tombstone: "SNAPSHOT_ONLY_NO_TOMBSTONE", filters: ["skuId", "materialId", "warehouseId", "itemType"], fields: ["stock_balance_id", "item_type", "sku_id", "material_id", "batch_id", "lot_code", "warehouse_id", "warehouse_location_id", "on_hand_quantity", "available_quantity", "reserved_quantity", "quality_hold_quantity", "recall_hold_quantity", "sale_lock_quantity", "as_of"] },
+  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/ledger", operationId: "listInventoryLedgerV1", permission: "INVENTORY_LEDGER_VIEW", schema: "external-inventory-ledger-entry.schema.json", fixture: "inventory-ledger", resource: "inventory.ledger", responseProfile: "inventory", sort: "occurredAt ASC, ledgerEntryId ASC", order: [["occurred_at", "ASC"], ["ledger_entry_id", "ASC"]], tombstone: "APPEND_ONLY_NO_TOMBSTONE", filters: [], fields: ["ledger_entry_id", "append_only", "movement_type", "item_type", "sku_id", "material_id", "batch_id", "lot_code", "warehouse_id", "warehouse_location_id", "quantity_delta", "source_object_type", "source_object_id", "source_object_no", "occurred_at"] },
+  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/stock-alerts", operationId: "listStockAlertsV1", permission: "STOCK_ALERT_VIEW", schema: "external-stock-alert.schema.json", fixture: "stock-alerts", resource: "inventory.stock-alerts", responseProfile: "inventory", sort: "occurredAt ASC, stockAlertId ASC", order: [["occurred_at", "ASC"], ["stock_alert_id", "ASC"]], tombstone: "APPEND_ONLY_LIFECYCLE_NO_TOMBSTONE", filters: ["skuId", "warehouseId", "status", "from", "to"], fields: ["stock_alert_id", "sku_id", "warehouse_id", "status", "available_stock", "yellow_threshold", "red_threshold", "stockout_risk_threshold", "occurred_at", "resolved_at"] },
+  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/allocations", operationId: "listInventoryAllocationsV1", permission: "INVENTORY_ALLOCATION_VIEW", schema: "external-inventory-allocation.schema.json", fixture: "inventory-allocations", resource: "inventory.allocations", responseProfile: "inventory", sort: "requestedAt DESC, allocationId DESC", order: [["requested_at", "DESC"], ["allocation_id", "DESC"]], tombstone: "STATE_REVISION_NO_TOMBSTONE", filters: [], fields: ["allocation_id", "allocation_no", "warehouse_id", "warehouse_location_id", "item_type", "item_id", "lot_code", "unit", "source_object_type", "source_object_id", "source_object_no", "allocated_quantity", "status", "requested_at", "confirmed_at", "released_at"] },
+  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouses", operationId: "listWarehousesV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse.schema.json", fixture: "warehouses", resource: "warehouses", responseProfile: "warehouse", sort: "warehouseCode ASC, warehouseId ASC", order: [["warehouse_code", "ASC"], ["warehouse_id", "ASC"]], tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_id", "warehouse_code", "warehouse_name", "warehouse_type", "status"] },
+  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-locations", operationId: "listWarehouseLocationsV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse-location.schema.json", fixture: "warehouse-locations", resource: "warehouse-locations", responseProfile: "warehouse", sort: "locationCode ASC, warehouseLocationId ASC", order: [["location_code", "ASC"], ["warehouse_location_id", "ASC"]], tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_location_id", "warehouse_id", "location_code", "location_name", "location_type", "status"] },
+  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-receipts", operationId: "listWarehouseReceiptsV1", permission: "WAREHOUSE_RECEIPT_VIEW", schema: "external-warehouse-receipt.schema.json", fixture: "warehouse-receipts", resource: "warehouse-receipts", responseProfile: "warehouse", sort: "createdAt DESC, warehouseReceiptId DESC", order: [["created_at", "DESC"], ["warehouse_receipt_id", "DESC"]], tombstone: "STATE_REVISION_NO_TOMBSTONE", filters: ["status", "batchId", "warehouseId", "fromDate", "toDate"], fields: ["warehouse_receipt_id", "warehouse_receipt_no", "status", "batch_id", "warehouse_id", "warehouse_location_id", "received_quantity", "received_at", "confirmed_at", "created_at"] },
   { file: "openapi/ops-core/sku.v1.yaml", route: "/v1/skus/{skuId}/public", operationId: "getPublicSkuV1", permission: "SKU_CATALOG_VIEW", schema: "external-public-sku.schema.json", fixture: "public-sku", responseProfile: "sku", collection: false, fields: ["sku_id", "sku_code", "product_id", "public_name", "dietary_type", "product_group", "lifecycle_status"] }
 ];
 
@@ -195,7 +195,7 @@ function canonicalJson(value) {
   return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
 }
 
-function snapshotManifest(payload, operation) {
+function snapshotManifest(payload, operation, accumulatedSnapshotItems = payload.data) {
   return {
     manifest_version: payload.meta.manifest_version,
     resource: operation.resource,
@@ -203,12 +203,29 @@ function snapshotManifest(payload, operation) {
     as_of: payload.meta.as_of,
     high_watermark: payload.meta.high_watermark,
     item_count: payload.meta.item_count,
-    items: payload.data
+    items: accumulatedSnapshotItems
   };
 }
 
-function snapshotManifestSha256(payload, operation) {
-  return createHash("sha256").update(canonicalJson(snapshotManifest(payload, operation)), "utf8").digest("hex");
+function snapshotManifestSha256(payload, operation, accumulatedSnapshotItems = payload.data) {
+  return createHash("sha256")
+    .update(canonicalJson(snapshotManifest(payload, operation, accumulatedSnapshotItems)), "utf8")
+    .digest("hex");
+}
+
+function compareStableOrder(left, right, operation) {
+  for (const [field, direction] of operation.order) {
+    const comparison = left[field] < right[field] ? -1 : left[field] > right[field] ? 1 : 0;
+    if (comparison !== 0) return direction === "ASC" ? comparison : -comparison;
+  }
+  return 0;
+}
+
+function assertStableOrdered(items, operation) {
+  assert.ok(Array.isArray(operation.order) && operation.order.length > 0, `${operation.operationId} stable order definition missing`);
+  for (let index = 1; index < items.length; index += 1) {
+    assert.ok(compareStableOrder(items[index - 1], items[index], operation) <= 0, "accumulated snapshot must preserve stable order");
+  }
 }
 
 function validateSchema(schema, value, schemaFile, location = "$") {
@@ -272,7 +289,7 @@ function validateSchema(schema, value, schemaFile, location = "$") {
   }
 }
 
-function validatePayload(payload, operation) {
+function validatePayload(payload, operation, accumulatedSnapshotItems = payload.data) {
   assert.equal(payload.schemaVersion, "v1");
   const correlationSchema = loadSchema("schemas/common/correlation.schema.json");
   validateSchema(correlationSchema.schema, payload.correlation, correlationSchema.file, "$.correlation");
@@ -286,17 +303,32 @@ function validatePayload(payload, operation) {
   assert.ok(Array.isArray(payload.data));
   assert.ok(payload.data.length <= 100, "$.data maxItems");
   payload.data.forEach((item, index) => validateSchema(itemSchema.schema, item, itemSchema.file, `$.data[${index}]`));
+  assert.ok(Array.isArray(accumulatedSnapshotItems), "accumulated snapshot items must be an array");
+  accumulatedSnapshotItems.forEach((item, index) => validateSchema(itemSchema.schema, item, itemSchema.file, `snapshot[${index}]`));
   const metaSchema = loadSchema("schemas/ops/x03b/external-snapshot-meta.schema.json");
   validateSchema(metaSchema.schema, payload.meta, metaSchema.file, "$.meta");
   assert.equal(payload.meta.resource, operation.resource, "$.meta.resource scope mismatch");
   assert.equal(payload.meta.page_item_count, payload.data.length, "$.meta.page_item_count mismatch");
   assert.ok(payload.meta.delivered_item_count >= payload.meta.page_item_count, "$.meta.delivered_item_count below page count");
   assert.ok(payload.meta.delivered_item_count <= payload.meta.item_count, "$.meta.delivered_item_count exceeds full snapshot count");
+  assert.equal(
+    payload.meta.delivered_item_count,
+    accumulatedSnapshotItems.length,
+    "$.meta.delivered_item_count mismatch with accumulated snapshot"
+  );
+  assertStableOrdered(accumulatedSnapshotItems, operation);
+  const currentPageSuffix = payload.meta.page_item_count === 0
+    ? []
+    : accumulatedSnapshotItems.slice(-payload.meta.page_item_count);
+  assert.deepEqual(currentPageSuffix, payload.data, "current page must be the suffix of accumulated snapshot items");
   if (payload.meta.complete) {
     assert.equal(payload.meta.next_cursor, null, "$.meta.next_cursor must be null when complete");
     assert.equal(payload.meta.delivered_item_count, payload.meta.item_count, "$.meta.item_count must equal delivered full snapshot count");
-    assert.equal(payload.meta.delivered_item_count, payload.data.length, "complete canonical fixture must contain the full ordered snapshot");
-    assert.equal(payload.meta.manifest_sha256, snapshotManifestSha256(payload, operation), "$.meta.manifest_sha256 mismatch");
+    assert.equal(
+      payload.meta.manifest_sha256,
+      snapshotManifestSha256(payload, operation, accumulatedSnapshotItems),
+      "$.meta.manifest_sha256 mismatch"
+    );
   } else {
     assert.equal(typeof payload.meta.next_cursor, "string", "$.meta.next_cursor required while incomplete");
     assert.ok(payload.meta.next_cursor.length > 0, "$.meta.next_cursor required while incomplete");
@@ -346,6 +378,33 @@ for (const operation of operations) {
     }
   }
 }
+
+const warehouseOperation = operations[4];
+const warehousePageOne = parseJson("contract-tests/x03b/fixtures/warehouses.two-page.page-1.response.fixture.json");
+const warehousePageTwo = parseJson("contract-tests/x03b/fixtures/warehouses.two-page.page-2.response.fixture.json");
+const accumulatedWarehouseItems = [...warehousePageOne.data, ...warehousePageTwo.data];
+assert.equal(warehousePageOne.meta.snapshot_id, warehousePageTwo.meta.snapshot_id);
+assert.equal(warehousePageOne.meta.manifest_sha256, warehousePageTwo.meta.manifest_sha256);
+assert.ok(warehousePageTwo.meta.page_item_count < warehousePageTwo.meta.delivered_item_count);
+assert.equal(warehousePageTwo.meta.delivered_item_count, warehousePageTwo.meta.item_count);
+validatePayload(warehousePageOne, warehouseOperation, warehousePageOne.data);
+validatePayload(warehousePageTwo, warehouseOperation, accumulatedWarehouseItems);
+
+assert.throws(
+  () => validatePayload(warehousePageTwo, warehouseOperation, [...accumulatedWarehouseItems].reverse()),
+  /stable order/
+);
+
+const priorPageTamper = structuredClone(accumulatedWarehouseItems);
+priorPageTamper[0].warehouse_name = "Tampered prior-page warehouse";
+assert.throws(() => validatePayload(warehousePageTwo, warehouseOperation, priorPageTamper), /manifest_sha256/);
+
+const finalPageTamper = structuredClone(warehousePageTwo);
+finalPageTamper.data[0].warehouse_name = "Tampered final-page warehouse";
+assert.throws(
+  () => validatePayload(finalPageTamper, warehouseOperation, [...warehousePageOne.data, ...finalPageTamper.data]),
+  /manifest_sha256/
+);
 
 const allocation = parseJson("examples/api/x03b/inventory-allocations.response.json");
 allocation.data[0].source_object_id = "order-line-from-position-1";
@@ -462,4 +521,4 @@ for (const profile of Object.values(responseProfiles)) {
   }
 }
 
-console.log(`X03B external bulk-read contract PASS: ${operations.length}/8 operations, positive examples/fixtures, and negative tamper checks.`);
+console.log(`X03B external bulk-read contract PASS: ${operations.length}/8 operations, one-page/empty/two-page snapshots, and negative tamper checks.`);
