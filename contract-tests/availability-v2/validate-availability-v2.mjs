@@ -88,7 +88,7 @@ function absolute(relativePath) {
 }
 
 function readText(relativePath) {
-  return fs.readFileSync(absolute(relativePath), "utf8");
+  return fs.readFileSync(absolute(relativePath), "utf8").replace(/\r\n?/g, "\n");
 }
 
 function readJson(relativePath) {
