@@ -57,6 +57,28 @@ paths:
         recompute_source: OPERATIONAL_TRUTH
         failure_mode: UNKNOWN_BLOCK
         cached_sellable_reuse_allowed: false
+      x-recheck-policy:
+        required_checkpoints:
+          - QUOTE_CREATE
+          - CHECKOUT_SUBMIT
+          - ORDER_CONFIRM
+          - BEFORE_FULFILLMENT
+          - BEFORE_SHIP
+      x-invalidation-policy:
+        target_seconds: 1
+        triggers:
+          - INVENTORY_LEDGER_CHANGED
+          - STOCK_BALANCE_CHANGED
+          - RESERVATION_CHANGED
+          - WAREHOUSE_RECEIPT_CHANGED
+          - BATCH_RELEASED_OR_REVOKED
+          - QC_OR_QUALITY_HOLD_CHANGED
+          - HSD_VALIDITY_CHANGED
+          - TRACE_READINESS_CHANGED
+          - RECALL_CHANGED
+          - SALE_LOCK_CHANGED
+          - SKU_ACTIVATION_CHANGED
+          - SELL_UOM_CHANGED
       x-rate-limit-policy:
         policy: ExternalAvailabilityCheck
         sustained_rps_per_principal: 10
@@ -72,7 +94,9 @@ paths:
         max_retry: 1
         total_retry_budget_seconds: 5
         retry_http_statuses: [408, 429, 502, 503, 504]
-        non_retry_http_statuses: [400, 401, 403, 404, 409, 422]
+        non_retry_http_statuses: [400, 401, 403, 404, 409, 415, 422, 500]
+        operation_emits_409: false
+        unexpected_409_behavior: UNKNOWN_BLOCK_NO_RETRY
         honor_retry_after: true
         backoff: FULL_JITTER
         backoff_base_ms: 100
@@ -94,6 +118,8 @@ paths:
             examples:
               fullFillWarehouse:
                 externalValue: "../../examples/api/availability-check.v2.request.json"
+              existenceAll:
+                externalValue: "../../examples/api/availability-check.v2.existence-all.request.json"
       responses:
         "200": { $ref: "#/components/responses/AvailabilityResolved" }
         "400": { $ref: "#/components/responses/InvalidRequest" }
@@ -116,6 +142,138 @@ components:
       $ref: "../../schemas/ops/availability-check-success.v2.schema.json"
     AvailabilityCheckError:
       $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+    InvalidRequestError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: INVALID_REQUEST }
+                http_status: { const: 400 }
+                retryable: { const: false }
+    UnauthorizedError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: UNAUTHORIZED }
+                http_status: { const: 401 }
+                retryable: { const: false }
+    ForbiddenError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: FORBIDDEN }
+                http_status: { const: 403 }
+                retryable: { const: false }
+    WarehouseNotFoundError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: WAREHOUSE_NOT_FOUND }
+                http_status: { const: 404 }
+                retryable: { const: false }
+    RequestTimeoutError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: REQUEST_TIMEOUT }
+                http_status: { const: 408 }
+                retryable: { const: true }
+    UnsupportedMediaTypeError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: UNSUPPORTED_MEDIA_TYPE }
+                http_status: { const: 415 }
+                retryable: { const: false }
+    ValidationFailedError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: VALIDATION_FAILED }
+                http_status: { const: 422 }
+                retryable: { const: false }
+    RateLimitedError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: RATE_LIMITED }
+                http_status: { const: 429 }
+                retryable: { const: true }
+    InternalErrorEnvelope:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: INTERNAL_ERROR }
+                http_status: { const: 500 }
+                retryable: { const: false }
+    BadGatewayError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: UPSTREAM_UNAVAILABLE }
+                http_status: { const: 502 }
+                retryable: { const: true }
+    ServiceUnavailableError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: UPSTREAM_UNAVAILABLE }
+                http_status: { const: 503 }
+                retryable: { const: true }
+    GatewayTimeoutError:
+      allOf:
+        - $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+        - type: object
+          properties:
+            error:
+              type: object
+              properties:
+                code: { const: UPSTREAM_TIMEOUT }
+                http_status: { const: 504 }
+                retryable: { const: true }
   headers:
     CacheControlNoStore:
       description: Required. Availability responses must not be stored by provider/intermediary caches.
@@ -159,50 +317,76 @@ components:
       content:
         application/json:
           schema: { $ref: "../../schemas/ops/availability-check-success.v2.schema.json" }
+          examples:
+            fullFillWarehouse:
+              externalValue: "../../examples/api/availability-check.v2.response.json"
+            existenceAll:
+              externalValue: "../../examples/api/availability-check.v2.existence-all.response.json"
     InvalidRequest:
       description: Malformed JSON or request framing; not retryable.
       x-error-code: INVALID_REQUEST
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/InvalidRequestError" }
     Unauthorized:
       description: Missing or invalid service bearer; not retryable.
       x-error-code: UNAUTHORIZED
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/UnauthorizedError" }
     Forbidden:
       description: Wrong token_use, audience, SELLABLE_CHECK permission, or SERVICE scope; not retryable.
       x-error-code: FORBIDDEN
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/ForbiddenError" }
     WarehouseNotFound:
       description: Supplied warehouse is missing, inactive, or inaccessible; no fallback and not retryable.
       x-error-code: WAREHOUSE_NOT_FOUND
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/WarehouseNotFoundError" }
     RequestTimeout:
       description: Resolution exceeded the two-second server budget; fail closed.
       x-error-code: REQUEST_TIMEOUT
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/RequestTimeoutError" }
     UnsupportedMediaType:
       description: Request Content-Type is not application/json; not retryable.
       x-error-code: UNSUPPORTED_MEDIA_TYPE
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/UnsupportedMediaTypeError" }
     ValidationFailed:
       description: >-
         Contract or semantic validation failed, including malformed UUID, non-positive/over-precision
         quantity, inactive/unapproved UOM, or case mismatch; not retryable.
       x-error-code: VALIDATION_FAILED
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/ValidationFailedError" }
     RateLimited:
       description: ExternalAvailabilityCheck limit exceeded; fail closed and honor Retry-After.
       x-error-code: RATE_LIMITED
@@ -215,34 +399,46 @@ components:
         X-RateLimit-Reset: { $ref: "#/components/headers/RateLimitReset" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/RateLimitedError" }
           examples:
             rateLimited:
               externalValue: "../../examples/errors/availability-check-v2-rate-limited.example.json"
     InternalError:
       description: Safe internal failure with no topology, credentials, or stack trace; not retryable.
       x-error-code: INTERNAL_ERROR
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/InternalErrorEnvelope" }
     UpstreamUnavailable:
       description: Operational Truth dependency returned an invalid gateway response; fail closed.
       x-error-code: UPSTREAM_UNAVAILABLE
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/BadGatewayError" }
     ServiceUnavailable:
       description: Provider or Operational Truth dependency is unavailable; fail closed.
       x-error-code: UPSTREAM_UNAVAILABLE
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/ServiceUnavailableError" }
     UpstreamTimeout:
       description: Operational Truth dependency timed out; fail closed.
       x-error-code: UPSTREAM_TIMEOUT
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
       content:
         application/json:
-          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          schema: { $ref: "#/components/schemas/GatewayTimeoutError" }
   securitySchemes:
     serviceBearer:
       type: http
