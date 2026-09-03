@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-warehouse.schema.json",
+  "title": "External warehouse projection",
+  "description": "Warehouse registry whitelist without MISA, source, evidence, or audit fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "warehouse_id": { "type": "string", "format": "uuid" },
+    "warehouse_code": { "type": "string", "minLength": 1 },
+    "warehouse_name": { "type": "string", "minLength": 1 },
+    "warehouse_type": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+  },
+  "required": ["warehouse_id", "warehouse_code", "warehouse_name", "warehouse_type", "status"]
+}

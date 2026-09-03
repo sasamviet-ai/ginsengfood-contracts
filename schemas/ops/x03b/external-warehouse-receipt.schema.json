@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-warehouse-receipt.schema.json",
+  "title": "External warehouse receipt projection",
+  "description": "Read-only warehouse-receipt whitelist without actor, reason, scan, ledger, evidence, audit, or MISA fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "warehouse_receipt_id": { "type": "string", "format": "uuid" },
+    "warehouse_receipt_no": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["DRAFT", "PENDING_CONFIRMATION", "CONFIRMED", "BLOCKED", "REJECTED"] },
+    "batch_id": { "type": "string", "format": "uuid" },
+    "warehouse_id": { "type": "string", "format": "uuid" },
+    "warehouse_location_id": { "type": "string", "format": "uuid" },
+    "received_quantity": { "$ref": "external-quantity.schema.json" },
+    "received_at": { "type": "string", "format": "date-time" },
+    "confirmed_at": { "type": "string", "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "required": ["warehouse_receipt_id", "warehouse_receipt_no", "status", "batch_id", "warehouse_id", "received_quantity", "created_at"]
+}

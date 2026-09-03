@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-snapshot-meta.schema.json",
+  "title": "External bulk-read snapshot cursor metadata",
+  "description": "Integrity-bound full-snapshot pagination metadata; v1 does not publish delta feeds.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "cursor_version": { "type": "integer", "const": 1 },
+    "snapshot_id": { "type": "string", "format": "uuid" },
+    "as_of": { "type": "string", "format": "date-time" },
+    "high_watermark": { "type": "string", "minLength": 1 },
+    "next_cursor": { "type": ["string", "null"], "minLength": 1 },
+    "item_count": { "type": "integer", "minimum": 0, "description": "Total item count bound into the full snapshot manifest." },
+    "complete": { "type": "boolean", "description": "True only when the full snapshot has been delivered and its count/hash can be reconciled." },
+    "manifest_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Lowercase SHA-256 for the canonical full-snapshot manifest." },
+    "delta_supported": { "type": "boolean", "const": false }
+  },
+  "required": ["cursor_version", "snapshot_id", "as_of", "high_watermark", "next_cursor", "item_count", "complete", "manifest_sha256", "delta_supported"]
+}

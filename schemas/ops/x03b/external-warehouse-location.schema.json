@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-warehouse-location.schema.json",
+  "title": "External warehouse location projection",
+  "description": "Warehouse-location registry whitelist without source, evidence, audit, or internal fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "warehouse_location_id": { "type": "string", "format": "uuid" },
+    "warehouse_id": { "type": "string", "format": "uuid" },
+    "location_code": { "type": "string", "minLength": 1 },
+    "location_name": { "type": "string", "minLength": 1 },
+    "location_type": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+  },
+  "required": ["warehouse_location_id", "warehouse_id", "location_code", "location_name", "location_type", "status"]
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "v1",
+  "correlation": { "correlationId": "corr-x03b-stock-alert" },
+  "data": [{
+    "stock_alert_id": "13000000-0000-4000-8000-000000000001",
+    "sku_id": "20000000-0000-4000-8000-000000000001",
+    "warehouse_id": "40000000-0000-4000-8000-000000000001",
+    "status": "STOCK_YELLOW_ALERT",
+    "available_stock": { "value": "100.000", "unit": "BOX" },
+    "yellow_threshold": { "value": "120.000", "unit": "BOX" },
+    "red_threshold": { "value": "60.000", "unit": "BOX" },
+    "stockout_risk_threshold": { "value": "30.000", "unit": "BOX" },
+    "occurred_at": "2026-09-03T00:45:00Z"
+  }],
+  "meta": {
+    "cursor_version": 1,
+    "snapshot_id": "11000000-0000-4000-8000-000000000003",
+    "as_of": "2026-09-03T01:00:00Z",
+    "high_watermark": "stock-alert-0001",
+    "next_cursor": null,
+    "item_count": 1,
+    "complete": true,
+    "manifest_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "delta_supported": false
+  }
+}

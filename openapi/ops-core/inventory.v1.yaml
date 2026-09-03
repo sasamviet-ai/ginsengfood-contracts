@@ -2,103 +2,218 @@ openapi: 3.1.0
 info:
   title: Ops Core Inventory API
   version: 1.0.0
-  description: Inventory v1 API contract for stock balances, ledger reads, and stock alerts. Inventory Ledger is append-only and is not directly mutable through consumer API.
+  description: >-
+    Protected external inventory read facades. Every operation is read-only, uses a dedicated
+    response whitelist, and must not mutate inventory truth. Collection reads use opaque,
+    scope-bound full-snapshot cursors; delta feeds are not published in v1.
 servers:
   - url: https://api.example.local
     description: Placeholder only.
+x-owner-decision-ref: OWNER-DIRECTIVE-2026-09-03-EXT-OD-01-07
+x-rate-limit-policies:
+  ExternalBulkRead:
+    sustained_rps_per_principal: 2
+    burst_per_principal: 4
+    fleet_rps: 10
+    fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+    server_timeout_seconds: 10
+    queue_limit: 0
+    partition_claims: [token_use, sub]
+    required_token_use: service
+    principal_sub_format: uuid
+    limiter_authority: DISTRIBUTED_INGRESS_TOKEN_BUCKET
+    in_process_limiter: DEFENSE_IN_DEPTH_ONLY
+    pre_auth_partition: TRUSTED_PROXY_VERIFIED_IP_ONLY
+    fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
+    startup_fail_closed: true
+    exhausted_or_unavailable_behavior: FAIL_CLOSED_NO_CACHED_PASS
+x-retry-policies:
+  ExternalBulkReadRetry:
+    max_retries: 2
+    total_budget_seconds: 30
+    retryable_statuses: [408, 429, 502, 503, 504]
+    non_retryable_statuses: [400, 401, 403, 404, 409, 410, 422]
+    honor_retry_after: true
+    backoff: FULL_JITTER_BASE_500MS_CAP_5S
+x-pagination-policies:
+  ExternalSnapshotCursorV1:
+    mode: OPAQUE_SCOPE_BOUND_SNAPSHOT_CURSOR
+    cursor_version: 1
+    cursor_ttl_seconds: 1800
+    cursor_ttl_mode: ABSOLUTE_NON_SLIDING
+    integrity_protected: true
+    default_limit: 50
+    max_limit: 100
+    delta_supported: false
+    delta_replay_retention_seconds: 604800
+    delta_poll_seconds: 30
+    delta_poll_jitter_percent: 20
+    future_tombstone_retention_seconds: 7776000
+    snapshot_refresh_seconds: 300
+    full_reconciliation_seconds: 21600
+    full_reconciliation_triggers: [STARTUP, RESUME, CHANGE_FEED_GAP, CURSOR_EXPIRED]
+    gap_reconcile_start_within_seconds: 60
+    cursor_bindings: [operation, resource, filters, sort, scope, principal, snapshot, high_watermark]
+    gap_recovery: FAIL_CLOSED_FULL_RECONCILE
+    expired_cursor_recovery: FULL_RECONCILE_NO_TIMESTAMP_OR_LOCAL_CHECKPOINT
+    absence_reconcile_requires: FULL_SNAPSHOT_COMPLETE_VERIFIED_MANIFEST_COUNT_HASH
 paths:
   /v1/inventory/stock-balances:
     get:
-      summary: List stock balances
-      description: Returns derived stock balances. This API is available to business-platform for sellable/availability checks but must not mutate ops-core inventory truth.
+      summary: List external stock balance projections
+      description: Returns a derived, read-only stock snapshot. This snapshot is not final sell authority and cannot be used to mutate the ledger.
       operationId: listStockBalancesV1
       tags: [inventory]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-permission: INVENTORY_BALANCE_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-pagination-policy: ExternalSnapshotCursorV1
+      x-delta-supported: false
+      x-stable-sort: "stockBalanceId ASC"
+      x-tombstone-policy: SNAPSHOT_ONLY_NO_TOMBSTONE
       parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
         - name: skuId
           in: query
           required: false
-          schema: { type: string }
+          schema: { type: string, format: uuid }
         - name: materialId
           in: query
           required: false
-          schema: { type: string }
+          schema: { type: string, format: uuid }
         - name: warehouseId
           in: query
           required: false
-          schema: { type: string }
+          schema: { type: string, format: uuid }
         - name: itemType
           in: query
           required: false
           schema: { type: string, enum: [MATERIAL, PACKAGING, FINISHED_GOOD] }
       responses:
         "200":
-          description: Stock balances wrapped in the common envelope.
+          description: Stable stock-balance snapshot page; empty snapshots return data=[] with complete=true.
           content:
             application/json:
               schema:
                 allOf:
                   - $ref: "../../schemas/common/envelope.schema.json"
                   - type: object
+                    required: [schemaVersion, correlation, data, meta]
                     properties:
                       data:
                         type: array
+                        maxItems: 100
                         items:
-                          $ref: "../../schemas/ops/stock-balance.schema.json"
-        "400": { $ref: "#/components/responses/BadRequest" }
+                          $ref: "../../schemas/ops/x03b/external-stock-balance.schema.json"
+                      meta:
+                        $ref: "../../schemas/ops/x03b/external-snapshot-meta.schema.json"
+        "400": { $ref: "#/components/responses/CursorInvalid" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
-        "409": { $ref: "#/components/responses/Conflict" }
+        "408": { $ref: "#/components/responses/RequestTimeout" }
+        "409": { $ref: "#/components/responses/ChangeFeedGap" }
+        "410": { $ref: "#/components/responses/CursorExpired" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
         "500": { $ref: "#/components/responses/InternalServerError" }
+        "502": { $ref: "#/components/responses/BadGateway" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+        "504": { $ref: "#/components/responses/GatewayTimeout" }
   /v1/inventory/ledger:
     get:
-      summary: List inventory ledger entries
-      description: Returns inventory ledger entries for audit/ops views. No POST/PATCH/DELETE is exposed here because consumer APIs must not directly edit ledger truth.
+      summary: List external inventory ledger entries
+      description: Returns append-only ledger projections. The route has no mutation, delete, or tombstone behavior.
       operationId: listInventoryLedgerV1
       tags: [inventory]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-permission: INVENTORY_LEDGER_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-pagination-policy: ExternalSnapshotCursorV1
+      x-delta-supported: false
+      x-stable-sort: "occurredAt ASC, ledgerEntryId ASC"
+      x-tombstone-policy: APPEND_ONLY_NO_TOMBSTONE
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
       responses:
         "200":
-          description: Inventory ledger entries wrapped in the common envelope.
+          description: Stable append-only ledger snapshot page.
           content:
             application/json:
               schema:
                 allOf:
                   - $ref: "../../schemas/common/envelope.schema.json"
                   - type: object
+                    required: [schemaVersion, correlation, data, meta]
                     properties:
                       data:
                         type: array
+                        maxItems: 100
                         items:
-                          $ref: "../../schemas/ops/inventory-ledger.schema.json"
-        "400": { $ref: "#/components/responses/BadRequest" }
+                          $ref: "../../schemas/ops/x03b/external-inventory-ledger-entry.schema.json"
+                      meta:
+                        $ref: "../../schemas/ops/x03b/external-snapshot-meta.schema.json"
+        "400": { $ref: "#/components/responses/CursorInvalid" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
-        "409": { $ref: "#/components/responses/Conflict" }
+        "408": { $ref: "#/components/responses/RequestTimeout" }
+        "409": { $ref: "#/components/responses/ChangeFeedGap" }
+        "410": { $ref: "#/components/responses/CursorExpired" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
         "500": { $ref: "#/components/responses/InternalServerError" }
+        "502": { $ref: "#/components/responses/BadGateway" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+        "504": { $ref: "#/components/responses/GatewayTimeout" }
   /v1/inventory/stock-alerts:
     get:
-      summary: List stock alerts
-      description: Lists stock alert contracts for ops-core planning. FGSA-01 scope is SKU + warehouse aggregate; batch/location evidence is optional and channel-specific policy is deferred.
+      summary: List external stock alert projections
+      description: Returns append-only lifecycle alert projections without internal calculation, evidence, or actor detail.
       operationId: listStockAlertsV1
       tags: [inventory]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-permission: STOCK_ALERT_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-pagination-policy: ExternalSnapshotCursorV1
+      x-delta-supported: false
+      x-stable-sort: "occurredAt ASC, stockAlertId ASC"
+      x-tombstone-policy: APPEND_ONLY_LIFECYCLE_NO_TOMBSTONE
       parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
         - name: skuId
           in: query
           required: false
-          schema: { type: string }
+          schema: { type: string, format: uuid }
         - name: warehouseId
           in: query
           required: false
-          schema: { type: string }
+          schema: { type: string, format: uuid }
         - name: status
           in: query
           required: false
-          schema:
-            type: string
-            enum: [STOCK_OK, STOCK_YELLOW_ALERT, STOCK_RED_ALERT, STOCKOUT_RISK, STOCK_ZERO_OR_NOT_SELLABLE]
+          schema: { type: string, enum: [STOCK_OK, STOCK_YELLOW_ALERT, STOCK_RED_ALERT, STOCKOUT_RISK, STOCK_ZERO_OR_NOT_SELLABLE] }
         - name: from
           in: query
           required: false
@@ -109,39 +224,136 @@ paths:
           schema: { type: string, format: date-time }
       responses:
         "200":
-          description: Stock alerts wrapped in the common envelope.
+          description: Stable stock-alert snapshot page.
           content:
             application/json:
               schema:
                 allOf:
                   - $ref: "../../schemas/common/envelope.schema.json"
                   - type: object
+                    required: [schemaVersion, correlation, data, meta]
                     properties:
                       data:
                         type: array
+                        maxItems: 100
                         items:
-                          $ref: "../../schemas/ops/stock-alert.schema.json"
-        "400": { $ref: "#/components/responses/BadRequest" }
+                          $ref: "../../schemas/ops/x03b/external-stock-alert.schema.json"
+                      meta:
+                        $ref: "../../schemas/ops/x03b/external-snapshot-meta.schema.json"
+        "400": { $ref: "#/components/responses/CursorInvalid" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
-        "409": { $ref: "#/components/responses/Conflict" }
+        "408": { $ref: "#/components/responses/RequestTimeout" }
+        "409": { $ref: "#/components/responses/ChangeFeedGap" }
+        "410": { $ref: "#/components/responses/CursorExpired" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
         "500": { $ref: "#/components/responses/InternalServerError" }
+        "502": { $ref: "#/components/responses/BadGateway" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+        "504": { $ref: "#/components/responses/GatewayTimeout" }
+  /v1/inventory/allocations:
+    get:
+      summary: List external inventory allocation projections
+      description: >-
+        Returns read-only allocation state. EXTERNAL_ORDER_ITEM source_object_id is the stable
+        order_item_id UUID; it must never be synthesized from order header, SKU, ordinal, hash,
+        or allocation ID. This route does not reserve, confirm, release, or write ledger entries.
+      operationId: listInventoryAllocationsV1
+      tags: [inventory]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-permission: INVENTORY_ALLOCATION_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-pagination-policy: ExternalSnapshotCursorV1
+      x-delta-supported: false
+      x-stable-sort: "requestedAt DESC, allocationId DESC"
+      x-tombstone-policy: STATE_REVISION_NO_TOMBSTONE
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Stable allocation snapshot page; absent items are not deletions.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    required: [schemaVersion, correlation, data, meta]
+                    properties:
+                      data:
+                        type: array
+                        maxItems: 100
+                        items:
+                          $ref: "../../schemas/ops/x03b/external-inventory-allocation.schema.json"
+                      meta:
+                        $ref: "../../schemas/ops/x03b/external-snapshot-meta.schema.json"
+        "400": { $ref: "#/components/responses/CursorInvalid" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "408": { $ref: "#/components/responses/RequestTimeout" }
+        "409": { $ref: "#/components/responses/ChangeFeedGap" }
+        "410": { $ref: "#/components/responses/CursorExpired" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+        "502": { $ref: "#/components/responses/BadGateway" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+        "504": { $ref: "#/components/responses/GatewayTimeout" }
 components:
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Opaque server-issued cursor bound to operation, filters, scope, principal, snapshot, and high-watermark. Omit on first page.
+      schema: { type: string, minLength: 1 }
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
   schemas:
     ErrorEnvelope:
       allOf:
         - $ref: "../../schemas/common/envelope.schema.json"
         - type: object
+          required: [schemaVersion, error]
           properties:
             error:
-              $ref: "../../schemas/common/error.schema.json"
+              $ref: "../../schemas/ops/x03b/external-bulk-read-error.schema.json"
   responses:
-    BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
-    Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
-    Forbidden: { description: Permission denied., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
-    NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
-    Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
-    UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
-    InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    CursorInvalid: { description: CURSOR_INVALID for malformed, tampered, or wrong-scope cursor., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Unauthorized: { description: Safe authentication failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    Forbidden: { description: Required operation permission or SERVICE scope is missing., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    NotFound: { description: Filtered resource scope is not found or inaccessible., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    RequestTimeout: { description: Request timed out before a safe snapshot page was returned., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    ChangeFeedGap: { description: CHANGE_FEED_GAP; discard the partial page and start fail-closed full reconciliation., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    CursorExpired: { description: CURSOR_EXPIRED after the absolute 30-minute TTL; restart full reconciliation., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    UnprocessableEntity: { description: Query validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    TooManyRequests:
+      description: RATE_LIMITED; caller must honor Retry-After and the 30-second total retry budget.
+      headers:
+        Retry-After: { required: true, schema: { type: integer, minimum: 1 } }
+        X-RateLimit-Limit: { required: true, schema: { type: integer, const: 2 } }
+        X-RateLimit-Remaining: { required: true, schema: { type: integer, minimum: 0 } }
+        X-RateLimit-Reset: { required: true, schema: { type: integer, minimum: 1 } }
+      content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } }
+    InternalServerError: { description: Safe internal error without stack trace or partition key., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    BadGateway: { description: Upstream bad gateway; retry only within ExternalBulkReadRetry., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    ServiceUnavailable: { description: Service unavailable; retry only within ExternalBulkReadRetry., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    GatewayTimeout: { description: Gateway timeout; retry only within ExternalBulkReadRetry., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+  securitySchemes:
+    ServiceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

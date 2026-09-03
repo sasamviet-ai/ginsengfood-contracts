@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "v1",
+  "correlation": { "correlationId": "corr-x03b-public-sku" },
+  "data": {
+    "sku_id": "20000000-0000-4000-8000-000000000001",
+    "sku_code": "A1",
+    "product_id": "21000000-0000-4000-8000-000000000001",
+    "public_name": "Ginseng Rice A1",
+    "dietary_type": "VEGAN",
+    "product_group": "GINSENG_RICE",
+    "lifecycle_status": "ACTIVE"
+  }
+}
