@@ -62,11 +62,26 @@ const operations = [
   { file: "openapi/ops-core/sku.v1.yaml", route: "/v1/skus/{skuId}/public", operationId: "getPublicSkuV1", permission: "SKU_CATALOG_VIEW", schema: "external-public-sku.schema.json", fixture: "public-sku", responseProfile: "sku", collection: false, fields: ["sku_id", "sku_code", "product_id", "public_name", "dietary_type", "product_group", "lifecycle_status"] }
 ];
 
-const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
+const normalizeNewlines = text => text.replace(/\r\n?/g, "\n");
+const read = relative => normalizeNewlines(fs.readFileSync(path.join(root, relative), "utf8"));
 const parseJson = relative => JSON.parse(read(relative));
 
+function replaceNormalizedText(text, current, replacement, context) {
+  const normalizedText = normalizeNewlines(text);
+  const normalizedCurrent = normalizeNewlines(current);
+  const normalizedReplacement = normalizeNewlines(replacement);
+  const start = normalizedText.indexOf(normalizedCurrent);
+  assert.notEqual(start, -1, `${context} target missing`);
+  assert.equal(
+    normalizedText.indexOf(normalizedCurrent, start + normalizedCurrent.length),
+    -1,
+    `${context} target must be unique`
+  );
+  return `${normalizedText.slice(0, start)}${normalizedReplacement}${normalizedText.slice(start + normalizedCurrent.length)}`;
+}
+
 function extractPathBlock(text, route) {
-  const lines = text.split(/\r?\n/);
+  const lines = normalizeNewlines(text).split("\n");
   const start = lines.findIndex(line => line === `  ${route}:`);
   assert.notEqual(start, -1, `missing route ${route}`);
   let end = lines.length;
@@ -84,7 +99,7 @@ function extractPathBlock(text, route) {
 }
 
 function extractMethodBlock(pathBlock, method) {
-  const lines = pathBlock.split(/\r?\n/);
+  const lines = normalizeNewlines(pathBlock).split("\n");
   const start = lines.findIndex(line => line === `    ${method}:`);
   assert.notEqual(start, -1, `missing ${method} method`);
   let end = lines.length;
@@ -98,7 +113,7 @@ function extractMethodBlock(pathBlock, method) {
 }
 
 function extractResponseComponentBlock(text, component) {
-  const lines = text.split(/\r?\n/);
+  const lines = normalizeNewlines(text).split("\n");
   const componentsStart = lines.findIndex(line => line === "components:");
   const responsesStart = lines.findIndex((line, index) => index > componentsStart && line === "  responses:");
   assert.ok(responsesStart > componentsStart, "components.responses missing");
@@ -115,7 +130,7 @@ function extractResponseComponentBlock(text, component) {
 }
 
 function assertOperationErrorMappings(operation, textOverride) {
-  const text = textOverride ?? read(operation.file);
+  const text = normalizeNewlines(textOverride ?? read(operation.file));
   const methodBlock = extractMethodBlock(extractPathBlock(text, operation.route), "get");
   for (const [status, expected] of Object.entries(responseProfiles[operation.responseProfile])) {
     assert.match(
@@ -135,7 +150,7 @@ function assertOperationErrorMappings(operation, textOverride) {
 }
 
 function assertOperationContract(operation, textOverride) {
-  const text = textOverride ?? read(operation.file);
+  const text = normalizeNewlines(textOverride ?? read(operation.file));
   const block = extractMethodBlock(extractPathBlock(text, operation.route), "get");
   assert.match(block, new RegExp(`operationId: ${operation.operationId}\\b`));
   assert.match(block, /security:\n\s+- ServiceBearer: \[\]/);
@@ -359,7 +374,10 @@ for (const operation of operations) {
     const tamperedPathBlock = sourcePathBlock.replace(expectedRef, `"${status}": { $ref: "#/components/responses/DefinitelyWrong" }`);
     assert.notEqual(tamperedPathBlock, sourcePathBlock, `${operation.operationId} response ${status} tamper setup failed`);
     assert.throws(
-      () => assertOperationErrorMappings(operation, sourceText.replace(sourcePathBlock, tamperedPathBlock)),
+      () => assertOperationErrorMappings(
+        operation,
+        replaceNormalizedText(sourceText, sourcePathBlock, tamperedPathBlock, `${operation.operationId} path tamper`)
+      ),
       /response .* component drift/
     );
 
@@ -372,12 +390,31 @@ for (const operation of operations) {
       const tamperedComponent = componentBlock.replace(needle, replacement);
       assert.notEqual(tamperedComponent, componentBlock, `${expected.component} metadata tamper setup failed`);
       assert.throws(
-        () => assertOperationErrorMappings(operation, sourceText.replace(componentBlock, tamperedComponent)),
+        () => assertOperationErrorMappings(
+          operation,
+          replaceNormalizedText(sourceText, componentBlock, tamperedComponent, `${expected.component} metadata tamper`)
+        ),
         failurePattern
       );
     }
   }
 }
+
+const crlfInventoryText = read(operations[0].file).replaceAll("\n", "\r\n");
+assertOperationContract(operations[0], crlfInventoryText);
+const crlfInventoryPathBlock = extractPathBlock(crlfInventoryText, operations[0].route);
+const crlfTamperedPathBlock = crlfInventoryPathBlock.replace(
+  '"401": { $ref: "#/components/responses/Unauthorized" }',
+  '"401": { $ref: "#/components/responses/DefinitelyWrong" }'
+);
+assert.notEqual(crlfTamperedPathBlock, crlfInventoryPathBlock, "CRLF tamper setup failed");
+assert.throws(
+  () => assertOperationErrorMappings(
+    operations[0],
+    replaceNormalizedText(crlfInventoryText, crlfInventoryPathBlock, crlfTamperedPathBlock, "CRLF path tamper")
+  ),
+  /response .* component drift/
+);
 
 const warehouseOperation = operations[4];
 const warehousePageOne = parseJson("contract-tests/x03b/fixtures/warehouses.two-page.page-1.response.fixture.json");
@@ -466,20 +503,24 @@ for (const filter of ["status", "batchId", "warehouseId", "fromDate", "toDate"])
   assert.match(receiptBlock, new RegExp(`name: ${filter}\\b`), `receipt filter ${filter} missing`);
 }
 
-const warehouseBase = execFileSync("git", ["show", `${baseSha}:openapi/ops-core/warehouse.v1.yaml`], { cwd: root, encoding: "utf8" });
+const warehouseBase = normalizeNewlines(
+  execFileSync("git", ["show", `${baseSha}:openapi/ops-core/warehouse.v1.yaml`], { cwd: root, encoding: "utf8" })
+);
 assert.equal(
   extractMethodBlock(extractPathBlock(warehouseNow, "/v1/warehouse-receipts"), "post").trim(),
   extractMethodBlock(extractPathBlock(warehouseBase, "/v1/warehouse-receipts"), "post").trim(),
-  "POST /v1/warehouse-receipts must remain byte-equivalent at the method block"
+  "POST /v1/warehouse-receipts must remain newline-normalized equivalent at the method block"
 );
 
 const skuNow = read("openapi/ops-core/sku.v1.yaml");
-const skuBase = execFileSync("git", ["show", `${baseSha}:openapi/ops-core/sku.v1.yaml`], { cwd: root, encoding: "utf8" });
+const skuBase = normalizeNewlines(
+  execFileSync("git", ["show", `${baseSha}:openapi/ops-core/sku.v1.yaml`], { cwd: root, encoding: "utf8" })
+);
 for (const route of ["/v1/skus/{skuId}", "/v1/skus/{skuId}/operational-status"]) {
   assert.equal(
     extractMethodBlock(extractPathBlock(skuNow, route), "get").trim(),
     extractMethodBlock(extractPathBlock(skuBase, route), "get").trim(),
-    `${route} is outside X03B and must remain byte-equivalent at the method block`
+    `${route} is outside X03B and must remain newline-normalized equivalent at the method block`
   );
 }
 
