@@ -1,1 +1,36 @@
-{"schemaVersion":"v1","correlation":{"correlationId":"fixture-x03b-stock-alert"},"data":[{"stock_alert_id":"13000000-0000-4000-8000-000000000002","sku_id":"20000000-0000-4000-8000-000000000002","warehouse_id":"40000000-0000-4000-8000-000000000001","status":"STOCK_RED_ALERT","available_stock":{"value":"5.000","unit":"BOX"},"occurred_at":"2026-09-03T00:45:00Z"}],"meta":{"cursor_version":1,"snapshot_id":"11000000-0000-4000-8000-000000000013","as_of":"2026-09-03T01:00:00Z","high_watermark":"fixture-alert-1","next_cursor":null,"item_count":1,"complete":true,"manifest_sha256":"3333333333333333333333333333333333333333333333333333333333333333","delta_supported":false}}
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "fixture-x03b-stock-alert"
+  },
+  "data": [
+    {
+      "stock_alert_id": "13000000-0000-4000-8000-000000000002",
+      "sku_id": "20000000-0000-4000-8000-000000000002",
+      "warehouse_id": "40000000-0000-4000-8000-000000000001",
+      "status": "STOCK_RED_ALERT",
+      "available_stock": {
+        "value": "5.000",
+        "unit": "BOX"
+      },
+      "occurred_at": "2026-09-03T00:45:00Z"
+    }
+  ],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "inventory.stock-alerts",
+    "snapshot_id": "11000000-0000-4000-8000-000000000013",
+    "as_of": "2026-09-03T01:00:00Z",
+    "high_watermark": "fixture-alert-1",
+    "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 1,
+    "item_count": 1,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "f82007e6bcb4f836fbdacc0d9015ccdee641b928214eeedeaa1ae6a6a126e7ef",
+    "delta_supported": false
+  }
+}

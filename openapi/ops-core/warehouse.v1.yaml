@@ -31,7 +31,7 @@ x-retry-policies:
     max_retries: 2
     total_budget_seconds: 30
     retryable_statuses: [408, 429, 502, 503, 504]
-    non_retryable_statuses: [400, 401, 403, 404, 409, 410, 422]
+    non_retryable_statuses: [400, 401, 403, 404, 409, 410, 422, 500]
     honor_retry_after: true
     backoff: FULL_JITTER_BASE_500MS_CAP_5S
 x-pagination-policies:
@@ -43,6 +43,17 @@ x-pagination-policies:
     integrity_protected: true
     default_limit: 50
     max_limit: 100
+    page_max_items: 100
+    page_item_count_semantics: EXACT_CURRENT_PAGE_DATA_LENGTH
+    item_count_semantics: EXACT_FULL_SNAPSHOT_TOTAL
+    delivered_item_count_semantics: CUMULATIVE_THROUGH_CURRENT_PAGE
+    complete_requires: DELIVERED_COUNT_EQUALS_ITEM_COUNT_AND_NEXT_CURSOR_NULL
+    manifest_version: 1
+    manifest_algorithm: SHA-256
+    manifest_canonicalization: JCS_RFC8785
+    manifest_document_fields: [manifest_version, resource, snapshot_id, as_of, high_watermark, item_count, items]
+    manifest_items_semantics: COMPLETE_STABLE_SORTED_SNAPSHOT
+    verify_manifest_before_absence_reconcile: true
     delta_supported: false
     delta_replay_retention_seconds: 604800
     delta_poll_seconds: 30
@@ -289,14 +300,6 @@ components:
           properties:
             error:
               $ref: "../../schemas/common/error.schema.json"
-    ExternalErrorEnvelope:
-      allOf:
-        - $ref: "../../schemas/common/envelope.schema.json"
-        - type: object
-          required: [schemaVersion, error]
-          properties:
-            error:
-              $ref: "../../schemas/ops/x03b/external-bulk-read-error.schema.json"
   responses:
     BadRequest: { description: Bad request., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     Unauthorized: { description: Authentication required., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
@@ -305,26 +308,89 @@ components:
     Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
-    CursorInvalid: { description: CURSOR_INVALID for malformed, tampered, or wrong-scope cursor., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
-    ExternalUnauthorized: { description: Safe authentication failure., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
-    ExternalForbidden: { description: Required operation permission or SERVICE scope is missing., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
-    ExternalNotFound: { description: Filtered resource scope is not found or inaccessible., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
-    RequestTimeout: { description: Request timed out before a safe snapshot page was returned., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
-    ChangeFeedGap: { description: CHANGE_FEED_GAP; discard the partial page and start fail-closed full reconciliation., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
-    CursorExpired: { description: CURSOR_EXPIRED after the absolute 30-minute TTL; restart full reconciliation., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
-    ExternalUnprocessableEntity: { description: Query validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
+    CursorInvalid:
+      description: CURSOR_INVALID for malformed, tampered, or wrong-scope cursor.
+      x-error-code: CURSOR_INVALID
+      x-http-status: 400
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/CursorInvalid" } } }
+    ExternalUnauthorized:
+      description: Safe authentication failure.
+      x-error-code: UNAUTHORIZED
+      x-http-status: 401
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/Unauthorized" } } }
+    ExternalForbidden:
+      description: Required operation permission or SERVICE scope is missing.
+      x-error-code: FORBIDDEN
+      x-http-status: 403
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/Forbidden" } } }
+    ExternalNotFound:
+      description: Filtered resource scope is not found or inaccessible.
+      x-error-code: NOT_FOUND
+      x-http-status: 404
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/NotFound" } } }
+    RequestTimeout:
+      description: Request timed out before a safe snapshot page was returned.
+      x-error-code: REQUEST_TIMEOUT
+      x-http-status: 408
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/RequestTimeout" } } }
+    ChangeFeedGap:
+      description: CHANGE_FEED_GAP; discard the partial page and start fail-closed full reconciliation.
+      x-error-code: CHANGE_FEED_GAP
+      x-http-status: 409
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/ChangeFeedGap" } } }
+    CursorExpired:
+      description: CURSOR_EXPIRED after the absolute 30-minute TTL; restart full reconciliation.
+      x-error-code: CURSOR_EXPIRED
+      x-http-status: 410
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/CursorExpired" } } }
+    ExternalUnprocessableEntity:
+      description: Query validation or guard failure.
+      x-error-code: VALIDATION_FAILED
+      x-http-status: 422
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/ValidationFailed" } } }
     TooManyRequests:
       description: RATE_LIMITED; caller must honor Retry-After and the 30-second total retry budget.
+      x-error-code: RATE_LIMITED
+      x-http-status: 429
+      x-retryable: true
       headers:
         Retry-After: { required: true, schema: { type: integer, minimum: 1 } }
         X-RateLimit-Limit: { required: true, schema: { type: integer, const: 2 } }
         X-RateLimit-Remaining: { required: true, schema: { type: integer, minimum: 0 } }
         X-RateLimit-Reset: { required: true, schema: { type: integer, minimum: 1 } }
-      content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } }
-    ExternalInternalServerError: { description: Safe internal error without stack trace or partition key., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
-    BadGateway: { description: Upstream bad gateway; retry only within ExternalBulkReadRetry., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
-    ServiceUnavailable: { description: Service unavailable; retry only within ExternalBulkReadRetry., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
-    GatewayTimeout: { description: Gateway timeout; retry only within ExternalBulkReadRetry., content: { application/json: { schema: { $ref: "#/components/schemas/ExternalErrorEnvelope" } } } }
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/RateLimited" } } }
+    ExternalInternalServerError:
+      description: Safe internal error without stack trace or partition key.
+      x-error-code: INTERNAL_ERROR
+      x-http-status: 500
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/InternalError" } } }
+    BadGateway:
+      description: Upstream bad gateway; retry only within ExternalBulkReadRetry.
+      x-error-code: BAD_GATEWAY
+      x-http-status: 502
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/BadGateway" } } }
+    ServiceUnavailable:
+      description: Service unavailable; retry only within ExternalBulkReadRetry.
+      x-error-code: SERVICE_UNAVAILABLE
+      x-http-status: 503
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/ServiceUnavailable" } } }
+    GatewayTimeout:
+      description: Gateway timeout; retry only within ExternalBulkReadRetry.
+      x-error-code: GATEWAY_TIMEOUT
+      x-http-status: 504
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/GatewayTimeout" } } }
   securitySchemes:
     ServiceBearer:
       type: http

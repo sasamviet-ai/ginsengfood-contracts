@@ -1,1 +1,40 @@
-{"schemaVersion":"v1","correlation":{"correlationId":"fixture-x03b-allocation"},"data":[{"allocation_id":"14000000-0000-4000-8000-000000000002","allocation_no":"ALLOC-FIXTURE-002","warehouse_id":"40000000-0000-4000-8000-000000000001","item_type":"FINISHED_GOOD","item_id":"20000000-0000-4000-8000-000000000002","lot_code":"FG-FIXTURE-002","unit":"BOX","source_object_type":"EXTERNAL_ORDER_ITEM","source_object_id":"60000000-0000-4000-8000-000000000002","source_object_no":"ORD-FIXTURE/LINE-002","allocated_quantity":"2.000","status":"RESERVED","requested_at":"2026-09-03T00:30:00Z"}],"meta":{"cursor_version":1,"snapshot_id":"11000000-0000-4000-8000-000000000014","as_of":"2026-09-03T01:00:00Z","high_watermark":"fixture-allocation-1","next_cursor":null,"item_count":1,"complete":true,"manifest_sha256":"4444444444444444444444444444444444444444444444444444444444444444","delta_supported":false}}
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "fixture-x03b-allocation"
+  },
+  "data": [
+    {
+      "allocation_id": "14000000-0000-4000-8000-000000000002",
+      "allocation_no": "ALLOC-FIXTURE-002",
+      "warehouse_id": "40000000-0000-4000-8000-000000000001",
+      "item_type": "FINISHED_GOOD",
+      "item_id": "20000000-0000-4000-8000-000000000002",
+      "lot_code": "FG-FIXTURE-002",
+      "unit": "BOX",
+      "source_object_type": "EXTERNAL_ORDER_ITEM",
+      "source_object_id": "60000000-0000-4000-8000-000000000002",
+      "source_object_no": "ORD-FIXTURE/LINE-002",
+      "allocated_quantity": "2.000",
+      "status": "RESERVED",
+      "requested_at": "2026-09-03T00:30:00Z"
+    }
+  ],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "inventory.allocations",
+    "snapshot_id": "11000000-0000-4000-8000-000000000014",
+    "as_of": "2026-09-03T01:00:00Z",
+    "high_watermark": "fixture-allocation-1",
+    "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 1,
+    "item_count": 1,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "772c4305ee7cb3941e7e02c57ba17f0cc31eb425c96109d94336b1e003e8c3ba",
+    "delta_supported": false
+  }
+}

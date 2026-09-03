@@ -1,1 +1,38 @@
-{"schemaVersion":"v1","correlation":{"correlationId":"fixture-x03b-ledger"},"data":[{"ledger_entry_id":"12000000-0000-4000-8000-000000000002","append_only":true,"movement_type":"WAREHOUSE_RECEIPT_CONFIRMED","item_type":"FINISHED_GOOD","sku_id":"20000000-0000-4000-8000-000000000002","warehouse_id":"40000000-0000-4000-8000-000000000001","quantity_delta":{"value":"10.000","unit":"BOX"},"occurred_at":"2026-09-03T00:40:00Z"}],"meta":{"cursor_version":1,"snapshot_id":"11000000-0000-4000-8000-000000000012","as_of":"2026-09-03T01:00:00Z","high_watermark":"fixture-ledger-1","next_cursor":null,"item_count":1,"complete":true,"manifest_sha256":"2222222222222222222222222222222222222222222222222222222222222222","delta_supported":false}}
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "fixture-x03b-ledger"
+  },
+  "data": [
+    {
+      "ledger_entry_id": "12000000-0000-4000-8000-000000000002",
+      "append_only": true,
+      "movement_type": "WAREHOUSE_RECEIPT_CONFIRMED",
+      "item_type": "FINISHED_GOOD",
+      "sku_id": "20000000-0000-4000-8000-000000000002",
+      "warehouse_id": "40000000-0000-4000-8000-000000000001",
+      "quantity_delta": {
+        "value": "10.000",
+        "unit": "BOX"
+      },
+      "occurred_at": "2026-09-03T00:40:00Z"
+    }
+  ],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "inventory.ledger",
+    "snapshot_id": "11000000-0000-4000-8000-000000000012",
+    "as_of": "2026-09-03T01:00:00Z",
+    "high_watermark": "fixture-ledger-1",
+    "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 1,
+    "item_count": 1,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "9cb167fb10f5fbb151cc2f35597dc91dd217d53cd929c956960ca37168a5f2a0",
+    "delta_supported": false
+  }
+}

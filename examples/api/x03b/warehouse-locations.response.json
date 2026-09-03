@@ -11,13 +11,19 @@
   }],
   "meta": {
     "cursor_version": 1,
+    "resource": "warehouse-locations",
     "snapshot_id": "11000000-0000-4000-8000-000000000006",
     "as_of": "2026-09-03T01:00:00Z",
     "high_watermark": "warehouse-location-revision-0001",
     "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 1,
     "item_count": 1,
     "complete": true,
-    "manifest_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "e7d8815497d908f06e422f0c32cd416417500a9796b1584d9a292e27aa9cc40a",
     "delta_supported": false
   }
 }

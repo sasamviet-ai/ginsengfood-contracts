@@ -1,1 +1,32 @@
-{"schemaVersion":"v1","correlation":{"correlationId":"fixture-x03b-warehouse"},"data":[{"warehouse_id":"40000000-0000-4000-8000-000000000002","warehouse_code":"WH-FG-02","warehouse_name":"Finished Goods Warehouse 02","warehouse_type":"FINISHED_GOODS","status":"INACTIVE"}],"meta":{"cursor_version":1,"snapshot_id":"11000000-0000-4000-8000-000000000015","as_of":"2026-09-03T01:00:00Z","high_watermark":"fixture-warehouse-1","next_cursor":null,"item_count":1,"complete":true,"manifest_sha256":"5555555555555555555555555555555555555555555555555555555555555555","delta_supported":false}}
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "fixture-x03b-warehouse"
+  },
+  "data": [
+    {
+      "warehouse_id": "40000000-0000-4000-8000-000000000002",
+      "warehouse_code": "WH-FG-02",
+      "warehouse_name": "Finished Goods Warehouse 02",
+      "warehouse_type": "FINISHED_GOODS",
+      "status": "INACTIVE"
+    }
+  ],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "warehouses",
+    "snapshot_id": "11000000-0000-4000-8000-000000000015",
+    "as_of": "2026-09-03T01:00:00Z",
+    "high_watermark": "fixture-warehouse-1",
+    "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 1,
+    "item_count": 1,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "f4c29e94920143f23289ed6107442df0da19a0ee306045dbfe4ccf9866ad4215",
+    "delta_supported": false
+  }
+}

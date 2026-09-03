@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -7,15 +8,58 @@ const root = path.resolve(import.meta.dirname, "../..");
 const baseSha = "7d452526cd94cd49ec18c056e56c789506faae41";
 const audience = "ginsengfood-ops-core-external-bulk-read-v1";
 
+const commonCollectionErrors = {
+  "400": { component: "CursorInvalid", code: "CURSOR_INVALID", retryable: false, definition: "CursorInvalid" },
+  "408": { component: "RequestTimeout", code: "REQUEST_TIMEOUT", retryable: true, definition: "RequestTimeout" },
+  "409": { component: "ChangeFeedGap", code: "CHANGE_FEED_GAP", retryable: false, definition: "ChangeFeedGap" },
+  "410": { component: "CursorExpired", code: "CURSOR_EXPIRED", retryable: false, definition: "CursorExpired" },
+  "429": { component: "TooManyRequests", code: "RATE_LIMITED", retryable: true, definition: "RateLimited" },
+  "502": { component: "BadGateway", code: "BAD_GATEWAY", retryable: true, definition: "BadGateway" },
+  "503": { component: "ServiceUnavailable", code: "SERVICE_UNAVAILABLE", retryable: true, definition: "ServiceUnavailable" },
+  "504": { component: "GatewayTimeout", code: "GATEWAY_TIMEOUT", retryable: true, definition: "GatewayTimeout" }
+};
+
+const responseProfiles = {
+  inventory: {
+    ...commonCollectionErrors,
+    "401": { component: "Unauthorized", code: "UNAUTHORIZED", retryable: false, definition: "Unauthorized" },
+    "403": { component: "Forbidden", code: "FORBIDDEN", retryable: false, definition: "Forbidden" },
+    "404": { component: "NotFound", code: "NOT_FOUND", retryable: false, definition: "NotFound" },
+    "422": { component: "UnprocessableEntity", code: "VALIDATION_FAILED", retryable: false, definition: "ValidationFailed" },
+    "500": { component: "InternalServerError", code: "INTERNAL_ERROR", retryable: false, definition: "InternalError" }
+  },
+  warehouse: {
+    ...commonCollectionErrors,
+    "401": { component: "ExternalUnauthorized", code: "UNAUTHORIZED", retryable: false, definition: "Unauthorized" },
+    "403": { component: "ExternalForbidden", code: "FORBIDDEN", retryable: false, definition: "Forbidden" },
+    "404": { component: "ExternalNotFound", code: "NOT_FOUND", retryable: false, definition: "NotFound" },
+    "422": { component: "ExternalUnprocessableEntity", code: "VALIDATION_FAILED", retryable: false, definition: "ValidationFailed" },
+    "500": { component: "ExternalInternalServerError", code: "INTERNAL_ERROR", retryable: false, definition: "InternalError" }
+  },
+  sku: {
+    "400": { component: "ExternalBadRequest", code: "INVALID_REQUEST", retryable: false, definition: "InvalidRequest" },
+    "401": { component: "ExternalUnauthorized", code: "UNAUTHORIZED", retryable: false, definition: "Unauthorized" },
+    "403": { component: "ExternalForbidden", code: "FORBIDDEN", retryable: false, definition: "Forbidden" },
+    "404": { component: "ExternalNotFound", code: "NOT_FOUND", retryable: false, definition: "NotFound" },
+    "408": { component: "RequestTimeout", code: "REQUEST_TIMEOUT", retryable: true, definition: "RequestTimeout" },
+    "422": { component: "ExternalUnprocessableEntity", code: "VALIDATION_FAILED", retryable: false, definition: "ValidationFailed" },
+    "429": { component: "TooManyRequests", code: "RATE_LIMITED", retryable: true, definition: "RateLimited" },
+    "500": { component: "ExternalInternalServerError", code: "INTERNAL_ERROR", retryable: false, definition: "InternalError" },
+    "502": { component: "BadGateway", code: "BAD_GATEWAY", retryable: true, definition: "BadGateway" },
+    "503": { component: "ServiceUnavailable", code: "SERVICE_UNAVAILABLE", retryable: true, definition: "ServiceUnavailable" },
+    "504": { component: "GatewayTimeout", code: "GATEWAY_TIMEOUT", retryable: true, definition: "GatewayTimeout" }
+  }
+};
+
 const operations = [
-  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/stock-balances", operationId: "listStockBalancesV1", permission: "INVENTORY_BALANCE_VIEW", schema: "external-stock-balance.schema.json", fixture: "stock-balances", sort: "stockBalanceId ASC", tombstone: "SNAPSHOT_ONLY_NO_TOMBSTONE", filters: ["skuId", "materialId", "warehouseId", "itemType"], fields: ["stock_balance_id", "item_type", "sku_id", "material_id", "batch_id", "lot_code", "warehouse_id", "warehouse_location_id", "on_hand_quantity", "available_quantity", "reserved_quantity", "quality_hold_quantity", "recall_hold_quantity", "sale_lock_quantity", "as_of"] },
-  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/ledger", operationId: "listInventoryLedgerV1", permission: "INVENTORY_LEDGER_VIEW", schema: "external-inventory-ledger-entry.schema.json", fixture: "inventory-ledger", sort: "occurredAt ASC, ledgerEntryId ASC", tombstone: "APPEND_ONLY_NO_TOMBSTONE", filters: [], fields: ["ledger_entry_id", "append_only", "movement_type", "item_type", "sku_id", "material_id", "batch_id", "lot_code", "warehouse_id", "warehouse_location_id", "quantity_delta", "source_object_type", "source_object_id", "source_object_no", "occurred_at"] },
-  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/stock-alerts", operationId: "listStockAlertsV1", permission: "STOCK_ALERT_VIEW", schema: "external-stock-alert.schema.json", fixture: "stock-alerts", sort: "occurredAt ASC, stockAlertId ASC", tombstone: "APPEND_ONLY_LIFECYCLE_NO_TOMBSTONE", filters: ["skuId", "warehouseId", "status", "from", "to"], fields: ["stock_alert_id", "sku_id", "warehouse_id", "status", "available_stock", "yellow_threshold", "red_threshold", "stockout_risk_threshold", "occurred_at", "resolved_at"] },
-  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/allocations", operationId: "listInventoryAllocationsV1", permission: "INVENTORY_ALLOCATION_VIEW", schema: "external-inventory-allocation.schema.json", fixture: "inventory-allocations", sort: "requestedAt DESC, allocationId DESC", tombstone: "STATE_REVISION_NO_TOMBSTONE", filters: [], fields: ["allocation_id", "allocation_no", "warehouse_id", "warehouse_location_id", "item_type", "item_id", "lot_code", "unit", "source_object_type", "source_object_id", "source_object_no", "allocated_quantity", "status", "requested_at", "confirmed_at", "released_at"] },
-  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouses", operationId: "listWarehousesV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse.schema.json", fixture: "warehouses", sort: "warehouseCode ASC, warehouseId ASC", tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_id", "warehouse_code", "warehouse_name", "warehouse_type", "status"] },
-  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-locations", operationId: "listWarehouseLocationsV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse-location.schema.json", fixture: "warehouse-locations", sort: "locationCode ASC, warehouseLocationId ASC", tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_location_id", "warehouse_id", "location_code", "location_name", "location_type", "status"] },
-  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-receipts", operationId: "listWarehouseReceiptsV1", permission: "WAREHOUSE_RECEIPT_VIEW", schema: "external-warehouse-receipt.schema.json", fixture: "warehouse-receipts", sort: "createdAt DESC, warehouseReceiptId DESC", tombstone: "STATE_REVISION_NO_TOMBSTONE", filters: ["status", "batchId", "warehouseId", "fromDate", "toDate"], fields: ["warehouse_receipt_id", "warehouse_receipt_no", "status", "batch_id", "warehouse_id", "warehouse_location_id", "received_quantity", "received_at", "confirmed_at", "created_at"] },
-  { file: "openapi/ops-core/sku.v1.yaml", route: "/v1/skus/{skuId}/public", operationId: "getPublicSkuV1", permission: "SKU_CATALOG_VIEW", schema: "external-public-sku.schema.json", fixture: "public-sku", collection: false, fields: ["sku_id", "sku_code", "product_id", "public_name", "dietary_type", "product_group", "lifecycle_status"] }
+  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/stock-balances", operationId: "listStockBalancesV1", permission: "INVENTORY_BALANCE_VIEW", schema: "external-stock-balance.schema.json", fixture: "stock-balances", resource: "inventory.stock-balances", responseProfile: "inventory", sort: "stockBalanceId ASC", tombstone: "SNAPSHOT_ONLY_NO_TOMBSTONE", filters: ["skuId", "materialId", "warehouseId", "itemType"], fields: ["stock_balance_id", "item_type", "sku_id", "material_id", "batch_id", "lot_code", "warehouse_id", "warehouse_location_id", "on_hand_quantity", "available_quantity", "reserved_quantity", "quality_hold_quantity", "recall_hold_quantity", "sale_lock_quantity", "as_of"] },
+  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/ledger", operationId: "listInventoryLedgerV1", permission: "INVENTORY_LEDGER_VIEW", schema: "external-inventory-ledger-entry.schema.json", fixture: "inventory-ledger", resource: "inventory.ledger", responseProfile: "inventory", sort: "occurredAt ASC, ledgerEntryId ASC", tombstone: "APPEND_ONLY_NO_TOMBSTONE", filters: [], fields: ["ledger_entry_id", "append_only", "movement_type", "item_type", "sku_id", "material_id", "batch_id", "lot_code", "warehouse_id", "warehouse_location_id", "quantity_delta", "source_object_type", "source_object_id", "source_object_no", "occurred_at"] },
+  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/stock-alerts", operationId: "listStockAlertsV1", permission: "STOCK_ALERT_VIEW", schema: "external-stock-alert.schema.json", fixture: "stock-alerts", resource: "inventory.stock-alerts", responseProfile: "inventory", sort: "occurredAt ASC, stockAlertId ASC", tombstone: "APPEND_ONLY_LIFECYCLE_NO_TOMBSTONE", filters: ["skuId", "warehouseId", "status", "from", "to"], fields: ["stock_alert_id", "sku_id", "warehouse_id", "status", "available_stock", "yellow_threshold", "red_threshold", "stockout_risk_threshold", "occurred_at", "resolved_at"] },
+  { file: "openapi/ops-core/inventory.v1.yaml", route: "/v1/inventory/allocations", operationId: "listInventoryAllocationsV1", permission: "INVENTORY_ALLOCATION_VIEW", schema: "external-inventory-allocation.schema.json", fixture: "inventory-allocations", resource: "inventory.allocations", responseProfile: "inventory", sort: "requestedAt DESC, allocationId DESC", tombstone: "STATE_REVISION_NO_TOMBSTONE", filters: [], fields: ["allocation_id", "allocation_no", "warehouse_id", "warehouse_location_id", "item_type", "item_id", "lot_code", "unit", "source_object_type", "source_object_id", "source_object_no", "allocated_quantity", "status", "requested_at", "confirmed_at", "released_at"] },
+  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouses", operationId: "listWarehousesV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse.schema.json", fixture: "warehouses", resource: "warehouses", responseProfile: "warehouse", sort: "warehouseCode ASC, warehouseId ASC", tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_id", "warehouse_code", "warehouse_name", "warehouse_type", "status"] },
+  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-locations", operationId: "listWarehouseLocationsV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse-location.schema.json", fixture: "warehouse-locations", resource: "warehouse-locations", responseProfile: "warehouse", sort: "locationCode ASC, warehouseLocationId ASC", tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_location_id", "warehouse_id", "location_code", "location_name", "location_type", "status"] },
+  { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-receipts", operationId: "listWarehouseReceiptsV1", permission: "WAREHOUSE_RECEIPT_VIEW", schema: "external-warehouse-receipt.schema.json", fixture: "warehouse-receipts", resource: "warehouse-receipts", responseProfile: "warehouse", sort: "createdAt DESC, warehouseReceiptId DESC", tombstone: "STATE_REVISION_NO_TOMBSTONE", filters: ["status", "batchId", "warehouseId", "fromDate", "toDate"], fields: ["warehouse_receipt_id", "warehouse_receipt_no", "status", "batch_id", "warehouse_id", "warehouse_location_id", "received_quantity", "received_at", "confirmed_at", "created_at"] },
+  { file: "openapi/ops-core/sku.v1.yaml", route: "/v1/skus/{skuId}/public", operationId: "getPublicSkuV1", permission: "SKU_CATALOG_VIEW", schema: "external-public-sku.schema.json", fixture: "public-sku", responseProfile: "sku", collection: false, fields: ["sku_id", "sku_code", "product_id", "public_name", "dietary_type", "product_group", "lifecycle_status"] }
 ];
 
 const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
@@ -53,6 +97,43 @@ function extractMethodBlock(pathBlock, method) {
   return lines.slice(start, end).join("\n");
 }
 
+function extractResponseComponentBlock(text, component) {
+  const lines = text.split(/\r?\n/);
+  const componentsStart = lines.findIndex(line => line === "components:");
+  const responsesStart = lines.findIndex((line, index) => index > componentsStart && line === "  responses:");
+  assert.ok(responsesStart > componentsStart, "components.responses missing");
+  const start = lines.findIndex((line, index) => index > responsesStart && line === `    ${component}:`);
+  assert.notEqual(start, -1, `missing response component ${component}`);
+  let end = lines.length;
+  for (let index = start + 1; index < lines.length; index += 1) {
+    if (/^    [A-Za-z][A-Za-z0-9]*:/.test(lines[index]) || /^  [A-Za-z][A-Za-z0-9]*:/.test(lines[index])) {
+      end = index;
+      break;
+    }
+  }
+  return lines.slice(start, end).join("\n");
+}
+
+function assertOperationErrorMappings(operation, textOverride) {
+  const text = textOverride ?? read(operation.file);
+  const methodBlock = extractMethodBlock(extractPathBlock(text, operation.route), "get");
+  for (const [status, expected] of Object.entries(responseProfiles[operation.responseProfile])) {
+    assert.match(
+      methodBlock,
+      new RegExp(`"${status}": \\{ \\$ref: "#\\/components\\/responses\\/${expected.component}" \\}`),
+      `${operation.operationId} response ${status} component drift`
+    );
+    const componentBlock = extractResponseComponentBlock(text, expected.component);
+    assert.match(componentBlock, new RegExp(`x-error-code: ${expected.code}\\b`));
+    assert.match(componentBlock, new RegExp(`x-http-status: ${status}\\b`));
+    assert.match(componentBlock, new RegExp(`x-retryable: ${expected.retryable}\\b`));
+    assert.match(
+      componentBlock,
+      new RegExp(`external-bulk-read-error-envelopes\\.schema\\.json#\\/\\$defs\\/${expected.definition}`)
+    );
+  }
+}
+
 function assertOperationContract(operation, textOverride) {
   const text = textOverride ?? read(operation.file);
   const block = extractMethodBlock(extractPathBlock(text, operation.route), "get");
@@ -65,7 +146,7 @@ function assertOperationContract(operation, textOverride) {
   assert.match(block, /x-permission-scope: SERVICE/);
   assert.match(block, /x-rate-limit-policy: ExternalBulkRead/);
   assert.match(block, /x-retry-policy: ExternalBulkReadRetry/);
-  assert.match(text, /schemas\/ops\/x03b\/external-bulk-read-error\.schema\.json/);
+  assert.match(text, /schemas\/ops\/x03b\/external-bulk-read-error-envelopes\.schema\.json/);
   assert.doesNotMatch(block, /requestBody:|X-Idempotency-Key|x-idempotency/i);
   assert.match(block, /"429": \{ \$ref: "#\/components\/responses\/TooManyRequests" \}/);
   assert.match(block, new RegExp(`schemas/ops/x03b/${operation.schema.replaceAll(".", "\\.")}`));
@@ -87,6 +168,7 @@ function assertOperationContract(operation, textOverride) {
     assert.doesNotMatch(block, /components\/parameters\/Cursor/);
     assert.doesNotMatch(block, /x-pagination-policy:/);
   }
+  assertOperationErrorMappings(operation, text);
 }
 
 function loadSchema(relative) {
@@ -94,9 +176,39 @@ function loadSchema(relative) {
 }
 
 function resolveRef(ref, schemaFile) {
-  assert.ok(!ref.startsWith("#"), `local JSON pointer is unsupported in X03B validator: ${ref}`);
-  const target = path.resolve(path.dirname(schemaFile), ref.split("#", 1)[0]);
-  return { schema: JSON.parse(fs.readFileSync(target, "utf8")), file: target };
+  const [relative, fragment] = ref.split("#", 2);
+  const target = relative ? path.resolve(path.dirname(schemaFile), relative) : schemaFile;
+  let schema = JSON.parse(fs.readFileSync(target, "utf8"));
+  if (fragment) {
+    assert.match(fragment, /^\//, `unsupported JSON pointer fragment: #${fragment}`);
+    for (const token of fragment.slice(1).split("/")) {
+      schema = schema[token.replaceAll("~1", "/").replaceAll("~0", "~")];
+      assert.ok(schema, `unresolved JSON pointer #${fragment}`);
+    }
+  }
+  return { schema, file: target };
+}
+
+function canonicalJson(value) {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+}
+
+function snapshotManifest(payload, operation) {
+  return {
+    manifest_version: payload.meta.manifest_version,
+    resource: operation.resource,
+    snapshot_id: payload.meta.snapshot_id,
+    as_of: payload.meta.as_of,
+    high_watermark: payload.meta.high_watermark,
+    item_count: payload.meta.item_count,
+    items: payload.data
+  };
+}
+
+function snapshotManifestSha256(payload, operation) {
+  return createHash("sha256").update(canonicalJson(snapshotManifest(payload, operation)), "utf8").digest("hex");
 }
 
 function validateSchema(schema, value, schemaFile, location = "$") {
@@ -116,6 +228,16 @@ function validateSchema(schema, value, schemaFile, location = "$") {
     });
     assert.equal(matches.length, 1, `${location} must match exactly one oneOf branch`);
   }
+  if (schema.if) {
+    let conditionMatches = true;
+    try {
+      validateSchema(schema.if, value, schemaFile, location);
+    } catch {
+      conditionMatches = false;
+    }
+    if (conditionMatches && schema.then) validateSchema(schema.then, value, schemaFile, location);
+    if (!conditionMatches && schema.else) validateSchema(schema.else, value, schemaFile, location);
+  }
   if (schema.const !== undefined) assert.deepEqual(value, schema.const, `${location} must equal const`);
   if (schema.enum) assert.ok(schema.enum.includes(value), `${location} must be in enum`);
   if (schema.type) {
@@ -134,7 +256,11 @@ function validateSchema(schema, value, schemaFile, location = "$") {
     if (schema.minimum !== undefined) assert.ok(value >= schema.minimum, `${location} minimum`);
     if (schema.maximum !== undefined) assert.ok(value <= schema.maximum, `${location} maximum`);
   }
-  if (Array.isArray(value) && schema.items) value.forEach((item, index) => validateSchema(schema.items, item, schemaFile, `${location}[${index}]`));
+  if (Array.isArray(value)) {
+    if (schema.minItems !== undefined) assert.ok(value.length >= schema.minItems, `${location} minItems`);
+    if (schema.maxItems !== undefined) assert.ok(value.length <= schema.maxItems, `${location} maxItems`);
+    if (schema.items) value.forEach((item, index) => validateSchema(schema.items, item, schemaFile, `${location}[${index}]`));
+  }
   if (value !== null && typeof value === "object" && !Array.isArray(value)) {
     for (const required of schema.required ?? []) assert.ok(Object.hasOwn(value, required), `${location}.${required} required`);
     if (schema.additionalProperties === false) {
@@ -158,9 +284,24 @@ function validatePayload(payload, operation) {
   }
   assert.deepEqual(Object.keys(payload).sort(), ["correlation", "data", "meta", "schemaVersion"].sort());
   assert.ok(Array.isArray(payload.data));
+  assert.ok(payload.data.length <= 100, "$.data maxItems");
   payload.data.forEach((item, index) => validateSchema(itemSchema.schema, item, itemSchema.file, `$.data[${index}]`));
   const metaSchema = loadSchema("schemas/ops/x03b/external-snapshot-meta.schema.json");
   validateSchema(metaSchema.schema, payload.meta, metaSchema.file, "$.meta");
+  assert.equal(payload.meta.resource, operation.resource, "$.meta.resource scope mismatch");
+  assert.equal(payload.meta.page_item_count, payload.data.length, "$.meta.page_item_count mismatch");
+  assert.ok(payload.meta.delivered_item_count >= payload.meta.page_item_count, "$.meta.delivered_item_count below page count");
+  assert.ok(payload.meta.delivered_item_count <= payload.meta.item_count, "$.meta.delivered_item_count exceeds full snapshot count");
+  if (payload.meta.complete) {
+    assert.equal(payload.meta.next_cursor, null, "$.meta.next_cursor must be null when complete");
+    assert.equal(payload.meta.delivered_item_count, payload.meta.item_count, "$.meta.item_count must equal delivered full snapshot count");
+    assert.equal(payload.meta.delivered_item_count, payload.data.length, "complete canonical fixture must contain the full ordered snapshot");
+    assert.equal(payload.meta.manifest_sha256, snapshotManifestSha256(payload, operation), "$.meta.manifest_sha256 mismatch");
+  } else {
+    assert.equal(typeof payload.meta.next_cursor, "string", "$.meta.next_cursor required while incomplete");
+    assert.ok(payload.meta.next_cursor.length > 0, "$.meta.next_cursor required while incomplete");
+    assert.ok(payload.meta.delivered_item_count < payload.meta.item_count, "incomplete snapshot must have remaining items");
+  }
 }
 
 for (const operation of operations) {
@@ -178,6 +319,32 @@ for (const operation of operations) {
     item.actor_id = "not-public";
     assert.throws(() => validatePayload(tampered, operation), /not whitelisted/);
   }
+
+  const sourceText = read(operation.file);
+  const sourcePathBlock = extractPathBlock(sourceText, operation.route);
+  for (const [status, expected] of Object.entries(responseProfiles[operation.responseProfile])) {
+    const expectedRef = `"${status}": { $ref: "#/components/responses/${expected.component}" }`;
+    const tamperedPathBlock = sourcePathBlock.replace(expectedRef, `"${status}": { $ref: "#/components/responses/DefinitelyWrong" }`);
+    assert.notEqual(tamperedPathBlock, sourcePathBlock, `${operation.operationId} response ${status} tamper setup failed`);
+    assert.throws(
+      () => assertOperationErrorMappings(operation, sourceText.replace(sourcePathBlock, tamperedPathBlock)),
+      /response .* component drift/
+    );
+
+    const componentBlock = extractResponseComponentBlock(sourceText, expected.component);
+    for (const [needle, replacement, failurePattern] of [
+      [`x-error-code: ${expected.code}`, "x-error-code: WRONG_CODE", /x-error-code/],
+      [`x-http-status: ${status}`, "x-http-status: 599", /x-http-status/],
+      [`x-retryable: ${expected.retryable}`, `x-retryable: ${!expected.retryable}`, /x-retryable/]
+    ]) {
+      const tamperedComponent = componentBlock.replace(needle, replacement);
+      assert.notEqual(tamperedComponent, componentBlock, `${expected.component} metadata tamper setup failed`);
+      assert.throws(
+        () => assertOperationErrorMappings(operation, sourceText.replace(componentBlock, tamperedComponent)),
+        failurePattern
+      );
+    }
+  }
 }
 
 const allocation = parseJson("examples/api/x03b/inventory-allocations.response.json");
@@ -192,9 +359,39 @@ const snapshot = parseJson("examples/api/x03b/stock-balances.response.json");
 snapshot.meta.delta_supported = true;
 assert.throws(() => validatePayload(snapshot, operations[0]), /const/);
 
+const oversizedSnapshot = parseJson("examples/api/x03b/stock-balances.response.json");
+oversizedSnapshot.data = Array.from({ length: 101 }, () => structuredClone(oversizedSnapshot.data[0]));
+assert.throws(() => validatePayload(oversizedSnapshot, operations[0]), /maxItems/);
+
+const mismatchedCountSnapshot = parseJson("examples/api/x03b/stock-balances.response.json");
+mismatchedCountSnapshot.meta.item_count += 1;
+assert.throws(() => validatePayload(mismatchedCountSnapshot, operations[0]), /item_count/);
+
+const mismatchedPageCountSnapshot = parseJson("examples/api/x03b/stock-balances.response.json");
+mismatchedPageCountSnapshot.meta.page_item_count = 0;
+assert.throws(() => validatePayload(mismatchedPageCountSnapshot, operations[0]), /page_item_count/);
+
+const inconsistentCursorSnapshot = parseJson("examples/api/x03b/stock-balances.response.json");
+inconsistentCursorSnapshot.meta.next_cursor = "cursor-must-not-exist-when-complete";
+assert.throws(() => validatePayload(inconsistentCursorSnapshot, operations[0]), /next_cursor/);
+
+const incompleteWithoutCursorSnapshot = parseJson("examples/api/x03b/stock-balances.response.json");
+incompleteWithoutCursorSnapshot.meta.complete = false;
+incompleteWithoutCursorSnapshot.meta.item_count = 2;
+assert.throws(() => validatePayload(incompleteWithoutCursorSnapshot, operations[0]), /next_cursor/);
+
+const staleManifestSnapshot = parseJson("examples/api/x03b/stock-balances.response.json");
+staleManifestSnapshot.data[0].available_quantity.value = "99.000";
+assert.throws(() => validatePayload(staleManifestSnapshot, operations[0]), /manifest_sha256/);
+
 const emptyReceiptSnapshot = parseJson("examples/api/x03b/warehouse-receipts.response.json");
 emptyReceiptSnapshot.data = [];
 emptyReceiptSnapshot.meta.item_count = 0;
+emptyReceiptSnapshot.meta.page_item_count = 0;
+emptyReceiptSnapshot.meta.delivered_item_count = 0;
+assert.throws(() => validatePayload(emptyReceiptSnapshot, operations[6]), /manifest_sha256/);
+
+emptyReceiptSnapshot.meta.manifest_sha256 = snapshotManifestSha256(emptyReceiptSnapshot, operations[6]);
 validatePayload(emptyReceiptSnapshot, operations[6]);
 
 const inventoryText = read("openapi/ops-core/inventory.v1.yaml");
@@ -232,9 +429,9 @@ for (const file of new Set(operations.map(operation => operation.file))) {
   assert.match(text, /x-owner-decision-ref: OWNER-DIRECTIVE-2026-09-03-EXT-OD-01-07/);
   assert.match(text, /securitySchemes:\n\s+ServiceBearer:\n\s+type: http\n\s+scheme: bearer\n\s+bearerFormat: JWT/);
   assert.match(text, /x-rate-limit-policies:[\s\S]*ExternalBulkRead:[\s\S]*sustained_rps_per_principal: 2[\s\S]*burst_per_principal: 4[\s\S]*fleet_rps: 10[\s\S]*server_timeout_seconds: 10[\s\S]*queue_limit: 0[\s\S]*partition_claims: \[token_use, sub\][\s\S]*required_token_use: service[\s\S]*principal_sub_format: uuid[\s\S]*limiter_authority: DISTRIBUTED_INGRESS_TOKEN_BUCKET[\s\S]*pre_auth_partition: TRUSTED_PROXY_VERIFIED_IP_ONLY[\s\S]*fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef[\s\S]*startup_fail_closed: true[\s\S]*exhausted_or_unavailable_behavior: FAIL_CLOSED_NO_CACHED_PASS/);
-  assert.match(text, /x-retry-policies:[\s\S]*ExternalBulkReadRetry:[\s\S]*max_retries: 2[\s\S]*total_budget_seconds: 30[\s\S]*retryable_statuses: \[408, 429, 502, 503, 504\][\s\S]*non_retryable_statuses: \[400, 401, 403, 404, 409, 410, 422\][\s\S]*backoff: FULL_JITTER_BASE_500MS_CAP_5S/);
+  assert.match(text, /x-retry-policies:[\s\S]*ExternalBulkReadRetry:[\s\S]*max_retries: 2[\s\S]*total_budget_seconds: 30[\s\S]*retryable_statuses: \[408, 429, 502, 503, 504\][\s\S]*non_retryable_statuses: \[400, 401, 403, 404, 409, 410, 422, 500\][\s\S]*backoff: FULL_JITTER_BASE_500MS_CAP_5S/);
   if (operations.some(operation => operation.file === file && operation.collection !== false)) {
-    assert.match(text, /x-pagination-policies:[\s\S]*ExternalSnapshotCursorV1:[\s\S]*mode: OPAQUE_SCOPE_BOUND_SNAPSHOT_CURSOR[\s\S]*cursor_version: 1[\s\S]*cursor_ttl_seconds: 1800[\s\S]*cursor_ttl_mode: ABSOLUTE_NON_SLIDING[\s\S]*integrity_protected: true[\s\S]*default_limit: 50[\s\S]*max_limit: 100[\s\S]*delta_supported: false[\s\S]*delta_replay_retention_seconds: 604800[\s\S]*delta_poll_seconds: 30[\s\S]*delta_poll_jitter_percent: 20[\s\S]*future_tombstone_retention_seconds: 7776000[\s\S]*snapshot_refresh_seconds: 300[\s\S]*full_reconciliation_seconds: 21600[\s\S]*full_reconciliation_triggers: \[STARTUP, RESUME, CHANGE_FEED_GAP, CURSOR_EXPIRED\][\s\S]*gap_reconcile_start_within_seconds: 60[\s\S]*gap_recovery: FAIL_CLOSED_FULL_RECONCILE[\s\S]*expired_cursor_recovery: FULL_RECONCILE_NO_TIMESTAMP_OR_LOCAL_CHECKPOINT[\s\S]*absence_reconcile_requires: FULL_SNAPSHOT_COMPLETE_VERIFIED_MANIFEST_COUNT_HASH/);
+    assert.match(text, /x-pagination-policies:[\s\S]*ExternalSnapshotCursorV1:[\s\S]*mode: OPAQUE_SCOPE_BOUND_SNAPSHOT_CURSOR[\s\S]*cursor_version: 1[\s\S]*cursor_ttl_seconds: 1800[\s\S]*cursor_ttl_mode: ABSOLUTE_NON_SLIDING[\s\S]*integrity_protected: true[\s\S]*default_limit: 50[\s\S]*max_limit: 100[\s\S]*page_max_items: 100[\s\S]*page_item_count_semantics: EXACT_CURRENT_PAGE_DATA_LENGTH[\s\S]*item_count_semantics: EXACT_FULL_SNAPSHOT_TOTAL[\s\S]*delivered_item_count_semantics: CUMULATIVE_THROUGH_CURRENT_PAGE[\s\S]*complete_requires: DELIVERED_COUNT_EQUALS_ITEM_COUNT_AND_NEXT_CURSOR_NULL[\s\S]*manifest_version: 1[\s\S]*manifest_algorithm: SHA-256[\s\S]*manifest_canonicalization: JCS_RFC8785[\s\S]*manifest_document_fields: \[manifest_version, resource, snapshot_id, as_of, high_watermark, item_count, items\][\s\S]*verify_manifest_before_absence_reconcile: true[\s\S]*delta_supported: false[\s\S]*delta_replay_retention_seconds: 604800[\s\S]*delta_poll_seconds: 30[\s\S]*delta_poll_jitter_percent: 20[\s\S]*future_tombstone_retention_seconds: 7776000[\s\S]*snapshot_refresh_seconds: 300[\s\S]*full_reconciliation_seconds: 21600[\s\S]*full_reconciliation_triggers: \[STARTUP, RESUME, CHANGE_FEED_GAP, CURSOR_EXPIRED\][\s\S]*gap_reconcile_start_within_seconds: 60[\s\S]*gap_recovery: FAIL_CLOSED_FULL_RECONCILE[\s\S]*expired_cursor_recovery: FULL_RECONCILE_NO_TIMESTAMP_OR_LOCAL_CHECKPOINT[\s\S]*absence_reconcile_requires: FULL_SNAPSHOT_COMPLETE_VERIFIED_MANIFEST_COUNT_HASH/);
   }
 }
 
@@ -246,5 +443,23 @@ assert.throws(
   () => validateSchema(errorSchema.schema, { code: "CURSOR_INVALID", message: "Safe external error.", httpStatus: 410, correlationId: "corr-x03b" }, errorSchema.file),
   /oneOf/
 );
+
+const responseEnvelopeSchema = loadSchema("schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json");
+for (const profile of Object.values(responseProfiles)) {
+  for (const [status, expected] of Object.entries(profile)) {
+    const envelope = {
+      schemaVersion: "v1",
+      correlation: { correlationId: `corr-x03b-${status}` },
+      error: { code: expected.code, message: "Safe external error.", httpStatus: Number(status), correlationId: `corr-x03b-${status}` }
+    };
+    validateSchema(responseEnvelopeSchema.schema.$defs[expected.definition], envelope, responseEnvelopeSchema.file);
+    const wrongCode = structuredClone(envelope);
+    wrongCode.error.code = expected.code === "FORBIDDEN" ? "UNAUTHORIZED" : "FORBIDDEN";
+    assert.throws(() => validateSchema(responseEnvelopeSchema.schema.$defs[expected.definition], wrongCode, responseEnvelopeSchema.file), /const|oneOf/);
+    const wrongStatus = structuredClone(envelope);
+    wrongStatus.error.httpStatus = Number(status) === 403 ? 401 : 403;
+    assert.throws(() => validateSchema(responseEnvelopeSchema.schema.$defs[expected.definition], wrongStatus, responseEnvelopeSchema.file), /const|oneOf/);
+  }
+}
 
 console.log(`X03B external bulk-read contract PASS: ${operations.length}/8 operations, positive examples/fixtures, and negative tamper checks.`);

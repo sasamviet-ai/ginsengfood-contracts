@@ -20,13 +20,19 @@
   }],
   "meta": {
     "cursor_version": 1,
+    "resource": "inventory.allocations",
     "snapshot_id": "11000000-0000-4000-8000-000000000004",
     "as_of": "2026-09-03T01:00:00Z",
     "high_watermark": "allocation-revision-0001",
     "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 1,
     "item_count": 1,
     "complete": true,
-    "manifest_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "79570331b7d1c19baa39d233c5cda13270886b4f9999090df60a63b858217654",
     "delta_supported": false
   }
 }

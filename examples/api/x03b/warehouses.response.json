@@ -10,13 +10,19 @@
   }],
   "meta": {
     "cursor_version": 1,
+    "resource": "warehouses",
     "snapshot_id": "11000000-0000-4000-8000-000000000005",
     "as_of": "2026-09-03T01:00:00Z",
     "high_watermark": "warehouse-revision-0001",
     "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 1,
     "item_count": 1,
     "complete": true,
-    "manifest_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "831445f9c1eced9ac4fc6344744cb4f8860fabcfbf351b99aec5dffecf284fc1",
     "delta_supported": false
   }
 }

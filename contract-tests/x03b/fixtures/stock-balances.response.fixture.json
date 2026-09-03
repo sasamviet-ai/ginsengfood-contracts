@@ -1,1 +1,56 @@
-{"schemaVersion":"v1","correlation":{"correlationId":"fixture-x03b-stock-balance"},"data":[{"stock_balance_id":"10000000-0000-4000-8000-000000000002","item_type":"FINISHED_GOOD","sku_id":"20000000-0000-4000-8000-000000000002","warehouse_id":"40000000-0000-4000-8000-000000000001","on_hand_quantity":{"value":"10.000","unit":"BOX"},"available_quantity":{"value":"10.000","unit":"BOX"},"reserved_quantity":{"value":"0.000","unit":"BOX"},"quality_hold_quantity":{"value":"0.000","unit":"BOX"},"recall_hold_quantity":{"value":"0.000","unit":"BOX"},"sale_lock_quantity":{"value":"0.000","unit":"BOX"},"as_of":"2026-09-03T01:00:00Z"}],"meta":{"cursor_version":1,"snapshot_id":"11000000-0000-4000-8000-000000000011","as_of":"2026-09-03T01:00:00Z","high_watermark":"fixture-stock-balance-1","next_cursor":null,"item_count":1,"complete":true,"manifest_sha256":"1111111111111111111111111111111111111111111111111111111111111111","delta_supported":false}}
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "fixture-x03b-stock-balance"
+  },
+  "data": [
+    {
+      "stock_balance_id": "10000000-0000-4000-8000-000000000002",
+      "item_type": "FINISHED_GOOD",
+      "sku_id": "20000000-0000-4000-8000-000000000002",
+      "warehouse_id": "40000000-0000-4000-8000-000000000001",
+      "on_hand_quantity": {
+        "value": "10.000",
+        "unit": "BOX"
+      },
+      "available_quantity": {
+        "value": "10.000",
+        "unit": "BOX"
+      },
+      "reserved_quantity": {
+        "value": "0.000",
+        "unit": "BOX"
+      },
+      "quality_hold_quantity": {
+        "value": "0.000",
+        "unit": "BOX"
+      },
+      "recall_hold_quantity": {
+        "value": "0.000",
+        "unit": "BOX"
+      },
+      "sale_lock_quantity": {
+        "value": "0.000",
+        "unit": "BOX"
+      },
+      "as_of": "2026-09-03T01:00:00Z"
+    }
+  ],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "inventory.stock-balances",
+    "snapshot_id": "11000000-0000-4000-8000-000000000011",
+    "as_of": "2026-09-03T01:00:00Z",
+    "high_watermark": "fixture-stock-balance-1",
+    "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 1,
+    "item_count": 1,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "29b7b97df5b5e8768b2943bb39b657590684033724e5d40564e00c9351b7c684",
+    "delta_supported": false
+  }
+}
