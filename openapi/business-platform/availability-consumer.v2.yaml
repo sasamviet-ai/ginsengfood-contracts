@@ -1,0 +1,254 @@
+openapi: 3.1.0
+info:
+  title: Business Platform Availability Consumer API
+  version: 2.0.0
+  description: >-
+    Consumer-side Availability v2 contract for calling the ops-core ephemeral, no-side-effect guard over current Operational Truth.
+    It never reserves stock, persists a sellable status, or mutates inventory, warehouse,
+    release, trace, recall, or sale-lock state. Availability v1 remains frozen.
+  x-owner-decision: OWNER-DIRECTIVE-2026-09-03-EXT-OD-01-07
+servers:
+  - url: https://api.example.local
+    description: Placeholder only; not runtime or release evidence.
+tags:
+  - name: availability-consumer
+paths:
+  /v2/availability/check:
+    post:
+      summary: Resolve exact-UOM availability
+      description: >-
+        Resolves an availability-existence or full-fill decision in one exact ACTIVE approved
+        sell/trade-item finished-goods UOM and an explicit ALL or WAREHOUSE scope. No conversion,
+        mixed-UOM aggregation, partial fulfillment, persistence, reservation, or cached PASS fallback
+        is allowed. Stale, timeout, unavailable, unresolved, or incomplete truth fails closed.
+      operationId: checkAvailabilityV2
+      tags: [availability-consumer]
+      security:
+        - serviceBearer: []
+      x-owner-decision: OWNER-DIRECTIVE-2026-09-03-EXT-OD-01-07
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-availability-v2
+      x-permission: SELLABLE_CHECK
+      x-permission-scope: SERVICE
+      x-side-effects: NONE
+      x-persistence: NONE
+      x-uom-policy:
+        case_sensitive: true
+        active_approved_sell_uom_required: true
+        conversion_allowed: false
+        mixed_uom_aggregation_allowed: false
+      x-quantity-policy:
+        format: numeric(18,3)
+        minimum_exclusive: 0
+        omitted_mode: EXISTENCE
+        fulfillment: FULL_FILL_ONLY
+        partial_supported: false
+      x-warehouse-policy:
+        omitted_scope: ALL
+        supplied_scope: WAREHOUSE
+        invalid_uuid_status: 422
+        missing_inactive_inaccessible_status: 404
+        fallback_allowed: false
+      x-freshness-policy:
+        provider_cache_seconds: 0
+        consumer_max_reuse_seconds: 5
+        invalidation_target_seconds: 1
+        recompute_source: OPERATIONAL_TRUTH
+        failure_mode: UNKNOWN_BLOCK
+        cached_sellable_reuse_allowed: false
+      x-rate-limit-policy:
+        policy: ExternalAvailabilityCheck
+        sustained_rps_per_principal: 10
+        burst_per_principal: 20
+        fleet_cap_rps: 50
+        queue_limit: 0
+        principal_partition: token.sub
+        fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+        fleet_authority_config: RateLimiting__External__FleetAuthorityRef
+        missing_authority_behavior: STARTUP_FAIL_CLOSED
+      x-timeout-retry-policy:
+        server_timeout_seconds: 2
+        max_retry: 1
+        total_retry_budget_seconds: 5
+        retry_http_statuses: [408, 429, 502, 503, 504]
+        non_retry_http_statuses: [400, 401, 403, 404, 409, 422]
+        honor_retry_after: true
+        backoff: FULL_JITTER
+        backoff_base_ms: 100
+        backoff_cap_ms: 500
+        budget_exhausted_behavior: UNKNOWN_BLOCK
+      x-invariants:
+        - uom_code is echoed exactly and all quantities use that UOM.
+        - available_quantity >= sellable_quantity >= 0.
+        - Omitted requested_quantity is SELLABLE only when sellable_quantity > 0.
+        - Supplied requested_quantity is SELLABLE only when sellable_quantity >= requested_quantity.
+        - valid_until equals resolved_at plus exactly 5 seconds.
+        - Recall, sale lock, quality hold, HSD, release, receipt, inventory, and trace guards override stock.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../../schemas/ops/availability-check-request.v2.schema.json"
+            examples:
+              fullFillWarehouse:
+                externalValue: "../../examples/api/availability-check.v2.request.json"
+      responses:
+        "200": { $ref: "#/components/responses/AvailabilityResolved" }
+        "400": { $ref: "#/components/responses/InvalidRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/WarehouseNotFound" }
+        "408": { $ref: "#/components/responses/RequestTimeout" }
+        "415": { $ref: "#/components/responses/UnsupportedMediaType" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
+        "502": { $ref: "#/components/responses/UpstreamUnavailable" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+        "504": { $ref: "#/components/responses/UpstreamTimeout" }
+components:
+  schemas:
+    AvailabilityCheckRequest:
+      $ref: "../../schemas/ops/availability-check-request.v2.schema.json"
+    AvailabilityCheckSuccess:
+      $ref: "../../schemas/ops/availability-check-success.v2.schema.json"
+    AvailabilityCheckError:
+      $ref: "../../schemas/ops/availability-check-error.v2.schema.json"
+  headers:
+    CacheControlNoStore:
+      description: Required. Availability responses must not be stored by provider/intermediary caches.
+      schema:
+        type: string
+        const: no-store
+    CorrelationId:
+      description: Required safe request correlation identifier.
+      schema:
+        type: string
+        minLength: 1
+    RateLimitLimit:
+      description: Required per-principal sustained limit for ExternalAvailabilityCheck.
+      schema:
+        type: integer
+        const: 10
+    RateLimitRemaining:
+      description: Required safe remaining count; never contains the principal partition key.
+      schema:
+        type: integer
+        minimum: 0
+    RateLimitReset:
+      description: Required non-negative seconds until the current per-principal limit resets.
+      schema:
+        type: integer
+        minimum: 0
+    RetryAfter:
+      description: Required on 429; integer seconds and never exposes a principal partition key.
+      schema:
+        type: integer
+        minimum: 1
+  responses:
+    AvailabilityResolved:
+      description: Fresh ephemeral decision. Cache-Control no-store is mandatory.
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
+        X-RateLimit-Limit: { $ref: "#/components/headers/RateLimitLimit" }
+        X-RateLimit-Remaining: { $ref: "#/components/headers/RateLimitRemaining" }
+        X-RateLimit-Reset: { $ref: "#/components/headers/RateLimitReset" }
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-success.v2.schema.json" }
+    InvalidRequest:
+      description: Malformed JSON or request framing; not retryable.
+      x-error-code: INVALID_REQUEST
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+    Unauthorized:
+      description: Missing or invalid service bearer; not retryable.
+      x-error-code: UNAUTHORIZED
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+    Forbidden:
+      description: Wrong token_use, audience, SELLABLE_CHECK permission, or SERVICE scope; not retryable.
+      x-error-code: FORBIDDEN
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+    WarehouseNotFound:
+      description: Supplied warehouse is missing, inactive, or inaccessible; no fallback and not retryable.
+      x-error-code: WAREHOUSE_NOT_FOUND
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+    RequestTimeout:
+      description: Resolution exceeded the two-second server budget; fail closed.
+      x-error-code: REQUEST_TIMEOUT
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+    UnsupportedMediaType:
+      description: Request Content-Type is not application/json; not retryable.
+      x-error-code: UNSUPPORTED_MEDIA_TYPE
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+    ValidationFailed:
+      description: >-
+        Contract or semantic validation failed, including malformed UUID, non-positive/over-precision
+        quantity, inactive/unapproved UOM, or case mismatch; not retryable.
+      x-error-code: VALIDATION_FAILED
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+    RateLimited:
+      description: ExternalAvailabilityCheck limit exceeded; fail closed and honor Retry-After.
+      x-error-code: RATE_LIMITED
+      headers:
+        Cache-Control: { $ref: "#/components/headers/CacheControlNoStore" }
+        Retry-After: { $ref: "#/components/headers/RetryAfter" }
+        X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
+        X-RateLimit-Limit: { $ref: "#/components/headers/RateLimitLimit" }
+        X-RateLimit-Remaining: { $ref: "#/components/headers/RateLimitRemaining" }
+        X-RateLimit-Reset: { $ref: "#/components/headers/RateLimitReset" }
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+          examples:
+            rateLimited:
+              externalValue: "../../examples/errors/availability-check-v2-rate-limited.example.json"
+    InternalError:
+      description: Safe internal failure with no topology, credentials, or stack trace; not retryable.
+      x-error-code: INTERNAL_ERROR
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+    UpstreamUnavailable:
+      description: Operational Truth dependency returned an invalid gateway response; fail closed.
+      x-error-code: UPSTREAM_UNAVAILABLE
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+    ServiceUnavailable:
+      description: Provider or Operational Truth dependency is unavailable; fail closed.
+      x-error-code: UPSTREAM_UNAVAILABLE
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+    UpstreamTimeout:
+      description: Operational Truth dependency timed out; fail closed.
+      x-error-code: UPSTREAM_TIMEOUT
+      content:
+        application/json:
+          schema: { $ref: "../../schemas/ops/availability-check-error.v2.schema.json" }
+  securitySchemes:
+    serviceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >-
+        SERVICE_BEARER JWT requiring token_use=service, audience
+        ginsengfood-ops-core-external-availability-v2, permission SELLABLE_CHECK,
+        permission scope SERVICE, and immutable UUID sub.
