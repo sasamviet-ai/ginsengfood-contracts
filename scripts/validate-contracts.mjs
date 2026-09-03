@@ -305,6 +305,25 @@ function checkRequiredIvrContracts() {
   }
 }
 
+function checkSkuLifecycleStatusParity() {
+  const relative = "enums/product/sku-lifecycle-status.yaml";
+  const enumPath = path.join(root, toFsPath(relative));
+  if (!fs.existsSync(enumPath)) {
+    errors.push(`${relative}: missing`);
+    return;
+  }
+
+  const values = extractYamlObjectValues(read(enumPath), "values", "value");
+  for (const requiredValue of ["ACTIVE", "INACTIVE", "RETIRED"]) {
+    if (values.filter(value => value === requiredValue).length !== 1) {
+      errors.push(`${relative}: must contain exactly one ${requiredValue} value`);
+    }
+  }
+  if (values.includes("ACTIVE_BASELINE")) {
+    errors.push(`${relative}: ACTIVE_BASELINE is internal and must project as ACTIVE at the external boundary`);
+  }
+}
+
 function checkLegacySourcePath(filePath, text) {
   const relative = rel(filePath);
   if (relative.startsWith("docs/documents/")) return;
@@ -828,6 +847,19 @@ if (validationScope === "operational-form-v2") {
   process.exit(0);
 }
 
+if (validationScope === "sku-lifecycle") {
+  checkSourceMap({ validateTargets: false });
+  checkSkuLifecycleStatusParity();
+  const enumPath = path.join(root, "enums", "product", "sku-lifecycle-status.yaml");
+  if (fs.existsSync(enumPath)) {
+    const text = read(enumPath);
+    checkSourceDocuments(enumPath, text);
+    checkKnownYamlPathFields(enumPath, text);
+  }
+  printResultAndExit();
+  process.exit(0);
+}
+
 if (validationScope !== "all") {
   errors.push(`Unknown validation scope: ${validationScope}`);
   printResultAndExit();
@@ -836,6 +868,7 @@ if (validationScope !== "all") {
 checkSourceMap();
 checkPhase8Sources();
 checkRequiredIvrContracts();
+checkSkuLifecycleStatusParity();
 checkOperationalFormV2();
 
 const files = walk(root);

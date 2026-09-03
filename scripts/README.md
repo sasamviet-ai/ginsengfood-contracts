@@ -18,4 +18,10 @@ Targeted Operational Forms v2 validation, intentionally independent of unrelated
 node scripts/validate-contracts.mjs --scope=operational-form-v2
 ```
 
+Targeted SKU lifecycle enum validation, including external `ACTIVE`/`INACTIVE`/`RETIRED` parity and the internal-only `ACTIVE_BASELINE` boundary:
+
+```powershell
+node scripts/validate-contracts.mjs --scope=sku-lifecycle
+```
+
 Future scripts may include strict OpenAPI/YAML/AsyncAPI validation, full JSON Schema example validation with an approved validator, breaking-change checks, and generated-client workflows after the toolchain is approved.
