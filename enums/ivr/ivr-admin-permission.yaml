@@ -4,7 +4,7 @@ title: IVR Admin Permission
 description: Phase 8 admin permission keys for queue, SIM, retry, and review actions.
 source_documents:
   - docs/documents/3. tech/02-TECH-01-FOUNDATION-RBAC-AUDIT-IDEMPOTENCY-EVIDENCE-REGISTRY.md
-  - docs/documents/4. phase/phase-8/IVR-08-admin-monitoring-evidence-audit-privacy.md
+  - docs/documents/4. phase/phase-8/08-GIÁM SÁT QUẢN TRỊ BẰNG CHỨNG KIỂM TOÁN VÀ RIÊNG TƯ.md
 values:
   - value: IVR_QUEUE_VIEW
     description: View IVR queue and job status.

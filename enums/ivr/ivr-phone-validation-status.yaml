@@ -3,7 +3,7 @@ name: ivr-phone-validation-status
 title: IVR Phone Validation Status
 description: Phase 8 phone validation statuses for official contact selection and call eligibility.
 source_documents:
-  - docs/documents/4. phase/phase-8/IVR-03-eligibility-customer-trust-official-contact.md
+  - docs/documents/4. phase/phase-8/03-ĐIỀU KIỆN GỌI NIỀM TIN KHÁCH HÀNG VÀ LIÊN HỆ CHÍNH THỨC.md
 values:
   - value: PHONE_VALID
     description: Phone can be used for IVR after official contact policy passes.

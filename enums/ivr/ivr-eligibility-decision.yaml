@@ -3,8 +3,8 @@ name: ivr-eligibility-decision
 title: IVR Eligibility Decision
 description: Phase 8 decisions for whether an Official Order should enter IVR.
 source_documents:
-  - docs/documents/4. phase/phase-8/IVR-03-eligibility-customer-trust-official-contact.md
-  - docs/documents/4. phase/phase-8/IVR-04-order-core-to-ivr-task-contract.md
+  - docs/documents/4. phase/phase-8/03-ĐIỀU KIỆN GỌI NIỀM TIN KHÁCH HÀNG VÀ LIÊN HỆ CHÍNH THỨC.md
+  - docs/documents/4. phase/phase-8/04-HỢP ĐỒNG TỪ LÕI ĐƠN HÀNG ĐẾN TÁC VỤ IVR.md
 values:
   - value: ELIGIBLE_FOR_IVR
     description: Official Order passes IVR eligibility checks and should receive an IVR task.

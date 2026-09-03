@@ -21,12 +21,12 @@ source_documents:
   - docs/documents/3. tech/08-TECH-07-ADS-MEASUREMENT-ATTRIBUTION-ROAS-CPA-AOV-VERIFIED-REVENUE-SCALE-GATE.md
   - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
   - docs/documents/3. tech/11-TECH-10-GLOBAL-SMOKE-UAT-EVIDENCE-RELEASE-GATEWAY-PRODUCTION-READINESS-CONTROL.md
-  - docs/documents/4. phase/phase-8/IVR-03-eligibility-customer-trust-official-contact.md
-  - docs/documents/4. phase/phase-8/IVR-04-order-core-to-ivr-task-contract.md
-  - docs/documents/4. phase/phase-8/IVR-05-attempt-policy-scheduler-queue.md
-  - docs/documents/4. phase/phase-8/IVR-07-result-normalization-order-core-callback.md
-  - docs/documents/4. phase/phase-8/IVR-08-admin-monitoring-evidence-audit-privacy.md
-  - docs/documents/4. phase/phase-8/IVR-09-test-matrix-smoke-release-gate.md
+  - docs/documents/4. phase/phase-8/03-ĐIỀU KIỆN GỌI NIỀM TIN KHÁCH HÀNG VÀ LIÊN HỆ CHÍNH THỨC.md
+  - docs/documents/4. phase/phase-8/04-HỢP ĐỒNG TỪ LÕI ĐƠN HÀNG ĐẾN TÁC VỤ IVR.md
+  - docs/documents/4. phase/phase-8/05-CHÍNH SÁCH GỌI LẠI BỘ LẬP LỊCH VÀ HÀNG ĐỢI.md
+  - docs/documents/4. phase/phase-8/07-CHUẨN HÓA KẾT QUẢ VÀ CALLBACK VỀ LÕI ĐƠN HÀNG.md
+  - docs/documents/4. phase/phase-8/08-GIÁM SÁT QUẢN TRỊ BẰNG CHỨNG KIỂM TOÁN VÀ RIÊNG TƯ.md
+  - docs/documents/4. phase/phase-8/09-MA TRẬN KIỂM THỬ KHÓI VÀ CỔNG PHÁT HÀNH.md
 fixtures:
   - file: availability-check.v1.fixture.json
     contract_area: availability

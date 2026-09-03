@@ -5,7 +5,7 @@ description: IVR v1 program types and attempt policies for order confirmation.
 source_documents:
   - docs/documents/2. pack/09-PACK-09-IVR-ORDER-CONFIRMATION.md
   - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
-  - docs/documents/4. phase/phase-8/IVR-05-attempt-policy-scheduler-queue.md
+  - docs/documents/4. phase/phase-8/05-CHÍNH SÁCH GỌI LẠI BỘ LẬP LỊCH VÀ HÀNG ĐỢI.md
 values:
   - value: GOLDEN_HOUR
     description: Golden Hour order confirmation program; two customer-counted attempts within ten minutes at T0 and T0 plus five minutes.
