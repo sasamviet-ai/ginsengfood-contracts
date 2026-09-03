@@ -253,6 +253,63 @@ function expectReject(mutator, validate, label) {
   assert.throws(() => validate(value), undefined, label);
 }
 
+function validateRequestSchemaStructure(schema) {
+  assert.equal(schema.$schema, "https://json-schema.org/draft/2020-12/schema");
+  assert.equal(schema.additionalProperties, false);
+  assert.deepEqual(schema.required, ["sku_id", "uom_code"]);
+  assert.equal(schema.properties.sku_id.type, "string");
+  assert.equal(schema.properties.sku_id.format, "uuid", "request sku_id must retain UUID format validation");
+  assert.equal(schema.properties.requested_quantity.pattern, positiveQuantityPattern.source);
+  assert.equal(schema.properties.uom_code.pattern, uomPattern.source);
+}
+
+function requiredConditional(schema, discriminator, discriminatorValue, guardedProperty) {
+  assert.equal(Array.isArray(schema.allOf), true, "result schema must define allOf conditionals");
+  const matches = schema.allOf.filter(rule => (
+    rule?.if?.properties?.[discriminator]?.const === discriminatorValue
+    && Array.isArray(rule.if.required)
+    && rule.if.required.includes(discriminator)
+  ));
+  assert.equal(matches.length, 1, `result schema must retain one ${discriminator}=${discriminatorValue} conditional`);
+  assert.deepEqual(matches[0].then?.required, [guardedProperty], `${guardedProperty} then-required drift`);
+  assert.deepEqual(matches[0].else?.not?.required, [guardedProperty], `${guardedProperty} else-forbidden drift`);
+}
+
+function validateResultSchemaStructure(schema) {
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.properties.partial_supported.const, false);
+  assert.deepEqual(schema.properties.decision.enum, ["SELLABLE", "BLOCKED", "UNKNOWN"]);
+  assert.equal(schema.properties.available_quantity.pattern, nonNegativeQuantityPattern.source);
+  assert.equal(schema.properties.sellable_quantity.pattern, nonNegativeQuantityPattern.source);
+  assert.ok(schema.$comment.includes("available_quantity >= sellable_quantity >= 0"));
+  assert.ok(schema.$comment.includes("valid_until = resolved_at + 5 seconds"));
+  assert.equal(schema.properties.resolved_at.pattern, "Z$");
+  assert.equal(schema.properties.valid_until.pattern, "Z$");
+  requiredConditional(schema, "warehouse_scope", "WAREHOUSE", "warehouse_id");
+  requiredConditional(schema, "check_mode", "FULL_FILL", "requested_quantity");
+}
+
+function validateErrorSchemaStructure(schema) {
+  assert.equal(schema.properties.schemaVersion.const, "v2");
+  assert.equal(schema.properties.error.oneOf.length, 11);
+  assert.equal(schema.properties.meta.properties.failure_mode.const, "UNKNOWN_BLOCK");
+  assert.equal(schema.properties.meta.properties.cached_sellable_reused.const, false);
+
+  for (const binding of Object.values(expectedErrorBindings)) {
+    const compatibleBaseMappings = schema.properties.error.oneOf.filter(mapping => {
+      const properties = mapping?.properties;
+      if (properties?.code?.const !== binding.code || properties?.retryable?.const !== binding.retryable) return false;
+      const status = properties.http_status;
+      return status?.const === binding.status || status?.enum?.includes(binding.status);
+    });
+    assert.equal(
+      compatibleBaseMappings.length,
+      1,
+      `base error schema must remain satisfiable with ${binding.status}/${binding.code}/retryable=${binding.retryable} wrapper`
+    );
+  }
+}
+
 function extractBlock(text, marker) {
   const lines = text.replaceAll("\r\n", "\n").split("\n");
   const start = lines.findIndex(line => line === marker);
@@ -448,22 +505,10 @@ assert.equal(
 );
 
 const requestSchema = readJson(files.requestSchema);
-assert.equal(requestSchema.$schema, "https://json-schema.org/draft/2020-12/schema");
-assert.equal(requestSchema.additionalProperties, false);
-assert.deepEqual(requestSchema.required, ["sku_id", "uom_code"]);
-assert.equal(requestSchema.properties.requested_quantity.pattern, positiveQuantityPattern.source);
-assert.equal(requestSchema.properties.uom_code.pattern, uomPattern.source);
+validateRequestSchemaStructure(requestSchema);
 
 const resultSchema = readJson(files.resultSchema);
-assert.equal(resultSchema.additionalProperties, false);
-assert.equal(resultSchema.properties.partial_supported.const, false);
-assert.deepEqual(resultSchema.properties.decision.enum, ["SELLABLE", "BLOCKED", "UNKNOWN"]);
-assert.equal(resultSchema.properties.available_quantity.pattern, nonNegativeQuantityPattern.source);
-assert.equal(resultSchema.properties.sellable_quantity.pattern, nonNegativeQuantityPattern.source);
-assert.ok(resultSchema.$comment.includes("available_quantity >= sellable_quantity >= 0"));
-assert.ok(resultSchema.$comment.includes("valid_until = resolved_at + 5 seconds"));
-assert.equal(resultSchema.properties.resolved_at.pattern, "Z$");
-assert.equal(resultSchema.properties.valid_until.pattern, "Z$");
+validateResultSchemaStructure(resultSchema);
 
 const successSchema = readJson(files.successSchema);
 assert.equal(successSchema.properties.schemaVersion.const, "v2");
@@ -471,10 +516,7 @@ assert.equal(successSchema.properties.meta.properties.provider_cache_seconds.con
 assert.equal(successSchema.properties.meta.properties.consumer_max_reuse_seconds.const, 5);
 
 const errorSchema = readJson(files.errorSchema);
-assert.equal(errorSchema.properties.schemaVersion.const, "v2");
-assert.equal(errorSchema.properties.error.oneOf.length, 11);
-assert.equal(errorSchema.properties.meta.properties.failure_mode.const, "UNKNOWN_BLOCK");
-assert.equal(errorSchema.properties.meta.properties.cached_sellable_reused.const, false);
+validateErrorSchemaStructure(errorSchema);
 
 const requestExample = readJson(files.requestExample);
 const successExample = readJson(files.successExample);
@@ -608,6 +650,45 @@ for (const [from, to, label] of [
   expectContractTamperReject(provider, from, to, label);
 }
 
+expectReject(
+  { base: requestSchema, change: value => { delete value.properties.sku_id.format; } },
+  validateRequestSchemaStructure,
+  "request sku_id UUID format schema tamper"
+);
+expectReject(
+  {
+    base: resultSchema,
+    change: value => {
+      value.allOf = value.allOf.filter(rule => rule?.if?.properties?.warehouse_scope?.const !== "WAREHOUSE");
+    }
+  },
+  validateResultSchemaStructure,
+  "warehouse_id conditional schema tamper"
+);
+expectReject(
+  {
+    base: resultSchema,
+    change: value => {
+      value.allOf = value.allOf.filter(rule => rule?.if?.properties?.check_mode?.const !== "FULL_FILL");
+    }
+  },
+  validateResultSchemaStructure,
+  "requested_quantity conditional schema tamper"
+);
+expectReject(
+  {
+    base: errorSchema,
+    change: value => {
+      const rateLimited = value.properties.error.oneOf.find(
+        mapping => mapping?.properties?.code?.const === "RATE_LIMITED"
+      );
+      rateLimited.properties.retryable.const = false;
+    }
+  },
+  validateErrorSchemaStructure,
+  "RATE_LIMITED base/wrapper satisfiability schema tamper"
+);
+
 console.log(
-  "Availability v2 dedicated contract validation passed: canonical provider/consumer parity, exact HTTP error bindings, schemas, examples, fixtures, and 26 negative tamper cases."
+  "Availability v2 dedicated contract validation passed: canonical provider/consumer parity, exact HTTP error bindings, schemas, examples, fixtures, and 30 negative tamper cases including JSON Schema structure."
 );
