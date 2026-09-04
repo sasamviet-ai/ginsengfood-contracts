@@ -26,6 +26,7 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 ### Fixed
 
 - Corrected the v1 FRM-14 OpenAPI extension to the published v1 enum value `ACCOUNTING_MATERIAL_ISSUE`.
+- Closed SKU lifecycle schema parity around the canonical registry: both Product Master and authenticated external public-SKU schemas now accept terminal `RETIRED`, reject internal-only `ACTIVE_BASELINE`, and are enforced by focused validation plus the X03B contract test in CI.
 
 ### Breaking Changes
 

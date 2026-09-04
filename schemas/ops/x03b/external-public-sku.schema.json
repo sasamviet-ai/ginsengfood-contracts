@@ -12,7 +12,7 @@
     "public_name": { "type": "string", "minLength": 1 },
     "dietary_type": { "type": "string", "enum": ["VEGAN", "SAVORY"] },
     "product_group": { "type": "string", "minLength": 1 },
-    "lifecycle_status": { "type": "string", "enum": ["DRAFT", "PENDING_CONFIG", "PENDING_EVIDENCE", "READY", "ACTIVE", "INACTIVE", "BLOCKED"] }
+    "lifecycle_status": { "type": "string", "enum": ["DRAFT", "PENDING_CONFIG", "PENDING_EVIDENCE", "READY", "ACTIVE", "INACTIVE", "RETIRED", "BLOCKED"] }
   },
   "required": ["sku_id", "sku_code", "product_id", "public_name", "lifecycle_status"]
 }

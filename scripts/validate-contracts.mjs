@@ -314,6 +314,9 @@ function checkSkuLifecycleStatusParity() {
   }
 
   const values = extractYamlObjectValues(read(enumPath), "values", "value");
+  if (new Set(values).size !== values.length) {
+    errors.push(`${relative}: lifecycle values must be unique`);
+  }
   for (const requiredValue of ["ACTIVE", "INACTIVE", "RETIRED"]) {
     if (values.filter(value => value === requiredValue).length !== 1) {
       errors.push(`${relative}: must contain exactly one ${requiredValue} value`);
@@ -321,6 +324,44 @@ function checkSkuLifecycleStatusParity() {
   }
   if (values.includes("ACTIVE_BASELINE")) {
     errors.push(`${relative}: ACTIVE_BASELINE is internal and must project as ACTIVE at the external boundary`);
+  }
+
+  for (const schemaRelative of [
+    "schemas/product/sku.schema.json",
+    "schemas/ops/x03b/external-public-sku.schema.json"
+  ]) {
+    const schemaPath = path.join(root, toFsPath(schemaRelative));
+    if (!fs.existsSync(schemaPath)) {
+      errors.push(`${schemaRelative}: missing`);
+      continue;
+    }
+
+    let schema;
+    try {
+      schema = readJson(schemaPath);
+    } catch (error) {
+      errors.push(`${schemaRelative}: invalid JSON (${error.message})`);
+      continue;
+    }
+
+    const schemaValues = schema?.properties?.lifecycle_status?.enum;
+    if (!Array.isArray(schemaValues)) {
+      errors.push(`${schemaRelative}: properties.lifecycle_status.enum must be a closed enum`);
+      continue;
+    }
+
+    if (new Set(schemaValues).size !== schemaValues.length) {
+      errors.push(`${schemaRelative}: properties.lifecycle_status.enum values must be unique`);
+    }
+
+    const missingValues = values.filter(value => !schemaValues.includes(value));
+    const extraValues = schemaValues.filter(value => !values.includes(value));
+    if (missingValues.length > 0 || extraValues.length > 0) {
+      errors.push(
+        `${schemaRelative}: properties.lifecycle_status.enum must match ${relative}` +
+        ` (missing: ${missingValues.join(", ") || "none"}; extra: ${extraValues.join(", ") || "none"})`
+      );
+    }
   }
 }
 

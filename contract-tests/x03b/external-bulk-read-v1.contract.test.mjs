@@ -400,6 +400,15 @@ for (const operation of operations) {
   }
 }
 
+const publicSkuOperation = operations.find(operation => operation.operationId === "getPublicSkuV1");
+const retiredPublicSku = parseJson("contract-tests/x03b/fixtures/public-sku.response.fixture.json");
+retiredPublicSku.data.lifecycle_status = "RETIRED";
+validatePayload(retiredPublicSku, publicSkuOperation);
+
+const internalLifecycleLeak = structuredClone(retiredPublicSku);
+internalLifecycleLeak.data.lifecycle_status = "ACTIVE_BASELINE";
+assert.throws(() => validatePayload(internalLifecycleLeak, publicSkuOperation), /enum/);
+
 const crlfInventoryText = read(operations[0].file).replaceAll("\n", "\r\n");
 assertOperationContract(operations[0], crlfInventoryText);
 const crlfInventoryPathBlock = extractPathBlock(crlfInventoryText, operations[0].route);

@@ -31,5 +31,9 @@ jobs:
           node-version: "20"
       - name: Validate Operational Forms v2 parity
         run: node scripts/validate-contracts.mjs --scope=operational-form-v2
+      - name: Validate SKU lifecycle enum parity
+        run: node scripts/validate-contracts.mjs --scope=sku-lifecycle
+      - name: Validate external bulk-read v1 contracts
+        run: node contract-tests/x03b/external-bulk-read-v1.contract.test.mjs
       - name: Validate complete contract baseline
         run: node scripts/validate-contracts.mjs
