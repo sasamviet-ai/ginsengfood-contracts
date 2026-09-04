@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-stock-balance.schema.json",
+  "title": "External stock balance projection",
+  "description": "Read-only stock balance whitelist without internal ledger, evidence, audit, or MISA references.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "stock_balance_id": { "type": "string", "format": "uuid" },
+    "item_type": { "type": "string", "enum": ["MATERIAL", "PACKAGING", "FINISHED_GOOD"] },
+    "sku_id": { "type": "string", "format": "uuid" },
+    "material_id": { "type": "string", "format": "uuid" },
+    "batch_id": { "type": "string", "format": "uuid" },
+    "lot_code": { "type": "string", "minLength": 1 },
+    "warehouse_id": { "type": "string", "format": "uuid" },
+    "warehouse_location_id": { "type": "string", "format": "uuid" },
+    "on_hand_quantity": { "$ref": "external-quantity.schema.json" },
+    "available_quantity": { "$ref": "external-quantity.schema.json" },
+    "reserved_quantity": { "$ref": "external-quantity.schema.json" },
+    "quality_hold_quantity": { "$ref": "external-quantity.schema.json" },
+    "recall_hold_quantity": { "$ref": "external-quantity.schema.json" },
+    "sale_lock_quantity": { "$ref": "external-quantity.schema.json" },
+    "as_of": { "type": "string", "format": "date-time" }
+  },
+  "required": ["stock_balance_id", "item_type", "warehouse_id", "on_hand_quantity", "available_quantity", "reserved_quantity", "quality_hold_quantity", "recall_hold_quantity", "sale_lock_quantity", "as_of"]
+}

@@ -44,6 +44,13 @@ Boundary chung giữa hai hệ thống được chốt tại `docs/ops-core-busi
 - Ops-core không sở hữu customer, CRM, quote/cart/order final commerce, payment, shipping, ads, AI advisor, customer memory hoặc member/diamond benefit; nếu cần chỉ lưu reference key như `order_id`, `order_item_id`, `customer_id`, `shipment_id`.
 - Sale Lock / Recall / Not Sellable thắng mọi downstream selling flow. Product Active không đồng nghĩa Sellable. SKU Active không đồng nghĩa có hàng bán.
 
+## External API / Checkout Contract Set
+
+- Availability v1 được giữ nguyên để tương thích; contract v2 riêng nằm tại `openapi/ops-core/availability-sellable.v2.yaml`, với consumer mirror tại `openapi/business-platform/availability-consumer.v2.yaml`.
+- External bulk-read façades cho stock balance, inventory ledger, stock alert, allocation, warehouse, warehouse location, warehouse receipt và public SKU nằm trong các provider contract `inventory.v1.yaml`, `warehouse.v1.yaml` và `sku.v1.yaml`.
+- Request/response/error schemas, examples và dedicated contract validators nằm dưới `schemas/ops/`, `examples/` và `contract-tests/`.
+- Việc contract tồn tại không chứng minh provider runtime, consumer acceptance, sandbox, performance hoặc production cutover đã PASS.
+
 ## Nhóm Contract Chính
 
 - `openapi/`: REST API contracts.

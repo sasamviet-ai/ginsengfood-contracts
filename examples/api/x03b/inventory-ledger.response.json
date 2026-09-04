@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "v1",
+  "correlation": { "correlationId": "corr-x03b-ledger" },
+  "data": [{
+    "ledger_entry_id": "12000000-0000-4000-8000-000000000001",
+    "append_only": true,
+    "movement_type": "WAREHOUSE_RECEIPT_CONFIRMED",
+    "item_type": "FINISHED_GOOD",
+    "sku_id": "20000000-0000-4000-8000-000000000001",
+    "batch_id": "30000000-0000-4000-8000-000000000001",
+    "lot_code": "FG-LOT-20260903-001",
+    "warehouse_id": "40000000-0000-4000-8000-000000000001",
+    "warehouse_location_id": "50000000-0000-4000-8000-000000000001",
+    "quantity_delta": { "value": "120.000", "unit": "BOX" },
+    "source_object_type": "WAREHOUSE_RECEIPT",
+    "source_object_id": "17000000-0000-4000-8000-000000000001",
+    "source_object_no": "WR-20260903-001",
+    "occurred_at": "2026-09-03T00:40:00Z"
+  }],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "inventory.ledger",
+    "snapshot_id": "11000000-0000-4000-8000-000000000002",
+    "as_of": "2026-09-03T01:00:00Z",
+    "high_watermark": "ledger-entry-0001",
+    "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 1,
+    "item_count": 1,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "e10615b6099218af64dd1ec27e64c58cfcf29a11f9fc79be271a6b3ad80b3ed6",
+    "delta_supported": false
+  }
+}

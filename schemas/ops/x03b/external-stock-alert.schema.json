@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-stock-alert.schema.json",
+  "title": "External stock alert projection",
+  "description": "Stock-alert lifecycle whitelist without private calculation, evidence, actor, or guard-detail payloads.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "stock_alert_id": { "type": "string", "format": "uuid" },
+    "sku_id": { "type": "string", "format": "uuid" },
+    "warehouse_id": { "type": "string", "format": "uuid" },
+    "status": { "type": "string", "enum": ["STOCK_OK", "STOCK_YELLOW_ALERT", "STOCK_RED_ALERT", "STOCKOUT_RISK", "STOCK_ZERO_OR_NOT_SELLABLE"] },
+    "available_stock": { "$ref": "external-quantity.schema.json" },
+    "yellow_threshold": { "$ref": "external-quantity.schema.json" },
+    "red_threshold": { "$ref": "external-quantity.schema.json" },
+    "stockout_risk_threshold": { "$ref": "external-quantity.schema.json" },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "resolved_at": { "type": "string", "format": "date-time" }
+  },
+  "required": ["stock_alert_id", "sku_id", "warehouse_id", "status", "available_stock", "occurred_at"]
+}

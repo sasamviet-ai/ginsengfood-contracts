@@ -7,7 +7,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "sellable_status_id": { "type": "string", "minLength": 1, "description": "Sellable status identifier." },
+    "sellable_status_id": { "type": "string", "minLength": 1, "description": "Sellable status identifier. Resolvable through GET /v1/sellable-statuses/{id} ONLY when it came from an ops-core.sellable.* event. The value returned by POST /v1/availability/check is ephemeral - that path does not persist, so treat it as a correlation token; looking it up returns 404." },
     "sku_id": { "type": "string", "minLength": 1, "description": "SKU being evaluated." },
     "batch_id": { "type": "string", "minLength": 1, "description": "Batch being evaluated." },
     "decision": { "type": "string", "description": "Sellable decision. Prefer enums/ops/sellable-status.yaml." },

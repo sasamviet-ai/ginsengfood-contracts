@@ -23,10 +23,13 @@ values:
   - value: INACTIVE
     description: SKU is inactive.
     source: TODO: source documents do not define inactive semantics.
+  - value: RETIRED
+    description: SKU is permanently retired and remains identifiable for historical and audit records.
+    source: PACK-02 SKU lifecycle, identifier no-reuse, and audit rules.
   - value: BLOCKED
     description: SKU is blocked by missing config, evidence, owner review, or guard condition.
     source: PACK-02 guard behavior.
 compatibility:
   breaking_change: Removing or renaming lifecycle values is breaking for product consumers.
 todos:
-  - Confirm authoritative SKU lifecycle state machine in a future Product Master state-machine phase.
+  - Confirm authoritative transitions for the remaining non-terminal SKU lifecycle values in a future Product Master state-machine phase.

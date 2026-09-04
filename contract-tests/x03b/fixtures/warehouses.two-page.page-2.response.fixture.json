@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "fixture-x03b-warehouse-two-page-2"
+  },
+  "data": [
+    {
+      "warehouse_id": "40000000-0000-4000-8000-000000000102",
+      "warehouse_code": "WH-MP-B",
+      "warehouse_name": "Multi-page Warehouse B",
+      "warehouse_type": "FINISHED_GOODS",
+      "status": "ACTIVE"
+    }
+  ],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "warehouses",
+    "snapshot_id": "11000000-0000-4000-8000-000000000101",
+    "as_of": "2026-09-03T02:00:00Z",
+    "high_watermark": "warehouse-two-page-1",
+    "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 2,
+    "item_count": 2,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "aaecc122b51e5fdfe346050b360e5de012312e3d65300007a0efba69a0a8a3a7",
+    "delta_supported": false
+  }
+}

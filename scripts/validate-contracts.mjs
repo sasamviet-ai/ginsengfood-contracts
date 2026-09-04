@@ -26,17 +26,17 @@ const unsupportedDeprecatedOpfPattern = /\bOPF-(?:00|1[3-9]|[2-9][0-9A-Za-z_-]*)
 const techHandoffId = ["TECH", "-13"].join("");
 const staleTechHandoffPattern = new RegExp(`${techHandoffId}.{0,80}blocked|blocked.{0,80}${techHandoffId}`, "i");
 const requiredPhase8SrsPaths = [
-  "docs/documents/4. phase/phase-8/IVR-SRS-trace-matrix.md",
-  "docs/documents/4. phase/phase-8/IVR-00-governance-source-of-truth-scope-boundary.md",
-  "docs/documents/4. phase/phase-8/IVR-01-business-purpose-confirmation-use-case.md",
-  "docs/documents/4. phase/phase-8/IVR-02-ownership-boundary-connected-systems.md",
-  "docs/documents/4. phase/phase-8/IVR-03-eligibility-customer-trust-official-contact.md",
-  "docs/documents/4. phase/phase-8/IVR-04-order-core-to-ivr-task-contract.md",
-  "docs/documents/4. phase/phase-8/IVR-05-attempt-policy-scheduler-queue.md",
-  "docs/documents/4. phase/phase-8/IVR-06-internal-sim-gateway-adapter.md",
-  "docs/documents/4. phase/phase-8/IVR-07-result-normalization-order-core-callback.md",
-  "docs/documents/4. phase/phase-8/IVR-08-admin-monitoring-evidence-audit-privacy.md",
-  "docs/documents/4. phase/phase-8/IVR-09-test-matrix-smoke-release-gate.md"
+  "docs/documents/4. phase/phase-8/25-MA TRẬN TRUY VẾT SRS IVR.md",
+  "docs/documents/4. phase/phase-8/00-QUẢN TRỊ NGUỒN SỰ THẬT VÀ PHẠM VI.md",
+  "docs/documents/4. phase/phase-8/01-MỤC ĐÍCH KINH DOANH VÀ CA SỬ DỤNG XÁC NHẬN.md",
+  "docs/documents/4. phase/phase-8/02-RANH GIỚI SỞ HỮU VÀ HỆ THỐNG KẾT NỐI.md",
+  "docs/documents/4. phase/phase-8/03-ĐIỀU KIỆN GỌI NIỀM TIN KHÁCH HÀNG VÀ LIÊN HỆ CHÍNH THỨC.md",
+  "docs/documents/4. phase/phase-8/04-HỢP ĐỒNG TỪ LÕI ĐƠN HÀNG ĐẾN TÁC VỤ IVR.md",
+  "docs/documents/4. phase/phase-8/05-CHÍNH SÁCH GỌI LẠI BỘ LẬP LỊCH VÀ HÀNG ĐỢI.md",
+  "docs/documents/4. phase/phase-8/06-BỘ CHUYỂN ĐỔI CỔNG SIM NỘI BỘ.md",
+  "docs/documents/4. phase/phase-8/07-CHUẨN HÓA KẾT QUẢ VÀ CALLBACK VỀ LÕI ĐƠN HÀNG.md",
+  "docs/documents/4. phase/phase-8/08-GIÁM SÁT QUẢN TRỊ BẰNG CHỨNG KIỂM TOÁN VÀ RIÊNG TƯ.md",
+  "docs/documents/4. phase/phase-8/09-MA TRẬN KIỂM THỬ KHÓI VÀ CỔNG PHÁT HÀNH.md"
 ];
 const requiredIvrContractFiles = [
   "enums/ivr/ivr-call-job-status.yaml",
@@ -301,6 +301,66 @@ function checkRequiredIvrContracts() {
   for (const contractPath of requiredIvrContractFiles) {
     if (!existsRel(contractPath)) {
       errors.push(`Required Phase 8 IVR contract file missing: ${contractPath}`);
+    }
+  }
+}
+
+function checkSkuLifecycleStatusParity() {
+  const relative = "enums/product/sku-lifecycle-status.yaml";
+  const enumPath = path.join(root, toFsPath(relative));
+  if (!fs.existsSync(enumPath)) {
+    errors.push(`${relative}: missing`);
+    return;
+  }
+
+  const values = extractYamlObjectValues(read(enumPath), "values", "value");
+  if (new Set(values).size !== values.length) {
+    errors.push(`${relative}: lifecycle values must be unique`);
+  }
+  for (const requiredValue of ["ACTIVE", "INACTIVE", "RETIRED"]) {
+    if (values.filter(value => value === requiredValue).length !== 1) {
+      errors.push(`${relative}: must contain exactly one ${requiredValue} value`);
+    }
+  }
+  if (values.includes("ACTIVE_BASELINE")) {
+    errors.push(`${relative}: ACTIVE_BASELINE is internal and must project as ACTIVE at the external boundary`);
+  }
+
+  for (const schemaRelative of [
+    "schemas/product/sku.schema.json",
+    "schemas/ops/x03b/external-public-sku.schema.json"
+  ]) {
+    const schemaPath = path.join(root, toFsPath(schemaRelative));
+    if (!fs.existsSync(schemaPath)) {
+      errors.push(`${schemaRelative}: missing`);
+      continue;
+    }
+
+    let schema;
+    try {
+      schema = readJson(schemaPath);
+    } catch (error) {
+      errors.push(`${schemaRelative}: invalid JSON (${error.message})`);
+      continue;
+    }
+
+    const schemaValues = schema?.properties?.lifecycle_status?.enum;
+    if (!Array.isArray(schemaValues)) {
+      errors.push(`${schemaRelative}: properties.lifecycle_status.enum must be a closed enum`);
+      continue;
+    }
+
+    if (new Set(schemaValues).size !== schemaValues.length) {
+      errors.push(`${schemaRelative}: properties.lifecycle_status.enum values must be unique`);
+    }
+
+    const missingValues = values.filter(value => !schemaValues.includes(value));
+    const extraValues = schemaValues.filter(value => !values.includes(value));
+    if (missingValues.length > 0 || extraValues.length > 0) {
+      errors.push(
+        `${schemaRelative}: properties.lifecycle_status.enum must match ${relative}` +
+        ` (missing: ${missingValues.join(", ") || "none"}; extra: ${extraValues.join(", ") || "none"})`
+      );
     }
   }
 }
@@ -828,6 +888,19 @@ if (validationScope === "operational-form-v2") {
   process.exit(0);
 }
 
+if (validationScope === "sku-lifecycle") {
+  checkSourceMap({ validateTargets: false });
+  checkSkuLifecycleStatusParity();
+  const enumPath = path.join(root, "enums", "product", "sku-lifecycle-status.yaml");
+  if (fs.existsSync(enumPath)) {
+    const text = read(enumPath);
+    checkSourceDocuments(enumPath, text);
+    checkKnownYamlPathFields(enumPath, text);
+  }
+  printResultAndExit();
+  process.exit(0);
+}
+
 if (validationScope !== "all") {
   errors.push(`Unknown validation scope: ${validationScope}`);
   printResultAndExit();
@@ -836,6 +909,7 @@ if (validationScope !== "all") {
 checkSourceMap();
 checkPhase8Sources();
 checkRequiredIvrContracts();
+checkSkuLifecycleStatusParity();
 checkOperationalFormV2();
 
 const files = walk(root);

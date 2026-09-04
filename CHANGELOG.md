@@ -13,6 +13,7 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 ### Changed
 
 - OpenAPI validation now derives major from `.vN.yaml` and checks matching `info.version` plus `/vN` paths.
+- Documented that `sellable_status_id` returned by `POST /v1/availability/check` is **ephemeral**: that path evaluates without persisting, so the identifier is newly generated per call and `GET /v1/sellable-statuses/{sellableStatusId}` with it always returns `404`. Only identifiers carried by `ops-core.sellable.*` events resolve. Description-only change on `openapi/ops-core/availability-sellable.v1.yaml` and `schemas/ops/sellable-status.schema.json` — no field, shape or status code changed. Raised by the business-platform M3 integration review after an ops-core smoke test proved the behaviour; ops-core locks it with `SellableStatusEphemeralIdBehaviorTests`.
 
 ### Deprecated
 
@@ -25,6 +26,7 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 ### Fixed
 
 - Corrected the v1 FRM-14 OpenAPI extension to the published v1 enum value `ACCOUNTING_MATERIAL_ISSUE`.
+- Closed SKU lifecycle schema parity around the canonical registry: both Product Master and authenticated external public-SKU schemas now accept terminal `RETIRED`, reject internal-only `ACTIVE_BASELINE`, and are enforced by focused validation plus the X03B contract test in CI.
 
 ### Breaking Changes
 

@@ -5,7 +5,7 @@ description: IVR v1 result and outcome values for order confirmation signals.
 source_documents:
   - docs/documents/2. pack/09-PACK-09-IVR-ORDER-CONFIRMATION.md
   - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
-  - docs/documents/4. phase/phase-8/IVR-07-result-normalization-order-core-callback.md
+  - docs/documents/4. phase/phase-8/07-CHUẨN HÓA KẾT QUẢ VÀ CALLBACK VỀ LÕI ĐƠN HÀNG.md
 values:
   - value: IVR_CONFIRMED
     description: Customer pressed the confirm key; Order Core must still revalidate before confirming the order.

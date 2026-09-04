@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/availability-check-result.v2.schema.json",
+  "title": "Availability Check Result v2",
+  "description": "Ephemeral Availability v2 resolution from current Operational Truth. It is not a persisted sellable-status record, reservation, allocation, or inventory mutation.",
+  "$comment": "OWNER-DIRECTIVE-2026-09-03-EXT-OD-01-07 / EXT-OD-03. Provider invariants: available_quantity >= sellable_quantity >= 0 in the exact request uom_code; a requested quantity is SELLABLE only when sellable_quantity >= requested_quantity; an omitted quantity is SELLABLE only when sellable_quantity > 0; valid_until = resolved_at + 5 seconds; stale, timeout, unavailable, or unresolved input yields UNKNOWN or BLOCKED with fulfillable=false and never reuses an earlier PASS.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "sku_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "batch_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "warehouse_scope": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "WAREHOUSE"
+      ]
+    },
+    "warehouse_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "uom_code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{0,31}$"
+    },
+    "check_mode": {
+      "type": "string",
+      "enum": [
+        "EXISTENCE",
+        "FULL_FILL"
+      ]
+    },
+    "requested_quantity": {
+      "type": "string",
+      "pattern": "^(?=.{1,19}$)(?=.*[1-9])(?:0|[1-9][0-9]{0,14})(?:\\.[0-9]{1,3})?$"
+    },
+    "available_quantity": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]{0,14})(?:\\.[0-9]{1,3})?$",
+      "description": "Non-negative current quantity in the exact requested UOM before sellability guards."
+    },
+    "sellable_quantity": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]{0,14})(?:\\.[0-9]{1,3})?$",
+      "description": "Non-negative quantity remaining sellable after release, receipt, inventory, HSD, quality, trace, recall, and sale-lock guards, in the exact requested UOM."
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "SELLABLE",
+        "BLOCKED",
+        "UNKNOWN"
+      ]
+    },
+    "fulfillable": {
+      "type": "boolean",
+      "description": "True only when the exact-UOM existence or full-fill condition passes every operational guard."
+    },
+    "partial_supported": {
+      "type": "boolean",
+      "const": false
+    },
+    "block_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "SKU_NOT_ACTIVE",
+          "UOM_NOT_ACTIVE",
+          "UOM_MISMATCH",
+          "BATCH_NOT_RELEASED",
+          "WAREHOUSE_RECEIPT_NOT_CONFIRMED",
+          "INSUFFICIENT_STOCK",
+          "ZERO_SELLABLE_QUANTITY",
+          "QUALITY_HOLD",
+          "HSD_EXPIRED",
+          "TRACE_NOT_READY",
+          "RECALL_HOLD",
+          "SALE_LOCK",
+          "RESOLUTION_TIMEOUT",
+          "PROVIDER_UNAVAILABLE",
+          "FLEET_AUTHORITY_UNAVAILABLE"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$",
+      "description": "UTC instant at which Operational Truth was resolved."
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$",
+      "description": "Exactly five seconds after resolved_at. Consumers must block and recheck after this instant."
+    }
+  },
+  "required": [
+    "sku_id",
+    "warehouse_scope",
+    "uom_code",
+    "check_mode",
+    "available_quantity",
+    "sellable_quantity",
+    "decision",
+    "fulfillable",
+    "partial_supported",
+    "block_reasons",
+    "resolved_at",
+    "valid_until"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "warehouse_scope": { "const": "WAREHOUSE" }
+        },
+        "required": ["warehouse_scope"]
+      },
+      "then": {
+        "required": ["warehouse_id"]
+      },
+      "else": {
+        "not": {
+          "required": ["warehouse_id"]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "check_mode": { "const": "FULL_FILL" }
+        },
+        "required": ["check_mode"]
+      },
+      "then": {
+        "required": ["requested_quantity"]
+      },
+      "else": {
+        "not": {
+          "required": ["requested_quantity"]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": { "const": "SELLABLE" }
+        },
+        "required": ["decision"]
+      },
+      "then": {
+        "properties": {
+          "fulfillable": { "const": true },
+          "block_reasons": { "maxItems": 0 }
+        }
+      },
+      "else": {
+        "properties": {
+          "fulfillable": { "const": false },
+          "block_reasons": { "minItems": 1 }
+        }
+      }
+    }
+  ]
+}

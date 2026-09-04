@@ -6,6 +6,32 @@ info:
 servers:
   - url: https://api.example.local
     description: Placeholder only.
+x-owner-decision-ref: OWNER-DIRECTIVE-2026-09-03-EXT-OD-01-07
+x-rate-limit-policies:
+  ExternalBulkRead:
+    sustained_rps_per_principal: 2
+    burst_per_principal: 4
+    fleet_rps: 10
+    fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+    server_timeout_seconds: 10
+    queue_limit: 0
+    partition_claims: [token_use, sub]
+    required_token_use: service
+    principal_sub_format: uuid
+    limiter_authority: DISTRIBUTED_INGRESS_TOKEN_BUCKET
+    in_process_limiter: DEFENSE_IN_DEPTH_ONLY
+    pre_auth_partition: TRUSTED_PROXY_VERIFIED_IP_ONLY
+    fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
+    startup_fail_closed: true
+    exhausted_or_unavailable_behavior: FAIL_CLOSED_NO_CACHED_PASS
+x-retry-policies:
+  ExternalBulkReadRetry:
+    max_retries: 2
+    total_budget_seconds: 30
+    retryable_statuses: [408, 429, 502, 503, 504]
+    non_retryable_statuses: [400, 401, 403, 404, 409, 410, 422, 500]
+    honor_retry_after: true
+    backoff: FULL_JITTER_BASE_500MS_CAP_5S
 paths:
   /v1/skus/{skuId}:
     get:
@@ -37,9 +63,18 @@ paths:
   /v1/skus/{skuId}/public:
     get:
       summary: Get public SKU projection
-      description: "Returns the public-safe SKU projection for business-platform and channel consumers. Must not expose recipe, formula, supplier, QC internals, cost, or private operational data. TODO: source documents do not lock the final public projection shape."
+      description: Returns the protected, public-safe SKU projection without recipe, formula, BOM, supplier, QC, cost, source, evidence, or private operational data. The public path name does not make this operation anonymous.
       operationId: getPublicSkuV1
       tags: [sku]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-permission: SKU_CATALOG_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
       parameters:
         - $ref: "#/components/parameters/SkuId"
       responses:
@@ -51,16 +86,21 @@ paths:
                 allOf:
                   - $ref: "../../schemas/common/envelope.schema.json"
                   - type: object
+                    required: [schemaVersion, correlation, data]
                     properties:
                       data:
-                        $ref: "../../schemas/product/sku.schema.json"
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "403": { $ref: "#/components/responses/Forbidden" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "409": { $ref: "#/components/responses/Conflict" }
-        "422": { $ref: "#/components/responses/UnprocessableEntity" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
+                        $ref: "../../schemas/ops/x03b/external-public-sku.schema.json"
+        "400": { $ref: "#/components/responses/ExternalBadRequest" }
+        "401": { $ref: "#/components/responses/ExternalUnauthorized" }
+        "403": { $ref: "#/components/responses/ExternalForbidden" }
+        "404": { $ref: "#/components/responses/ExternalNotFound" }
+        "408": { $ref: "#/components/responses/RequestTimeout" }
+        "422": { $ref: "#/components/responses/ExternalUnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ExternalInternalServerError" }
+        "502": { $ref: "#/components/responses/BadGateway" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+        "504": { $ref: "#/components/responses/GatewayTimeout" }
   /v1/skus/{skuId}/operational-status:
     get:
       summary: Get SKU operational status
@@ -111,3 +151,79 @@ components:
     Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    ExternalBadRequest:
+      description: Malformed path or query input.
+      x-error-code: INVALID_REQUEST
+      x-http-status: 400
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/InvalidRequest" } } }
+    ExternalUnauthorized:
+      description: Safe authentication failure.
+      x-error-code: UNAUTHORIZED
+      x-http-status: 401
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/Unauthorized" } } }
+    ExternalForbidden:
+      description: Required SKU_CATALOG_VIEW permission or SERVICE scope is missing.
+      x-error-code: FORBIDDEN
+      x-http-status: 403
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/Forbidden" } } }
+    ExternalNotFound:
+      description: SKU is not found or inaccessible.
+      x-error-code: NOT_FOUND
+      x-http-status: 404
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/NotFound" } } }
+    RequestTimeout:
+      description: Request timed out before a safe projection was returned.
+      x-error-code: REQUEST_TIMEOUT
+      x-http-status: 408
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/RequestTimeout" } } }
+    ExternalUnprocessableEntity:
+      description: Path/query validation or guard failure.
+      x-error-code: VALIDATION_FAILED
+      x-http-status: 422
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/ValidationFailed" } } }
+    TooManyRequests:
+      description: RATE_LIMITED; caller must honor Retry-After and the 30-second total retry budget.
+      x-error-code: RATE_LIMITED
+      x-http-status: 429
+      x-retryable: true
+      headers:
+        Retry-After: { required: true, schema: { type: integer, minimum: 1 } }
+        X-RateLimit-Limit: { required: true, schema: { type: integer, const: 2 } }
+        X-RateLimit-Remaining: { required: true, schema: { type: integer, minimum: 0 } }
+        X-RateLimit-Reset: { required: true, schema: { type: integer, minimum: 1 } }
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/RateLimited" } } }
+    ExternalInternalServerError:
+      description: Safe internal error without stack trace or partition key.
+      x-error-code: INTERNAL_ERROR
+      x-http-status: 500
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/InternalError" } } }
+    BadGateway:
+      description: Upstream bad gateway; retry only within ExternalBulkReadRetry.
+      x-error-code: BAD_GATEWAY
+      x-http-status: 502
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/BadGateway" } } }
+    ServiceUnavailable:
+      description: Service unavailable; retry only within ExternalBulkReadRetry.
+      x-error-code: SERVICE_UNAVAILABLE
+      x-http-status: 503
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/ServiceUnavailable" } } }
+    GatewayTimeout:
+      description: Gateway timeout; retry only within ExternalBulkReadRetry.
+      x-error-code: GATEWAY_TIMEOUT
+      x-http-status: 504
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/GatewayTimeout" } } }
+  securitySchemes:
+    ServiceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

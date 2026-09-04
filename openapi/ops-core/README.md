@@ -2,7 +2,7 @@
 
 ## Ops Core OpenAPI
 
-Thu muc nay chua OpenAPI 3.1.0 contracts cho `ginsengfood-ops-core`. Phần lớn surface hiện ở v1; Operational Forms có replacement v2 riêng. Cac file chi mo ta API contract giua systems/frontend; khong chua implementation code, client SDK, database migration, service logic hoac business logic.
+Thu muc nay chua OpenAPI 3.1.0 contracts cho `ginsengfood-ops-core`. Phần lớn surface hiện ở v1; Availability / Sellable và Operational Forms có v2 riêng. Cac file chi mo ta API contract giua systems/frontend; khong chua implementation code, client SDK, database migration, service logic hoac business logic.
 
 API groups:
 - Product Master: `product-master.v1.yaml`
@@ -16,7 +16,8 @@ API groups:
 - Batch / QC / Release: `batch-qc-release.v1.yaml`
 - Warehouse: `warehouse.v1.yaml`
 - Inventory: `inventory.v1.yaml`
-- Availability / Sellable: `availability-sellable.v1.yaml`
+- Availability / Sellable v1 compatibility: `availability-sellable.v1.yaml`
+- Availability / Sellable v2 conservative contract: `availability-sellable.v2.yaml`
 - Traceability: `traceability.v1.yaml`
 - Recall / Sale Lock: `recall-sale-lock.v1.yaml`
 - Operational Evidence / Forms: `operational-evidence.v1.yaml`
@@ -34,8 +35,9 @@ Ops-core expose API:
 | Product Public API | `product-master.v1.yaml`, `sku.v1.yaml` | Public-safe projection only. |
 | SKU Detail API | `sku.v1.yaml` | SKU Active không đồng nghĩa có hàng bán. |
 | Product Activation Status API | `product-activation.v1.yaml` | Product Active không đồng nghĩa Sellable. |
-| Availability / Sellable Check API | `availability-sellable.v1.yaml` | Read/check only; no reservation or mutation. |
-| Stock Balance API | `inventory.v1.yaml` | Derived stock balance only; ledger remains ops-core truth. |
+| Availability / Sellable Check API | `availability-sellable.v1.yaml`, `availability-sellable.v2.yaml` | Read/check only; v1 frozen, v2 exact-UOM and fail-closed; no reservation or mutation. |
+| Inventory external reads | `inventory.v1.yaml` | Stock balance, ledger, stock alert và allocation là read-only projections; ledger remains ops-core truth. |
+| Warehouse external reads | `warehouse.v1.yaml` | Warehouse, location và receipt projections không thực hiện command hoặc ledger mutation. |
 | Trace Public API | `traceability.v1.yaml` | Whitelist-only public fields. |
 | Recall Status API | `recall-sale-lock.v1.yaml` | Recall blocks downstream flow where applicable. |
 | Sale Lock Status API | `recall-sale-lock.v1.yaml` | Sale Lock wins every downstream selling flow. |
@@ -50,9 +52,16 @@ Boundary locks:
 API phuc vu business-platform:
 - `POST /v1/service-tokens`
 - `POST /v1/availability/check`
+- `POST /v2/availability/check`
 - `GET /v1/skus/{skuId}/public`
 - `GET /v1/skus/{skuId}/operational-status`
 - `GET /v1/inventory/stock-balances`
+- `GET /v1/inventory/ledger`
+- `GET /v1/inventory/stock-alerts`
+- `GET /v1/inventory/allocations`
+- `GET /v1/warehouses`
+- `GET /v1/warehouse-locations`
+- `GET /v1/warehouse-receipts`
 - `GET /v1/trace/public/{qrCode}`
 - `GET /v1/misa-handoffs` va `GET /v1/misa-handoffs/{misaHandoffId}` neu co quyen integration review
 
@@ -89,7 +98,7 @@ Boundary notes:
 - Product Activation is not Sellable.
 
 TODO:
-- Source docs do not lock every search/filter parameter, public projection shape, per-form transition matrix, MISA target module payload, warehouse taxonomy, recall severity model, or availability-check request schema. These remain TODO comments in the relevant OpenAPI descriptions.
+- Source docs do not lock every search/filter parameter, every public projection shape, per-form transition matrix, MISA target module payload, warehouse taxonomy, or recall severity model. These remain TODO comments in the relevant OpenAPI descriptions.
 
 Thư mục này dành cho REST API contracts do `ginsengfood-ops-core` expose cho `ginsengfood-business-platform` hoặc consumer hợp lệ khác.
 

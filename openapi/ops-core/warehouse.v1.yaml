@@ -2,66 +2,253 @@ openapi: 3.1.0
 info:
   title: Ops Core Warehouse API
   version: 1.0.0
-  description: Warehouse v1 API contract for warehouses, locations, and warehouse receipt confirmation boundaries.
+  description: >-
+    Warehouse v1 API contract. Protected external collection GETs use dedicated whitelists and
+    opaque full-snapshot cursors. The existing warehouse-receipt POST command remains unchanged.
 servers:
   - url: https://api.example.local
     description: Placeholder only.
+x-owner-decision-ref: OWNER-DIRECTIVE-2026-09-03-EXT-OD-01-07
+x-rate-limit-policies:
+  ExternalBulkRead:
+    sustained_rps_per_principal: 2
+    burst_per_principal: 4
+    fleet_rps: 10
+    fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+    server_timeout_seconds: 10
+    queue_limit: 0
+    partition_claims: [token_use, sub]
+    required_token_use: service
+    principal_sub_format: uuid
+    limiter_authority: DISTRIBUTED_INGRESS_TOKEN_BUCKET
+    in_process_limiter: DEFENSE_IN_DEPTH_ONLY
+    pre_auth_partition: TRUSTED_PROXY_VERIFIED_IP_ONLY
+    fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
+    startup_fail_closed: true
+    exhausted_or_unavailable_behavior: FAIL_CLOSED_NO_CACHED_PASS
+x-retry-policies:
+  ExternalBulkReadRetry:
+    max_retries: 2
+    total_budget_seconds: 30
+    retryable_statuses: [408, 429, 502, 503, 504]
+    non_retryable_statuses: [400, 401, 403, 404, 409, 410, 422, 500]
+    honor_retry_after: true
+    backoff: FULL_JITTER_BASE_500MS_CAP_5S
+x-pagination-policies:
+  ExternalSnapshotCursorV1:
+    mode: OPAQUE_SCOPE_BOUND_SNAPSHOT_CURSOR
+    cursor_version: 1
+    cursor_ttl_seconds: 1800
+    cursor_ttl_mode: ABSOLUTE_NON_SLIDING
+    integrity_protected: true
+    default_limit: 50
+    max_limit: 100
+    page_max_items: 100
+    page_item_count_semantics: EXACT_CURRENT_PAGE_DATA_LENGTH
+    item_count_semantics: EXACT_FULL_SNAPSHOT_TOTAL
+    delivered_item_count_semantics: CUMULATIVE_THROUGH_CURRENT_PAGE
+    complete_requires: DELIVERED_COUNT_EQUALS_ITEM_COUNT_AND_NEXT_CURSOR_NULL
+    manifest_version: 1
+    manifest_algorithm: SHA-256
+    manifest_canonicalization: JCS_RFC8785
+    manifest_document_fields: [manifest_version, resource, snapshot_id, as_of, high_watermark, item_count, items]
+    manifest_items_semantics: COMPLETE_STABLE_SORTED_SNAPSHOT
+    verify_manifest_before_absence_reconcile: true
+    delta_supported: false
+    delta_replay_retention_seconds: 604800
+    delta_poll_seconds: 30
+    delta_poll_jitter_percent: 20
+    future_tombstone_retention_seconds: 7776000
+    snapshot_refresh_seconds: 300
+    full_reconciliation_seconds: 21600
+    full_reconciliation_triggers: [STARTUP, RESUME, CHANGE_FEED_GAP, CURSOR_EXPIRED]
+    gap_reconcile_start_within_seconds: 60
+    cursor_bindings: [operation, resource, filters, sort, scope, principal, snapshot, high_watermark]
+    gap_recovery: FAIL_CLOSED_FULL_RECONCILE
+    expired_cursor_recovery: FULL_RECONCILE_NO_TIMESTAMP_OR_LOCAL_CHECKPOINT
+    absence_reconcile_requires: FULL_SNAPSHOT_COMPLETE_VERIFIED_MANIFEST_COUNT_HASH
 paths:
   /v1/warehouses:
     get:
-      summary: List warehouses
-      description: "Lists warehouse records. TODO: source documents do not lock warehouse type/location taxonomy."
+      summary: List external warehouse projections
+      description: Returns warehouse lifecycle projections. INACTIVE is lifecycle state, not a tombstone.
       operationId: listWarehousesV1
       tags: [warehouse]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-permission: WAREHOUSE_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-pagination-policy: ExternalSnapshotCursorV1
+      x-delta-supported: false
+      x-stable-sort: "warehouseCode ASC, warehouseId ASC"
+      x-tombstone-policy: INACTIVE_LIFECYCLE_NO_TOMBSTONE
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
       responses:
         "200":
-          description: Warehouses wrapped in the common envelope.
+          description: Stable warehouse snapshot page.
           content:
             application/json:
               schema:
                 allOf:
                   - $ref: "../../schemas/common/envelope.schema.json"
                   - type: object
+                    required: [schemaVersion, correlation, data, meta]
                     properties:
                       data:
                         type: array
+                        maxItems: 100
                         items:
-                          $ref: "../../schemas/ops/warehouse.schema.json"
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "403": { $ref: "#/components/responses/Forbidden" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "409": { $ref: "#/components/responses/Conflict" }
-        "422": { $ref: "#/components/responses/UnprocessableEntity" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
+                          $ref: "../../schemas/ops/x03b/external-warehouse.schema.json"
+                      meta:
+                        $ref: "../../schemas/ops/x03b/external-snapshot-meta.schema.json"
+        "400": { $ref: "#/components/responses/CursorInvalid" }
+        "401": { $ref: "#/components/responses/ExternalUnauthorized" }
+        "403": { $ref: "#/components/responses/ExternalForbidden" }
+        "404": { $ref: "#/components/responses/ExternalNotFound" }
+        "408": { $ref: "#/components/responses/RequestTimeout" }
+        "409": { $ref: "#/components/responses/ChangeFeedGap" }
+        "410": { $ref: "#/components/responses/CursorExpired" }
+        "422": { $ref: "#/components/responses/ExternalUnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ExternalInternalServerError" }
+        "502": { $ref: "#/components/responses/BadGateway" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+        "504": { $ref: "#/components/responses/GatewayTimeout" }
   /v1/warehouse-locations:
     get:
-      summary: List warehouse locations
-      description: Lists warehouse location records.
+      summary: List external warehouse location projections
+      description: Returns warehouse-location lifecycle projections. INACTIVE is lifecycle state, not a tombstone.
       operationId: listWarehouseLocationsV1
       tags: [warehouse]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-permission: WAREHOUSE_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-pagination-policy: ExternalSnapshotCursorV1
+      x-delta-supported: false
+      x-stable-sort: "locationCode ASC, warehouseLocationId ASC"
+      x-tombstone-policy: INACTIVE_LIFECYCLE_NO_TOMBSTONE
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
       responses:
         "200":
-          description: Warehouse locations wrapped in the common envelope.
+          description: Stable warehouse-location snapshot page.
           content:
             application/json:
               schema:
                 allOf:
                   - $ref: "../../schemas/common/envelope.schema.json"
                   - type: object
+                    required: [schemaVersion, correlation, data, meta]
                     properties:
                       data:
                         type: array
+                        maxItems: 100
                         items:
-                          $ref: "../../schemas/ops/warehouse-location.schema.json"
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "403": { $ref: "#/components/responses/Forbidden" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "409": { $ref: "#/components/responses/Conflict" }
-        "422": { $ref: "#/components/responses/UnprocessableEntity" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
+                          $ref: "../../schemas/ops/x03b/external-warehouse-location.schema.json"
+                      meta:
+                        $ref: "../../schemas/ops/x03b/external-snapshot-meta.schema.json"
+        "400": { $ref: "#/components/responses/CursorInvalid" }
+        "401": { $ref: "#/components/responses/ExternalUnauthorized" }
+        "403": { $ref: "#/components/responses/ExternalForbidden" }
+        "404": { $ref: "#/components/responses/ExternalNotFound" }
+        "408": { $ref: "#/components/responses/RequestTimeout" }
+        "409": { $ref: "#/components/responses/ChangeFeedGap" }
+        "410": { $ref: "#/components/responses/CursorExpired" }
+        "422": { $ref: "#/components/responses/ExternalUnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ExternalInternalServerError" }
+        "502": { $ref: "#/components/responses/BadGateway" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+        "504": { $ref: "#/components/responses/GatewayTimeout" }
   /v1/warehouse-receipts:
+    get:
+      summary: List external warehouse receipt projections
+      description: >-
+        Returns a read-only receipt snapshot without actor, notes/reasons, QR/scan,
+        ledger/balance/evidence/audit references, MISA fields, or allowed actions.
+      operationId: listWarehouseReceiptsV1
+      tags: [warehouse]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-permission: WAREHOUSE_RECEIPT_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-pagination-policy: ExternalSnapshotCursorV1
+      x-delta-supported: false
+      x-stable-sort: "createdAt DESC, warehouseReceiptId DESC"
+      x-tombstone-policy: STATE_REVISION_NO_TOMBSTONE
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - name: status
+          in: query
+          required: false
+          schema: { type: string, enum: [DRAFT, PENDING_CONFIRMATION, CONFIRMED, BLOCKED, REJECTED] }
+        - name: batchId
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+        - name: warehouseId
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+        - name: fromDate
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+        - name: toDate
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: Stable warehouse-receipt snapshot page; empty snapshots return data=[] and absent items are not deletions.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    required: [schemaVersion, correlation, data, meta]
+                    properties:
+                      data:
+                        type: array
+                        maxItems: 100
+                        items:
+                          $ref: "../../schemas/ops/x03b/external-warehouse-receipt.schema.json"
+                      meta:
+                        $ref: "../../schemas/ops/x03b/external-snapshot-meta.schema.json"
+        "400": { $ref: "#/components/responses/CursorInvalid" }
+        "401": { $ref: "#/components/responses/ExternalUnauthorized" }
+        "403": { $ref: "#/components/responses/ExternalForbidden" }
+        "404": { $ref: "#/components/responses/ExternalNotFound" }
+        "408": { $ref: "#/components/responses/RequestTimeout" }
+        "409": { $ref: "#/components/responses/ChangeFeedGap" }
+        "410": { $ref: "#/components/responses/CursorExpired" }
+        "422": { $ref: "#/components/responses/ExternalUnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ExternalInternalServerError" }
+        "502": { $ref: "#/components/responses/BadGateway" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+        "504": { $ref: "#/components/responses/GatewayTimeout" }
     post:
       summary: Create warehouse receipt
       description: Creates a warehouse receipt contract record. Confirmed warehouse receipt is one input to sellable status.
@@ -93,6 +280,18 @@ paths:
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
         "500": { $ref: "#/components/responses/InternalServerError" }
 components:
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Opaque server-issued cursor bound to operation, filters, scope, principal, snapshot, and high-watermark. Omit on first page.
+      schema: { type: string, minLength: 1 }
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
   schemas:
     ErrorEnvelope:
       allOf:
@@ -109,3 +308,91 @@ components:
     Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    CursorInvalid:
+      description: CURSOR_INVALID for malformed, tampered, or wrong-scope cursor.
+      x-error-code: CURSOR_INVALID
+      x-http-status: 400
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/CursorInvalid" } } }
+    ExternalUnauthorized:
+      description: Safe authentication failure.
+      x-error-code: UNAUTHORIZED
+      x-http-status: 401
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/Unauthorized" } } }
+    ExternalForbidden:
+      description: Required operation permission or SERVICE scope is missing.
+      x-error-code: FORBIDDEN
+      x-http-status: 403
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/Forbidden" } } }
+    ExternalNotFound:
+      description: Filtered resource scope is not found or inaccessible.
+      x-error-code: NOT_FOUND
+      x-http-status: 404
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/NotFound" } } }
+    RequestTimeout:
+      description: Request timed out before a safe snapshot page was returned.
+      x-error-code: REQUEST_TIMEOUT
+      x-http-status: 408
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/RequestTimeout" } } }
+    ChangeFeedGap:
+      description: CHANGE_FEED_GAP; discard the partial page and start fail-closed full reconciliation.
+      x-error-code: CHANGE_FEED_GAP
+      x-http-status: 409
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/ChangeFeedGap" } } }
+    CursorExpired:
+      description: CURSOR_EXPIRED after the absolute 30-minute TTL; restart full reconciliation.
+      x-error-code: CURSOR_EXPIRED
+      x-http-status: 410
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/CursorExpired" } } }
+    ExternalUnprocessableEntity:
+      description: Query validation or guard failure.
+      x-error-code: VALIDATION_FAILED
+      x-http-status: 422
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/ValidationFailed" } } }
+    TooManyRequests:
+      description: RATE_LIMITED; caller must honor Retry-After and the 30-second total retry budget.
+      x-error-code: RATE_LIMITED
+      x-http-status: 429
+      x-retryable: true
+      headers:
+        Retry-After: { required: true, schema: { type: integer, minimum: 1 } }
+        X-RateLimit-Limit: { required: true, schema: { type: integer, const: 2 } }
+        X-RateLimit-Remaining: { required: true, schema: { type: integer, minimum: 0 } }
+        X-RateLimit-Reset: { required: true, schema: { type: integer, minimum: 1 } }
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/RateLimited" } } }
+    ExternalInternalServerError:
+      description: Safe internal error without stack trace or partition key.
+      x-error-code: INTERNAL_ERROR
+      x-http-status: 500
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/InternalError" } } }
+    BadGateway:
+      description: Upstream bad gateway; retry only within ExternalBulkReadRetry.
+      x-error-code: BAD_GATEWAY
+      x-http-status: 502
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/BadGateway" } } }
+    ServiceUnavailable:
+      description: Service unavailable; retry only within ExternalBulkReadRetry.
+      x-error-code: SERVICE_UNAVAILABLE
+      x-http-status: 503
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/ServiceUnavailable" } } }
+    GatewayTimeout:
+      description: Gateway timeout; retry only within ExternalBulkReadRetry.
+      x-error-code: GATEWAY_TIMEOUT
+      x-http-status: 504
+      x-retryable: true
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/GatewayTimeout" } } }
+  securitySchemes:
+    ServiceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

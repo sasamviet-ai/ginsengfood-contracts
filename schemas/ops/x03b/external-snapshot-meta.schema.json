@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-snapshot-meta.schema.json",
+  "title": "External bulk-read snapshot cursor metadata",
+  "description": "Integrity-bound full-snapshot pagination metadata; v1 does not publish delta feeds. Clients accumulate ordered pages and verify the full manifest before reconciling absence.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "cursor_version": { "type": "integer", "const": 1 },
+    "resource": { "type": "string", "enum": ["inventory.stock-balances", "inventory.ledger", "inventory.stock-alerts", "inventory.allocations", "warehouses", "warehouse-locations", "warehouse-receipts"] },
+    "snapshot_id": { "type": "string", "format": "uuid" },
+    "as_of": { "type": "string", "format": "date-time" },
+    "high_watermark": { "type": "string", "minLength": 1 },
+    "next_cursor": { "type": ["string", "null"], "minLength": 1 },
+    "page_item_count": { "type": "integer", "minimum": 0, "maximum": 100, "description": "Exact number of data items in this response page." },
+    "delivered_item_count": { "type": "integer", "minimum": 0, "description": "Cumulative number of ordered items delivered through this page." },
+    "item_count": { "type": "integer", "minimum": 0, "description": "Exact total number of ordered items in the full snapshot; never a page count." },
+    "complete": { "type": "boolean", "description": "True only after delivered_item_count equals item_count. A complete page must have next_cursor=null." },
+    "manifest_version": { "type": "integer", "const": 1 },
+    "manifest_algorithm": { "type": "string", "const": "SHA-256" },
+    "manifest_canonicalization": { "type": "string", "const": "JCS_RFC8785" },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Lowercase SHA-256 over UTF-8 RFC 8785 canonical JSON of {manifest_version,resource,snapshot_id,as_of,high_watermark,item_count,items}, where items is the complete ordered snapshot accumulated across all pages."
+    },
+    "delta_supported": { "type": "boolean", "const": false }
+  },
+  "required": ["cursor_version", "resource", "snapshot_id", "as_of", "high_watermark", "next_cursor", "page_item_count", "delivered_item_count", "item_count", "complete", "manifest_version", "manifest_algorithm", "manifest_canonicalization", "manifest_sha256", "delta_supported"],
+  "allOf": [
+    {
+      "if": { "properties": { "complete": { "const": true } }, "required": ["complete"] },
+      "then": { "properties": { "next_cursor": { "type": "null" } } }
+    },
+    {
+      "if": { "properties": { "complete": { "const": false } }, "required": ["complete"] },
+      "then": { "properties": { "next_cursor": { "type": "string", "minLength": 1 } } }
+    }
+  ]
+}

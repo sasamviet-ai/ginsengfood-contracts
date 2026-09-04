@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-bulk-read-error-envelopes.schema.json",
+  "title": "External bulk-read exact error envelopes",
+  "description": "Per-response envelope definitions that bind each HTTP response to one safe error code and status. Retryability remains explicit OpenAPI response metadata and is not trusted from the payload.",
+  "$defs": {
+    "BaseEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "type": "string", "const": "v1" },
+        "correlation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "correlationId": { "type": "string", "minLength": 1 },
+            "causationId": { "type": "string", "minLength": 1 },
+            "sourceSystem": { "type": "string", "minLength": 1 },
+            "timestamp": { "type": "string", "format": "date-time" }
+          },
+          "required": ["correlationId"]
+        },
+        "error": { "$ref": "external-bulk-read-error.schema.json" }
+      },
+      "required": ["schemaVersion", "correlation", "error"]
+    },
+    "InvalidRequest": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "INVALID_REQUEST" }, "httpStatus": { "const": 400 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "Unauthorized": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "UNAUTHORIZED" }, "httpStatus": { "const": 401 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "Forbidden": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "FORBIDDEN" }, "httpStatus": { "const": 403 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "NotFound": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "NOT_FOUND" }, "httpStatus": { "const": 404 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "RequestTimeout": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "REQUEST_TIMEOUT" }, "httpStatus": { "const": 408 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "CursorInvalid": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "CURSOR_INVALID" }, "httpStatus": { "const": 400 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "ChangeFeedGap": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "CHANGE_FEED_GAP" }, "httpStatus": { "const": 409 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "CursorExpired": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "CURSOR_EXPIRED" }, "httpStatus": { "const": 410 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "ValidationFailed": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "VALIDATION_FAILED" }, "httpStatus": { "const": 422 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "RateLimited": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "RATE_LIMITED" }, "httpStatus": { "const": 429 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "InternalError": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "INTERNAL_ERROR" }, "httpStatus": { "const": 500 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "BadGateway": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "BAD_GATEWAY" }, "httpStatus": { "const": 502 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "ServiceUnavailable": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "SERVICE_UNAVAILABLE" }, "httpStatus": { "const": 503 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "GatewayTimeout": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "GATEWAY_TIMEOUT" }, "httpStatus": { "const": 504 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    }
+  }
+}

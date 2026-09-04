@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "v1",
+  "correlation": { "correlationId": "corr-x03b-warehouse" },
+  "data": [{
+    "warehouse_id": "40000000-0000-4000-8000-000000000001",
+    "warehouse_code": "WH-FG-01",
+    "warehouse_name": "Finished Goods Warehouse 01",
+    "warehouse_type": "FINISHED_GOODS",
+    "status": "ACTIVE"
+  }],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "warehouses",
+    "snapshot_id": "11000000-0000-4000-8000-000000000005",
+    "as_of": "2026-09-03T01:00:00Z",
+    "high_watermark": "warehouse-revision-0001",
+    "next_cursor": null,
+    "page_item_count": 1,
+    "delivered_item_count": 1,
+    "item_count": 1,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "831445f9c1eced9ac4fc6344744cb4f8860fabcfbf351b99aec5dffecf284fc1",
+    "delta_supported": false
+  }
+}

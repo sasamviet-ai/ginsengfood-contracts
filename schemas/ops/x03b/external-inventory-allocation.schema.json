@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-inventory-allocation.schema.json",
+  "title": "External inventory allocation projection",
+  "description": "Read-only allocation whitelist with stable UUID external order and order-item identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "allocation_id": { "type": "string", "format": "uuid" },
+    "allocation_no": { "type": "string", "minLength": 1 },
+    "warehouse_id": { "type": "string", "format": "uuid" },
+    "warehouse_location_id": { "type": "string", "format": "uuid" },
+    "item_type": { "type": "string", "enum": ["MATERIAL", "PACKAGING", "FINISHED_GOOD"] },
+    "item_id": { "type": "string", "format": "uuid" },
+    "lot_code": { "type": "string", "minLength": 1 },
+    "unit": { "type": "string", "minLength": 1 },
+    "source_object_type": { "type": "string", "enum": ["EXTERNAL_ORDER", "EXTERNAL_ORDER_ITEM"], "description": "Approved external order lifecycle identity kind; shipping references are not exposed." },
+    "source_object_id": { "type": "string", "format": "uuid", "description": "Stable order_item_id for EXTERNAL_ORDER_ITEM or order_id for EXTERNAL_ORDER; never synthesized." },
+    "source_object_no": { "type": "string", "minLength": 1, "description": "Display-only source number; never used as lifecycle identity." },
+    "allocated_quantity": { "type": "string", "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]{1,3})?$" },
+    "status": { "type": "string", "enum": ["RESERVED", "CONFIRMED", "RELEASED"] },
+    "requested_at": { "type": "string", "format": "date-time" },
+    "confirmed_at": { "type": "string", "format": "date-time" },
+    "released_at": { "type": "string", "format": "date-time" }
+  },
+  "required": ["allocation_id", "allocation_no", "warehouse_id", "item_type", "item_id", "lot_code", "unit", "source_object_type", "source_object_id", "allocated_quantity", "status", "requested_at"]
+}

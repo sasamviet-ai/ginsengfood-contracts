@@ -3,9 +3,9 @@ name: ivr-call-job-status
 title: IVR Call Job Status
 description: Phase 8 IVR call job lifecycle states.
 source_documents:
-  - docs/documents/4. phase/phase-8/IVR-04-order-core-to-ivr-task-contract.md
-  - docs/documents/4. phase/phase-8/IVR-05-attempt-policy-scheduler-queue.md
-  - docs/documents/4. phase/phase-8/IVR-07-result-normalization-order-core-callback.md
+  - docs/documents/4. phase/phase-8/04-HỢP ĐỒNG TỪ LÕI ĐƠN HÀNG ĐẾN TÁC VỤ IVR.md
+  - docs/documents/4. phase/phase-8/05-CHÍNH SÁCH GỌI LẠI BỘ LẬP LỊCH VÀ HÀNG ĐỢI.md
+  - docs/documents/4. phase/phase-8/07-CHUẨN HÓA KẾT QUẢ VÀ CALLBACK VỀ LÕI ĐƠN HÀNG.md
 values:
   - value: TASK_RECEIVED
     description: IVR received an Order Core confirmation task.

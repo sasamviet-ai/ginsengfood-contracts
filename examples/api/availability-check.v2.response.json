@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "v2",
+  "correlation": {
+    "correlationId": "corr-availability-v2-20260903-001",
+    "sourceSystem": "ops-core",
+    "timestamp": "2026-09-03T01:00:00Z"
+  },
+  "data": {
+    "sku_id": "a1000000-0000-4000-8000-000000000001",
+    "batch_id": "b1000000-0000-4000-8000-000000000001",
+    "warehouse_scope": "WAREHOUSE",
+    "warehouse_id": "c1000000-0000-4000-8000-000000000001",
+    "uom_code": "BOX",
+    "check_mode": "FULL_FILL",
+    "requested_quantity": "10.000",
+    "available_quantity": "14.000",
+    "sellable_quantity": "12.000",
+    "decision": "SELLABLE",
+    "fulfillable": true,
+    "partial_supported": false,
+    "block_reasons": [],
+    "resolved_at": "2026-09-03T01:00:00Z",
+    "valid_until": "2026-09-03T01:00:05Z"
+  },
+  "meta": {
+    "provider_cache_seconds": 0,
+    "consumer_max_reuse_seconds": 5,
+    "rate_limit_policy": "ExternalAvailabilityCheck",
+    "server_timeout_seconds": 2,
+    "max_retry": 1,
+    "total_retry_budget_seconds": 5
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-quantity.schema.json",
+  "title": "External exact quantity",
+  "description": "Exact decimal-string quantity and UOM pair exposed by X03B read facades.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "value": { "type": "string", "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]{1,3})?$" },
+    "unit": { "type": "string", "minLength": 1 }
+  },
+  "required": ["value", "unit"]
+}

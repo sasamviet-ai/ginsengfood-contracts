@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-inventory-ledger-entry.schema.json",
+  "title": "External inventory ledger entry projection",
+  "description": "Append-only inventory ledger whitelist without evidence, audit, actor, or internal projection fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ledger_entry_id": { "type": "string", "format": "uuid" },
+    "append_only": { "type": "boolean", "const": true },
+    "movement_type": { "type": "string", "minLength": 1 },
+    "item_type": { "type": "string", "enum": ["MATERIAL", "PACKAGING", "FINISHED_GOOD"] },
+    "sku_id": { "type": "string", "format": "uuid" },
+    "material_id": { "type": "string", "format": "uuid" },
+    "batch_id": { "type": "string", "format": "uuid" },
+    "lot_code": { "type": "string", "minLength": 1 },
+    "warehouse_id": { "type": "string", "format": "uuid" },
+    "warehouse_location_id": { "type": "string", "format": "uuid" },
+    "quantity_delta": { "$ref": "external-quantity.schema.json" },
+    "source_object_type": { "type": "string", "minLength": 1 },
+    "source_object_id": { "type": "string", "format": "uuid" },
+    "source_object_no": { "type": "string", "minLength": 1 },
+    "occurred_at": { "type": "string", "format": "date-time" }
+  },
+  "required": ["ledger_entry_id", "append_only", "movement_type", "item_type", "warehouse_id", "quantity_delta", "occurred_at"]
+}

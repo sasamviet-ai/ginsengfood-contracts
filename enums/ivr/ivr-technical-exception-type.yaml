@@ -5,8 +5,8 @@ description: IVR v1 technical exception categories for failures that must not be
 source_documents:
   - docs/documents/2. pack/09-PACK-09-IVR-ORDER-CONFIRMATION.md
   - docs/documents/3. tech/10-TECH-09-IVR-ORDER-CONFIRMATION-AUTO-CALL-VERIFICATION-ANTI-FAKE-ORDER-CONTROL.md
-  - docs/documents/4. phase/phase-8/IVR-06-internal-sim-gateway-adapter.md
-  - docs/documents/4. phase/phase-8/IVR-07-result-normalization-order-core-callback.md
+  - docs/documents/4. phase/phase-8/06-BỘ CHUYỂN ĐỔI CỔNG SIM NỘI BỘ.md
+  - docs/documents/4. phase/phase-8/07-CHUẨN HÓA KẾT QUẢ VÀ CALLBACK VỀ LÕI ĐƠN HÀNG.md
 values:
   - value: IVR_TECHNICAL_EXCEPTION
     description: Generic IVR technical exception.
