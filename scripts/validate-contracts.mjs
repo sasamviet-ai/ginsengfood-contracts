@@ -647,6 +647,194 @@ function hasExactUniqueStringSet(actualValues, expectedValues) {
   );
 }
 
+function checkRecipeFormulaV2() {
+  const requiredFiles = [
+    "openapi/ops-core/recipe-formula-bom.v1.yaml",
+    "openapi/ops-core/recipe-formula-bom.v2.yaml",
+    "schemas/product/recipe.v2.schema.json",
+    "schemas/product/formula-version.v2.schema.json",
+    "enums/product/recipe-formula-lifecycle-status.v2.yaml",
+    "enums/product/formula-kind.v2.yaml",
+    "compatibility/recipe-formula-bom-v1-to-v2-migration.md",
+    "docs/documents/0. appendices/07-RECIPE-FORMULA-STATUS-V2-OWNER-ADDENDUM.md"
+  ];
+
+  for (const relative of requiredFiles) {
+    if (!existsRel(relative)) errors.push(`Recipe/Formula v2 required file missing: ${relative}`);
+  }
+  if (requiredFiles.some(relative => !existsRel(relative))) return;
+
+  const expectedLifecycle = [
+    "DRAFT",
+    "PENDING_APPROVAL",
+    "APPROVED",
+    "APPROVED_SEED_BASELINE",
+    "ACTIVE_OPERATIONAL",
+    "RETIRED",
+    "REJECTED"
+  ];
+  const expectedFormulaKinds = ["PILOT_PERCENT_BASED", "FIXED_QUANTITY_BATCH"];
+  const forbiddenDerivedStatuses = [
+    "PENDING_CONFIG",
+    "PENDING_EVIDENCE",
+    "ACTIVE",
+    "BLOCKED",
+    "LOCKED",
+    "SUPERSEDED"
+  ];
+
+  const lifecycleEnumPath = path.join(root, toFsPath("enums/product/recipe-formula-lifecycle-status.v2.yaml"));
+  const formulaKindEnumPath = path.join(root, toFsPath("enums/product/formula-kind.v2.yaml"));
+  const lifecycleEnumValues = extractYamlObjectValues(read(lifecycleEnumPath), "values", "value");
+  const formulaKindEnumValues = extractYamlObjectValues(read(formulaKindEnumPath), "values", "value");
+
+  if (JSON.stringify(lifecycleEnumValues) !== JSON.stringify(expectedLifecycle)) {
+    errors.push("enums/product/recipe-formula-lifecycle-status.v2.yaml: values must be the exact ordered canonical seven-value lifecycle");
+  }
+  if (JSON.stringify(formulaKindEnumValues) !== JSON.stringify(expectedFormulaKinds)) {
+    errors.push("enums/product/formula-kind.v2.yaml: values must be the exact ordered two-value formula_kind vocabulary");
+  }
+
+  for (const relative of [
+    "schemas/product/recipe.v2.schema.json",
+    "schemas/product/formula-version.v2.schema.json"
+  ]) {
+    const schema = readJson(path.join(root, toFsPath(relative)));
+    const properties = schema.properties ?? {};
+    const lifecycleValues = properties.lifecycle_status?.enum ?? [];
+    const formulaKindValues = properties.formula_kind?.enum ?? [];
+    const required = schema.required ?? [];
+
+    if (schema.additionalProperties !== false) {
+      errors.push(`${relative}: additionalProperties must be false`);
+    }
+    if (Object.hasOwn(properties, "status")) {
+      errors.push(`${relative}: legacy status field is forbidden; use lifecycle_status`);
+    }
+    if (JSON.stringify(lifecycleValues) !== JSON.stringify(expectedLifecycle)) {
+      errors.push(`${relative}: lifecycle_status must be the exact ordered canonical seven-value lifecycle`);
+    }
+    if (JSON.stringify(formulaKindValues) !== JSON.stringify(expectedFormulaKinds)) {
+      errors.push(`${relative}: formula_kind must be the exact ordered two-value vocabulary`);
+    }
+    if (!required.includes("lifecycle_status") || !required.includes("formula_kind")) {
+      errors.push(`${relative}: lifecycle_status and formula_kind must both be required`);
+    }
+    if (!hasExactUniqueStringSet(lifecycleValues, lifecycleEnumValues)) {
+      errors.push(`${relative}: lifecycle_status must have exact set parity with the v2 lifecycle enum file`);
+    }
+    if (!hasExactUniqueStringSet(formulaKindValues, formulaKindEnumValues)) {
+      errors.push(`${relative}: formula_kind must have exact set parity with the v2 formula-kind enum file`);
+    }
+    if (forbiddenDerivedStatuses.some(value => lifecycleValues.includes(value))) {
+      errors.push(`${relative}: lifecycle_status must not include v1 readiness, lock, supersession, or guard tokens`);
+    }
+
+    if (relative.endsWith("formula-version.v2.schema.json")) {
+      const invariants = schema.allOf ?? [];
+      const g0 = invariants.find(item => item.if?.properties?.generation?.const === "G0");
+      const g1 = invariants.find(item => item.if?.properties?.generation?.const === "G1");
+      if (g0?.then?.properties?.lifecycle_status?.not?.const !== "ACTIVE_OPERATIONAL") {
+        errors.push(`${relative}: G0 must explicitly reject lifecycle_status ACTIVE_OPERATIONAL`);
+      }
+      if (g1?.then?.properties?.formula_kind?.const !== "PILOT_PERCENT_BASED") {
+        errors.push(`${relative}: G1 must require formula_kind PILOT_PERCENT_BASED`);
+      }
+    }
+  }
+
+  const v1 = read(path.join(root, toFsPath("openapi/ops-core/recipe-formula-bom.v1.yaml")));
+  const v2 = read(path.join(root, toFsPath("openapi/ops-core/recipe-formula-bom.v2.yaml")));
+  const compatibility = read(path.join(root, toFsPath("compatibility/recipe-formula-bom-v1-to-v2-migration.md")));
+  const addendum = read(path.join(root, toFsPath("docs/documents/0. appendices/07-RECIPE-FORMULA-STATUS-V2-OWNER-ADDENDUM.md")));
+
+  const v1DeprecationCount = (v1.match(/^\s+deprecated:\s+true\s*$/gm) ?? []).length;
+  if (v1DeprecationCount !== 2) {
+    errors.push("openapi/ops-core/recipe-formula-bom.v1.yaml: exactly the Recipe and Formula Version operations must be deprecated");
+  }
+  for (const frozenTuple of [
+    "/v1/recipes/{recipeId}:",
+    "operationId: getRecipeV1",
+    "/v1/formula-versions/{formulaVersionId}:",
+    "operationId: getFormulaVersionV1",
+    "/v1/boms/{bomId}:",
+    "operationId: getBomV1"
+  ]) {
+    if (!v1.includes(frozenTuple)) errors.push(`openapi/ops-core/recipe-formula-bom.v1.yaml: frozen v1 tuple token missing: ${frozenTuple}`);
+  }
+  if ((v1.match(/^\s+x-superseded-by:\s+recipe-formula-bom\.v2\.yaml#/gm) ?? []).length !== 2) {
+    errors.push("openapi/ops-core/recipe-formula-bom.v1.yaml: exactly the two deprecated operations must declare v2 successor metadata");
+  }
+  if (/^  x-superseded-by:\s+recipe-formula-bom\.v2\.yaml\s*$/m.test(v1)) {
+    errors.push("openapi/ops-core/recipe-formula-bom.v1.yaml: file-level successor metadata is forbidden because BOM v1 remains active");
+  }
+
+  for (const requiredToken of [
+    "version: 2.0.0",
+    "/v2/recipes/{recipeId}:",
+    "operationId: getRecipeV2",
+    "/v2/formula-versions/{formulaVersionId}:",
+    "operationId: getFormulaVersionV2",
+    "x-owner-decision: OD-B9-FORMULA-STATUS-001",
+    "x-runtime-status: CONTRACT_ONLY",
+    "x-auth-status: BLOCKED_BY_X04",
+    "$ref: \"../../schemas/product/recipe.v2.schema.json\"",
+    "$ref: \"../../schemas/product/formula-version.v2.schema.json\""
+  ]) {
+    if (!v2.includes(requiredToken)) errors.push(`openapi/ops-core/recipe-formula-bom.v2.yaml: missing required token ${requiredToken}`);
+  }
+  for (const forbiddenToken of ["/v1/", "/v2/boms/", "operationId: getBomV2"]) {
+    if (v2.includes(forbiddenToken)) errors.push(`openapi/ops-core/recipe-formula-bom.v2.yaml: forbidden scope token ${forbiddenToken}`);
+  }
+
+  for (const requiredCompatibilityToken of [
+    "V1_FROZEN",
+    "CONTRACT_OWNER_REVIEW_REQUIRED",
+    "RUNTIME_BLOCKED_BY_X04",
+    "Không map lossy",
+    "No v1 removal date"
+  ]) {
+    if (!compatibility.includes(requiredCompatibilityToken)) {
+      errors.push(`compatibility/recipe-formula-bom-v1-to-v2-migration.md: missing ${requiredCompatibilityToken}`);
+    }
+  }
+  for (const value of [...expectedLifecycle, ...expectedFormulaKinds]) {
+    if (!addendum.includes(`\`${value}\``)) {
+      errors.push(`Recipe/Formula v2 owner addendum: missing approved value ${value}`);
+    }
+  }
+  for (const axis of ["readiness", "usage lock", "supersession", "derived guard outcome"]) {
+    if (!addendum.toLowerCase().includes(axis)) {
+      errors.push(`Recipe/Formula v2 owner addendum: missing separate-axis statement for ${axis}`);
+    }
+  }
+}
+
+function checkTargetedRecipeFormulaV2Files() {
+  const targetFiles = new Set([
+    "openapi/ops-core/recipe-formula-bom.v1.yaml",
+    "openapi/ops-core/recipe-formula-bom.v2.yaml",
+    "schemas/product/recipe.v2.schema.json",
+    "schemas/product/formula-version.v2.schema.json",
+    "enums/product/recipe-formula-lifecycle-status.v2.yaml",
+    "enums/product/formula-kind.v2.yaml"
+  ]);
+
+  for (const relative of targetFiles) {
+    if (!existsRel(relative)) continue;
+    const filePath = path.join(root, toFsPath(relative));
+    const extension = path.extname(filePath).toLowerCase();
+    const content = read(filePath);
+    checkRefs(filePath, content);
+    if (extension === ".json") checkJson(filePath);
+    if (relative.startsWith("openapi/")) checkOpenApi(filePath, content);
+    if (extension === ".yaml" || extension === ".yml") {
+      checkSourceDocuments(filePath, content);
+      checkKnownYamlPathFields(filePath, content);
+    }
+  }
+}
+
 function checkOperationalFormV2() {
   const requiredFiles = [
     "openapi/ops-core/operational-forms.v2.yaml",
@@ -901,6 +1089,14 @@ if (validationScope === "sku-lifecycle") {
   process.exit(0);
 }
 
+if (validationScope === "recipe-formula-v2") {
+  checkSourceMap({ validateTargets: false });
+  checkRecipeFormulaV2();
+  checkTargetedRecipeFormulaV2Files();
+  printResultAndExit();
+  process.exit(0);
+}
+
 if (validationScope !== "all") {
   errors.push(`Unknown validation scope: ${validationScope}`);
   printResultAndExit();
@@ -911,6 +1107,7 @@ checkPhase8Sources();
 checkRequiredIvrContracts();
 checkSkuLifecycleStatusParity();
 checkOperationalFormV2();
+checkRecipeFormulaV2();
 
 const files = walk(root);
 for (const filePath of files) {

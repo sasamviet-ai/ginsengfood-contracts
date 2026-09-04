@@ -1,0 +1,13 @@
+version: v2
+name: formula-kind
+title: Formula Kind
+description: Formula calculation kind, kept separate from lifecycle status.
+source_documents:
+  - docs/documents/0. appendices/07-RECIPE-FORMULA-STATUS-V2-OWNER-ADDENDUM.md
+values:
+  - value: PILOT_PERCENT_BASED
+    description: Anchor and ratio-percent formula kind used by G1.
+  - value: FIXED_QUANTITY_BATCH
+    description: Fixed-quantity-per-batch formula kind available for later approved formula versions such as G2.
+compatibility:
+  breaking_change: Formula kind is a separate axis and must never be collapsed into lifecycle_status.

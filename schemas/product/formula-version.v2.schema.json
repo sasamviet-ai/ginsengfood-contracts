@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v2/formula-version.schema.json",
+  "title": "Formula Version v2",
+  "description": "Formula Version v2 contract using the canonical ops-core lifecycle; readiness, usage lock, supersession, and guard outcomes are separate axes and are not inferred from lifecycle_status.",
+  "$comment": "Source: owner-approved OD-B9-FORMULA-STATUS-001 option A. Runtime remains blocked by X04 auth/audience review.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "formula_version_id": { "type": "string", "minLength": 1, "description": "Formula Version identifier." },
+    "formula_code": { "type": "string", "minLength": 1, "description": "Formula code." },
+    "sku_id": { "type": "string", "minLength": 1, "description": "SKU governed by this formula version." },
+    "generation": { "type": "string", "enum": ["G0", "G1", "POST_G1"], "description": "Generation marker retained independently from lifecycle." },
+    "version_label": { "type": "string", "minLength": 1, "description": "Human-readable version label." },
+    "lifecycle_status": {
+      "type": "string",
+      "enum": ["DRAFT", "PENDING_APPROVAL", "APPROVED", "APPROVED_SEED_BASELINE", "ACTIVE_OPERATIONAL", "RETIRED", "REJECTED"],
+      "description": "Canonical Recipe/Formula lifecycle status. Only ACTIVE_OPERATIONAL is eligible for production-order recipe resolution."
+    },
+    "formula_kind": {
+      "type": "string",
+      "enum": ["PILOT_PERCENT_BASED", "FIXED_QUANTITY_BATCH"],
+      "description": "Formula calculation kind; this is not a lifecycle status."
+    },
+    "anchor_ingredient_id": { "type": "string", "minLength": 1, "description": "Anchor ingredient identifier when the formula kind uses an anchor." },
+    "anchor_rice_quantity": { "$ref": "../common/quantity.schema.json" },
+    "ratio_to_rice_basis": { "type": "string", "description": "Ratio-to-rice basis retained for compatible formula calculation." },
+    "unit_policy": { "type": "string", "description": "Unit policy retained in the formula version." },
+    "rounding_policy": { "type": "string", "description": "Rounding policy retained in the formula version." },
+    "effective_date": { "type": "string", "format": "date", "description": "Effective date for the version." },
+    "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
+    "source_ref": { "$ref": "../common/source-ref.schema.json" },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+  },
+  "required": ["formula_version_id", "sku_id", "generation", "version_label", "lifecycle_status", "formula_kind"],
+  "allOf": [
+    {
+      "if": {
+        "properties": { "generation": { "const": "G0" } },
+        "required": ["generation"]
+      },
+      "then": {
+        "properties": {
+          "lifecycle_status": { "not": { "const": "ACTIVE_OPERATIONAL" } }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "generation": { "const": "G1" } },
+        "required": ["generation"]
+      },
+      "then": {
+        "properties": {
+          "formula_kind": { "const": "PILOT_PERCENT_BASED" }
+        }
+      }
+    }
+  ]
+}

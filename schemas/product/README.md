@@ -15,8 +15,10 @@ Source basis:
 - Current 19 SKU operational formula catalog for G1, formula codes, anchor rice, and ratio_to_rice concepts; historical 20-SKU source naming is preserved only as provenance.
 
 Compatibility:
-- All schemas are v1 and must stay backward compatible unless a compatibility note is added in a later phase.
+- Existing v1 schemas must stay backward compatible unless a compatibility note approves a major-version migration.
 - Product Activation is not sellable. Sellable status belongs to Operational Core.
+- `recipe.v2.schema.json` and `formula-version.v2.schema.json` are contract-only major-version candidates under `OD-B9-FORMULA-STATUS-001`; runtime is blocked by X04 auth/audience review.
+- v2 replaces ambiguous `status` with required `lifecycle_status` and keeps required `formula_kind` as a separate axis.
 
 TODO:
 - Confirm final SKU lifecycle, recipe lifecycle, BOM lifecycle, and post-G1 version naming.

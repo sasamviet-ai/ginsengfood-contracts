@@ -8,7 +8,8 @@ API groups:
 - Product Master: `product-master.v1.yaml`
 - SKU: `sku.v1.yaml`
 - Ingredient: `ingredient.v1.yaml`
-- Recipe / Formula / BOM: `recipe-formula-bom.v1.yaml`
+- Recipe / Formula / BOM v1 compatibility: `recipe-formula-bom.v1.yaml`
+- Recipe / Formula v2 contract candidate (runtime blocked by X04): `recipe-formula-bom.v2.yaml`
 - Product Activation: `product-activation.v1.yaml`
 - Demand / MRP: `demand-mrp.v1.yaml`
 - Production: `production.v1.yaml`
@@ -35,6 +36,7 @@ Ops-core expose API:
 | Product Public API | `product-master.v1.yaml`, `sku.v1.yaml` | Public-safe projection only. |
 | SKU Detail API | `sku.v1.yaml` | SKU Active không đồng nghĩa có hàng bán. |
 | Product Activation Status API | `product-activation.v1.yaml` | Product Active không đồng nghĩa Sellable. |
+| Recipe / Formula read API | `recipe-formula-bom.v1.yaml`, `recipe-formula-bom.v2.yaml` | v1 Recipe/Formula operations frozen/deprecated; v2 uses canonical lifecycle plus separate formula_kind and remains contract-only until X04 and consumer gates close. |
 | Availability / Sellable Check API | `availability-sellable.v1.yaml`, `availability-sellable.v2.yaml` | Read/check only; v1 frozen, v2 exact-UOM and fail-closed; no reservation or mutation. |
 | Inventory external reads | `inventory.v1.yaml` | Stock balance, ledger, stock alert và allocation là read-only projections; ledger remains ops-core truth. |
 | Warehouse external reads | `warehouse.v1.yaml` | Warehouse, location và receipt projections không thực hiện command hoặc ledger mutation. |

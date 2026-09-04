@@ -1,0 +1,23 @@
+version: v2
+name: recipe-formula-lifecycle-status
+title: Recipe and Formula Lifecycle Status
+description: Canonical lifecycle values shared by Recipe v2 and Formula Version v2.
+source_documents:
+  - docs/documents/0. appendices/07-RECIPE-FORMULA-STATUS-V2-OWNER-ADDENDUM.md
+values:
+  - value: DRAFT
+    description: The version is being prepared and is not approved for operational use.
+  - value: PENDING_APPROVAL
+    description: The version is awaiting the required approval.
+  - value: APPROVED
+    description: The version is approved but is not the active operational version.
+  - value: APPROVED_SEED_BASELINE
+    description: The version is an approved canonical seed baseline but is not active by this value alone.
+  - value: ACTIVE_OPERATIONAL
+    description: The version is the active operational formula and is the only lifecycle value eligible for production-order resolution.
+  - value: RETIRED
+    description: The version is retained for history and is no longer operationally active.
+  - value: REJECTED
+    description: The version was rejected during lifecycle review.
+compatibility:
+  breaking_change: Removing, renaming, reordering semantically, or reinterpreting these lifecycle values requires a new major contract and consumer review.
