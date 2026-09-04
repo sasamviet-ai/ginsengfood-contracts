@@ -11,6 +11,22 @@ info:
 servers:
   - url: https://api.example.local
     description: Placeholder only.
+x-audience-catalog:
+  NONE:
+    auth_class: ANONYMOUS_BOOTSTRAP
+    token_use: NONE
+    permission_scope: NONE
+x-rate-limit-policies:
+  AuthSensitive:
+    permit_limit: 10
+    window_seconds: 60
+    queue_limit: 0
+    partition: VERIFIED_REMOTE_IP
+x-retry-policies:
+  AuthSensitiveNoRetry:
+    max_retries: 0
+    total_budget_seconds: 0
+    honor_retry_after: true
 paths:
   /v1/service-tokens:
     post:
@@ -23,6 +39,16 @@ paths:
       operationId: issueServiceTokenV1
       tags: [service-auth]
       security: []
+      x-auth-class: ANONYMOUS_BOOTSTRAP
+      x-audience: NONE
+      x-token-use: NONE
+      x-permission: NONE
+      x-permission-scope: NONE
+      x-rate-limit-policy: AuthSensitive
+      x-retry-policy: AuthSensitiveNoRetry
+      x-idempotency-disposition: NOT_APPLICABLE_CONFIDENTIAL_CLIENT_EXCHANGE
+      x-runtime-policy: "CURRENT_SOURCE_ROUTE_REQUIRES_EXACT_PARITY; AUTH_SENSITIVE_RATE_POLICY_MATCHED"
+      x-owner-decision-ref: X04D-SEC-01
       requestBody:
         required: true
         content:
@@ -116,6 +142,15 @@ components:
           schema: { $ref: "#/components/schemas/ErrorEnvelope" }
     TooManyRequests:
       description: Authentication-sensitive rate limit exceeded.
+      x-error-code: RATE_LIMITED
+      x-http-status: 429
+      x-retryable: true
+      headers:
+        Retry-After:
+          required: true
+          schema:
+            type: integer
+            minimum: 1
       content:
         application/json:
           schema: { $ref: "#/components/schemas/ErrorEnvelope" }

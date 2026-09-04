@@ -7,6 +7,11 @@ servers:
   - url: https://api.example.local
     description: Placeholder only.
 x-owner-decision-ref: OWNER-DIRECTIVE-2026-09-03-EXT-OD-01-07
+x-audience-catalog:
+  ginsengfood-ops-core-external-bulk-read-v1:
+    auth_class: SERVICE_BEARER
+    token_use: service
+    permission_scope: SERVICE
 x-rate-limit-policies:
   ExternalBulkRead:
     sustained_rps_per_principal: 2
@@ -39,6 +44,18 @@ paths:
       description: Returns internal SKU contract data for ops-core frontend and authorized internal consumers.
       operationId: getSkuV1
       tags: [sku]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-token-use: service
+      x-permission: SKU_CATALOG_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED"
+      x-owner-decision-ref: X04D-SEC-01
       parameters:
         - $ref: "#/components/parameters/SkuId"
       responses:
@@ -59,6 +76,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   /v1/skus/{skuId}/public:
     get:
@@ -107,6 +125,18 @@ paths:
       description: Returns the ops-core operational sellable status for a SKU. Business-platform may read this status but must not mutate ops-core truth.
       operationId: getSkuOperationalStatusV1
       tags: [sku, availability-sellable]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-token-use: service
+      x-permission: SELLABLE_STATUS_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED"
+      x-owner-decision-ref: X04D-SEC-01
       parameters:
         - $ref: "#/components/parameters/SkuId"
       responses:
@@ -127,6 +157,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
         "500": { $ref: "#/components/responses/InternalServerError" }
 components:
   parameters:

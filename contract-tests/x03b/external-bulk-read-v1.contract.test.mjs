@@ -525,11 +525,17 @@ const skuNow = read("openapi/ops-core/sku.v1.yaml");
 const skuBase = normalizeNewlines(
   execFileSync("git", ["show", `${baseSha}:openapi/ops-core/sku.v1.yaml`], { cwd: root, encoding: "utf8" })
 );
+function withoutX04dSecurityMetadata(methodBlock) {
+  return methodBlock
+    .replace(/\n      security:\n        - ServiceBearer: \[\]/, "")
+    .replace(/\n      x-(?:auth-class|audience|token-use|permission|permission-scope|rate-limit-policy|retry-policy|idempotency-disposition|runtime-policy|owner-decision-ref):[^\n]*/g, "")
+    .replace(/\n        "429": \{ \$ref: "#\/components\/responses\/TooManyRequests" \}/, "");
+}
 for (const route of ["/v1/skus/{skuId}", "/v1/skus/{skuId}/operational-status"]) {
   assert.equal(
-    extractMethodBlock(extractPathBlock(skuNow, route), "get").trim(),
+    withoutX04dSecurityMetadata(extractMethodBlock(extractPathBlock(skuNow, route), "get")).trim(),
     extractMethodBlock(extractPathBlock(skuBase, route), "get").trim(),
-    `${route} is outside X03B and must remain newline-normalized equivalent at the method block`
+    `${route} is outside X03B and must remain equivalent after removing the exact X04D additive security whitelist`
   );
 }
 

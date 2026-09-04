@@ -40,6 +40,8 @@ Ops-core expose API:
 | Availability / Sellable Check API | `availability-sellable.v1.yaml`, `availability-sellable.v2.yaml` | Read/check only; v1 frozen, v2 exact-UOM and fail-closed; no reservation or mutation. |
 | Inventory external reads | `inventory.v1.yaml` | Stock balance, ledger, stock alert và allocation là read-only projections; ledger remains ops-core truth. |
 | Warehouse external reads | `warehouse.v1.yaml` | Warehouse, location và receipt projections không thực hiện command hoặc ledger mutation. |
+
+The 21 implemented external v1 operations declare exact X04D operation-level auth class, audience, token-use disposition, permission/scope, rate/retry policy, idempotency disposition, runtime policy, owner-decision reference, and `429 RATE_LIMITED` response metadata. Operator rate policies remain contract-approved but are explicitly marked as not yet implemented at runtime.
 | Trace Public API | `traceability.v1.yaml` | Whitelist-only public fields. |
 | Recall Status API | `recall-sale-lock.v1.yaml` | Recall blocks downstream flow where applicable. |
 | Sale Lock Status API | `recall-sale-lock.v1.yaml` | Sale Lock wins every downstream selling flow. |

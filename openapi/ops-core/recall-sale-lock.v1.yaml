@@ -6,6 +6,48 @@ info:
 servers:
   - url: https://api.example.local
     description: Placeholder only.
+x-audience-catalog:
+  ginsengfood-ops-core-external-bulk-read-v1:
+    auth_class: SERVICE_BEARER
+    token_use: service
+    permission_scope: SERVICE
+  ginsengfood-ops-core-external-operator-v1:
+    auth_class: OPERATOR_BEARER
+    token_use: ABSENT
+    permission_scope: ADMIN_OPERATIONAL
+x-rate-limit-policies:
+  ExternalBulkRead:
+    sustained_rps_per_principal: 2
+    burst_per_principal: 4
+    fleet_rps: 10
+    fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+    server_timeout_seconds: 10
+    queue_limit: 0
+    partition_claims: [token_use, sub]
+    fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
+    startup_fail_closed: true
+  ExternalOperatorHighRisk:
+    sustained_rps_per_principal: 0.1
+    burst_per_principal: 1
+    fleet_rps: 1
+    fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+    server_timeout_seconds: 15
+    queue_limit: 0
+    partition_claims: [sub]
+    fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
+    startup_fail_closed: true
+x-retry-policies:
+  ExternalBulkReadRetry:
+    max_retries: 2
+    total_budget_seconds: 30
+    retryable_statuses: [408, 429, 502, 503, 504]
+    honor_retry_after: true
+    backoff: FULL_JITTER_BASE_500MS_CAP_5S
+  ExternalManualReplayOnly:
+    max_retries: 0
+    total_budget_seconds: 0
+    replay: MANUAL_SAME_IDEMPOTENCY_KEY_AND_PAYLOAD_ONLY
+    honor_retry_after: true
 paths:
   /v1/recall-cases:
     post:
@@ -13,6 +55,18 @@ paths:
       description: Creates a Recall Case through an authenticated high-risk command. The response status is the external projection defined by OD-M13-RCL-STATUS-002; provider-owned ID/status fields are not accepted in the request.
       operationId: createRecallCaseV1
       tags: [recall-sale-lock]
+      security:
+        - OperatorBearer: []
+      x-auth-class: OPERATOR_BEARER
+      x-audience: ginsengfood-ops-core-external-operator-v1
+      x-token-use: ABSENT
+      x-permission: RECALL_CASE_CREATE
+      x-permission-scope: ADMIN_OPERATIONAL
+      x-rate-limit-policy: ExternalOperatorHighRisk
+      x-retry-policy: ExternalManualReplayOnly
+      x-idempotency-disposition: IDEMPOTENCY_KEY_REQUIRED
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_PARITY; RATE_POLICY_NOT_IMPLEMENTED"
+      x-owner-decision-ref: X04D-SEC-01
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -39,6 +93,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   /v1/recall-cases/{recallCaseId}:
     get:
@@ -46,6 +101,18 @@ paths:
       description: Returns one Recall Case external projection. BLOCKED is a derived overlay with blocked_from_status and blocking_error_codes; unknown internal state fails closed with CONTRACT_STATUS_UNMAPPED and is never exposed raw.
       operationId: getRecallCaseV1
       tags: [recall-sale-lock]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-token-use: service
+      x-permission: RECALL_CASE_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED"
+      x-owner-decision-ref: X04D-SEC-01
       parameters:
         - name: recallCaseId
           in: path
@@ -69,6 +136,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   /v1/sale-locks:
     post:
@@ -76,6 +144,18 @@ paths:
       description: Creates a durable Sale Lock / Stop Sale contract record for SKU, BATCH, LOT, or TRACE_CHAIN only. All identifiers are UUIDs; TRACE_CHAIN uses scope_id equal to recall_case_id and covers the complete versioned historical impact union for that case. Unsupported or mismatched scope fails validation before side effects. Per OD-RCL-03, every successful durable activation enqueues both ops-core.recall.sale-lock-activated.v1 and ops-core.recall.stop-sale-required.v1 for the same scope in the same outbox transaction; Recall Case creation alone does not emit stop-sale.
       operationId: createSaleLockV1
       tags: [recall-sale-lock]
+      security:
+        - OperatorBearer: []
+      x-auth-class: OPERATOR_BEARER
+      x-audience: ginsengfood-ops-core-external-operator-v1
+      x-token-use: ABSENT
+      x-permission: RECALL_SALE_LOCK_APPLY
+      x-permission-scope: ADMIN_OPERATIONAL
+      x-rate-limit-policy: ExternalOperatorHighRisk
+      x-retry-policy: ExternalManualReplayOnly
+      x-idempotency-disposition: IDEMPOTENCY_KEY_REQUIRED
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_PARITY; RATE_POLICY_NOT_IMPLEMENTED"
+      x-owner-decision-ref: X04D-SEC-01
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -102,6 +182,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   /v1/sale-locks/{saleLockId}:
     get:
@@ -109,6 +190,18 @@ paths:
       description: Returns one Sale Lock record. ACTIVE remains authoritative until an approved release is effective; consumers must not infer commerce availability from a release request.
       operationId: getSaleLockV1
       tags: [recall-sale-lock]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-token-use: service
+      x-permission: RECALL_HOLD_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED"
+      x-owner-decision-ref: X04D-SEC-01
       parameters:
         - name: saleLockId
           in: path
@@ -132,6 +225,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/InternalServerError" }
 components:
   parameters:
@@ -159,4 +253,27 @@ components:
     NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    RateLimited:
+      description: RATE_LIMITED; caller must honor Retry-After and the operation retry disposition.
+      x-error-code: RATE_LIMITED
+      x-http-status: 429
+      x-retryable: true
+      headers:
+        Retry-After:
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
     InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+  securitySchemes:
+    ServiceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OperatorBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

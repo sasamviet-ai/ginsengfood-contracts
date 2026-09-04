@@ -6,6 +6,45 @@ info:
 servers:
   - url: https://api.example.local
     description: Placeholder only.
+x-audience-catalog:
+  ginsengfood-ops-core-external-availability-v1:
+    auth_class: SERVICE_BEARER
+    token_use: service
+    permission_scope: SERVICE
+x-rate-limit-policies:
+  ExternalAvailabilityCheck:
+    sustained_rps_per_principal: 10
+    burst_per_principal: 20
+    fleet_rps: 50
+    fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+    server_timeout_seconds: 2
+    queue_limit: 0
+    partition_claims: [token_use, sub]
+    fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
+    startup_fail_closed: true
+  ExternalBulkRead:
+    sustained_rps_per_principal: 2
+    burst_per_principal: 4
+    fleet_rps: 10
+    fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+    server_timeout_seconds: 10
+    queue_limit: 0
+    partition_claims: [token_use, sub]
+    fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
+    startup_fail_closed: true
+x-retry-policies:
+  ExternalAvailabilityCheckRetry:
+    max_retries: 1
+    total_budget_seconds: 5
+    retryable_statuses: [408, 429, 502, 503, 504]
+    honor_retry_after: true
+    backoff: FULL_JITTER
+  ExternalBulkReadRetry:
+    max_retries: 2
+    total_budget_seconds: 30
+    retryable_statuses: [408, 429, 502, 503, 504]
+    honor_retry_after: true
+    backoff: FULL_JITTER_BASE_500MS_CAP_5S
 paths:
   /v1/availability/check:
     post:
@@ -15,6 +54,16 @@ paths:
       tags: [availability-sellable]
       security:
         - bearerAuth: []
+      x-auth-class: SERVICE_BEARER
+      x-audience: ginsengfood-ops-core-external-availability-v1
+      x-token-use: service
+      x-permission: SELLABLE_CHECK
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalAvailabilityCheck
+      x-retry-policy: ExternalAvailabilityCheckRetry
+      x-idempotency-disposition: NOT_APPLICABLE_SAFE_EVALUATION
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED"
+      x-owner-decision-ref: X04D-SEC-01
       requestBody:
         required: true
         content:
@@ -39,6 +88,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   /v1/sellable-statuses/{sellableStatusId}:
     get:
@@ -53,6 +103,16 @@ paths:
           schema: { type: string, format: uuid }
       security:
         - bearerAuth: []
+      x-auth-class: SERVICE_BEARER
+      x-audience: ginsengfood-ops-core-external-availability-v1
+      x-token-use: service
+      x-permission: SELLABLE_STATUS_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED"
+      x-owner-decision-ref: X04D-SEC-01
       responses:
         "200":
           description: Sellable status wrapped in the common envelope.
@@ -71,6 +131,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/InternalServerError" }
 components:
   schemas:
@@ -110,6 +171,20 @@ components:
     NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    RateLimited:
+      description: RATE_LIMITED; caller must honor Retry-After and the operation retry budget.
+      x-error-code: RATE_LIMITED
+      x-http-status: 429
+      x-retryable: true
+      headers:
+        Retry-After:
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
     InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
   securitySchemes:
     bearerAuth:

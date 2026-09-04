@@ -5,6 +5,7 @@ This folder contains planning assets and fixtures for provider/consumer contract
 Current validation:
 
 - Repository-level contract hygiene/source trace validation is available through `node scripts/validate-contracts.mjs`.
+- Exact X04D metadata parity for the 21 implemented external v1 operations is enforced by `node contract-tests/x04d/external-runtime-v1-security.contract.test.mjs`.
 - Existing Postman collections and JSON fixtures remain early contract-test assets.
 - Pact files remain planning-only until the provider/consumer registry and Pact toolchain are approved.
 

@@ -6,6 +6,44 @@ info:
 servers:
   - url: https://api.example.local
     description: Placeholder only.
+x-audience-catalog:
+  ginsengfood-ops-core-external-operator-v1:
+    auth_class: OPERATOR_BEARER
+    token_use: ABSENT
+    permission_scope: ADMIN_OPERATIONAL
+x-rate-limit-policies:
+  ExternalOperatorRead:
+    sustained_rps_per_principal: 2
+    burst_per_principal: 4
+    fleet_rps: 10
+    fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+    server_timeout_seconds: 10
+    queue_limit: 0
+    partition_claims: [sub]
+    fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
+    startup_fail_closed: true
+  ExternalOperatorMutation:
+    sustained_rps_per_principal: 0.5
+    burst_per_principal: 2
+    fleet_rps: 5
+    fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+    server_timeout_seconds: 15
+    queue_limit: 0
+    partition_claims: [sub]
+    fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
+    startup_fail_closed: true
+x-retry-policies:
+  ExternalOperatorReadRetry:
+    max_retries: 1
+    total_budget_seconds: 20
+    retryable_statuses: [408, 429, 502, 503, 504]
+    honor_retry_after: true
+    backoff: FULL_JITTER
+  ExternalManualReplayOnly:
+    max_retries: 0
+    total_budget_seconds: 0
+    replay: MANUAL_SAME_IDEMPOTENCY_KEY_AND_PAYLOAD_ONLY
+    honor_retry_after: true
 paths:
   /v1/misa-handoffs:
     get:
@@ -13,6 +51,18 @@ paths:
       description: "Lists MISA handoff records for ops-core and integration review. TODO: source documents do not lock final filter parameters."
       operationId: listMisaHandoffsV1
       tags: [misa-handoff]
+      security:
+        - OperatorBearer: []
+      x-auth-class: OPERATOR_BEARER
+      x-audience: ginsengfood-ops-core-external-operator-v1
+      x-token-use: ABSENT
+      x-permission: MISA_SYNC_VIEW
+      x-permission-scope: ADMIN_OPERATIONAL
+      x-rate-limit-policy: ExternalOperatorRead
+      x-retry-policy: ExternalOperatorReadRetry
+      x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY
+      x-runtime-policy: "CONDITIONAL_ROUTE_PRESENT; OWNER_ORDER_AND_RUNTIME_FLAG_REQUIRED; RATE_POLICY_NOT_IMPLEMENTED"
+      x-owner-decision-ref: X04D-SEC-01
       responses:
         "200":
           description: MISA handoffs wrapped in the common envelope.
@@ -33,12 +83,27 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/InternalServerError" }
     post:
       summary: Create MISA handoff
       description: Creates a MISA handoff from a valid operational checkpoint. This API must not invent accounting postings or bypass mapping/sync/reconcile status.
       operationId: createMisaHandoffV1
       tags: [misa-handoff]
+      security:
+        - OperatorBearer: []
+      x-auth-class: OPERATOR_BEARER
+      x-audience: ginsengfood-ops-core-external-operator-v1
+      x-token-use: ABSENT
+      x-permission: ACCOUNTING_DOCUMENT_POST
+      x-permission-scope: ADMIN_OPERATIONAL
+      x-rate-limit-policy: ExternalOperatorMutation
+      x-retry-policy: ExternalManualReplayOnly
+      x-idempotency-disposition: IDEMPOTENCY_KEY_REQUIRED
+      x-runtime-policy: "CONDITIONAL_ROUTE_PRESENT; OWNER_ORDER_AND_RUNTIME_FLAG_REQUIRED; RATE_POLICY_NOT_IMPLEMENTED"
+      x-owner-decision-ref: X04D-SEC-01
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -63,6 +128,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/InternalServerError" }
   /v1/misa-handoffs/{misaHandoffId}:
     get:
@@ -70,6 +136,18 @@ paths:
       description: Returns one MISA handoff record with mapping, sync, and reconcile status.
       operationId: getMisaHandoffV1
       tags: [misa-handoff]
+      security:
+        - OperatorBearer: []
+      x-auth-class: OPERATOR_BEARER
+      x-audience: ginsengfood-ops-core-external-operator-v1
+      x-token-use: ABSENT
+      x-permission: MISA_SYNC_VIEW
+      x-permission-scope: ADMIN_OPERATIONAL
+      x-rate-limit-policy: ExternalOperatorRead
+      x-retry-policy: ExternalOperatorReadRetry
+      x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY
+      x-runtime-policy: "CONDITIONAL_ROUTE_PRESENT; OWNER_ORDER_AND_RUNTIME_FLAG_REQUIRED; RATE_POLICY_NOT_IMPLEMENTED"
+      x-owner-decision-ref: X04D-SEC-01
       parameters:
         - name: misaHandoffId
           in: path
@@ -93,8 +171,18 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/InternalServerError" }
 components:
+  parameters:
+    IdempotencyKey:
+      name: X-Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
   schemas:
     ErrorEnvelope:
       allOf:
@@ -110,4 +198,23 @@ components:
     NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    RateLimited:
+      description: RATE_LIMITED; caller must honor Retry-After and the operation retry disposition.
+      x-error-code: RATE_LIMITED
+      x-http-status: 429
+      x-retryable: true
+      headers:
+        Retry-After:
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
     InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+  securitySchemes:
+    OperatorBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
