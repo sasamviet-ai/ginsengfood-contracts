@@ -9,7 +9,6 @@
       "warehouse_id": "40000000-0000-4000-8000-000000000002",
       "location_code": "FG-B-02",
       "location_name": "Finished Goods B-02",
-      "location_type": "STORAGE_BIN",
       "status": "INACTIVE"
     }
   ],
@@ -27,7 +26,7 @@
     "manifest_version": 1,
     "manifest_algorithm": "SHA-256",
     "manifest_canonicalization": "JCS_RFC8785",
-    "manifest_sha256": "7c2b51739b5ed6a9ac1caf4c9de0165fff53d140bcbedade0f0703536b22b38e",
+    "manifest_sha256": "ca55a3639a03f7c130a62eb28848fa896600bd883d71cbd5a1f530d711fcd33a",
     "delta_supported": false
   }
 }

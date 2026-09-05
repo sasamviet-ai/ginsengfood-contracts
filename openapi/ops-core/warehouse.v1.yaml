@@ -201,7 +201,7 @@ paths:
         - name: status
           in: query
           required: false
-          schema: { type: string, enum: [DRAFT, PENDING_CONFIRMATION, CONFIRMED, BLOCKED, REJECTED] }
+          schema: { type: string, enum: [DRAFT, PENDING_CONFIRMATION, CONFIRMED, CANCELLED, CORRECTED] }
         - name: batchId
           in: query
           required: false

@@ -10,8 +10,12 @@
     "warehouse_id": { "type": "string", "format": "uuid" },
     "location_code": { "type": "string", "minLength": 1 },
     "location_name": { "type": "string", "minLength": 1 },
-    "location_type": { "type": "string", "minLength": 1 },
+    "location_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional and NOT emitted by v1 (OD-C24-02, owner decision 05-09-2026). No approved taxonomy and no source column exist on the provider side. Consumers MUST NOT infer it from location_code, location_name or warehouse type, and MUST NOT treat its absence as a defect. Populating it requires an approved vocabulary plus a data-steward backfill in a successor contract."
+    },
     "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
   },
-  "required": ["warehouse_location_id", "warehouse_id", "location_code", "location_name", "location_type", "status"]
+  "required": ["warehouse_location_id", "warehouse_id", "location_code", "location_name", "status"]
 }

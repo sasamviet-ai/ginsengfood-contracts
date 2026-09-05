@@ -8,14 +8,21 @@
   "properties": {
     "warehouse_receipt_id": { "type": "string", "format": "uuid" },
     "warehouse_receipt_no": { "type": "string", "minLength": 1 },
-    "status": { "type": "string", "enum": ["DRAFT", "PENDING_CONFIRMATION", "CONFIRMED", "BLOCKED", "REJECTED"] },
+    "status": {
+      "type": "string",
+      "enum": ["DRAFT", "PENDING_CONFIRMATION", "CONFIRMED", "CANCELLED", "CORRECTED"],
+      "description": "Canonical warehouse-receipt lifecycle (OD-C24-03, owner decision 05-09-2026). CANCELLED and CORRECTED receipts stay in the full snapshot and keep their own token; the provider MUST NOT map them onto CONFIRMED or filter them out. The former BLOCKED/REJECTED tokens were packaging-intake vocabulary and never existed for warehouse receipts."
+    },
     "batch_id": { "type": "string", "format": "uuid" },
     "warehouse_id": { "type": "string", "format": "uuid" },
     "warehouse_location_id": { "type": "string", "format": "uuid" },
-    "received_quantity": { "$ref": "external-quantity.schema.json" },
+    "received_quantity": {
+      "$ref": "external-quantity.schema.json",
+      "description": "Header roll-up emitted ONLY when every receipt line shares one UOM; omitted otherwise, because summing mixed UOM lines would produce a silently wrong number (OD-C24-03). Absence means 'not expressible as a single quantity', never zero. A CORRECTED receipt reports the post-correction quantity."
+    },
     "received_at": { "type": "string", "format": "date-time" },
     "confirmed_at": { "type": "string", "format": "date-time" },
     "created_at": { "type": "string", "format": "date-time" }
   },
-  "required": ["warehouse_receipt_id", "warehouse_receipt_no", "status", "batch_id", "warehouse_id", "received_quantity", "created_at"]
+  "required": ["warehouse_receipt_id", "warehouse_receipt_no", "status", "batch_id", "warehouse_id", "created_at"]
 }

@@ -1,7 +1,7 @@
 version: v1
 name: warehouse-receipt-status
 title: Warehouse Receipt Status
-description: Warehouse Receipt v1 status values. Receipt confirmed is the boundary that can create finished goods inventory ledger entries.
+description: Warehouse Receipt v1 status values, reconciled against the ops-core implementation on 2026-09-05. Receipt confirmed is the boundary that can create finished goods inventory ledger entries.
 source_documents:
   - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
 values:
@@ -14,13 +14,18 @@ values:
   - value: CONFIRMED
     description: Receipt confirmed; inventory ledger can be created.
     source: PACK-01 Warehouse Receipt Confirmed.
-  - value: BLOCKED
-    description: Receipt is blocked, for example batch not RELEASED.
-    source: PACK-01 negative smoke.
-  - value: REJECTED
-    description: Receipt rejected.
-    source: TODO: rejection semantics are not specified.
+  - value: CANCELLED
+    description: Receipt cancelled after creation; it stays in the full snapshot with this token and is never re-labelled.
+    source: ops-core WarehouseConstants.ReceiptStatusCancelled, OpWarehouseReceipt.Cancel.
+  - value: CORRECTED
+    description: Receipt superseded by a correction; quantities reported for it are post-correction.
+    source: ops-core WarehouseConstants.ReceiptStatusCorrected, OpWarehouseReceipt.Correct.
 compatibility:
   breaking_change: Confirming receipt for a non-RELEASED batch is breaking.
-todos:
-  - Confirm whether rejected/cancelled statuses are needed separately.
+  removed_2026_09_05:
+    - value: BLOCKED
+      reason: Never existed for warehouse receipts. A receipt against a non-RELEASED batch is refused at command time, so no row is ever persisted in this state. BLOCKED/REJECTED belong to the packaging-intake vocabulary and were copied here by mistake.
+    - value: REJECTED
+      reason: Same as BLOCKED. Its own description carried an unresolved TODO admitting the semantics were never specified.
+  removal_safety: No provider runtime emitted either token and GET /v1/warehouse-receipts was not implemented at removal time, so no consumer could have depended on them.
+  owner_decision: OD-C24-03, docs/decisions/05-09-10-55-c24-three-warehouse-projection-owner-decision.md

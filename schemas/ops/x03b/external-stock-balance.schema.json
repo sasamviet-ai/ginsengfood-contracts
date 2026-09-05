@@ -2,24 +2,47 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "external-stock-balance.schema.json",
   "title": "External stock balance projection",
-  "description": "Read-only stock balance whitelist without internal ledger, evidence, audit, or MISA references.",
+  "description": "Read-only stock balance whitelist without internal ledger, evidence, audit, or MISA references. Scope is finished goods only (OD-C24-01B, owner decision 05-09-2026): raw-material, packaging and work-in-progress balances are never projected, and their absence is deliberate rather than 'no stock'. The three hold quantities are DISJOINT buckets — see available_quantity for the invariant. This projection is for display and reconciliation; POST /v1/availability/check remains the sole authority for whether an order line may be committed.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "stock_balance_id": { "type": "string", "format": "uuid" },
-    "item_type": { "type": "string", "enum": ["MATERIAL", "PACKAGING", "FINISHED_GOOD"] },
+    "item_type": {
+      "type": "string",
+      "enum": ["FINISHED_GOOD"],
+      "description": "Narrowed to FINISHED_GOOD in v1 so the finished-goods-only boundary is structural, not merely enforced in provider code (OD-C24-01B). Widening the scope requires a successor contract."
+    },
     "sku_id": { "type": "string", "format": "uuid" },
-    "material_id": { "type": "string", "format": "uuid" },
+    "material_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reserved for a future non-finished-goods scope; NEVER emitted while item_type is restricted to FINISHED_GOOD."
+    },
     "batch_id": { "type": "string", "format": "uuid" },
     "lot_code": { "type": "string", "minLength": 1 },
     "warehouse_id": { "type": "string", "format": "uuid" },
     "warehouse_location_id": { "type": "string", "format": "uuid" },
-    "on_hand_quantity": { "$ref": "external-quantity.schema.json" },
-    "available_quantity": { "$ref": "external-quantity.schema.json" },
+    "on_hand_quantity": {
+      "$ref": "external-quantity.schema.json",
+      "description": "Total physically held at this balance row: available + reserved + quality_hold + recall_hold + sale_lock."
+    },
+    "available_quantity": {
+      "$ref": "external-quantity.schema.json",
+      "description": "INVARIANT (OD-C24-01): on_hand_quantity = available_quantity + reserved_quantity + quality_hold_quantity + recall_hold_quantity + sale_lock_quantity, holding at every row and at every aggregation. The three hold buckets are a PARTITION, so consumers may add and subtract them freely without double counting."
+    },
     "reserved_quantity": { "$ref": "external-quantity.schema.json" },
-    "quality_hold_quantity": { "$ref": "external-quantity.schema.json" },
-    "recall_hold_quantity": { "$ref": "external-quantity.schema.json" },
-    "sale_lock_quantity": { "$ref": "external-quantity.schema.json" },
+    "quality_hold_quantity": {
+      "$ref": "external-quantity.schema.json",
+      "description": "Quantity blocked by a QC/quarantine hold. Lowest bucket priority: a row also under recall or sale lock is reported under that higher bucket instead, so a single row never contributes to two buckets."
+    },
+    "recall_hold_quantity": {
+      "$ref": "external-quantity.schema.json",
+      "description": "Quantity blocked by an active recall. HIGHEST bucket priority (recall > sale lock > quality hold), so a row under several restrictions at once is reported here and its other reasons are not separately visible."
+    },
+    "sale_lock_quantity": {
+      "$ref": "external-quantity.schema.json",
+      "description": "Quantity blocked by an active sale lock. Middle bucket priority: outranks a quality hold on the same row, and is itself outranked by a recall."
+    },
     "as_of": { "type": "string", "format": "date-time" }
   },
   "required": ["stock_balance_id", "item_type", "warehouse_id", "on_hand_quantity", "available_quantity", "reserved_quantity", "quality_hold_quantity", "recall_hold_quantity", "sale_lock_quantity", "as_of"]
