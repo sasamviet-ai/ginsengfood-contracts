@@ -1,0 +1,10 @@
+{
+  "sku_id": "20000000-0000-4000-8000-000000000001",
+  "warehouse_id": "40000000-0000-4000-8000-000000000001",
+  "uom_code": "BOX",
+  "requested_quantity": "15.000",
+  "source_object_type": "EXTERNAL_ORDER_ITEM",
+  "source_object_id": "60000000-0000-4000-8000-000000000001",
+  "source_object_no": "ORD-20260905-001/LINE-001",
+  "expires_at": "2026-09-05T03:00:00Z"
+}

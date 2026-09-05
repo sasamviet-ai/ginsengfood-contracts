@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-allocation-reserve-line.schema.json",
+  "title": "External inventory allocation reserve line",
+  "description": "One hold placed on exactly one warehouse lot. Field names and vocabulary match external-inventory-allocation.schema.json so the same reader can consume both the reserve result and the allocation snapshot.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "allocation_id": { "type": "string", "format": "uuid" },
+    "allocation_no": { "type": "string" },
+    "warehouse_id": { "type": "string", "format": "uuid" },
+    "warehouse_location_id": { "type": "string", "format": "uuid" },
+    "item_type": {
+      "type": "string",
+      "enum": ["MATERIAL", "PACKAGING", "FINISHED_GOOD"]
+    },
+    "item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Provider-side inventory item identity for the held lot. It is not the SKU identifier; resolve stock by SKU through the reserve request or the allocation snapshot filters."
+    },
+    "lot_code": { "type": "string" },
+    "unit": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,31}$" },
+    "source_object_type": {
+      "type": "string",
+      "enum": ["EXTERNAL_ORDER", "EXTERNAL_ORDER_ITEM"]
+    },
+    "source_object_id": { "type": "string", "format": "uuid" },
+    "source_object_no": { "type": "string" },
+    "allocated_quantity": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]{0,14})(?:\\.[0-9]{1,3})?$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["RESERVED", "CONFIRMED", "RELEASED"],
+      "description": "A freshly created hold is always RESERVED. CONFIRMED and RELEASED are reached only by warehouse operations; the sales platform cannot drive those transitions."
+    },
+    "requested_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" }
+  },
+  "required": [
+    "allocation_id",
+    "allocation_no",
+    "warehouse_id",
+    "item_type",
+    "item_id",
+    "lot_code",
+    "unit",
+    "source_object_type",
+    "source_object_id",
+    "allocated_quantity",
+    "status",
+    "requested_at"
+  ]
+}

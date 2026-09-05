@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-allocation-reserve-error.schema.json",
+  "title": "External allocation reserve error envelopes",
+  "description": "Error envelopes for POST /v1/inventory/allocations. The envelope shape is identical to the bulk-read one so a consumer parses both with the same reader; only the code vocabulary differs, because a write route can fail in ways a snapshot read cannot.",
+  "$comment": "Deliberately a separate closed enum instead of widening external-bulk-read-error.schema.json: INSUFFICIENT_STOCK and ALLOCATION_CONFLICT are meaningless on read routes, and a read consumer must not be told to expect them. The provider never forwards internal operational reason codes (SALE_LOCK_ACTIVE, RECALL_IMPACT_ACTIVE, BATCH_NOT_RELEASED, QUALITY_HOLD) — those disclose warehouse state to a consumer that only needs to know whether the hold succeeded.",
+  "$defs": {
+    "Error": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_REQUEST",
+            "UNAUTHORIZED",
+            "FORBIDDEN",
+            "NOT_FOUND",
+            "VALIDATION_FAILED",
+            "INSUFFICIENT_STOCK",
+            "ALLOCATION_CONFLICT",
+            "RATE_LIMITED",
+            "REQUEST_TIMEOUT",
+            "SERVICE_UNAVAILABLE",
+            "INTERNAL_ERROR"
+          ]
+        },
+        "message": { "type": "string" },
+        "httpStatus": { "type": "integer" },
+        "correlationId": { "type": "string", "minLength": 1 },
+        "details": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["code", "message", "httpStatus", "correlationId"]
+    },
+    "BaseEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "type": "string", "const": "v1" },
+        "correlation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "correlationId": { "type": "string", "minLength": 1 },
+            "causationId": { "type": "string", "minLength": 1 },
+            "sourceSystem": { "type": "string", "minLength": 1 },
+            "timestamp": { "type": "string", "format": "date-time" }
+          },
+          "required": ["correlationId"]
+        },
+        "error": { "$ref": "#/$defs/Error" }
+      },
+      "required": ["schemaVersion", "correlation", "error"]
+    },
+    "InvalidRequest": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "INVALID_REQUEST" }, "httpStatus": { "const": 400 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "Unauthorized": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "UNAUTHORIZED" }, "httpStatus": { "const": 401 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "Forbidden": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "FORBIDDEN" }, "httpStatus": { "const": 403 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "NotFound": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "NOT_FOUND" }, "httpStatus": { "const": 404 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "InsufficientStock": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "INSUFFICIENT_STOCK" }, "httpStatus": { "const": 409 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "AllocationConflict": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "ALLOCATION_CONFLICT" }, "httpStatus": { "const": 409 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "ValidationFailed": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "VALIDATION_FAILED" }, "httpStatus": { "const": 422 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "RateLimited": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "RATE_LIMITED" }, "httpStatus": { "const": 429 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    },
+    "InternalError": {
+      "allOf": [
+        { "$ref": "#/$defs/BaseEnvelope" },
+        { "properties": { "error": { "properties": { "code": { "const": "INTERNAL_ERROR" }, "httpStatus": { "const": 500 } }, "required": ["code", "httpStatus"] } } }
+      ]
+    }
+  }
+}
