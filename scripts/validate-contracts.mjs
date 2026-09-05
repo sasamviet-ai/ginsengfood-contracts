@@ -326,10 +326,7 @@ function checkSkuLifecycleStatusParity() {
     errors.push(`${relative}: ACTIVE_BASELINE is internal and must project as ACTIVE at the external boundary`);
   }
 
-  for (const schemaRelative of [
-    "schemas/product/sku.schema.json",
-    "schemas/ops/x03b/external-public-sku.schema.json"
-  ]) {
+  for (const schemaRelative of ["schemas/product/sku.schema.json"]) {
     const schemaPath = path.join(root, toFsPath(schemaRelative));
     if (!fs.existsSync(schemaPath)) {
       errors.push(`${schemaRelative}: missing`);

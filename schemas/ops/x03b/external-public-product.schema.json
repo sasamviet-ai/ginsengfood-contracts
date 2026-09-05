@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-public-product.schema.json",
+  "title": "Protected external public Product projection",
+  "description": "Approved and effective public-safe Product content. Product identity is the one-to-one SKU identity, without exposing internal SKU fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "product_id": { "type": "string", "format": "uuid" },
+    "public_name": { "type": "string", "minLength": 1 },
+    "public_safe_description": { "type": "string", "minLength": 1 },
+    "ingredient_public_summary": { "type": "string", "minLength": 1 },
+    "product_positioning": { "type": "string", "minLength": 1 },
+    "product_group": { "type": "string", "enum": ["SEASONAL", "FUNCTIONAL", "NUTRITIOUS"] },
+    "content_version": { "type": "string", "minLength": 1 },
+    "dietary_flags": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "enum": ["VEGAN", "SAVORY"] }
+    },
+    "usage_guidance": { "type": "string", "minLength": 1 },
+    "benefit_phrase": { "type": "string", "minLength": 1 }
+  },
+  "required": [
+    "product_id",
+    "public_name",
+    "public_safe_description",
+    "ingredient_public_summary",
+    "product_positioning",
+    "product_group",
+    "content_version"
+  ]
+}

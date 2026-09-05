@@ -6,8 +6,8 @@ All OpenAPI contracts use OpenAPI 3.1.0. File major, `info.version`, and `/vN` p
 
 | API group | File | Version | Primary consumers | Compatibility notes |
 | --- | --- | --- | --- | --- |
-| Product master | `openapi/ops-core/product-master.v1.yaml` | v1 | ops-core frontend | Product activation does not imply sellable. |
-| SKU | `openapi/ops-core/sku.v1.yaml` | v1 | ops-core frontend, business-platform | Public SKU reads must not expose operational sensitive data. |
+| Product master | `openapi/ops-core/product-master.v1.yaml` | v1 | business-platform M2M | `/v1/products*` requires `PRODUCT_PUBLIC_VIEW`; approved/effective public content only. Product activation does not imply sellable. |
+| SKU | `openapi/ops-core/sku.v1.yaml` | v1 | ops-core frontend, business-platform M2M | `/v1/skus/{skuId}/public` shares the exact public Product schema and must not expose `sku_code` or operational sensitive data. |
 | Ingredient | `openapi/ops-core/ingredient.v1.yaml` | v1 | ops-core frontend | Ingredient contracts remain ops-owned. |
 | Recipe / formula / BOM | `openapi/ops-core/recipe-formula-bom.v1.yaml` | v1 | ops-core frontend | G0/G1/version, anchor rice, ratio, and BOM snapshot must stay distinct. |
 | Product activation | `openapi/ops-core/product-activation.v1.yaml` | v1 | ops-core frontend | Activation is not sellable status. |

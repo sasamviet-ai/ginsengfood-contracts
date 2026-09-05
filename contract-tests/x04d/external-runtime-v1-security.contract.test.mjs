@@ -11,10 +11,13 @@ const operations = [
   { file: "ingredient.v1.yaml", operationId: "getIngredientV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "SKU_CATALOG_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer" },
   { file: "product-activation.v1.yaml", operationId: "getProductActivationV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "SKU_ACTIVATION_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer" },
   { file: "product-activation.v1.yaml", operationId: "getSkuActivationV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "SKU_ACTIVATION_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer" },
+  { file: "product-master.v1.yaml", operationId: "listProductsV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "PRODUCT_PUBLIC_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer", ownerDecision: "OD-A6-05" },
+  { file: "product-master.v1.yaml", operationId: "getProductV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "PRODUCT_PUBLIC_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer", ownerDecision: "OD-A6-05" },
   { file: "recipe-formula-bom.v1.yaml", operationId: "getRecipeV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "SKU_CATALOG_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer" },
   { file: "recipe-formula-bom.v1.yaml", operationId: "getFormulaVersionV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "SKU_CATALOG_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer" },
   { file: "recipe-formula-bom.v1.yaml", operationId: "getBomV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "SKU_CATALOG_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer" },
   { file: "sku.v1.yaml", operationId: "getSkuV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "SKU_CATALOG_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer" },
+  { file: "sku.v1.yaml", operationId: "getPublicSkuV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "PRODUCT_PUBLIC_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer", ownerDecision: "OD-A6-05" },
   { file: "sku.v1.yaml", operationId: "getSkuOperationalStatusV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "SELLABLE_STATUS_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer" },
   { file: "recall-sale-lock.v1.yaml", operationId: "getRecallCaseV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "RECALL_CASE_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer" },
   { file: "recall-sale-lock.v1.yaml", operationId: "getSaleLockV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-bulk-read-v1", tokenUse: "service", permission: "RECALL_HOLD_VIEW", scope: "SERVICE", rate: "ExternalBulkRead", retry: "ExternalBulkReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer" },
@@ -128,7 +131,7 @@ function assertOperation(operation, textOverride) {
   assertScalar(block, "x-retry-policy", operation.retry, operation.operationId);
   assertScalar(block, "x-idempotency-disposition", operation.idempotency, operation.operationId);
   assertScalar(block, "x-runtime-policy", `"${operation.runtime}"`, operation.operationId);
-  assertScalar(block, "x-owner-decision-ref", ownerDecision, operation.operationId);
+  assertScalar(block, "x-owner-decision-ref", operation.ownerDecision ?? ownerDecision, operation.operationId);
   assert.doesNotMatch(block, /^      x-auth-alternatives:/m, `${operation.operationId} must not declare conditional auth`);
   if (operation.idempotency === "IDEMPOTENCY_KEY_REQUIRED") {
     assert.match(block, /#\/components\/parameters\/IdempotencyKey/, `${operation.operationId} idempotency header reference missing`);
@@ -163,8 +166,8 @@ function assertOperation(operation, textOverride) {
   assert.match(response, /#\/components\/schemas\/ErrorEnvelope|schemas\/.*error.*schema\.json/);
 }
 
-assert.equal(operations.length, 21, "runtime security operation inventory must remain 21");
-assert.equal(new Set(operations.map(operation => operation.operationId)).size, 21, "operationId values must be unique");
+assert.equal(operations.length, 24, "runtime security operation inventory must remain 24");
+assert.equal(new Set(operations.map(operation => operation.operationId)).size, 24, "operationId values must be unique");
 
 for (const operation of operations) assertOperation(operation);
 
@@ -190,4 +193,4 @@ assert.throws(
   /x-idempotency-disposition drift/
 );
 
-console.log("X04D external runtime v1 security metadata PASS: 21/21 operations plus negative tamper checks.");
+console.log("X04D external runtime v1 security metadata PASS: 24/24 operations plus negative tamper checks.");

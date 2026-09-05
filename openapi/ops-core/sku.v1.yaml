@@ -81,7 +81,7 @@ paths:
   /v1/skus/{skuId}/public:
     get:
       summary: Get public SKU projection
-      description: Returns the protected, public-safe SKU projection without recipe, formula, BOM, supplier, QC, cost, source, evidence, or private operational data. The public path name does not make this operation anonymous.
+      description: Returns the protected, public-safe SKU projection. Must not expose recipe, formula, supplier, QC internals, cost, or private operational data; BOM, source, evidence, internal codes, and governance metadata are also excluded. The public path name does not make this operation anonymous.
       operationId: getPublicSkuV1
       tags: [sku]
       security:
@@ -89,10 +89,13 @@ paths:
       x-auth-class: SERVICE_BEARER
       x-token-use: service
       x-audience: ginsengfood-ops-core-external-bulk-read-v1
-      x-permission: SKU_CATALOG_VIEW
+      x-permission: PRODUCT_PUBLIC_VIEW
       x-permission-scope: SERVICE
       x-rate-limit-policy: ExternalBulkRead
       x-retry-policy: ExternalBulkReadRetry
+      x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED"
+      x-owner-decision-ref: OD-A6-05
       parameters:
         - $ref: "#/components/parameters/SkuId"
       responses:
@@ -107,7 +110,7 @@ paths:
                     required: [schemaVersion, correlation, data]
                     properties:
                       data:
-                        $ref: "../../schemas/ops/x03b/external-public-sku.schema.json"
+                        $ref: "../../schemas/ops/x03b/external-public-product.schema.json"
         "400": { $ref: "#/components/responses/ExternalBadRequest" }
         "401": { $ref: "#/components/responses/ExternalUnauthorized" }
         "403": { $ref: "#/components/responses/ExternalForbidden" }
@@ -195,13 +198,13 @@ components:
       x-retryable: false
       content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/Unauthorized" } } }
     ExternalForbidden:
-      description: Required SKU_CATALOG_VIEW permission or SERVICE scope is missing.
+      description: Required operation permission or SERVICE scope is missing.
       x-error-code: FORBIDDEN
       x-http-status: 403
       x-retryable: false
       content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/Forbidden" } } }
     ExternalNotFound:
-      description: SKU is not found or inaccessible.
+      description: Requested SKU or public Product content is not found or inaccessible.
       x-error-code: NOT_FOUND
       x-http-status: 404
       x-retryable: false

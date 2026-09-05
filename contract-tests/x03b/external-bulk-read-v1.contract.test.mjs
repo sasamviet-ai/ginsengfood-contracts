@@ -59,7 +59,7 @@ const operations = [
   { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouses", operationId: "listWarehousesV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse.schema.json", fixture: "warehouses", resource: "warehouses", responseProfile: "warehouse", sort: "warehouseCode ASC, warehouseId ASC", order: [["warehouse_code", "ASC"], ["warehouse_id", "ASC"]], tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_id", "warehouse_code", "warehouse_name", "warehouse_type", "status"] },
   { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-locations", operationId: "listWarehouseLocationsV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse-location.schema.json", fixture: "warehouse-locations", resource: "warehouse-locations", responseProfile: "warehouse", sort: "locationCode ASC, warehouseLocationId ASC", order: [["location_code", "ASC"], ["warehouse_location_id", "ASC"]], tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_location_id", "warehouse_id", "location_code", "location_name", "location_type", "status"] },
   { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-receipts", operationId: "listWarehouseReceiptsV1", permission: "WAREHOUSE_RECEIPT_VIEW", schema: "external-warehouse-receipt.schema.json", fixture: "warehouse-receipts", resource: "warehouse-receipts", responseProfile: "warehouse", sort: "createdAt DESC, warehouseReceiptId DESC", order: [["created_at", "DESC"], ["warehouse_receipt_id", "DESC"]], tombstone: "STATE_REVISION_NO_TOMBSTONE", filters: ["status", "batchId", "warehouseId", "fromDate", "toDate"], fields: ["warehouse_receipt_id", "warehouse_receipt_no", "status", "batch_id", "warehouse_id", "warehouse_location_id", "received_quantity", "received_at", "confirmed_at", "created_at"] },
-  { file: "openapi/ops-core/sku.v1.yaml", route: "/v1/skus/{skuId}/public", operationId: "getPublicSkuV1", permission: "SKU_CATALOG_VIEW", schema: "external-public-sku.schema.json", fixture: "public-sku", responseProfile: "sku", collection: false, fields: ["sku_id", "sku_code", "product_id", "public_name", "dietary_type", "product_group", "lifecycle_status"] }
+  { file: "openapi/ops-core/sku.v1.yaml", route: "/v1/skus/{skuId}/public", operationId: "getPublicSkuV1", permission: "PRODUCT_PUBLIC_VIEW", schema: "external-public-product.schema.json", fixture: "public-sku", responseProfile: "sku", collection: false, fields: ["product_id", "public_name", "public_safe_description", "ingredient_public_summary", "product_positioning", "product_group", "content_version", "dietary_flags", "usage_guidance", "benefit_phrase"] }
 ];
 
 const normalizeNewlines = text => text.replace(/\r\n?/g, "\n");
@@ -161,8 +161,11 @@ function assertOperationContract(operation, textOverride) {
   assert.match(block, /x-permission-scope: SERVICE/);
   assert.match(block, /x-rate-limit-policy: ExternalBulkRead/);
   assert.match(block, /x-retry-policy: ExternalBulkReadRetry/);
+  if (operation.operationId === "getPublicSkuV1") {
+    assert.match(block, /x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY/);
+  }
   assert.match(text, /schemas\/ops\/x03b\/external-bulk-read-error-envelopes\.schema\.json/);
-  assert.doesNotMatch(block, /requestBody:|X-Idempotency-Key|x-idempotency/i);
+  assert.doesNotMatch(block, /requestBody:|X-Idempotency-Key/i);
   assert.match(block, /"429": \{ \$ref: "#\/components\/responses\/TooManyRequests" \}/);
   assert.match(block, new RegExp(`schemas/ops/x03b/${operation.schema.replaceAll(".", "\\.")}`));
 
@@ -401,13 +404,9 @@ for (const operation of operations) {
 }
 
 const publicSkuOperation = operations.find(operation => operation.operationId === "getPublicSkuV1");
-const retiredPublicSku = parseJson("contract-tests/x03b/fixtures/public-sku.response.fixture.json");
-retiredPublicSku.data.lifecycle_status = "RETIRED";
-validatePayload(retiredPublicSku, publicSkuOperation);
-
-const internalLifecycleLeak = structuredClone(retiredPublicSku);
-internalLifecycleLeak.data.lifecycle_status = "ACTIVE_BASELINE";
-assert.throws(() => validatePayload(internalLifecycleLeak, publicSkuOperation), /enum/);
+const publicSkuInternalLeak = parseJson("contract-tests/x03b/fixtures/public-sku.response.fixture.json");
+publicSkuInternalLeak.data.sku_code = "INTERNAL-A1";
+assert.throws(() => validatePayload(publicSkuInternalLeak, publicSkuOperation), /not whitelisted/);
 
 const crlfInventoryText = read(operations[0].file).replaceAll("\n", "\r\n");
 assertOperationContract(operations[0], crlfInventoryText);

@@ -1,18 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "external-public-sku.schema.json",
-  "title": "Protected external public SKU projection",
-  "description": "Public-safe but authenticated SKU whitelist without recipe, formula, BOM, source, evidence, supplier, cost, or QC fields.",
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "sku_id": { "type": "string", "format": "uuid" },
-    "sku_code": { "type": "string", "minLength": 1 },
-    "product_id": { "type": "string", "format": "uuid" },
-    "public_name": { "type": "string", "minLength": 1 },
-    "dietary_type": { "type": "string", "enum": ["VEGAN", "SAVORY"] },
-    "product_group": { "type": "string", "minLength": 1 },
-    "lifecycle_status": { "type": "string", "enum": ["DRAFT", "PENDING_CONFIG", "PENDING_EVIDENCE", "READY", "ACTIVE", "INACTIVE", "RETIRED", "BLOCKED"] }
-  },
-  "required": ["sku_id", "sku_code", "product_id", "public_name", "lifecycle_status"]
+  "title": "Compatibility alias for the protected external public Product projection",
+  "description": "Compatibility schema that resolves the public SKU view to the canonical one-to-one public Product projection.",
+  "$ref": "./external-public-product.schema.json"
 }

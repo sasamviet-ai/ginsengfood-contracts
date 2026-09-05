@@ -33,7 +33,7 @@ Ops-core expose API:
 
 | API | Contract file | Boundary lock |
 |---|---|---|
-| Product Public API | `product-master.v1.yaml`, `sku.v1.yaml` | Public-safe projection only. |
+| Product Public API | `product-master.v1.yaml`, `sku.v1.yaml` | Protected M2M projection; exact `PRODUCT_PUBLIC_VIEW` allowlist only, không fallback sang internal SKU/formula/BOM. |
 | SKU Detail API | `sku.v1.yaml` | SKU Active không đồng nghĩa có hàng bán. |
 | Product Activation Status API | `product-activation.v1.yaml` | Product Active không đồng nghĩa Sellable. |
 | Recipe / Formula read API | `recipe-formula-bom.v1.yaml`, `recipe-formula-bom.v2.yaml` | v1 Recipe/Formula operations frozen/deprecated; v2 uses canonical lifecycle plus separate formula_kind and remains contract-only until X04 and consumer gates close. |
@@ -41,7 +41,7 @@ Ops-core expose API:
 | Inventory external reads | `inventory.v1.yaml` | Stock balance, ledger, stock alert và allocation là read-only projections; ledger remains ops-core truth. |
 | Warehouse external reads | `warehouse.v1.yaml` | Warehouse, location và receipt projections không thực hiện command hoặc ledger mutation. |
 
-The 21 implemented external v1 operations declare exact X04D operation-level auth class, audience, token-use disposition, permission/scope, rate/retry policy, idempotency disposition, runtime policy, owner-decision reference, and `429 RATE_LIMITED` response metadata. Operator rate policies remain contract-approved but are explicitly marked as not yet implemented at runtime.
+The 24 implemented external v1 operations declare exact X04D operation-level auth class, audience, token-use disposition, permission/scope, rate/retry policy, idempotency disposition, runtime policy, owner-decision reference, and `429 RATE_LIMITED` response metadata. Operator rate policies remain contract-approved but are explicitly marked as not yet implemented at runtime.
 | Trace Public API | `traceability.v1.yaml` | Whitelist-only public fields. |
 | Recall Status API | `recall-sale-lock.v1.yaml` | Recall blocks downstream flow where applicable. |
 | Sale Lock Status API | `recall-sale-lock.v1.yaml` | Sale Lock wins every downstream selling flow. |
