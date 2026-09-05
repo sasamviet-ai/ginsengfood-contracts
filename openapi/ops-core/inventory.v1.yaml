@@ -320,6 +320,126 @@ paths:
         "502": { $ref: "#/components/responses/BadGateway" }
         "503": { $ref: "#/components/responses/ServiceUnavailable" }
         "504": { $ref: "#/components/responses/GatewayTimeout" }
+    post:
+      summary: Reserve finished-goods stock for an external order or order line
+      description: >-
+        Synchronous hold on finished-goods stock. The provider selects lots in a deterministic
+        allocation order and applies the same sellability guard as the internal allocation path
+        (batch release, warehouse receipt confirmation, quality hold, expiry, recall, sale lock).
+        Reservation is full-fill only: a shortage reserves nothing and returns INSUFFICIENT_STOCK.
+        The hold does not write a ledger entry, does not move goods, and does not confirm or release
+        the allocation — those transitions belong to warehouse operations.
+      operationId: reserveInventoryAllocationV1
+      tags: [inventory]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-allocation-v1
+      x-permission: INVENTORY_ALLOCATION_CREATE
+      x-permission-scope: SERVICE
+      # ⚠ EXT-OD-04 §16.6 khóa đúng hai policy (hot + bulk) vì lúc chốt chưa có route ghi ngoài nào.
+      # Route này tạm dùng bucket hot; một policy ExternalAllocationReserve riêng cần owner bổ sung
+      # vào bảng đã khóa trước khi coi đây là thông số đã duyệt.
+      x-rate-limit-policy: ExternalAvailabilityCheck
+      x-idempotency: REQUIRED
+      x-write-surface: EXTERNAL_ALLOCATION_RESERVE
+      parameters:
+        - name: X-Idempotency-Key
+          in: header
+          required: true
+          description: >-
+            Required on this write route. A network retry without it would hold stock twice for the
+            same order line. A repeat call for the same source object with a new key is answered with
+            reservation_status=ALREADY_RESERVED and creates nothing.
+          schema: { type: string, minLength: 1, maxLength: 100 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../../schemas/ops/x03b/external-allocation-reserve-request.schema.json"
+      responses:
+        "200":
+          description: An equivalent hold already existed; nothing was created.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    required: [schemaVersion, correlation, data]
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/x03b/external-allocation-reserve-result.schema.json"
+        "201":
+          description: Stock reserved.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    required: [schemaVersion, correlation, data]
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/x03b/external-allocation-reserve-result.schema.json"
+        "400":
+          description: INVALID_REQUEST for a malformed body.
+          x-error-code: INVALID_REQUEST
+          x-http-status: 400
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/InvalidRequest" } } }
+        "401":
+          description: UNAUTHORIZED for missing or invalid service credentials.
+          x-error-code: UNAUTHORIZED
+          x-http-status: 401
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/Unauthorized" } } }
+        "403":
+          description: FORBIDDEN when the principal lacks INVENTORY_ALLOCATION_CREATE or the allocation audience.
+          x-error-code: FORBIDDEN
+          x-http-status: 403
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/Forbidden" } } }
+        "404":
+          description: NOT_FOUND for an unknown SKU or an unknown, inactive, or inaccessible warehouse.
+          x-error-code: NOT_FOUND
+          x-http-status: 404
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/NotFound" } } }
+        "409":
+          description: >-
+            INSUFFICIENT_STOCK when no combination of allocatable lots can fill the exact quantity,
+            or ALLOCATION_CONFLICT when the same source object already holds a different scope or
+            quantity. Neither reserves anything.
+          x-error-code: INSUFFICIENT_STOCK
+          x-http-status: 409
+          x-retryable: false
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/InsufficientStock"
+                  - $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/AllocationConflict"
+        "422":
+          description: VALIDATION_FAILED for a missing idempotency key, malformed quantity, or non-conforming UOM code.
+          x-error-code: VALIDATION_FAILED
+          x-http-status: 422
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/ValidationFailed" } } }
+        "429":
+          description: RATE_LIMITED.
+          x-error-code: RATE_LIMITED
+          x-http-status: 429
+          x-retryable: true
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/RateLimited" } } }
+        "500":
+          description: INTERNAL_ERROR.
+          x-error-code: INTERNAL_ERROR
+          x-http-status: 500
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/InternalError" } } }
 components:
   parameters:
     Cursor:
