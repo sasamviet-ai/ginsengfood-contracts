@@ -28,7 +28,8 @@
     },
     "uom_code": {
       "type": "string",
-      "pattern": "^[A-Z][A-Z0-9_]{0,31}$"
+      "enum": ["hộp", "thùng", "lọ", "hũ"],
+      "description": "ACTIVE approved finished-goods UOM code echoed from the request, exactly as stored in ref_uom: lowercase Vietnamese with diacritics. Fixed 2026-09-07 - see availability-check-request.v2.schema.json."
     },
     "check_mode": {
       "type": "string",

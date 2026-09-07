@@ -24,8 +24,8 @@
     },
     "uom_code": {
       "type": "string",
-      "pattern": "^[A-Z][A-Z0-9_]{0,31}$",
-      "description": "Required case-sensitive ACTIVE approved sell/trade-item finished-goods UOM code. No case folding, conversion, or mixed-UOM aggregation is allowed."
+      "enum": ["hộp", "thùng", "lọ", "hũ"],
+      "description": "Required case-sensitive ACTIVE approved sell/trade-item finished-goods UOM code, exactly as stored in ref_uom: lowercase Vietnamese with diacritics. No case folding, conversion, or mixed-UOM aggregation is allowed - 'HỘP', 'Hop' and 'BOX' are all rejected. Fixed 2026-09-07: this field previously declared pattern ^[A-Z][A-Z0-9_]{0,31}$, which no code in ref_uom can match, so a schema-validating caller could only send a code the runtime does not know. Enum kept identical to external-allocation-reserve-request.schema.json; note ref_uom also has ACTIVE PACKAGING codes 'gói' and 'khay' that neither contract lists."
     },
     "requested_quantity": {
       "type": "string",

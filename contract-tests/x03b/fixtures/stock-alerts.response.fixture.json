@@ -11,7 +11,7 @@
       "status": "STOCK_RED_ALERT",
       "available_stock": {
         "value": "5.000",
-        "unit": "BOX"
+        "unit": "hộp"
       },
       "occurred_at": "2026-09-03T00:45:00Z"
     }

@@ -8,7 +8,7 @@
   "data": {
     "sku_id": "a1000000-0000-4000-8000-000000000001",
     "warehouse_scope": "ALL",
-    "uom_code": "BOX",
+    "uom_code": "hộp",
     "check_mode": "EXISTENCE",
     "available_quantity": "3.000",
     "sellable_quantity": "2.000",

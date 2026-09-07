@@ -11,7 +11,7 @@
       "item_type": "FINISHED_GOOD",
       "item_id": "20000000-0000-4000-8000-000000000002",
       "lot_code": "FG-FIXTURE-002",
-      "unit": "BOX",
+      "unit": "hộp",
       "source_object_type": "EXTERNAL_ORDER_ITEM",
       "source_object_id": "60000000-0000-4000-8000-000000000002",
       "source_object_no": "ORD-FIXTURE/LINE-002",

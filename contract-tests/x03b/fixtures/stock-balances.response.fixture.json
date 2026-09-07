@@ -11,27 +11,27 @@
       "warehouse_id": "40000000-0000-4000-8000-000000000001",
       "on_hand_quantity": {
         "value": "10.000",
-        "unit": "BOX"
+        "unit": "hộp"
       },
       "available_quantity": {
         "value": "10.000",
-        "unit": "BOX"
+        "unit": "hộp"
       },
       "reserved_quantity": {
         "value": "0.000",
-        "unit": "BOX"
+        "unit": "hộp"
       },
       "quality_hold_quantity": {
         "value": "0.000",
-        "unit": "BOX"
+        "unit": "hộp"
       },
       "recall_hold_quantity": {
         "value": "0.000",
-        "unit": "BOX"
+        "unit": "hộp"
       },
       "sale_lock_quantity": {
         "value": "0.000",
-        "unit": "BOX"
+        "unit": "hộp"
       },
       "as_of": "2026-09-03T01:00:00Z"
     }
