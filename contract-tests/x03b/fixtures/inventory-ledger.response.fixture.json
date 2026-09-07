@@ -32,7 +32,7 @@
     "manifest_version": 1,
     "manifest_algorithm": "SHA-256",
     "manifest_canonicalization": "JCS_RFC8785",
-    "manifest_sha256": "9cb167fb10f5fbb151cc2f35597dc91dd217d53cd929c956960ca37168a5f2a0",
+    "manifest_sha256": "9645f515b749b7efc25b56ca5cbc5b8649426e26516741763487fbe3ed97a544",
     "delta_supported": false
   }
 }

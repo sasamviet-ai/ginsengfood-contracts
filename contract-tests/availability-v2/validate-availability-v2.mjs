@@ -7,7 +7,11 @@ const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(testDirectory, "../..");
 const positiveQuantityPattern = /^(?=.{1,19}$)(?=.*[1-9])(?:0|[1-9][0-9]{0,14})(?:\.[0-9]{1,3})?$/;
 const nonNegativeQuantityPattern = /^(?:0|[1-9][0-9]{0,14})(?:\.[0-9]{1,3})?$/;
-const uomPattern = /^[A-Z][A-Z0-9_]{0,31}$/;
+// Mã đơn vị canonical đúng như ref_uom: chữ thường tiếng Việt có dấu, so sánh Ordinal.
+// Trước 07-09-2026 chỗ này là /^[A-Z][A-Z0-9_]{0,31}$/ — mẫu mà KHÔNG mã ref_uom nào khớp được,
+// nên hợp đồng chỉ có thể mô tả một đơn vị mà runtime không biết. Giữ khít với enum trong
+// availability-check-request.v2 và external-allocation-reserve-request.
+const canonicalUomCodes = ["hộp", "thùng", "lọ", "hũ"];
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const files = {
@@ -119,7 +123,7 @@ function validateRequest(request) {
   assertUuid(request.sku_id, "request.sku_id");
   if (request.batch_id !== undefined) assertUuid(request.batch_id, "request.batch_id");
   if (request.warehouse_id !== undefined) assertUuid(request.warehouse_id, "request.warehouse_id");
-  assert.match(request.uom_code, uomPattern, "request.uom_code must preserve an uppercase, case-sensitive canonical code");
+  assert.ok(canonicalUomCodes.includes(request.uom_code), "request.uom_code must be an exact canonical ref_uom code (case-sensitive, with diacritics)");
   if (request.requested_quantity !== undefined) {
     assert.ok(decimal(request.requested_quantity, positiveQuantityPattern, "request.requested_quantity") > 0n);
   }
@@ -260,7 +264,7 @@ function validateRequestSchemaStructure(schema) {
   assert.equal(schema.properties.sku_id.type, "string");
   assert.equal(schema.properties.sku_id.format, "uuid", "request sku_id must retain UUID format validation");
   assert.equal(schema.properties.requested_quantity.pattern, positiveQuantityPattern.source);
-  assert.equal(schema.properties.uom_code.pattern, uomPattern.source);
+  assert.deepEqual(schema.properties.uom_code.enum, canonicalUomCodes, "request uom_code must be an enum of real ref_uom codes, never a character pattern");
 }
 
 function requiredConditional(schema, discriminator, discriminatorValue, guardedProperty) {

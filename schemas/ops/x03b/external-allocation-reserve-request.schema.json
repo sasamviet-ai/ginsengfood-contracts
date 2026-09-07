@@ -19,8 +19,8 @@
     },
     "uom_code": {
       "type": "string",
-      "pattern": "^[A-Z][A-Z0-9_]{0,31}$",
-      "description": "Required case-sensitive ACTIVE approved sell/trade-item finished-goods UOM code. No case folding, conversion, or mixed-UOM aggregation is allowed."
+      "enum": ["hộp", "thùng", "lọ", "hũ"],
+      "description": "Required case-sensitive ACTIVE approved finished-goods stock UOM code, exactly as stored in ref_uom: lowercase Vietnamese with diacritics. No case folding, conversion, or mixed-UOM aggregation is allowed - 'HỘP', 'Hop' and 'BOX' are all rejected. Fixed 2026-09-07: this field previously declared pattern ^[A-Z][A-Z0-9_]{0,31}$, which no code in ref_uom can match, so every reserve request was rejected with 422."
     },
     "requested_quantity": {
       "type": "string",
@@ -46,7 +46,7 @@
       "type": "string",
       "format": "date-time",
       "pattern": "Z$",
-      "description": "Optional UTC hold expiry. Must be after trusted server time. Omission holds until confirmed or released by warehouse operations."
+      "description": "Optional UTC hold expiry. Must be after trusted server time and at most 24 hours after it; a later value is rejected with 422 VALIDATION_FAILED. Omission defaults the hold to 30 minutes after the request is received. Once the expiry passes, the provider releases the hold on its own: the allocation moves to RELEASED, the held quantity returns to the lot's available quantity, and no goods movement is recorded. Set by OD-ALLOC-LIFECYCLE-01 (2026-09-07), which replaced the earlier statement that omission holds until warehouse operations confirm or release. Expiry is not distinguishable from an operator release through status alone - both read RELEASED."
     }
   },
   "required": [

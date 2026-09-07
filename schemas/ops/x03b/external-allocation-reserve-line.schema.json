@@ -20,7 +20,7 @@
       "description": "Provider-side inventory item identity for the held lot. It is not the SKU identifier; resolve stock by SKU through the reserve request or the allocation snapshot filters."
     },
     "lot_code": { "type": "string" },
-    "unit": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,31}$" },
+    "unit": { "type": "string", "enum": ["hộp", "thùng", "lọ", "hũ"] },
     "source_object_type": {
       "type": "string",
       "enum": ["EXTERNAL_ORDER", "EXTERNAL_ORDER_ITEM"]

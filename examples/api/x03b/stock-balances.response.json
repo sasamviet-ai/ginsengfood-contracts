@@ -9,12 +9,12 @@
     "lot_code": "FG-LOT-20260903-001",
     "warehouse_id": "40000000-0000-4000-8000-000000000001",
     "warehouse_location_id": "50000000-0000-4000-8000-000000000001",
-    "on_hand_quantity": { "value": "120.000", "unit": "BOX" },
-    "available_quantity": { "value": "100.000", "unit": "BOX" },
-    "reserved_quantity": { "value": "20.000", "unit": "BOX" },
-    "quality_hold_quantity": { "value": "0.000", "unit": "BOX" },
-    "recall_hold_quantity": { "value": "0.000", "unit": "BOX" },
-    "sale_lock_quantity": { "value": "0.000", "unit": "BOX" },
+    "on_hand_quantity": { "value": "120.000", "unit": "hộp" },
+    "available_quantity": { "value": "100.000", "unit": "hộp" },
+    "reserved_quantity": { "value": "20.000", "unit": "hộp" },
+    "quality_hold_quantity": { "value": "0.000", "unit": "hộp" },
+    "recall_hold_quantity": { "value": "0.000", "unit": "hộp" },
+    "sale_lock_quantity": { "value": "0.000", "unit": "hộp" },
     "as_of": "2026-09-03T01:00:00Z"
   }],
   "meta": {
@@ -31,7 +31,7 @@
     "manifest_version": 1,
     "manifest_algorithm": "SHA-256",
     "manifest_canonicalization": "JCS_RFC8785",
-    "manifest_sha256": "4363ddef866aff2391470fcd343552862d91a449f12846af5258b979c78fcbf4",
+    "manifest_sha256": "79dade2aaad018b42855b4f7d365675585fe6e5d7a5c09243fd9364d839a0cfe",
     "delta_supported": false
   }
 }

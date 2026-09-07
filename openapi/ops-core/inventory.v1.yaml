@@ -289,6 +289,19 @@ paths:
       parameters:
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
+        # QĐ-6 phương án C (owner 07-09-2026): mở đúng một filter để consumer tra được phân bổ
+        # của chính đơn mình. Trước đó operation khai mảng filter rỗng nên mọi query param ngoài
+        # cursor/limit bị trả 422.
+        - name: sourceObjectId
+          in: query
+          required: false
+          description: >-
+            Restricts the snapshot to allocations whose source_object_id equals this value. It is the
+            consumer's own EXTERNAL_ORDER order_id or EXTERNAL_ORDER_ITEM order_item_id, never a
+            synthesized identifier. A filtered read is still a complete snapshot of that filter, and the
+            cursor is bound to it: dropping or changing the filter mid-pagination returns CURSOR_INVALID.
+            A syntactically invalid or nil UUID returns VALIDATION_FAILED, never a silently unfiltered page.
+          schema: { type: string, format: uuid }
       responses:
         "200":
           description: Stable allocation snapshot page; absent items are not deletions.

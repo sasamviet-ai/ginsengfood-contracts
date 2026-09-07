@@ -11,7 +11,7 @@
     "lot_code": "FG-LOT-20260903-001",
     "warehouse_id": "40000000-0000-4000-8000-000000000001",
     "warehouse_location_id": "50000000-0000-4000-8000-000000000001",
-    "quantity_delta": { "value": "120.000", "unit": "BOX" },
+    "quantity_delta": { "value": "120.000", "unit": "hộp" },
     "source_object_type": "WAREHOUSE_RECEIPT",
     "source_object_id": "17000000-0000-4000-8000-000000000001",
     "source_object_no": "WR-20260903-001",
@@ -31,7 +31,7 @@
     "manifest_version": 1,
     "manifest_algorithm": "SHA-256",
     "manifest_canonicalization": "JCS_RFC8785",
-    "manifest_sha256": "e10615b6099218af64dd1ec27e64c58cfcf29a11f9fc79be271a6b3ad80b3ed6",
+    "manifest_sha256": "7a5a6f267e582a89abcdd4fb9a133d588cc8c26c48ba12e5b936028d3c58c73c",
     "delta_supported": false
   }
 }

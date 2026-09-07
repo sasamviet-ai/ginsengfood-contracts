@@ -9,7 +9,7 @@
   "properties": {
     "sku_id": { "type": "string", "format": "uuid" },
     "warehouse_id": { "type": "string", "format": "uuid" },
-    "uom_code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,31}$" },
+    "uom_code": { "type": "string", "enum": ["hộp", "thùng", "lọ", "hũ"] },
     "requested_quantity": {
       "type": "string",
       "pattern": "^(?:0|[1-9][0-9]{0,14})(?:\\.[0-9]{1,3})?$"

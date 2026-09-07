@@ -8,7 +8,7 @@
     "batch_id": "30000000-0000-4000-8000-000000000001",
     "warehouse_id": "40000000-0000-4000-8000-000000000001",
     "warehouse_location_id": "50000000-0000-4000-8000-000000000001",
-    "received_quantity": { "value": "120.000", "unit": "BOX" },
+    "received_quantity": { "value": "120.000", "unit": "hộp" },
     "received_at": "2026-09-03T00:39:00Z",
     "confirmed_at": "2026-09-03T00:40:00Z",
     "created_at": "2026-09-03T00:38:00Z"
@@ -27,7 +27,7 @@
     "manifest_version": 1,
     "manifest_algorithm": "SHA-256",
     "manifest_canonicalization": "JCS_RFC8785",
-    "manifest_sha256": "26235e571c895967007425ba9a3cec1b06e56580241855f0552f35ddad146114",
+    "manifest_sha256": "789d10e049ce56c3e6eecc7aca523f4c8e329de7e3aae8efc4dd4fdf15f1117b",
     "delta_supported": false
   }
 }
