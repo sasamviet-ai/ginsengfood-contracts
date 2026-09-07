@@ -18,7 +18,7 @@
     "warehouse_location_id": { "type": "string", "format": "uuid" },
     "received_quantity": {
       "$ref": "external-quantity.schema.json",
-      "description": "Header roll-up emitted ONLY when every receipt line shares one UOM; omitted otherwise, because summing mixed UOM lines would produce a silently wrong number (OD-C24-03). Absence means 'not expressible as a single quantity', never zero. A CORRECTED receipt reports the post-correction quantity."
+      "description": "Header roll-up emitted ONLY when every receipt line shares one UOM; omitted otherwise, because summing mixed UOM lines would produce a silently wrong number (OD-C24-03). Absence means 'not expressible as a single quantity', never zero. A CORRECTED receipt keeps the quantity recorded on the receipt itself: correcting a receipt only advances its status, it does not rewrite the receipt lines, so the corrected amount is carried by a separate document. Consumers must not read this field as the post-correction figure."
     },
     "received_at": { "type": "string", "format": "date-time" },
     "confirmed_at": { "type": "string", "format": "date-time" },
