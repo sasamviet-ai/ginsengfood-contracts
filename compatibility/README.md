@@ -9,6 +9,7 @@ Compatibility documents define what downstream systems may rely on when using `g
 - `consumer-provider-boundary.v1.yaml`: provider/consumer ownership boundaries.
 - `versioning-policy.v1.yaml`: v1 compatibility and release semantics.
 - `operational-form-v1-to-v2-migration.md`: owner-approved Operational Forms identity migration, overlap, retired-key, rollback, and removal constraints.
+- `availability-sellable-v1-to-v2-migration.md`: block_reasons mapping across ops-core v1, ops-core v2 and the business-platform consumer list, plus the reasons ops-core must never emit.
 
 ## Rules
 

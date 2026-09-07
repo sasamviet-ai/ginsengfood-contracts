@@ -6,6 +6,7 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ### Added
 
+- `compatibility/availability-sellable-v1-to-v2-migration.md`: the mapping between the three block_reason vocabularies - ops-core v1 runtime (11 tokens, unconstrained because v1 declares `block_reasons` as a bare string array), the closed 15-value enum in `availability-check-result.v2.schema.json`, and the business-platform `SellableBlockReason` list. Records which reasons ops-core owns, which the consumer raises on its own and ops-core must never emit (pricing, channel, resolver failure, and `PRODUCT_INACTIVE`, which `OD-A6-01` makes impossible), and three cells still open - notably `INVENTORY_LEDGER_NOT_PASSED`, which signals an internal inconsistency and must not be flattened into `NO_AVAILABLE_STOCK`.
 - Operational Forms v2 OpenAPI, JSON Schemas, canonical 32-value `form_key` enum (30 legacy-code mappings plus semantic-only `COOKING_LOG` and `EQUIPMENT_READINESS_CHECK`), status/state docs, example, fixture manifest, and migration note under owner decision `D1=A` plus additive owner approvals.
 - Targeted zero-dependency validation scope `operational-form-v2` and version-discovered fixture manifest validation.
 - Required `X-Idempotency-Key` header on every Operational Forms v2 state-changing operation (14 create + 1 status update), declared once as `components.parameters.IdempotencyKey`, plus a validation ratchet that fails when a `post`/`put`/`patch`/`delete` operation does not reference it or a read-only operation does.
