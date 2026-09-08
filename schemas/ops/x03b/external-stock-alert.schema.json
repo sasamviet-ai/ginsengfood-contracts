@@ -15,7 +15,7 @@
     "red_threshold": { "$ref": "external-quantity.schema.json" },
     "stockout_risk_threshold": { "$ref": "external-quantity.schema.json" },
     "occurred_at": { "type": "string", "format": "date-time" },
-    "resolved_at": { "type": "string", "format": "date-time" }
+    "resolved_at": { "type": "string", "format": "date-time", "description": "Optional and NOT emitted by v1 (OD-C28-STOCK-ALERT-RESOLVED-01, owner decision 08-09-2026). The provider models stock alerts as an append-only event stream (op_stock_alert_event): each evaluation writes a new row carrying status, and no resolved or closed column exists, so there is nothing to populate. This is a model mismatch, not missing data - the information is available another way. Consumers derive resolution by reading the most recent event for the same sku_id and warehouse_id: a status of STOCK_OK means the alert is resolved, and that event's occurred_at is when it resolved. Consumers MUST NOT treat the absence of resolved_at as a defect, and MUST NOT infer that an alert is still open from it." }
   },
   "required": ["stock_alert_id", "sku_id", "warehouse_id", "status", "available_stock", "occurred_at"]
 }
