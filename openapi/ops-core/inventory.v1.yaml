@@ -354,7 +354,7 @@ paths:
       # ⚠ EXT-OD-04 §16.6 khóa đúng hai policy (hot + bulk) vì lúc chốt chưa có route ghi ngoài nào.
       # Route này tạm dùng bucket hot; một policy ExternalAllocationReserve riêng cần owner bổ sung
       # vào bảng đã khóa trước khi coi đây là thông số đã duyệt.
-      x-rate-limit-policy: ExternalAvailabilityCheck
+      x-rate-limit-policy: ExternalAllocationWrite
       x-idempotency: REQUIRED
       x-write-surface: EXTERNAL_ALLOCATION_RESERVE
       parameters:
