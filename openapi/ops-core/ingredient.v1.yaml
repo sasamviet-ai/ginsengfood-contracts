@@ -68,7 +68,7 @@ paths:
       x-auth-class: SERVICE_BEARER
       x-audience: ginsengfood-ops-core-external-bulk-read-v1
       x-token-use: service
-      x-permission: SKU_CATALOG_VIEW
+      x-permission: RECIPE_PRODUCTION_VIEW
       x-permission-scope: SERVICE
       x-rate-limit-policy: ExternalBulkRead
       x-retry-policy: ExternalBulkReadRetry
