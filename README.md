@@ -46,7 +46,7 @@ Boundary chung giữa hai hệ thống được chốt tại `docs/ops-core-busi
 
 ## External API / Checkout Contract Set
 
-- Availability v1 được giữ nguyên để tương thích; contract v2 riêng nằm tại `openapi/ops-core/availability-sellable.v2.yaml`, với consumer mirror tại `openapi/business-platform/availability-consumer.v2.yaml`.
+- Availability chỉ còn **một phiên bản**: `openapi/ops-core/availability-sellable.v1.yaml`, consumer mirror `openapi/business-platform/availability-consumer.v1.yaml`. Contract v2 riêng đã bị gộp về v1 ngày 09-09-2026 (`OWNER-DIRECTIVE-2026-09-09-AVAILABILITY-V1-ONLY`) — khối số lượng theo UOM nay nằm trong chính v1, kích hoạt bằng `uom_code` trong request.
 - External bulk-read façades cho stock balance, inventory ledger, stock alert, allocation, warehouse, warehouse location, warehouse receipt và public SKU nằm trong các provider contract `inventory.v1.yaml`, `warehouse.v1.yaml` và `sku.v1.yaml`.
 - Request/response/error schemas, examples và dedicated contract validators nằm dưới `schemas/ops/`, `examples/` và `contract-tests/`.
 - Việc contract tồn tại không chứng minh provider runtime, consumer acceptance, sandbox, performance hoặc production cutover đã PASS.

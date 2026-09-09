@@ -4,7 +4,7 @@ API examples are source-backed request or response payloads used by QA, frontend
 
 Current examples cover:
 
-- availability and sellable checks, gồm v1 compatibility và v2 exact-UOM/full-fill examples;
+- availability and sellable checks (một phiên bản v1; ví dụ exact-UOM / full-fill dùng `uom_code` trong request);
 - external inventory, warehouse, warehouse-location, warehouse-receipt, allocation, stock-alert và public-SKU read projections dưới `x03b/`;
 - public trace responses;
 - deprecated Operational Form v1 and canonical `form_key` v2 requests;

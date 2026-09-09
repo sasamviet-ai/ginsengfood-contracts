@@ -152,6 +152,19 @@ components:
           format: uuid
         requested_quantity:
           $ref: "../../schemas/common/quantity.schema.json"
+        uom_code:
+          type: string
+          enum: ["hộp", "thùng", "lọ", "hũ"]
+          description: >-
+            Optional. Supplying it makes the response carry the quantity block (uom_code, warehouse_scope,
+            check_mode, available_quantity, sellable_quantity, fulfillable, resolved_at, valid_until);
+            omitting it leaves the response byte-for-byte identical to the pre-2026-09-09 shape.
+            Top-level rather than read off requested_quantity.unit because EXISTENCE mode asks "how much is
+            there" without sending a quantity, so nothing else carries the unit. When both are supplied,
+            requested_quantity.unit must equal uom_code exactly - a mismatch is 422, never a silent pick.
+            Ordinal match: no case folding, no conversion, no mixed-UOM aggregation.
+            Merged in from the retired POST /v2/availability/check under
+            OWNER-DIRECTIVE-2026-09-09-AVAILABILITY-V1-ONLY.
         channel_context:
           $ref: "../../schemas/common/source-ref.schema.json"
         correlation:

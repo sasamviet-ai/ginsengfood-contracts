@@ -9,7 +9,7 @@ Compatibility documents define what downstream systems may rely on when using `g
 - `consumer-provider-boundary.v1.yaml`: provider/consumer ownership boundaries.
 - `versioning-policy.v1.yaml`: v1 compatibility and release semantics.
 - `operational-form-v1-to-v2-migration.md`: owner-approved Operational Forms identity migration, overlap, retired-key, rollback, and removal constraints.
-- `availability-sellable-v1-to-v2-migration.md`: block_reasons mapping across ops-core v1, ops-core v2 and the business-platform consumer list, plus the reasons ops-core must never emit.
+- `availability-sellable-v1-to-v2-migration.md` was removed on 2026-09-09 with the v2 route it mapped (OWNER-DIRECTIVE-2026-09-09-AVAILABILITY-V1-ONLY). Availability has one version again, so there is no v1-to-v2 vocabulary gap left to bridge: `block_reasons` carries the 11 producer tokens unchanged. The consumer-side mapping it also held - which reasons the business-platform raises on its own and ops-core must never emit - moved into `openapi/business-platform/availability-consumer.v1.yaml`.
 
 ## Rules
 

@@ -20,8 +20,18 @@
     "recall_hold": { "type": "boolean", "description": "True when recall hold blocks sellable." },
     "sale_lock": { "type": "boolean", "description": "True when sale lock blocks sellable." },
     "trace_ready": { "type": "boolean", "description": "True when trace chain is ready." },
-    "block_reasons": { "type": "array", "items": { "type": "string" }, "description": "Reasons blocking sellable status." },
-    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
+    "block_reasons": { "type": "array", "items": { "type": "string" }, "description": "Reasons blocking sellable status. Exactly the 11 tokens OpSellableStatus.GetBlockReasons emits; see enums/ops/sellable-block-reason.v1.yaml." },
+    "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
+
+    "uom_code": { "type": "string", "enum": ["hộp", "thùng", "lọ", "hũ"], "description": "Quantity block. Echoes the request uom_code. Present only when the request supplied uom_code; absent otherwise, together with the seven properties below. Ordinal match - no case folding, no conversion, no mixed-UOM aggregation." },
+    "warehouse_scope": { "type": "string", "enum": ["ALL", "WAREHOUSE"], "description": "Quantity block. ALL when the request omitted warehouse_id, WAREHOUSE when it supplied one. A warehouse_id that does not resolve to an ACTIVE warehouse returns 404 - it never silently falls back to ALL." },
+    "check_mode": { "type": "string", "enum": ["EXISTENCE", "FULL_FILL"], "description": "Quantity block. EXISTENCE when the request omitted requested_quantity, FULL_FILL when it supplied one. FULL_FILL passes only when the whole requested amount is coverable; there is no partial fulfilment." },
+    "available_quantity": { "type": "string", "pattern": "^(?:0|[1-9][0-9]{0,14})(?:\\.[0-9]{1,3})?$", "description": "Quantity block. Total physically on hand in uom_code. Invariant: available_quantity >= sellable_quantity >= 0." },
+    "sellable_quantity": { "type": "string", "pattern": "^(?:0|[1-9][0-9]{0,14})(?:\\.[0-9]{1,3})?$", "description": "Quantity block. The part actually sellable in uom_code - reservations and the three hold buckets already deducted." },
+    "fulfillable": { "type": "boolean", "description": "Quantity block. True only when decision is SELLABLE AND the requested amount is fully coverable. A lot holding 1000 boxes under an active sale lock is false." },
+    "resolved_at": { "type": "string", "format": "date-time", "pattern": "Z$", "description": "Quantity block. UTC instant the quantities were resolved, truncated to the second. Must end with Z." },
+    "valid_until": { "type": "string", "format": "date-time", "pattern": "Z$", "description": "Quantity block. resolved_at + 5 seconds. A consumer must not reuse the quantities past this instant." }
   },
-  "required": ["sellable_status_id"]
+  "required": ["sellable_status_id"],
+  "$comment_quantity_block": "The eight quantity properties were merged in from the retired POST /v2/availability/check under OWNER-DIRECTIVE-2026-09-09-AVAILABILITY-V1-ONLY. They are purely additive: a request that omits uom_code gets a response byte-for-byte identical to the pre-merge shape. v2 declared a closed 15-token block_reasons enum that forced a projection layer over the 11 tokens the domain actually emits - renaming HSD_NOT_VALID to HSD_EXPIRED, splitting STOCK_NOT_AVAILABLE in two, folding SKU_ACTIVATION_NOT_ACTIVE away, and demoting INVENTORY_LEDGER_NOT_PASSED (a data inconsistency) to PROVIDER_UNAVAILABLE (a transport word). Merging into v1 deleted that layer; block_reasons now carries the producer vocabulary unchanged."
 }

@@ -2,7 +2,7 @@
 
 ## Ops Core OpenAPI
 
-Thu muc nay chua OpenAPI 3.1.0 contracts cho `ginsengfood-ops-core`. Phần lớn surface hiện ở v1; Availability / Sellable và Operational Forms có v2 riêng. Cac file chi mo ta API contract giua systems/frontend; khong chua implementation code, client SDK, database migration, service logic hoac business logic.
+Thu muc nay chua OpenAPI 3.1.0 contracts cho `ginsengfood-ops-core`. Phần lớn surface ở v1. Availability / Sellable chỉ còn v1 (v2 gộp về v1 ngày 09-09-2026, `OWNER-DIRECTIVE-2026-09-09-AVAILABILITY-V1-ONLY`); Operational Forms và Recipe/Formula/BOM còn contract v2 riêng nhưng CHƯA có runtime. Cac file chi mo ta API contract giua systems/frontend; khong chua implementation code, client SDK, database migration, service logic hoac business logic.
 
 API groups:
 - Product Master: `product-master.v1.yaml`
@@ -18,7 +18,6 @@ API groups:
 - Warehouse: `warehouse.v1.yaml`
 - Inventory: `inventory.v1.yaml`
 - Availability / Sellable v1 compatibility: `availability-sellable.v1.yaml`
-- Availability / Sellable v2 conservative contract: `availability-sellable.v2.yaml`
 - Traceability: `traceability.v1.yaml`
 - Recall / Sale Lock: `recall-sale-lock.v1.yaml`
 - Operational Evidence / Forms: `operational-evidence.v1.yaml`
@@ -37,7 +36,7 @@ Ops-core expose API:
 | SKU Detail API | `sku.v1.yaml` | SKU Active không đồng nghĩa có hàng bán. |
 | Product Activation Status API | `product-activation.v1.yaml` | Product Active không đồng nghĩa Sellable. |
 | Recipe / Formula read API | `recipe-formula-bom.v1.yaml`, `recipe-formula-bom.v2.yaml` | v1 Recipe/Formula operations frozen/deprecated; v2 uses canonical lifecycle plus separate formula_kind and remains contract-only until X04 and consumer gates close. |
-| Availability / Sellable Check API | `availability-sellable.v1.yaml`, `availability-sellable.v2.yaml` | Read/check only; v1 frozen, v2 exact-UOM and fail-closed; no reservation or mutation. |
+| Availability / Sellable Check API | `availability-sellable.v1.yaml` | Read/check only; single version. Exact-UOM and fail-closed quantities are opt-in through `uom_code`; no reservation or mutation. |
 | Inventory external reads | `inventory.v1.yaml` | Stock balance, ledger, stock alert và allocation là read-only projections; ledger remains ops-core truth. |
 | Warehouse external reads | `warehouse.v1.yaml` | Warehouse, location và receipt projections không thực hiện command hoặc ledger mutation. |
 
@@ -56,7 +55,6 @@ Boundary locks:
 API phuc vu business-platform:
 - `POST /v1/service-tokens`
 - `POST /v1/availability/check`
-- `POST /v2/availability/check`
 - `GET /v1/skus/{skuId}/public`
 - `GET /v1/skus/{skuId}/operational-status`
 - `GET /v1/inventory/stock-balances`
