@@ -35,6 +35,16 @@ channels:
       operationId: skuBecameNotSellableV1
       message:
         $ref: '#/components/messages/skuBecameNotSellableV1Message'
+  ops-core.recall.recall-case-opened.v1:
+    description: Published when a recall case is opened. Carries the recall case pointer
+      plus sku_id/batch_id when the initial scope resolves to them; a consumer resolves
+      the remaining scope through GET /v1/recall-cases/{recallCaseId}. Opening a case is
+      not by itself a stop-sale signal - ops-core.recall.stop-sale-required.v1 is.
+    publish:
+      summary: ops-core publishes recall-case-opened.v1.
+      operationId: recallCaseOpenedV1
+      message:
+        $ref: '#/components/messages/recallCaseOpenedV1Message'
   ops-core.recall.sale-lock-activated.v1:
     description: Published when sale lock becomes active. Payload includes sale-lock
       scope needed for business-platform to stop quote, order, AI, CRM, Ads, and Live
@@ -248,6 +258,15 @@ components:
       contentType: application/json
       payload:
         $ref: ../events/ops-core/sellable/sku-became-not-sellable.v1.json
+    recallCaseOpenedV1Message:
+      name: recall-case-opened.v1
+      title: Recall Case Opened Event v1
+      summary: Published when a recall case is opened. Carries the recall case pointer
+        plus sku_id/batch_id when the initial scope resolves to them; opening a case is
+        not by itself a stop-sale signal.
+      contentType: application/json
+      payload:
+        $ref: ../events/ops-core/recall/recall-case-opened.v1.json
     saleLockActivatedV1Message:
       name: sale-lock-activated.v1
       title: Sale Lock Activated Event v1

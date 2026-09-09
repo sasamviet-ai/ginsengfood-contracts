@@ -41,5 +41,7 @@ jobs:
         run: node contract-tests/x03b/external-bulk-read-v1.contract.test.mjs
       - name: Validate external runtime v1 security metadata
         run: node contract-tests/x04d/external-runtime-v1-security.contract.test.mjs
+      - name: Validate recall / sale-lock v1 event contracts
+        run: node contract-tests/c6/recall-sale-lock-events-v1.contract.test.mjs
       - name: Validate complete contract baseline
         run: node scripts/validate-contracts.mjs
