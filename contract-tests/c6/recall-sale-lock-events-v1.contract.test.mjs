@@ -20,6 +20,8 @@ import path from "node:path";
  *   4. Từ vựng `scope_type` ĐỐI NGOẠI đúng 4 giá trị — nới ra là lộ định danh nội bộ,
  *      thu hẹp lại là consumer gặp giá trị không xử lý được.
  *   5. AsyncAPI khai đủ 4 kênh, tên kênh khớp chính xác `eventType` const.
+ *   6. Cờ `recall_case_open` (C6, owner 10-09-2026) có mặt, là BỔ SUNG, và KHÔNG lọt vào
+ *      từ vựng `block_reasons` — xem §5 bên dưới để biết vì sao ranh giới đó quan trọng.
  *
  * Nguồn: docs/integration/module-6/09-09-13-56-goi-chot-ket-noi-module-6.md (ops-core repo) §1.1, §4.3, §7.
  */
@@ -195,11 +197,40 @@ for (const event of EVENTS) {
     `asyncapi/integration-events.v1.yaml: thiếu kênh ${event.eventType}`));
 }
 
-// ── 5. Cổng an toàn cho chính test này ────────────────────────────────────────────────────────────
+// ── 5. recall_case_open — cờ rủi ro của M6, và ranh giới KHÔNG được vượt ──────────────────────────
+// Owner chốt 10-09-2026: thêm cờ boolean, KHÔNG thêm token vào block_reasons. Lý do nằm ở chỗ
+// `decision` được suy ra từ chính `block_reasons` (rỗng ⇒ SELLABLE), nên nhét một token vào đó biến
+// mọi SKU có hồ sơ thu hồi mở thành không bán được với hệ bán hàng, bất kể còn hàng sạch — đó là đổi
+// chính sách bán, không phải thêm nhãn. Bốn khẳng định dưới đây ghim đúng ranh giới ấy.
+const sellableStatus = readJson("schemas/ops/sellable-status.schema.json");
+
+check(() => assert.equal(
+  sellableStatus.properties?.recall_case_open?.type,
+  "boolean",
+  "sellable-status.schema.json: thiếu cờ recall_case_open (kiểu boolean) — cổng rủi ro của M6 đọc trường này"));
+
+check(() => assert.ok(
+  !(sellableStatus.required ?? []).includes("recall_case_open"),
+  "recall_case_open phải là BỔ SUNG: đưa vào required là phá consumer v1 đang chạy"));
+
+check(() => assert.match(
+  sellableStatus.properties?.recall_case_open?.description ?? "",
+  /NOT part of decision or block_reasons/i,
+  "mô tả của recall_case_open phải ghi rõ nó KHÔNG tham gia decision/block_reasons — "
+  + "ranh giới này sống trong hợp đồng đã phát hành, không chỉ trong comment mã nguồn"));
+
+check(() => assert.match(
+  sellableStatus.properties?.block_reasons?.description ?? "",
+  /Exactly the 11 tokens/,
+  "block_reasons vẫn phải là đúng 11 token của OpSellableStatus.GetBlockReasons. "
+  + "Test này đỏ khi ai đó thêm RECALL_CASE_OPEN (hoặc token thứ 12 bất kỳ) vào từ vựng chặn — "
+  + "hãy đọc lại vì sao owner từ chối, đừng sửa assertion cho xanh"));
+
+// ── 6. Cổng an toàn cho chính test này ────────────────────────────────────────────────────────────
 // Regex hoặc bộ liệt kê hỏng thì test soi 0 thứ và xanh giả. 4 event × (6 envelope + 4 data +
 // 5..6 required) + 14 khẳng định schema/asyncapi ⇒ luôn > 60.
 assert.ok(
   checks > 60,
   `contract test tự kiểm: chỉ chạy được ${checks} khẳng định — bộ liệt kê hỏng`);
 
-console.log(`recall-sale-lock events v1 contract test: ${checks} khẳng định PASS (4 event, 1 schema dùng chung, 4 kênh AsyncAPI).`);
+console.log(`recall-sale-lock v1 contract test: ${checks} khẳng định PASS (4 event, 2 schema dùng chung, 4 kênh AsyncAPI, cờ recall_case_open).`);
