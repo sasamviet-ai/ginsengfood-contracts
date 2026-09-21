@@ -9,7 +9,7 @@
   "properties": {
     "sku_id": { "type": "string", "minLength": 1, "description": "SKU identifier." },
     "sku_code": { "type": "string", "minLength": 1, "description": "Canonical SKU code such as A1/CS/DM/HS from the current 19 SKU operational catalog; the schema remains extensible." },
-    "product_id": { "type": "string", "minLength": 1, "description": "Owning product master identifier." },
+    "product_id": { "type": "string", "minLength": 1, "description": "Owning product identifier. Ops-core v1 emits the same value as sku_id under OD-A6-01: Product and SKU are 1:1 identity aliases in this phase, not separate aggregates." },
     "canonical_name": { "type": "string", "minLength": 1, "description": "Canonical SKU name." },
     "public_name": { "type": "string", "minLength": 1, "description": "Public product name for the SKU." },
     "dietary_type": { "type": "string", "enum": ["VEGAN", "SAVORY"], "description": "Dietary grouping from the operational SKU catalog: Vegan / Man. TODO: confirm exact English label for Man." },

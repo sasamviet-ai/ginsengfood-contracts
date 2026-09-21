@@ -22,7 +22,7 @@
     "owner_approval_ref": { "$ref": "../common/owner-decision-ref.schema.json" },
     "source_ref": { "$ref": "../common/source-ref.schema.json" },
     "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } },
-    "audit_refs": { "type": "array", "items": { "$ref": "../common/audit.schema.json" } }
+    "audit_refs": { "type": "array", "description": "Reserved optional field; NOT emitted by the ops-core v1 formula-version provider under OD-N10-N13-2026-09-21/D1 (NEVER_EMITTED_V1). Internal audit records and actor identity are outside this projection. Absence does not mean no internal audit exists; any future external audit exposure requires a separate scope, redaction, data-source and versioning decision.", "items": { "$ref": "../common/audit.schema.json" } }
   },
   "required": ["formula_version_id", "generation"]
 }
