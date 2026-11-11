@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "fixture-x03b-allocation-release"
+  },
+  "data": {
+    "source_object_type": "EXTERNAL_ORDER",
+    "source_object_id": "5d65e4a9-b171-599d-ac58-c4308320bf1d",
+    "release_status": "RELEASED",
+    "allocations": [
+      {
+        "allocation_id": "14000000-0000-4000-8000-000000000031",
+        "allocation_no": "ALLOC-FIXTURE-031",
+        "warehouse_id": "40000000-0000-4000-8000-000000000001",
+        "item_type": "FINISHED_GOOD",
+        "item_id": "70000000-0000-4000-8000-000000000031",
+        "lot_code": "FG-FIXTURE-031",
+        "unit": "hộp",
+        "source_object_type": "EXTERNAL_ORDER",
+        "source_object_id": "5d65e4a9-b171-599d-ac58-c4308320bf1d",
+        "allocated_quantity": "2.000",
+        "status": "RELEASED",
+        "requested_at": "2026-09-05T02:00:00Z",
+        "released_at": "2026-09-05T02:10:00Z"
+      }
+    ],
+    "resolved_at": "2026-09-05T02:10:00Z"
+  }
+}

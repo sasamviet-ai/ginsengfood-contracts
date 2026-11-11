@@ -21,6 +21,7 @@ These enums define contract vocabulary only. They do not implement transitions, 
 - Operational forms v2: `operational-form-key.v2.yaml`, `operational-form-status.v2.yaml`
 - Printing: `print-job-status.yaml`
 - Material/packaging: `material-group.yaml`, `material-group-family.yaml`, `material-planning-policy.yaml`, `material-suppression-reason.yaml`
+- Inventory allocation: `inventory-allocation-status.yaml` (RESERVED, CONFIRMED, ISSUED, RELEASED; state machine in `state-machines/ops/allocation-state.md`)
 - MISA: `misa-checkpoint-type.yaml`, `misa-mapping-status.yaml`, `misa-sync-status.yaml`, `misa-reconcile-status.yaml`, plus `misa-handoff-status.yaml` for compatibility with broad consumers.
 
 Future tightening is allowed only when the source documents or owner decisions define stable values.

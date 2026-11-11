@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-allocation-release-result.schema.json",
+  "title": "External inventory allocation release result",
+  "description": "Outcome of a successful self-release. The holds listed in allocations were RESERVED by the calling service principal and are now RELEASED; their quantity is back in the lots' available quantity and no ledger entry was written.",
+  "$comment": "OD-M3-REPLY-01 section 3.2. Only a success has this body. Nothing to release is never a 200: a source with no hold of the caller is 404, a source whose hold already ended (released, or expired) is 409 ALLOCATION_NOT_HELD, and a source the warehouse already confirmed or issued is 409 ALLOCATION_CONFLICT with nothing released. A replay with the same X-Idempotency-Key returns this same body again (same lines, same released_at), which is why there is no ALREADY_RELEASED value.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "source_object_type": {
+      "type": "string",
+      "enum": ["EXTERNAL_ORDER", "EXTERNAL_ORDER_ITEM"]
+    },
+    "source_object_id": { "type": "string", "format": "uuid" },
+    "release_status": {
+      "type": "string",
+      "const": "RELEASED"
+    },
+    "allocations": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One entry per lot hold that this call released. All entries belong to the requested source.",
+      "items": { "$ref": "external-allocation-release-line.schema.json" }
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    }
+  },
+  "required": [
+    "source_object_type",
+    "source_object_id",
+    "release_status",
+    "allocations",
+    "resolved_at"
+  ]
+}

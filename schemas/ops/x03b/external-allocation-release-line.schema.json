@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-allocation-release-line.schema.json",
+  "title": "External inventory allocation release line",
+  "description": "One hold that was just released, on exactly one warehouse lot. Same field names and vocabulary as external-allocation-reserve-line.schema.json, with released_at instead of expires_at and status fixed to RELEASED.",
+  "$comment": "warehouse_location_id and source_object_no are optional and are ABSENT, never null, when the provider has no value (same wire rule as the reserve line). The releaser identity, the release reason and the internal lot balance id are internal operational data and are not part of this projection. allocated_quantity always carries exactly three decimals (numeric(18,3) wire precision).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "allocation_id": { "type": "string", "format": "uuid" },
+    "allocation_no": { "type": "string", "minLength": 1 },
+    "warehouse_id": { "type": "string", "format": "uuid" },
+    "warehouse_location_id": { "type": "string", "format": "uuid" },
+    "item_type": {
+      "type": "string",
+      "enum": ["MATERIAL", "PACKAGING", "FINISHED_GOOD"]
+    },
+    "item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Provider-side inventory item identity for the released lot. It is not the SKU identifier."
+    },
+    "lot_code": { "type": "string", "minLength": 1 },
+    "unit": { "type": "string", "enum": ["hộp", "thùng", "lọ", "hũ"] },
+    "source_object_type": {
+      "type": "string",
+      "enum": ["EXTERNAL_ORDER", "EXTERNAL_ORDER_ITEM"]
+    },
+    "source_object_id": { "type": "string", "format": "uuid" },
+    "source_object_no": { "type": "string" },
+    "allocated_quantity": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]{0,14})\\.[0-9]{3}$",
+      "description": "Quantity that was held on this lot and is now returned to the lot's available quantity."
+    },
+    "status": {
+      "type": "string",
+      "const": "RELEASED"
+    },
+    "requested_at": { "type": "string", "format": "date-time" },
+    "released_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$",
+      "description": "UTC instant the hold ended, ending in Z."
+    }
+  },
+  "required": [
+    "allocation_id",
+    "allocation_no",
+    "warehouse_id",
+    "item_type",
+    "item_id",
+    "lot_code",
+    "unit",
+    "source_object_type",
+    "source_object_id",
+    "allocated_quantity",
+    "status",
+    "requested_at",
+    "released_at"
+  ]
+}

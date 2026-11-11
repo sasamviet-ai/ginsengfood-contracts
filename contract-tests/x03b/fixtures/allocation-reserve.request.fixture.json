@@ -1,0 +1,8 @@
+{
+  "sku_id": "20000000-0000-4000-8000-000000000002",
+  "warehouse_id": "40000000-0000-4000-8000-000000000001",
+  "uom_code": "hộp",
+  "requested_quantity": "2",
+  "source_object_type": "EXTERNAL_ORDER",
+  "source_object_id": "5d65e4a9-b171-599d-ac58-c4308320bf1d"
+}

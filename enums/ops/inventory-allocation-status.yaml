@@ -1,0 +1,28 @@
+version: v1
+name: inventory-allocation-status
+title: Inventory Allocation Status
+description: Lifecycle status of a finished-goods allocation (a hold of stock on one warehouse lot) as published by ops-core on the external v1 surface. Until 2026-11 these values lived only inside two x03b schemas; this file is the single vocabulary they now both point to.
+source_documents:
+  - docs/source-map.md
+values:
+  - value: RESERVED
+    description: Stock is held on the lot. Created by POST /v1/inventory/allocations. Ends by warehouse confirmation or by release (warehouse, consumer self-release, or expiry). It is the only status that expires.
+    source: OWNER-DIRECTIVE-2026-09-05-EXT-ALLOC-RESERVE; OD-ALLOC-LIFECYCLE-01 (2026-09-07) for the expiry rule.
+  - value: CONFIRMED
+    description: The warehouse confirmed the hold when it started picking the order. Never expires on its own, and the consumer cannot release it.
+    source: ops-core OpInventoryAllocation.Confirm; OD-M3-REPLY-01 section 3.2.
+  - value: ISSUED
+    description: Terminal. The warehouse applied a sales issue document that consumed this allocation, and the stock left the held quantity. It cannot be released or reserved again.
+    source: C37, OD-ALLOC-CONSUME-01 item 2; ops-core OpInventoryAllocation.Issue.
+  - value: RELEASED
+    description: Terminal. The hold ended without goods leaving - warehouse release, consumer self-release through releaseInventoryAllocationV1, or hold expiry. The quantity is back in the lot's available quantity and no ledger entry was written. The status alone does not say which of the three caused it.
+    source: OD-ALLOC-LIFECYCLE-01; OD-M3-REPLY-01 section 3.2.
+compatibility:
+  breaking_change: Renaming or removing a value, or letting a consumer drive CONFIRMED or ISSUED, is breaking.
+  additive_2026_11:
+    value: ISSUED
+    classification: additive, coordinated
+    reason: Per compatibility/breaking-change-policy.md a new enum value is non-breaking when consumers must already tolerate unknown values. The business-platform reviews and confirms its status parser before the provider emits ISSUED on a shared environment.
+  consumer_rule: A consumer must treat an unknown status as "not mine to change" and read the allocation again later; it must never map an unknown status to RESERVED or RELEASED.
+  state_machine: state-machines/ops/allocation-state.md
+todos: []

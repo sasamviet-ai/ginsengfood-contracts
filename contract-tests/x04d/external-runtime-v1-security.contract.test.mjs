@@ -29,12 +29,16 @@ const operations = [
   { file: "operational-admin.v1.yaml", operationId: "listMaterialPlanningPoliciesV1", authClass: "OPERATOR_BEARER", audience: "ginsengfood-ops-core-external-operator-v1", tokenUse: "ABSENT", permission: "MRP_VIEW", scope: "ADMIN_OPERATIONAL", rate: "ExternalOperatorRead", retry: "ExternalOperatorReadRetry", idempotency: "NOT_APPLICABLE_READ_ONLY", runtime: "CURRENT_SOURCE_AUTH_PARITY; RATE_POLICY_NOT_IMPLEMENTED", securityScheme: "OperatorBearer" },
   { file: "recall-sale-lock.v1.yaml", operationId: "createRecallCaseV1", authClass: "OPERATOR_BEARER", audience: "ginsengfood-ops-core-external-operator-v1", tokenUse: "ABSENT", permission: "RECALL_CASE_CREATE", scope: "ADMIN_OPERATIONAL", rate: "ExternalOperatorHighRisk", retry: "ExternalManualReplayOnly", idempotency: "IDEMPOTENCY_KEY_REQUIRED", runtime: "CURRENT_SOURCE_AUTH_PARITY; RATE_POLICY_NOT_IMPLEMENTED", securityScheme: "OperatorBearer" },
   { file: "recall-sale-lock.v1.yaml", operationId: "createSaleLockV1", authClass: "OPERATOR_BEARER", audience: "ginsengfood-ops-core-external-operator-v1", tokenUse: "ABSENT", permission: "RECALL_SALE_LOCK_APPLY", scope: "ADMIN_OPERATIONAL", rate: "ExternalOperatorHighRisk", retry: "ExternalManualReplayOnly", idempotency: "IDEMPOTENCY_KEY_REQUIRED", runtime: "CURRENT_SOURCE_AUTH_PARITY; RATE_POLICY_NOT_IMPLEMENTED", securityScheme: "OperatorBearer" },
+  // Allocation write surface (inventory.v1.yaml): own audience and bucket, required idempotency key, replay-only retry.
+  { file: "inventory.v1.yaml", operationId: "reserveInventoryAllocationV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-allocation-v1", tokenUse: "service", permission: "INVENTORY_ALLOCATION_CREATE", scope: "SERVICE", rate: "ExternalAllocationWrite", retry: "ExternalManualReplayOnly", idempotency: "IDEMPOTENCY_KEY_REQUIRED", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer", ownerDecision: "OWNER-DIRECTIVE-2026-09-05-EXT-ALLOC-RESERVE" },
+  { file: "inventory.v1.yaml", operationId: "releaseInventoryAllocationV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-allocation-v1", tokenUse: "service", permission: "INVENTORY_ALLOCATION_CREATE", scope: "SERVICE", rate: "ExternalAllocationWrite", retry: "ExternalManualReplayOnly", idempotency: "IDEMPOTENCY_KEY_REQUIRED", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer", ownerDecision: "OD-M3-REPLY-01" },
   { file: "service-auth.v1.yaml", operationId: "issueServiceTokenV1", authClass: "ANONYMOUS_BOOTSTRAP", audience: "NONE", tokenUse: "NONE", permission: "NONE", scope: "NONE", rate: "AuthSensitive", retry: "AuthSensitiveNoRetry", idempotency: "NOT_APPLICABLE_CONFIDENTIAL_CLIENT_EXCHANGE", runtime: "CURRENT_SOURCE_ROUTE_REQUIRES_EXACT_PARITY; AUTH_SENSITIVE_RATE_POLICY_MATCHED", securityScheme: null }
 ];
 
 const ratePolicyTokens = {
   ExternalAvailabilityCheck: ["sustained_rps_per_principal: 10", "burst_per_principal: 20", "fleet_rps: 50", "server_timeout_seconds: 2", "queue_limit: 0", "partition_claims: [token_use, sub]"],
   ExternalBulkRead: ["sustained_rps_per_principal: 2", "burst_per_principal: 4", "fleet_rps: 10", "server_timeout_seconds: 10", "queue_limit: 0", "partition_claims: [token_use, sub]"],
+  ExternalAllocationWrite: ["sustained_rps_per_principal: 5", "burst_per_principal: 10", "fleet_rps: 25", "queue_limit: 0", "partition_claims: [token_use, sub]"],
   ExternalOperatorRead: ["sustained_rps_per_principal: 2", "burst_per_principal: 4", "fleet_rps: 10", "server_timeout_seconds: 10", "queue_limit: 0", "partition_claims: [sub]"],
   ExternalOperatorMutation: ["sustained_rps_per_principal: 0.5", "burst_per_principal: 2", "fleet_rps: 5", "server_timeout_seconds: 15", "queue_limit: 0", "partition_claims: [sub]"],
   ExternalOperatorHighRisk: ["sustained_rps_per_principal: 0.1", "burst_per_principal: 1", "fleet_rps: 1", "server_timeout_seconds: 15", "queue_limit: 0", "partition_claims: [sub]"],
@@ -166,8 +170,8 @@ function assertOperation(operation, textOverride) {
   assert.match(response, /#\/components\/schemas\/ErrorEnvelope|schemas\/.*error.*schema\.json/);
 }
 
-assert.equal(operations.length, 24, "runtime security operation inventory must remain 24");
-assert.equal(new Set(operations.map(operation => operation.operationId)).size, 24, "operationId values must be unique");
+assert.equal(operations.length, 26, "runtime security operation inventory must remain 26");
+assert.equal(new Set(operations.map(operation => operation.operationId)).size, 26, "operationId values must be unique");
 
 for (const operation of operations) assertOperation(operation);
 
@@ -193,4 +197,23 @@ assert.throws(
   /x-idempotency-disposition drift/
 );
 
-console.log("X04D external runtime v1 security metadata PASS: 24/24 operations plus negative tamper checks.");
+// The two allocation write operations also pin their own tamper cases: wrong bucket, wrong audience, optional idempotency.
+for (const operationId of ["reserveInventoryAllocationV1", "releaseInventoryAllocationV1"]) {
+  const write = operations.find(operation => operation.operationId === operationId);
+  const writeText = read(write.file);
+  const writeBlock = operationBlock(writeText, operationId);
+  for (const [needle, replacement, failure] of [
+    ["x-rate-limit-policy: ExternalAllocationWrite", "x-rate-limit-policy: ExternalAvailabilityCheck", /x-rate-limit-policy drift/],
+    ["x-audience: ginsengfood-ops-core-external-allocation-v1", "x-audience: ginsengfood-ops-core-external-bulk-read-v1", /x-audience drift/],
+    ["x-idempotency-disposition: IDEMPOTENCY_KEY_REQUIRED", "x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY", /x-idempotency-disposition drift/],
+    ["x-retry-policy: ExternalManualReplayOnly", "x-retry-policy: ExternalBulkReadRetry", /x-retry-policy drift/]
+  ]) {
+    assert.ok(writeBlock.includes(needle), `${operationId} tamper setup failed for ${needle}`);
+    assert.throws(
+      () => assertOperation(write, writeText.replace(writeBlock, () => writeBlock.replace(needle, () => replacement))),
+      failure
+    );
+  }
+}
+
+console.log("X04D external runtime v1 security metadata PASS: 26/26 operations plus negative tamper checks.");

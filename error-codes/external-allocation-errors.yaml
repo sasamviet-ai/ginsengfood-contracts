@@ -1,0 +1,30 @@
+version: v1
+namespace: EXTERNAL_ALLOCATION
+title: External Allocation Write Errors
+description: Error codes of the external allocation write surface (POST /v1/inventory/allocations and POST /v1/inventory/allocations/release). On the wire these are plain tokens in a closed per-operation enum (schemas/ops/x03b/external-allocation-reserve-error.schema.json and external-allocation-release-error.schema.json), not namespaced strings; the namespace only groups this catalog. Codes shared with the read surface (INVALID_REQUEST, UNAUTHORIZED, FORBIDDEN, NOT_FOUND, VALIDATION_FAILED, RATE_LIMITED, REQUEST_TIMEOUT, SERVICE_UNAVAILABLE, INTERNAL_ERROR) keep their standard meaning and are not repeated here.
+source_documents:
+  - docs/source-map.md
+codes:
+  - code: INSUFFICIENT_STOCK
+    httpStatus: 409
+    operations: [reserveInventoryAllocationV1]
+    message: The requested stock could not be held.
+    description: Reserve only. One code for four causes that the provider deliberately does not disclose - stock really short, lots with stock but blocked (sale lock, recall, quality hold, batch not released), the same source already holding a different warehouse, unit or quantity, or more than 20 lots needed. It is not "out of stock"; call POST /v1/availability/check for the reason.
+    retryable: false
+  - code: ALLOCATION_CONFLICT
+    httpStatus: 409
+    operations: [reserveInventoryAllocationV1, releaseInventoryAllocationV1]
+    message: Fixed per cause; the text differs, the code does not.
+    description: Reserve - the hold recorded for this idempotency key is no longer held (expired and released), or the source was already ISSUED by the warehouse. Release - the warehouse already CONFIRMED or ISSUED stock of the source and nothing was released; or the allocation changed while the release was processed; or a release with the same X-Idempotency-Key is still in progress. Do not parse the message. Read GET /v1/inventory/allocations?sourceObjectId= once to learn the state; an ISSUED row means stop.
+    retryable: false
+  - code: ALLOCATION_NOT_HELD
+    httpStatus: 409
+    operations: [releaseInventoryAllocationV1]
+    message: Nothing is held for this source any more; it was already released or its hold expired. Nothing was released.
+    description: Release only. Every line of this principal for the source is already RELEASED, or is RESERVED but past expires_at and waiting for the expiry worker. A cancelling consumer treats it as success because nothing is held. Nothing changed, and calling again with a new key gives the same answer.
+    retryable: false
+    relatedStatus: RELEASED
+compatibility:
+  breaking_change: Removing a code, changing its HTTP status, or widening it to another operation's closed enum is breaking.
+  additive_2026_11: ALLOCATION_NOT_HELD is new with releaseInventoryAllocationV1 and exists only in the release error enum.
+todos: []

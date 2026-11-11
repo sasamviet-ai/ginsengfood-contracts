@@ -16,7 +16,7 @@ All OpenAPI contracts use OpenAPI 3.1.0. File major, `info.version`, and `/vN` p
 | Material issue | `openapi/ops-core/material-issue.v1.yaml` | v1 | ops-core frontend | Material issue must keep evidence and source object references. |
 | Batch / QC / release | `openapi/ops-core/batch-qc-release.v1.yaml` | v1 | ops-core frontend | `QC_PASS` and `RELEASED` must stay separate. |
 | Warehouse | `openapi/ops-core/warehouse.v1.yaml` | v1 | ops-core frontend | Warehouse receipt requires released batch. |
-| Inventory | `openapi/ops-core/inventory.v1.yaml` | v1 | ops-core frontend, business-platform | Consumers read stock balance; they must not mutate ledger truth. |
+| Inventory | `openapi/ops-core/inventory.v1.yaml` | v1 | ops-core frontend, business-platform | Consumers read stock balance; they must not mutate ledger truth. The only consumer writes are the allocation hold `reserveInventoryAllocationV1` and the self-release `releaseInventoryAllocationV1` (no ledger entry, no goods movement); see the exception in `consumer-compatibility-matrix.md`. |
 | Availability / sellable | `openapi/ops-core/availability-sellable.v1.yaml` | v1 | business-platform | `POST /v1/availability/check` is read/decision support, not mutation of ops truth. |
 | Traceability | `openapi/ops-core/traceability.v1.yaml` | v1 | consumers, business-platform | Public trace must exclude internal operational data. |
 | Recall / sale lock | `openapi/ops-core/recall-sale-lock.v1.yaml` | v1 | ops-core frontend, business-platform consumers | High-risk commands; active locks block commerce/channel flows. |

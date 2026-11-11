@@ -1,0 +1,387 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-allocation-release-error.schema.json",
+  "title": "External allocation release error envelopes",
+  "description": "Error envelopes for POST /v1/inventory/allocations/release. The envelope shape is identical to the reserve and bulk-read ones so a consumer parses all of them with the same reader; only the code vocabulary differs. Closed enum per operation: ALLOCATION_NOT_HELD exists only here, and INSUFFICIENT_STOCK (a shortage) can never come from a release.",
+  "$comment": "ALLOCATION_NOT_HELD (409) means the source no longer has any hold of this service principal that can be released: it was already released, or its hold expired and the expiry worker has not yet swept it. It is a logical success for a cancelling consumer: nothing is held, nothing was changed, and a retry will not change the answer. ALLOCATION_CONFLICT (409) on this route means the warehouse already CONFIRMED or ISSUED stock of the source and nothing was released (contact the warehouse), or the allocation changed while the release was being processed, or a release with the same X-Idempotency-Key is still in progress; the three share one code and differ only in message text, so a consumer that gets it reads GET /v1/inventory/allocations?sourceObjectId= once to learn the current state instead of looping. A source held by another principal and an unknown source are both 404, with the same message. The provider never forwards internal reason text: the message of each code is a fixed string.",
+  "$defs": {
+    "Error": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_REQUEST",
+            "UNAUTHORIZED",
+            "FORBIDDEN",
+            "NOT_FOUND",
+            "VALIDATION_FAILED",
+            "ALLOCATION_CONFLICT",
+            "ALLOCATION_NOT_HELD",
+            "RATE_LIMITED",
+            "REQUEST_TIMEOUT",
+            "SERVICE_UNAVAILABLE",
+            "INTERNAL_ERROR"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "httpStatus": {
+          "type": "integer"
+        },
+        "correlationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "details": {
+          "type": "array",
+          "description": "Which field or header is wrong and why. Present on 422 only; it names the offending field and a short reason and never carries internal text.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "reason"
+            ]
+          }
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "httpStatus",
+        "correlationId"
+      ]
+    },
+    "BaseEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "v1"
+        },
+        "correlation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "correlationId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "causationId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceSystem": {
+              "type": "string",
+              "minLength": 1
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "correlationId"
+          ]
+        },
+        "error": {
+          "$ref": "#/$defs/Error"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "correlation",
+        "error"
+      ]
+    },
+    "InvalidRequest": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "INVALID_REQUEST"
+                },
+                "httpStatus": {
+                  "const": 400
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "Unauthorized": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "UNAUTHORIZED"
+                },
+                "httpStatus": {
+                  "const": 401
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "Forbidden": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "FORBIDDEN"
+                },
+                "httpStatus": {
+                  "const": 403
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "NotFound": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "NOT_FOUND"
+                },
+                "httpStatus": {
+                  "const": 404
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "RequestTimeout": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "REQUEST_TIMEOUT"
+                },
+                "httpStatus": {
+                  "const": 408
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "AllocationConflict": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "ALLOCATION_CONFLICT"
+                },
+                "httpStatus": {
+                  "const": 409
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "AllocationNotHeld": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "ALLOCATION_NOT_HELD"
+                },
+                "httpStatus": {
+                  "const": 409
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "ValidationFailed": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "VALIDATION_FAILED"
+                },
+                "httpStatus": {
+                  "const": 422
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "RateLimited": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "RATE_LIMITED"
+                },
+                "httpStatus": {
+                  "const": 429
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "InternalError": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "INTERNAL_ERROR"
+                },
+                "httpStatus": {
+                  "const": 500
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "ServiceUnavailable": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BaseEnvelope"
+        },
+        {
+          "properties": {
+            "error": {
+              "properties": {
+                "code": {
+                  "const": "SERVICE_UNAVAILABLE"
+                },
+                "httpStatus": {
+                  "const": 503
+                }
+              },
+              "required": [
+                "code",
+                "httpStatus"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

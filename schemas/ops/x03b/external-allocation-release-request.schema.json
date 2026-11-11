@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "external-allocation-release-request.schema.json",
+  "title": "External inventory allocation release request",
+  "description": "Self-release of a finished-goods hold by the external sales platform, for example when an order is cancelled before the warehouse confirms it. The body names the source only: the provider releases the RESERVED lines that this same service principal created for that source, never a quantity and never a lot.",
+  "$comment": "OD-M3-REPLY-01 section 3.2 (owner decision 2B, 2026-10-08). Narrow exception next to OWNER-DIRECTIVE-2026-09-05-EXT-ALLOC-RESERVE: it reuses INVENTORY_ALLOCATION_CREATE and the allocation audience, so the admin permission INVENTORY_ALLOCATION_RELEASE is NOT granted to a service principal. Release only moves RESERVED to RELEASED through the same mechanism as warehouse release and hold expiry: no ledger entry, no goods movement. The pair (source_object_type, source_object_id) is exactly what the consumer sent to POST /v1/inventory/allocations.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "source_object_type": {
+      "type": "string",
+      "enum": ["EXTERNAL_ORDER", "EXTERNAL_ORDER_ITEM"],
+      "description": "Exactly the kind sent when the stock was reserved. SHIPMENT_REFERENCE is an internal allocation source and is rejected on this route."
+    },
+    "source_object_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Exactly the consumer-owned UUID sent when the stock was reserved. It is the only key of this command: a source held by another principal is indistinguishable from an unknown source and returns 404."
+    }
+  },
+  "required": ["source_object_type", "source_object_id"]
+}

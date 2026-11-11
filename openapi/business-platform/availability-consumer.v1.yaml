@@ -15,7 +15,8 @@ paths:
       description: >-
         Requests an availability check and returns the business-platform availability-check contract.
         The operation must not mutate ops-core inventory, sellable status, recall, sale lock, or trace truth.
-        TODO: source documents do not define a dedicated business-platform availability request schema.
+        The request body is the provider body of checkAvailabilityV1 (openapi/ops-core/availability-sellable.v1.yaml),
+        field for field: a bare JSON object, not wrapped in the common envelope.
       operationId: checkAvailabilityConsumerV1
       tags: [availability-consumer]
       requestBody:
@@ -49,14 +50,31 @@ components:
       type: object
       additionalProperties: false
       description: >-
-        Minimal availability check request. TODO: define official request shape if source docs lock quantity, channel, reservation, and customer context semantics.
+        Mirror of AvailabilityCheckRequest in openapi/ops-core/availability-sellable.v1.yaml. The provider closes the
+        object (additionalProperties false), so any other field - including the earlier channel_context_id, customer_id
+        and a unit such as "pack" - is rejected with 422. There is no customer field and no reservation field: the check
+        evaluates and never holds stock (holds are POST /v1/inventory/allocations).
       properties:
-        sku_id: { type: string, minLength: 1 }
-        batch_id: { type: string, minLength: 1 }
+        sku_id:
+          type: string
+          format: uuid
+        warehouse_id:
+          type: string
+          format: uuid
+          description: Optional warehouse scope. Omitted means scope ALL. A warehouse that does not resolve to an ACTIVE one is 404, never a silent fall back to ALL.
+        batch_id:
+          type: string
+          format: uuid
         requested_quantity:
           $ref: "../../schemas/common/quantity.schema.json"
-        channel_context_id: { type: string }
-        customer_id: { type: string }
+          description: Object {value, unit}, value a decimal string. Present means FULL_FILL mode, absent means EXISTENCE. When uom_code is also sent, unit must equal it exactly.
+        uom_code:
+          type: string
+          enum: ["hộp", "thùng", "lọ", "hũ"]
+          description: Optional. Supplying it makes the response carry the quantity block. Case-sensitive, no conversion, no mixed-unit aggregation.
+        channel_context:
+          $ref: "../../schemas/common/source-ref.schema.json"
+          description: Consumer context only; it is not an authorization or sellable-decision input.
         correlation:
           $ref: "../../schemas/common/correlation.schema.json"
       required: [sku_id]

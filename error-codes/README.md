@@ -27,6 +27,7 @@ Current v1 catalogs:
 - `permission-errors.yaml`
 - `idempotency-errors.yaml`
 - `integration-errors.yaml`
+- `external-allocation-errors.yaml` (external allocation write surface; wire tokens of the closed x03b enums, not namespaced strings)
 
 Example fixtures:
 

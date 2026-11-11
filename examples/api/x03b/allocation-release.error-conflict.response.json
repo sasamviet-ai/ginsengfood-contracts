@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-x03b-allocation-release-conflict"
+  },
+  "error": {
+    "code": "ALLOCATION_CONFLICT",
+    "message": "Stock held for this source has been confirmed or issued by the warehouse; nothing was released. Only the warehouse can release it.",
+    "httpStatus": 409,
+    "correlationId": "corr-x03b-allocation-release-conflict"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "fixture-x03b-release-not-held"
+  },
+  "error": {
+    "code": "ALLOCATION_NOT_HELD",
+    "message": "Nothing is held for this source any more: it was already released or its hold expired. Nothing was released.",
+    "httpStatus": 409,
+    "correlationId": "fixture-x03b-release-not-held"
+  }
+}

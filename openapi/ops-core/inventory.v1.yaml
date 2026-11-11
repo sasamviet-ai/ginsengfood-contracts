@@ -3,13 +3,27 @@ info:
   title: Ops Core Inventory API
   version: 1.0.0
   description: >-
-    Protected external inventory read facades. Every operation is read-only, uses a dedicated
+    Protected external inventory facades. Every read operation is read-only, uses a dedicated
     response whitelist, and must not mutate inventory truth. Collection reads use opaque,
-    scope-bound full-snapshot cursors; delta feeds are not published in v1.
+    scope-bound full-snapshot cursors; delta feeds are not published in v1. The only write
+    surface is the pair of hold commands on /v1/inventory/allocations: reserve
+    (reserveInventoryAllocationV1) and consumer self-release (releaseInventoryAllocationV1).
+    Both are deliberate, owner-approved exceptions to the read/check-only default; neither moves
+    goods or writes a ledger entry. Confirming, issuing and warehouse release stay with warehouse
+    operations.
 servers:
   - url: https://api.example.local
     description: Placeholder only.
 x-owner-decision-ref: OWNER-DIRECTIVE-2026-09-03-EXT-OD-01-07
+x-audience-catalog:
+  ginsengfood-ops-core-external-bulk-read-v1:
+    auth_class: SERVICE_BEARER
+    token_use: service
+    permission_scope: SERVICE
+  ginsengfood-ops-core-external-allocation-v1:
+    auth_class: SERVICE_BEARER
+    token_use: service
+    permission_scope: SERVICE
 x-rate-limit-policies:
   ExternalWarehouseRead:
     sustained_rps_per_principal: 5
@@ -43,6 +57,24 @@ x-rate-limit-policies:
     fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
     startup_fail_closed: true
     exhausted_or_unavailable_behavior: FAIL_CLOSED_NO_CACHED_PASS
+  # Owner decision C25 (2026-09-08). Its own bucket, shared only by the two allocation write operations, so a burst of
+  # availability checks or snapshot reads cannot starve the commands that prevent overselling. The partition key is
+  # policy name + principal, not the route: reserve and release draw from the same bucket.
+  ExternalAllocationWrite:
+    sustained_rps_per_principal: 5
+    burst_per_principal: 10
+    fleet_rps: 25
+    fleet_authority_id: OPS_CORE_EXTERNAL_FLEET_LIMITER_V1
+    queue_limit: 0
+    partition_claims: [token_use, sub]
+    required_token_use: service
+    principal_sub_format: uuid
+    limiter_authority: DISTRIBUTED_INGRESS_TOKEN_BUCKET
+    in_process_limiter: DEFENSE_IN_DEPTH_ONLY
+    pre_auth_partition: TRUSTED_PROXY_VERIFIED_IP_ONLY
+    fleet_authority_config_key: RateLimiting__External__FleetAuthorityRef
+    startup_fail_closed: true
+    exhausted_or_unavailable_behavior: FAIL_CLOSED_NO_CACHED_PASS
 x-retry-policies:
   ExternalBulkReadRetry:
     max_retries: 2
@@ -51,6 +83,13 @@ x-retry-policies:
     non_retryable_statuses: [400, 401, 403, 404, 409, 410, 422, 500]
     honor_retry_after: true
     backoff: FULL_JITTER_BASE_500MS_CAP_5S
+  # Write commands: no automatic retry loop. After a lost response, a timeout, 429 or 503, repeat the call with the SAME
+  # X-Idempotency-Key and the SAME body, honoring Retry-After. A new key for the same source can hold stock twice (reserve).
+  ExternalManualReplayOnly:
+    max_retries: 0
+    total_budget_seconds: 0
+    replay: MANUAL_SAME_IDEMPOTENCY_KEY_AND_PAYLOAD_ONLY
+    honor_retry_after: true
 x-pagination-policies:
   ExternalSnapshotCursorV1:
     mode: OPAQUE_SCOPE_BOUND_SNAPSHOT_CURSOR
@@ -287,6 +326,9 @@ paths:
         Returns read-only allocation state. EXTERNAL_ORDER_ITEM source_object_id is the stable
         order_item_id UUID; it must never be synthesized from order header, SKU, ordinal, hash,
         or allocation ID. This route does not reserve, confirm, release, or write ledger entries.
+        status is one of RESERVED, CONFIRMED, ISSUED, RELEASED (enums/ops/inventory-allocation-status.yaml,
+        state-machines/ops/allocation-state.md); a consumer must tolerate a value it does not know.
+        Expiry, warehouse release and consumer self-release all read RELEASED.
       operationId: listInventoryAllocationsV1
       tags: [inventory]
       security:
@@ -357,7 +399,15 @@ paths:
         (batch release, warehouse receipt confirmation, quality hold, expiry, recall, sale lock).
         Reservation is full-fill only: a shortage reserves nothing and returns INSUFFICIENT_STOCK.
         The hold does not write a ledger entry, does not move goods, and does not confirm or release
-        the allocation — those transitions belong to warehouse operations.
+        the allocation. Confirming and issuing belong to warehouse operations; the consumer can end its
+        own RESERVED hold only through releaseInventoryAllocationV1, and a hold it does not release
+        expires on its own (default 30 minutes, at most 24 hours; expires_at is a request field).
+        X-Idempotency-Key is required: a network retry without it would hold stock twice for the same
+        order line, so after a lost response repeat the call with the same key and body. A repeat call
+        for the same source object with a new key is answered with reservation_status=ALREADY_RESERVED
+        and creates nothing; a source the warehouse already issued is answered 409 ALLOCATION_CONFLICT
+        whatever the key. Retries and rate limits are described by the x-retry-policy and
+        x-rate-limit-policy entries.
       operationId: reserveInventoryAllocationV1
       tags: [inventory]
       security:
@@ -367,21 +417,18 @@ paths:
       x-audience: ginsengfood-ops-core-external-allocation-v1
       x-permission: INVENTORY_ALLOCATION_CREATE
       x-permission-scope: SERVICE
-      # ⚠ EXT-OD-04 §16.6 khóa đúng hai policy (hot + bulk) vì lúc chốt chưa có route ghi ngoài nào.
-      # Route này tạm dùng bucket hot; một policy ExternalAllocationReserve riêng cần owner bổ sung
-      # vào bảng đã khóa trước khi coi đây là thông số đã duyệt.
+      # Owner decision C25 (2026-09-08): own token bucket, defined in x-rate-limit-policies above
+      # (5 rps / burst 10 / fleet 25) and shared with releaseInventoryAllocationV1. It no longer
+      # shares the availability-check bucket.
       x-rate-limit-policy: ExternalAllocationWrite
+      x-retry-policy: ExternalManualReplayOnly
       x-idempotency: REQUIRED
+      x-idempotency-disposition: IDEMPOTENCY_KEY_REQUIRED
       x-write-surface: EXTERNAL_ALLOCATION_RESERVE
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED"
+      x-owner-decision-ref: OWNER-DIRECTIVE-2026-09-05-EXT-ALLOC-RESERVE
       parameters:
-        - name: X-Idempotency-Key
-          in: header
-          required: true
-          description: >-
-            Required on this write route. A network retry without it would hold stock twice for the
-            same order line. A repeat call for the same source object with a new key is answered with
-            reservation_status=ALREADY_RESERVED and creates nothing.
-          schema: { type: string, minLength: 1, maxLength: 100 }
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -439,9 +486,15 @@ paths:
           content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/NotFound" } } }
         "409":
           description: >-
-            INSUFFICIENT_STOCK when no combination of allocatable lots can fill the exact quantity,
-            or ALLOCATION_CONFLICT when the same source object already holds a different scope or
-            quantity. Neither reserves anything.
+            INSUFFICIENT_STOCK is one code for four causes the provider does not disclose: no combination
+            of allocatable lots fills the exact quantity; lots hold stock but are blocked (sale lock,
+            recall, quality hold, batch not released); the same source object already holds a different
+            warehouse, unit or quantity; or more than 20 lots would be needed. It does not mean out of
+            stock - call POST /v1/availability/check for the reason. ALLOCATION_CONFLICT means the hold
+            recorded for this idempotency key is no longer held (it expired and was released: send a new
+            key), or the source was already ISSUED by the warehouse (do not reserve it again, whatever
+            the key). Neither reserves anything. To tell the two ALLOCATION_CONFLICT causes apart, read
+            GET /v1/inventory/allocations?sourceObjectId= once: an ISSUED row means stop.
           x-error-code: INSUFFICIENT_STOCK
           x-http-status: 409
           x-retryable: false
@@ -457,18 +510,136 @@ paths:
           x-http-status: 422
           x-retryable: false
           content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/ValidationFailed" } } }
-        "429":
-          description: RATE_LIMITED.
-          x-error-code: RATE_LIMITED
-          x-http-status: 429
-          x-retryable: true
-          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/RateLimited" } } }
+        "429": { $ref: "#/components/responses/AllocationReserveRateLimited" }
         "500":
           description: INTERNAL_ERROR.
           x-error-code: INTERNAL_ERROR
           x-http-status: 500
           x-retryable: false
           content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/InternalError" } } }
+  /v1/inventory/allocations/release:
+    post:
+      summary: Release the finished-goods hold of an external order or order line
+      description: >-
+        Narrow self-release for the consumer, for example when an order is cancelled before the
+        warehouse confirms it. It releases every RESERVED line that this same service principal
+        created for the source (source_object_type, source_object_id) and that has not expired, or
+        releases nothing: the body carries no quantity and no lot. The effect is that of a warehouse
+        release or a hold expiry - the quantity returns to the lot's available quantity, no ledger
+        entry is written, no goods move - and the allocation reads RELEASED.
+        Verdict order, looking only at lines of the calling principal: a CONFIRMED or ISSUED line means
+        409 ALLOCATION_CONFLICT and nothing at all is released (the warehouse committed part of the
+        order; contact the warehouse); otherwise every RESERVED line still inside its expiry is
+        released (200); otherwise, if the principal has lines but none can be released (already
+        RELEASED, or RESERVED past expires_at and waiting for the expiry worker) it is
+        409 ALLOCATION_NOT_HELD, which a cancelling consumer treats as success; otherwise 404. A source
+        held only by another principal is a 404 with the same message as an unknown source.
+        Expiry stays with the provider worker: this route never releases a line that is past its expiry.
+        X-Idempotency-Key is required. A replay with the same key returns the original 200 body
+        unchanged (same lines, same released_at) and does not release anything again; a key reused for a
+        different source is 422 VALIDATION_FAILED naming the header; a call whose first attempt with the
+        same key is still running is 409 ALLOCATION_CONFLICT. The route uses the same permission
+        (INVENTORY_ALLOCATION_CREATE) and audience as reserveInventoryAllocationV1; the warehouse
+        permission INVENTORY_ALLOCATION_RELEASE is never granted to a service principal.
+        Retries and rate limits are described by the x-retry-policy and x-rate-limit-policy entries.
+      operationId: releaseInventoryAllocationV1
+      tags: [inventory]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-allocation-v1
+      x-permission: INVENTORY_ALLOCATION_CREATE
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalAllocationWrite
+      x-retry-policy: ExternalManualReplayOnly
+      x-idempotency: REQUIRED
+      x-idempotency-disposition: IDEMPOTENCY_KEY_REQUIRED
+      x-write-surface: EXTERNAL_ALLOCATION_RELEASE
+      x-runtime-policy: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED"
+      x-owner-decision-ref: OD-M3-REPLY-01
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../../schemas/ops/x03b/external-allocation-release-request.schema.json"
+      responses:
+        "200":
+          description: >-
+            The lines in data.allocations were RESERVED by the calling principal and are now RELEASED.
+            Replaying the call with the same X-Idempotency-Key returns this body again.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    required: [schemaVersion, correlation, data]
+                    properties:
+                      data:
+                        $ref: "../../schemas/ops/x03b/external-allocation-release-result.schema.json"
+        "400":
+          description: INVALID_REQUEST for an empty or malformed body.
+          x-error-code: INVALID_REQUEST
+          x-http-status: 400
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/InvalidRequest" } } }
+        "401":
+          description: UNAUTHORIZED for missing or invalid service credentials.
+          x-error-code: UNAUTHORIZED
+          x-http-status: 401
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/Unauthorized" } } }
+        "403":
+          description: FORBIDDEN when the principal lacks INVENTORY_ALLOCATION_CREATE or the allocation audience.
+          x-error-code: FORBIDDEN
+          x-http-status: 403
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/Forbidden" } } }
+        "404":
+          description: >-
+            NOT_FOUND when this service principal holds no allocation for the source. An unknown source and
+            a source held only by another principal are indistinguishable.
+          x-error-code: NOT_FOUND
+          x-http-status: 404
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/NotFound" } } }
+        "409":
+          description: >-
+            ALLOCATION_CONFLICT when the warehouse already CONFIRMED or ISSUED stock of the source (nothing
+            was released; contact the warehouse), when the allocation changed while the release was being
+            processed, or when a release with the same idempotency key is still running; the code is the same
+            for all three and only the message differs, so read GET /v1/inventory/allocations?sourceObjectId=
+            once instead of looping. ALLOCATION_NOT_HELD when nothing of this principal is held for the source
+            any more: it was already released, or its hold expired and the expiry worker has not swept it yet.
+            Nothing is changed, and a new key gives the same answer.
+          x-error-code: ALLOCATION_CONFLICT
+          x-http-status: 409
+          x-retryable: false
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/AllocationConflict"
+                  - $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/AllocationNotHeld"
+        "422":
+          description: >-
+            VALIDATION_FAILED for a missing, malformed or reused X-Idempotency-Key (details[].field is the
+            header name), or for an unsupported source_object_type or source_object_id.
+          x-error-code: VALIDATION_FAILED
+          x-http-status: 422
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/ValidationFailed" } } }
+        "429": { $ref: "#/components/responses/AllocationReleaseRateLimited" }
+        "500":
+          description: INTERNAL_ERROR.
+          x-error-code: INTERNAL_ERROR
+          x-http-status: 500
+          x-retryable: false
+          content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/InternalError" } } }
 components:
   parameters:
     Cursor:
@@ -482,7 +653,40 @@ components:
       in: query
       required: false
       schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
+    IdempotencyKey:
+      name: X-Idempotency-Key
+      in: header
+      required: true
+      description: >-
+        Required on both allocation write operations (1-200 characters, letters, digits and : - _ . only; leading and
+        trailing whitespace is trimmed). A missing, over-long or malformed key is 422 VALIDATION_FAILED with
+        details[].field set to X-Idempotency-Key. Repeating a call with the same key and the same body returns the
+        original answer; reusing a key for a different source is 422. Generate one key per intent and keep it
+        across retries of that intent.
+      schema: { type: string, minLength: 1, maxLength: 200, pattern: "^[A-Za-z0-9:_.-]+$" }
   responses:
+    AllocationReserveRateLimited:
+      description: RATE_LIMITED on the ExternalAllocationWrite bucket; honor Retry-After, then repeat the call with the same X-Idempotency-Key and body.
+      x-error-code: RATE_LIMITED
+      x-http-status: 429
+      x-retryable: true
+      headers:
+        Retry-After: { required: true, schema: { type: integer, minimum: 1 } }
+        X-RateLimit-Limit: { required: true, schema: { type: integer, const: 5 } }
+        X-RateLimit-Remaining: { required: true, schema: { type: integer, minimum: 0 } }
+        X-RateLimit-Reset: { required: true, schema: { type: integer, minimum: 1 } }
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/RateLimited" } } }
+    AllocationReleaseRateLimited:
+      description: RATE_LIMITED on the ExternalAllocationWrite bucket, shared with reserve; honor Retry-After, then repeat the call with the same X-Idempotency-Key and body.
+      x-error-code: RATE_LIMITED
+      x-http-status: 429
+      x-retryable: true
+      headers:
+        Retry-After: { required: true, schema: { type: integer, minimum: 1 } }
+        X-RateLimit-Limit: { required: true, schema: { type: integer, const: 5 } }
+        X-RateLimit-Remaining: { required: true, schema: { type: integer, minimum: 0 } }
+        X-RateLimit-Reset: { required: true, schema: { type: integer, minimum: 1 } }
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/RateLimited" } } }
     CursorInvalid:
       description: CURSOR_INVALID for malformed, tampered, or wrong-scope cursor.
       x-error-code: CURSOR_INVALID
