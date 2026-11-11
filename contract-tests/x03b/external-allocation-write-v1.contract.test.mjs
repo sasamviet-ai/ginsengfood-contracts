@@ -726,6 +726,48 @@ assert.match(collapse(notes), /compare quantities as decimals/);
 assert.match(collapse(notes), /\| either \| `429` `RATE_LIMITED` \| [^|]*or a call with the same key is still running/);
 assert.doesNotMatch(collapse(notes), /allocation changed mid-call, or the first attempt/);
 
+// Temporary contention (PERSIST-01, provider commit d55ff75a0): 429 RATE_LIMITED + Retry-After 1, never a 409.
+const contentionMessage = "The request could not be completed because of concurrent activity. Retry later with the same X-Idempotency-Key.";
+for (const component of ["AllocationReserveRateLimited", "AllocationReleaseRateLimited"]) {
+  const text = collapse(extractComponentBlock(inventoryText, "responses", component));
+  assert.match(text, /three causes that share one code, one status and one way to handle them/, `${component}: three causes`);
+  assert.ok(text.includes(`message "${contentionMessage}"`), `${component}: contention message`);
+  assert.match(text, /temporary contention/i, `${component}: contention cause`);
+  assert.match(text, /\(6 attempts, a few hundred milliseconds in total\) ran out, Retry-After: 1/, `${component}: retry budget and Retry-After`);
+  assert.match(text, /no details/, `${component}: no details`);
+  assert.match(text, /(?:is not out of stock and changes|releases nothing and changes) no state, so the key stays reusable/, `${component}: not out of stock, key reusable`);
+  assert.match(text, /repeat the call with the same key and the same body; never send a new key for the same intent/, `${component}: same key and body`);
+  assert.match(text, /Only the message text tells the causes apart, and it is not contractual/, `${component}: message not contractual`);
+}
+assert.match(collapse(reserveBlock), /A 429 is also the answer when the provider's own database transaction kept being rejected because of concurrent activity .* the key stays reusable, so wait Retry-After and repeat with the same key and the same body/);
+assert.match(reserve409, /Temporary contention is never reported as INSUFFICIENT_STOCK or ALLOCATION_CONFLICT; it is 429 RATE_LIMITED/);
+assert.match(collapse(releaseBlock), /A 429 is also the answer when the provider's own database transaction kept being rejected because of concurrent activity and its internal retries ran out \(temporary contention\): nothing was released, the key stays reusable/);
+assert.match(release409, /Temporary contention that outlasts the provider's own retries is 429 RATE_LIMITED, not this 409/);
+assert.match(releaseErrorComment, /and so is temporary contention that outlasts the provider's own retries \(same code RATE_LIMITED, a different message, retry with the same key and body\)/);
+assert.ok(errorCatalog.includes(contentionMessage), "error catalog carries the contention message");
+assert.match(errorCatalog, /Temporary contention is never reported with this code, it is RATE_LIMITED \(429\)/);
+assert.match(errorCatalog, /Temporary contention that outlasts the provider retries is RATE_LIMITED \(429\), never this code/);
+assert.match(errorCatalog, /both handled the same way, wait and repeat with the same key and body, never as out of stock/);
+assert.match(notes, /### Retrying a 429/);
+assert.ok(notes.includes(`message "${contentionMessage}" and no \`details\``), "notes carry the contention message");
+for (const rule of [
+  "Never show a customer an out-of-stock message for a `429`",
+  "send the same call with the same `X-Idempotency-Key` and the same body (`expires_at` included)",
+  "Retry up to about 5 times in total",
+  "treat the outcome as UNKNOWN: neither held nor refused",
+  "Do not report out of stock, do not mint a new key"
+]) {
+  assert.ok(notes.includes(rule), `notes retry guidance must say: ${rule}`);
+}
+assert.match(collapse(notes), /treats every `429` on these two commands as retry-with-the-same-key-and-body, never as out of stock/);
+assert.match(collapse(notes), /or temporary contention on the same source or stock that outlasted the provider's own retries/);
+assert.match(unreleased, /\(e\) Temporary contention is `429`, not `409`\*\* \(provider commit `d55ff75a0`, local, not pushed\)/);
+assert.ok(unreleased.includes(`the message "${contentionMessage}" and no \`details\``), "CHANGELOG carries the contention message");
+assert.match(unreleased, /6 attempts \(about 375 ms of sleeping at most\)/);
+assert.match(unreleased, /Until this change the same situation was answered `409 INSUFFICIENT_STOCK` \(reserve\) or `409 ALLOCATION_CONFLICT` \(release\)/);
+assert.match(unreleased, /so those two `409` answers now never mean contention/);
+assert.match(unreleased, /Internal and admin endpoints keep `409 CONCURRENCY_CONFLICT`/);
+
 assert.match(unreleased, /#### Provider behavior coming with ops-core WP07b phase A \(NOT live yet\)/);
 for (const marker of ["(a) A hold of another principal", "(b) `GET /v1/inventory/allocations` lists only", "(c) A call whose first attempt", "(d) Reserve: the same key reused with a different body"]) {
   assert.ok(unreleased.includes(marker), `CHANGELOG must record the coming provider change: ${marker}`);

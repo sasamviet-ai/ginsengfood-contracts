@@ -46,9 +46,20 @@ Example key shapes (not part of the contract): `m3:rsv:<orderId>:<n>` for hold a
 | reserve | `422` `VALIDATION_FAILED` | Bad, missing or over-long key; the key already used for this source with a different body (`expires_at` included); bad body field; `details[]` names it | Fix the request; do not retry unchanged. |
 | release | `422` `VALIDATION_FAILED` | Bad, missing or over-long key; the key already used for a different source; bad body field; `details[]` names it | Fix the request; do not retry unchanged. |
 | either | `403` `FORBIDDEN` | Missing permission or audience, a token without subject, or a key first used by another service principal | Do not retry; check the credentials and that keys are never shared between principals. |
-| either | `429` `RATE_LIMITED` | The `ExternalAllocationWrite` bucket (5 per second, burst 10) is empty, or a call with the same key is still running (`Retry-After: 1`) | Wait `Retry-After`, repeat with the same key and body. |
+| either | `429` `RATE_LIMITED` | The `ExternalAllocationWrite` bucket (5 per second, burst 10) is empty, or a call with the same key is still running (`Retry-After: 1`), or temporary contention on the same source or stock that outlasted the provider's own retries (`Retry-After: 1`, no `details`) | Not out of stock, nothing changed. Wait `Retry-After`, repeat with the same key and the same body (see "Retrying a 429" below). |
 
 The consumer cannot confirm or issue an allocation, and cannot release a `CONFIRMED` one.
+
+### Retrying a 429
+
+One code, `RATE_LIMITED`, three causes: the bucket is empty, a call with the same key is still running, or temporary contention (the provider's database transaction was rejected because of concurrent activity on the same source or stock and its own retries, 6 attempts in a few hundred milliseconds, ran out). The contention case has the message "The request could not be completed because of concurrent activity. Retry later with the same X-Idempotency-Key." and no `details`; the message is a hint, not part of the contract. Handle all three the same way:
+
+1. It is not "out of stock" and nothing changed: the transaction did not commit, so the idempotency key is reusable. Never show a customer an out-of-stock message for a `429`.
+2. Wait at least `Retry-After` seconds (1), then send the same call with the same `X-Idempotency-Key` and the same body (`expires_at` included). A new key for the same intent can open a second hold on reserve, or a second release.
+3. Retry up to about 5 times in total, with a growing pause and some jitter so competing callers do not retry in step.
+4. If it is still `429` after that, treat the outcome as UNKNOWN: neither held nor refused. Do not report out of stock, do not mint a new key; keep the intent open, repeat later with the same key and body, or resolve it by reading `GET /v1/inventory/allocations?sourceObjectId=` once (your own rows only).
+
+Before the provider change that introduced the contention answer, the same situation was reported as `409 INSUFFICIENT_STOCK` on reserve and `409 ALLOCATION_CONFLICT` on release, which a consumer could only read as "no stock" or "do not retry". Those two `409` answers now mean a real shortage, an issued source, or an ordinary state conflict.
 
 ## 3. Status values the consumer must tolerate
 
@@ -65,5 +76,5 @@ The pull model (reading `GET` snapshots and `POST /v1/availability/check` before
 1. M3 parser accepts `ISSUED` and unknown `status` values.
 2. M3 derives `source_object_id` with the rule above and reproduces both vectors.
 3. M3 cancellation flow calls release, treats `ALLOCATION_NOT_HELD` and `404` as done, and routes `ALLOCATION_CONFLICT` to the warehouse instead of re-reserving.
-4. M3 never builds a new idempotency key for a retry of the same intent.
+4. M3 never builds a new idempotency key for a retry of the same intent, and treats every `429` on these two commands as retry-with-the-same-key-and-body, never as out of stock.
 5. M3 pins a contracts revision that contains these files.

@@ -413,7 +413,10 @@ paths:
         includes expires_at, so a retry must resend the original expires_at unchanged) is 422
         VALIDATION_FAILED naming the header. A key belongs to the service principal that first used it
         (another principal gets 403). A call whose first attempt with the same key is still running is
-        429 with Retry-After: 1. A repeat call for the same source object with a new key and the same
+        429 with Retry-After: 1. A 429 is also the answer when the provider's own database transaction
+        kept being rejected because of concurrent activity on the same source or stock and its internal
+        retries ran out (temporary contention): that is neither out of stock nor a change of state, the key
+        stays reusable, so wait Retry-After and repeat with the same key and the same body. A repeat call for the same source object with a new key and the same
         scope and quantity is answered with reservation_status=ALREADY_RESERVED when the existing hold is
         this principal's own: it creates nothing and never extends the hold (the lines keep their
         original expires_at). A source held by another principal is 409 INSUFFICIENT_STOCK and the holder
@@ -513,7 +516,8 @@ paths:
             key). An ISSUED allocation created by another principal is not visible to the caller and is
             answered INSUFFICIENT_STOCK, never ALLOCATION_CONFLICT. Neither reserves anything. To tell the
             ALLOCATION_CONFLICT causes apart, read GET /v1/inventory/allocations?sourceObjectId= once: an
-            ISSUED row of your own means stop.
+            ISSUED row of your own means stop. Temporary contention is never reported as INSUFFICIENT_STOCK or
+            ALLOCATION_CONFLICT; it is 429 RATE_LIMITED.
           x-error-code: INSUFFICIENT_STOCK
           x-http-status: 409
           x-retryable: false
@@ -562,7 +566,10 @@ paths:
         scope of this operation is the key alone, not the source: a key reused for a different source is
         422 VALIDATION_FAILED naming the header. A key belongs to the service principal that first used it
         (another principal gets 403). A call whose first attempt with the same key is still running is
-        429 with Retry-After: 1. The route uses the same permission
+        429 with Retry-After: 1. A 429 is also the answer when the provider's own database transaction kept
+        being rejected because of concurrent activity and its internal retries ran out (temporary
+        contention): nothing was released, the key stays reusable, so wait Retry-After and repeat with the
+        same key and the same body. The route uses the same permission
         (INVENTORY_ALLOCATION_CREATE) and audience as reserveInventoryAllocationV1; the warehouse
         permission INVENTORY_ALLOCATION_RELEASE is never granted to a service principal.
         Retries and rate limits are described by the x-retry-policy and x-rate-limit-policy entries.
@@ -638,7 +645,8 @@ paths:
             ALLOCATION_CONFLICT when the warehouse already CONFIRMED or ISSUED stock of the source (nothing
             was released; contact the warehouse), or when the allocation changed while the release was being
             processed; the code is the same for both and only the message differs, so read
-            GET /v1/inventory/allocations?sourceObjectId= once instead of looping. ALLOCATION_NOT_HELD when nothing of this principal is held for the source
+            GET /v1/inventory/allocations?sourceObjectId= once instead of looping. Temporary contention that
+            outlasts the provider's own retries is 429 RATE_LIMITED, not this 409. ALLOCATION_NOT_HELD when nothing of this principal is held for the source
             any more: it was already released, or its hold expired and the expiry worker has not swept it yet.
             Nothing is changed, and a new key gives the same answer.
           x-error-code: ALLOCATION_CONFLICT
@@ -697,9 +705,14 @@ components:
   responses:
     AllocationReserveRateLimited:
       description: >-
-        RATE_LIMITED: the ExternalAllocationWrite bucket is empty, or a call with the same X-Idempotency-Key is
-        still running (Retry-After: 1). Honor Retry-After, then repeat the call with the same key and body.
-        The X-RateLimit-* headers are present only when the bucket rejected the call.
+        RATE_LIMITED with three causes that share one code, one status and one way to handle them. The
+        ExternalAllocationWrite bucket is empty (X-RateLimit-* headers present). A call with the same
+        X-Idempotency-Key is still running (Retry-After: 1). Or temporary contention: the provider's database
+        transaction was rejected because of concurrent activity on the same source or stock and its internal
+        retries (6 attempts, a few hundred milliseconds in total) ran out, Retry-After: 1, message "The request could not be completed because of concurrent activity. Retry later with the same X-Idempotency-Key.",
+        no details. Contention is not out of stock and changes no state, so the key stays reusable. In every case
+        honor Retry-After, then repeat the call with the same key and the same body; never send a new key for the
+        same intent. Only the message text tells the causes apart, and it is not contractual.
       x-error-code: RATE_LIMITED
       x-http-status: 429
       x-retryable: true
@@ -711,9 +724,14 @@ components:
       content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/RateLimited" } } }
     AllocationReleaseRateLimited:
       description: >-
-        RATE_LIMITED: the ExternalAllocationWrite bucket (shared with reserve) is empty, or a call with the same
-        X-Idempotency-Key is still running (Retry-After: 1). Honor Retry-After, then repeat the call with the same
-        key and body. The X-RateLimit-* headers are present only when the bucket rejected the call.
+        RATE_LIMITED with three causes that share one code, one status and one way to handle them. The
+        ExternalAllocationWrite bucket (shared with reserve) is empty (X-RateLimit-* headers present). A call
+        with the same X-Idempotency-Key is still running (Retry-After: 1). Or temporary contention: the
+        provider's database transaction was rejected because of concurrent activity and its internal retries
+        (6 attempts, a few hundred milliseconds in total) ran out, Retry-After: 1, message "The request could not be completed because of concurrent activity. Retry later with the same X-Idempotency-Key.",
+        no details. Contention releases nothing and changes no state, so the key stays reusable. In every case
+        honor Retry-After, then repeat the call with the same key and the same body; never send a new key for the
+        same intent. Only the message text tells the causes apart, and it is not contractual.
       x-error-code: RATE_LIMITED
       x-http-status: 429
       x-retryable: true
