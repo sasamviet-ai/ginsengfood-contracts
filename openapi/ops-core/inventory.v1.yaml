@@ -417,9 +417,10 @@ paths:
         scope and quantity is answered with reservation_status=ALREADY_RESERVED when the existing hold is
         this principal's own: it creates nothing and never extends the hold (the lines keep their
         original expires_at). A source held by another principal is 409 INSUFFICIENT_STOCK and the holder
-        is never disclosed. A source the warehouse already issued is answered 409 ALLOCATION_CONFLICT
-        whatever the key. Retries and rate limits are described by the x-retry-policy and
-        x-rate-limit-policy entries.
+        is never disclosed, whatever the state of that hold, ISSUED included. A source whose allocation
+        of this same principal the warehouse already issued is answered 409 ALLOCATION_CONFLICT whatever
+        the key. Retries and rate limits are described by the x-retry-policy and x-rate-limit-policy
+        entries.
       operationId: reserveInventoryAllocationV1
       tags: [inventory]
       security:
@@ -503,14 +504,16 @@ paths:
             INSUFFICIENT_STOCK is one code for five causes the provider does not disclose: no combination
             of allocatable lots fills the exact quantity; lots hold stock but are blocked (sale lock,
             recall, quality hold, batch not released); the same source object already holds a different
-            warehouse, unit or quantity; the source is held by another service principal; or more than
-            20 lots would be needed. It does not mean out of stock - call POST /v1/availability/check
+            warehouse, unit or quantity; the source is held by another service principal (in any state,
+            including ISSUED; the holder is not disclosed); or more than 20 lots would be needed. It does not mean out of stock - call POST /v1/availability/check
             for the reason. ALLOCATION_CONFLICT means the hold recorded for this idempotency key is no
             longer held (it expired, or the warehouse or the consumer's own releaseInventoryAllocationV1
             released it: send a new key if the order is still live), or the source was already ISSUED by
-            the warehouse (do not reserve it again, whatever the key). Neither reserves anything. To tell
-            the ALLOCATION_CONFLICT causes apart, read GET /v1/inventory/allocations?sourceObjectId= once:
-            an ISSUED row means stop.
+            the warehouse for an allocation of this same principal (do not reserve it again, whatever the
+            key). An ISSUED allocation created by another principal is not visible to the caller and is
+            answered INSUFFICIENT_STOCK, never ALLOCATION_CONFLICT. Neither reserves anything. To tell the
+            ALLOCATION_CONFLICT causes apart, read GET /v1/inventory/allocations?sourceObjectId= once: an
+            ISSUED row of your own means stop.
           x-error-code: INSUFFICIENT_STOCK
           x-http-status: 409
           x-retryable: false

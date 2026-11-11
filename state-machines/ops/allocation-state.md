@@ -24,7 +24,7 @@ An allocation is one hold of finished-goods stock on one warehouse lot. One rese
 | --- | --- | --- |
 | ISSUED | RELEASED | Goods already left the warehouse; reversing an issue is a warehouse document, not a release. |
 | ISSUED | CONFIRMED | Terminal state. |
-| ISSUED | RESERVED | Terminal state. A reserve call for an issued source is answered `409 ALLOCATION_CONFLICT`, with or without a new idempotency key. |
+| ISSUED | RESERVED | Terminal state. A reserve call for a source whose allocation of the same principal is issued is answered `409 ALLOCATION_CONFLICT`, with or without a new idempotency key; an issued allocation of another principal is answered `409 INSUFFICIENT_STOCK`. |
 | RELEASED | RESERVED | A new reserve call creates new allocations; a released row is never reopened. |
 | RELEASED | any | Terminal state. A second release is `409 ALLOCATION_NOT_HELD`. |
 | CONFIRMED | RELEASED (consumer) | The warehouse committed part of the order; releasing the rest would leave half an order held. `releaseInventoryAllocationV1` answers `409 ALLOCATION_CONFLICT` and releases nothing. |

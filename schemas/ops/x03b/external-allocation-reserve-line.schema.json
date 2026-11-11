@@ -34,7 +34,7 @@
     "status": {
       "type": "string",
       "enum": ["RESERVED", "CONFIRMED", "ISSUED", "RELEASED"],
-      "description": "A freshly created hold is always RESERVED. CONFIRMED and ISSUED are reached only by warehouse operations; the sales platform cannot drive those transitions. RELEASED is reached by warehouse release, by hold expiry, or by the consumer itself through POST /v1/inventory/allocations/release. Lines of an ALREADY_RESERVED answer repeat the state of the existing hold, so they can be CONFIRMED; ISSUED is accepted by this schema only so that every allocation projection shares one status vocabulary; it is not emitted on this route, because a source that was already issued is answered 409 ALLOCATION_CONFLICT. See enums/ops/inventory-allocation-status.yaml."
+      "description": "A freshly created hold is always RESERVED. CONFIRMED and ISSUED are reached only by warehouse operations; the sales platform cannot drive those transitions. RELEASED is reached by warehouse release, by hold expiry, or by the consumer itself through POST /v1/inventory/allocations/release. Lines of an ALREADY_RESERVED answer repeat the state of the existing hold, so they can be CONFIRMED; ISSUED is accepted by this schema only so that every allocation projection shares one status vocabulary; it is not emitted on this route, because a source whose allocation of the same principal was already issued is answered 409 ALLOCATION_CONFLICT (and an issued allocation of another principal, 409 INSUFFICIENT_STOCK). See enums/ops/inventory-allocation-status.yaml."
     },
     "requested_at": { "type": "string", "format": "date-time" },
     "expires_at": { "type": "string", "format": "date-time" }

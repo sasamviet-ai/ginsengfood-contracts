@@ -665,7 +665,12 @@ assert.match(reserve409, /INSUFFICIENT_STOCK is one code for five causes/);
 assert.match(reserve409, /different warehouse, unit or quantity/);
 assert.match(reserve409, /held by another service principal/);
 assert.match(reserve409, /ALLOCATION_CONFLICT means the hold recorded for this idempotency key is no longer held \(it expired, or the warehouse or the consumer's own releaseInventoryAllocationV1 released it/);
-assert.match(reserve409, /or the source was already ISSUED by the warehouse/);
+assert.match(reserve409, /or the source was already ISSUED by the warehouse for an allocation of this same principal/);
+assert.match(reserve409, /held by another service principal \(in any state, including ISSUED; the holder is not disclosed\)/);
+assert.match(reserve409, /An ISSUED allocation created by another principal is not visible to the caller and is answered INSUFFICIENT_STOCK, never ALLOCATION_CONFLICT/);
+assert.doesNotMatch(collapse(reserveBlock), /A source the warehouse already issued is answered/, "ISSUED => ALLOCATION_CONFLICT only holds for the caller's own allocation");
+assert.match(collapse(reserveBlock), /whatever the state of that hold, ISSUED included/);
+assert.match(collapse(reserveBlock), /A source whose allocation of this same principal the warehouse already issued is answered 409 ALLOCATION_CONFLICT whatever the key/);
 assert.doesNotMatch(reserve409, /ALLOCATION_CONFLICT when the same source/, "a different scope is INSUFFICIENT_STOCK, never ALLOCATION_CONFLICT");
 
 const release409 = collapse(extractInlineResponse(releaseBlock, "409"));
@@ -708,11 +713,15 @@ assert.doesNotMatch(releaseErrorComment, /still in progress/);
 
 const errorCatalog = read("error-codes/external-allocation-errors.yaml");
 assert.match(errorCatalog, /One code for five causes/);
+assert.match(errorCatalog, /an ISSUED allocation of another principal is INSUFFICIENT_STOCK, never this code/);
+assert.match(errorCatalog, /held by another service principal in any state \(ISSUED included/);
 assert.match(errorCatalog, /released by the warehouse or by the consumer's own releaseInventoryAllocationV1/);
 assert.doesNotMatch(errorCatalog, /still in progress/);
 assert.match(statusEnumText, /The real gate is on the consumer side/);
 assert.doesNotMatch(statusEnumText, /before the provider emits ISSUED/, "the contract cannot promise the provider will hold ISSUED back");
 assert.match(collapse(notes), /five causes: short stock/);
+assert.match(collapse(notes), /for an allocation of your own principal/);
+assert.match(collapse(notes), /source held by another principal \(any state, `ISSUED` included/);
 assert.match(collapse(notes), /compare quantities as decimals/);
 assert.match(collapse(notes), /\| either \| `429` `RATE_LIMITED` \| [^|]*or a call with the same key is still running/);
 assert.doesNotMatch(collapse(notes), /allocation changed mid-call, or the first attempt/);
@@ -722,6 +731,10 @@ for (const marker of ["(a) A hold of another principal", "(b) `GET /v1/inventory
   assert.ok(unreleased.includes(marker), `CHANGELOG must record the coming provider change: ${marker}`);
 }
 assert.doesNotMatch(unreleased, /A key accepted before is still accepted/);
+assert.match(unreleased, /an `ISSUED` allocation of another principal is answered `409 INSUFFICIENT_STOCK`/);
+assert.match(unreleased, /not `ALLOCATION_CONFLICT` \(that code is kept for an `ISSUED` allocation of the calling principal itself\)/);
+assert.match(stateMachine, /an issued allocation of another principal is answered `409 INSUFFICIENT_STOCK`/);
+assert.match(parseJson("schemas/ops/x03b/external-allocation-reserve-line.schema.json").properties.status.description, /an issued allocation of another principal, 409 INSUFFICIENT_STOCK/);
 assert.doesNotMatch(unreleased, /does not emit `ISSUED` or enable the release route/);
 
 console.log(`X03B allocation write-surface contract PASS: ${operations.length}/2 operations, ${reserveResponseFiles.length + releaseResponseFiles.length} response payloads, ${releaseErrorCases.length} release error envelopes, ${vectors.length} UUIDv5 vectors, 13 webhook event types, and negative tamper checks.`);
