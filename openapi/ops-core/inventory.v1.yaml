@@ -329,6 +329,10 @@ paths:
         status is one of RESERVED, CONFIRMED, ISSUED, RELEASED (enums/ops/inventory-allocation-status.yaml,
         state-machines/ops/allocation-state.md); a consumer must tolerate a value it does not know.
         Expiry, warehouse release and consumer self-release all read RELEASED.
+        The snapshot lists only allocations created by the calling service principal: holds, CONFIRMED
+        or ISSUED rows of another principal for the same source are not visible. allocated_quantity is
+        written without trailing zeros here ("5", "0.5"), while reserve and release lines always carry
+        three decimals ("5.000"); compare quantities as decimals, never as strings.
       operationId: listInventoryAllocationsV1
       tags: [inventory]
       security:
@@ -403,9 +407,17 @@ paths:
         own RESERVED hold only through releaseInventoryAllocationV1, and a hold it does not release
         expires on its own (default 30 minutes, at most 24 hours; expires_at is a request field).
         X-Idempotency-Key is required: a network retry without it would hold stock twice for the same
-        order line, so after a lost response repeat the call with the same key and body. A repeat call
-        for the same source object with a new key is answered with reservation_status=ALREADY_RESERVED
-        and creates nothing; a source the warehouse already issued is answered 409 ALLOCATION_CONFLICT
+        order line, so after a lost response repeat the call with the same key and the same body. The
+        idempotency scope of this operation is the source: a key sent for a different source is a new
+        command, and a key already used for the same source with a different body (the fingerprint
+        includes expires_at, so a retry must resend the original expires_at unchanged) is 422
+        VALIDATION_FAILED naming the header. A key belongs to the service principal that first used it
+        (another principal gets 403). A call whose first attempt with the same key is still running is
+        429 with Retry-After: 1. A repeat call for the same source object with a new key and the same
+        scope and quantity is answered with reservation_status=ALREADY_RESERVED when the existing hold is
+        this principal's own: it creates nothing and never extends the hold (the lines keep their
+        original expires_at). A source held by another principal is 409 INSUFFICIENT_STOCK and the holder
+        is never disclosed. A source the warehouse already issued is answered 409 ALLOCATION_CONFLICT
         whatever the key. Retries and rate limits are described by the x-retry-policy and
         x-rate-limit-policy entries.
       operationId: reserveInventoryAllocationV1
@@ -437,7 +449,7 @@ paths:
               $ref: "../../schemas/ops/x03b/external-allocation-reserve-request.schema.json"
       responses:
         "200":
-          description: An equivalent hold already existed; nothing was created.
+          description: An equivalent hold of this service principal already existed; nothing was created.
           content:
             application/json:
               schema:
@@ -473,7 +485,9 @@ paths:
           x-retryable: false
           content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/Unauthorized" } } }
         "403":
-          description: FORBIDDEN when the principal lacks INVENTORY_ALLOCATION_CREATE or the allocation audience.
+          description: >-
+            FORBIDDEN when the principal lacks INVENTORY_ALLOCATION_CREATE or the allocation audience, when the
+            token carries no subject, or when the X-Idempotency-Key was first used by another service principal.
           x-error-code: FORBIDDEN
           x-http-status: 403
           x-retryable: false
@@ -486,15 +500,17 @@ paths:
           content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/NotFound" } } }
         "409":
           description: >-
-            INSUFFICIENT_STOCK is one code for four causes the provider does not disclose: no combination
+            INSUFFICIENT_STOCK is one code for five causes the provider does not disclose: no combination
             of allocatable lots fills the exact quantity; lots hold stock but are blocked (sale lock,
             recall, quality hold, batch not released); the same source object already holds a different
-            warehouse, unit or quantity; or more than 20 lots would be needed. It does not mean out of
-            stock - call POST /v1/availability/check for the reason. ALLOCATION_CONFLICT means the hold
-            recorded for this idempotency key is no longer held (it expired and was released: send a new
-            key), or the source was already ISSUED by the warehouse (do not reserve it again, whatever
-            the key). Neither reserves anything. To tell the two ALLOCATION_CONFLICT causes apart, read
-            GET /v1/inventory/allocations?sourceObjectId= once: an ISSUED row means stop.
+            warehouse, unit or quantity; the source is held by another service principal; or more than
+            20 lots would be needed. It does not mean out of stock - call POST /v1/availability/check
+            for the reason. ALLOCATION_CONFLICT means the hold recorded for this idempotency key is no
+            longer held (it expired, or the warehouse or the consumer's own releaseInventoryAllocationV1
+            released it: send a new key if the order is still live), or the source was already ISSUED by
+            the warehouse (do not reserve it again, whatever the key). Neither reserves anything. To tell
+            the ALLOCATION_CONFLICT causes apart, read GET /v1/inventory/allocations?sourceObjectId= once:
+            an ISSUED row means stop.
           x-error-code: INSUFFICIENT_STOCK
           x-http-status: 409
           x-retryable: false
@@ -505,7 +521,10 @@ paths:
                   - $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/InsufficientStock"
                   - $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/AllocationConflict"
         "422":
-          description: VALIDATION_FAILED for a missing idempotency key, malformed quantity, or non-conforming UOM code.
+          description: >-
+            VALIDATION_FAILED for a missing, malformed or over-long X-Idempotency-Key, or one already used for
+            the same source with a different request body (details[].field is the header name), a malformed
+            quantity, or a non-conforming UOM code.
           x-error-code: VALIDATION_FAILED
           x-http-status: 422
           x-retryable: false
@@ -536,9 +555,11 @@ paths:
         held only by another principal is a 404 with the same message as an unknown source.
         Expiry stays with the provider worker: this route never releases a line that is past its expiry.
         X-Idempotency-Key is required. A replay with the same key returns the original 200 body
-        unchanged (same lines, same released_at) and does not release anything again; a key reused for a
-        different source is 422 VALIDATION_FAILED naming the header; a call whose first attempt with the
-        same key is still running is 409 ALLOCATION_CONFLICT. The route uses the same permission
+        unchanged (same lines, same released_at) and does not release anything again. The idempotency
+        scope of this operation is the key alone, not the source: a key reused for a different source is
+        422 VALIDATION_FAILED naming the header. A key belongs to the service principal that first used it
+        (another principal gets 403). A call whose first attempt with the same key is still running is
+        429 with Retry-After: 1. The route uses the same permission
         (INVENTORY_ALLOCATION_CREATE) and audience as reserveInventoryAllocationV1; the warehouse
         permission INVENTORY_ALLOCATION_RELEASE is never granted to a service principal.
         Retries and rate limits are described by the x-retry-policy and x-rate-limit-policy entries.
@@ -594,7 +615,9 @@ paths:
           x-retryable: false
           content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/Unauthorized" } } }
         "403":
-          description: FORBIDDEN when the principal lacks INVENTORY_ALLOCATION_CREATE or the allocation audience.
+          description: >-
+            FORBIDDEN when the principal lacks INVENTORY_ALLOCATION_CREATE or the allocation audience, when the
+            token carries no subject, or when the X-Idempotency-Key was first used by another service principal.
           x-error-code: FORBIDDEN
           x-http-status: 403
           x-retryable: false
@@ -610,10 +633,9 @@ paths:
         "409":
           description: >-
             ALLOCATION_CONFLICT when the warehouse already CONFIRMED or ISSUED stock of the source (nothing
-            was released; contact the warehouse), when the allocation changed while the release was being
-            processed, or when a release with the same idempotency key is still running; the code is the same
-            for all three and only the message differs, so read GET /v1/inventory/allocations?sourceObjectId=
-            once instead of looping. ALLOCATION_NOT_HELD when nothing of this principal is held for the source
+            was released; contact the warehouse), or when the allocation changed while the release was being
+            processed; the code is the same for both and only the message differs, so read
+            GET /v1/inventory/allocations?sourceObjectId= once instead of looping. ALLOCATION_NOT_HELD when nothing of this principal is held for the source
             any more: it was already released, or its hold expired and the expiry worker has not swept it yet.
             Nothing is changed, and a new key gives the same answer.
           x-error-code: ALLOCATION_CONFLICT
@@ -627,8 +649,9 @@ paths:
                   - $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/AllocationNotHeld"
         "422":
           description: >-
-            VALIDATION_FAILED for a missing, malformed or reused X-Idempotency-Key (details[].field is the
-            header name), or for an unsupported source_object_type or source_object_id.
+            VALIDATION_FAILED for a missing, malformed or over-long X-Idempotency-Key, or one reused for a
+            different source (details[].field is the header name), or for an unsupported source_object_type
+            or source_object_id.
           x-error-code: VALIDATION_FAILED
           x-http-status: 422
           x-retryable: false
@@ -661,31 +684,41 @@ components:
         Required on both allocation write operations (1-200 characters, letters, digits and : - _ . only; leading and
         trailing whitespace is trimmed). A missing, over-long or malformed key is 422 VALIDATION_FAILED with
         details[].field set to X-Idempotency-Key. Repeating a call with the same key and the same body returns the
-        original answer; reusing a key for a different source is 422. Generate one key per intent and keep it
-        across retries of that intent.
+        original answer. What counts as the same command differs: for reserve the scope is the source (the same
+        key with another source is a new command; the same key and source with a different body, expires_at
+        included, is 422); for release the scope is the key alone (the same key with another source is 422). A key
+        belongs to the service principal that first used it; another principal gets 403. A call whose first
+        attempt is still running is 429 with Retry-After: 1. Generate one key per intent and keep it across
+        retries of that intent.
       schema: { type: string, minLength: 1, maxLength: 200, pattern: "^[A-Za-z0-9:_.-]+$" }
   responses:
     AllocationReserveRateLimited:
-      description: RATE_LIMITED on the ExternalAllocationWrite bucket; honor Retry-After, then repeat the call with the same X-Idempotency-Key and body.
+      description: >-
+        RATE_LIMITED: the ExternalAllocationWrite bucket is empty, or a call with the same X-Idempotency-Key is
+        still running (Retry-After: 1). Honor Retry-After, then repeat the call with the same key and body.
+        The X-RateLimit-* headers are present only when the bucket rejected the call.
       x-error-code: RATE_LIMITED
       x-http-status: 429
       x-retryable: true
       headers:
         Retry-After: { required: true, schema: { type: integer, minimum: 1 } }
-        X-RateLimit-Limit: { required: true, schema: { type: integer, const: 5 } }
-        X-RateLimit-Remaining: { required: true, schema: { type: integer, minimum: 0 } }
-        X-RateLimit-Reset: { required: true, schema: { type: integer, minimum: 1 } }
+        X-RateLimit-Limit: { required: false, schema: { type: integer, const: 5 } }
+        X-RateLimit-Remaining: { required: false, schema: { type: integer, minimum: 0 } }
+        X-RateLimit-Reset: { required: false, schema: { type: integer, minimum: 1 } }
       content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-reserve-error.schema.json#/$defs/RateLimited" } } }
     AllocationReleaseRateLimited:
-      description: RATE_LIMITED on the ExternalAllocationWrite bucket, shared with reserve; honor Retry-After, then repeat the call with the same X-Idempotency-Key and body.
+      description: >-
+        RATE_LIMITED: the ExternalAllocationWrite bucket (shared with reserve) is empty, or a call with the same
+        X-Idempotency-Key is still running (Retry-After: 1). Honor Retry-After, then repeat the call with the same
+        key and body. The X-RateLimit-* headers are present only when the bucket rejected the call.
       x-error-code: RATE_LIMITED
       x-http-status: 429
       x-retryable: true
       headers:
         Retry-After: { required: true, schema: { type: integer, minimum: 1 } }
-        X-RateLimit-Limit: { required: true, schema: { type: integer, const: 5 } }
-        X-RateLimit-Remaining: { required: true, schema: { type: integer, minimum: 0 } }
-        X-RateLimit-Reset: { required: true, schema: { type: integer, minimum: 1 } }
+        X-RateLimit-Limit: { required: false, schema: { type: integer, const: 5 } }
+        X-RateLimit-Remaining: { required: false, schema: { type: integer, minimum: 0 } }
+        X-RateLimit-Reset: { required: false, schema: { type: integer, minimum: 1 } }
       content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-allocation-release-error.schema.json#/$defs/RateLimited" } } }
     CursorInvalid:
       description: CURSOR_INVALID for malformed, tampered, or wrong-scope cursor.

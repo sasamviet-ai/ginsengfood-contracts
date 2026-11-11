@@ -16,7 +16,7 @@
       "source_object_type": "EXTERNAL_ORDER_ITEM",
       "source_object_id": "60000000-0000-4000-8000-000000000011",
       "source_object_no": "ORD-20260903-011/LINE-001",
-      "allocated_quantity": "5.000",
+      "allocated_quantity": "5",
       "status": "ISSUED",
       "requested_at": "2026-09-03T00:30:00Z",
       "confirmed_at": "2026-09-03T00:45:00Z"
@@ -37,6 +37,6 @@
     "manifest_algorithm": "SHA-256",
     "manifest_canonicalization": "JCS_RFC8785",
     "delta_supported": false,
-    "manifest_sha256": "2e5c6a04c615f9b636ea0899e95201720c27f14fb9411c20cbb6fc7be83af4c8"
+    "manifest_sha256": "51bc2dc27a27fc2134ce0c60168e6547b34420045e264fc505642048b76f7b15"
   }
 }

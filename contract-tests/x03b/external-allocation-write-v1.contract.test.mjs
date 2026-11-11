@@ -330,7 +330,7 @@ for (const accepted of ["m3:rsv:123456:1", "a".repeat(200), "A_b-c.d:e", "5d65e4
 for (const rejected of ["", "has space", "slash/key", "dấu-tiếng-việt", "key\n"]) {
   assert.ok(!keyRegex.test(rejected), `key should be rejected: ${JSON.stringify(rejected)}`);
 }
-assert.ok("a".repeat(201).length > 200, "201 characters is over the 200 limit");
+assert.equal(Number(keyParameter.match(/maxLength: (\d+)/)[1]), 200, "the 201st character is over the declared limit");
 
 // ---------------------------------------------------------------------------------------------------------
 // Payloads: examples + fixtures validate; tampered payloads do not.
@@ -628,6 +628,19 @@ function availabilityRequestShape(file) {
 const providerRequest = availabilityRequestShape("openapi/ops-core/availability-sellable.v1.yaml");
 const consumerRequest = availabilityRequestShape("openapi/business-platform/availability-consumer.v1.yaml");
 assert.deepEqual(consumerRequest, providerRequest, "availability-consumer request must mirror the provider request");
+function availabilityResponses(file) {
+  const block = extractMethodBlock(extractPathBlock(read(file), "/v1/availability/check"), "post");
+  return {
+    codes: [...block.matchAll(/^        "(\d{3})":/gm)].map(match => match[1]),
+    // The 200 body is envelope + data; the data schema is the last $ref of the response.
+    okSchema: [...extractInlineResponse(block, "200").matchAll(/\$ref: "(?:\.\.\/)+(schemas\/[^"]*\.schema\.json)"/g)].at(-1)?.[1]
+  };
+}
+const providerResponses = availabilityResponses("openapi/ops-core/availability-sellable.v1.yaml");
+const consumerResponses = availabilityResponses("openapi/business-platform/availability-consumer.v1.yaml");
+assert.equal(providerResponses.okSchema, "schemas/ops/sellable-status.schema.json", "provider 200 schema");
+assert.deepEqual(consumerResponses, providerResponses, "availability-consumer responses (status set and 200 schema) must mirror the provider");
+assert.ok(consumerResponses.codes.includes("429"), "availability-consumer declares 429");
 for (const removed of ["channel_context_id", "customer_id"]) {
   assert.ok(!consumerRequest.names.includes(removed), `${removed} is not a provider field`);
 }
@@ -639,5 +652,76 @@ assert.ok(["hộp", "thùng", "lọ", "hũ"].includes(availabilityExample.uom_co
 assert.equal(availabilityExample.requested_quantity.unit, availabilityExample.uom_code, "unit must equal uom_code when both are sent");
 assert.equal(typeof availabilityExample.requested_quantity.value, "string", "quantity value is a decimal string");
 assert.ok(!Object.hasOwn(availabilityExample, "data") && !Object.hasOwn(availabilityExample, "schemaVersion"), "request body is bare, not enveloped");
+
+// ---------------------------------------------------------------------------------------------------------
+// Semantics that live in prose: pin them so a later edit cannot silently reverse them.
+// ---------------------------------------------------------------------------------------------------------
+const collapse = text => text.replace(/\s+/g, " ");
+const reserveBlock = extractMethodBlock(extractPathBlock(inventoryText, "/v1/inventory/allocations"), "post");
+const releaseBlock = extractMethodBlock(extractPathBlock(inventoryText, "/v1/inventory/allocations/release"), "post");
+
+const reserve409 = collapse(extractInlineResponse(reserveBlock, "409"));
+assert.match(reserve409, /INSUFFICIENT_STOCK is one code for five causes/);
+assert.match(reserve409, /different warehouse, unit or quantity/);
+assert.match(reserve409, /held by another service principal/);
+assert.match(reserve409, /ALLOCATION_CONFLICT means the hold recorded for this idempotency key is no longer held \(it expired, or the warehouse or the consumer's own releaseInventoryAllocationV1 released it/);
+assert.match(reserve409, /or the source was already ISSUED by the warehouse/);
+assert.doesNotMatch(reserve409, /ALLOCATION_CONFLICT when the same source/, "a different scope is INSUFFICIENT_STOCK, never ALLOCATION_CONFLICT");
+
+const release409 = collapse(extractInlineResponse(releaseBlock, "409"));
+assert.doesNotMatch(release409, /still running|in progress/, "an in-flight call is a 429, not a 409");
+assert.match(release409, /changed while the release was being processed; the code is the same for both/);
+
+for (const [name, block] of [["reserve", reserveBlock], ["release", releaseBlock]]) {
+  assert.match(collapse(block), /still running is 429 with Retry-After: 1/, `${name}: an in-flight call with the same key is 429`);
+  assert.match(collapse(block), /another principal gets 403/, `${name}: a key belongs to its first principal`);
+  assert.match(collapse(extractInlineResponse(block, "403")), /first used by another service principal/, `${name}: 403 cause`);
+}
+assert.match(collapse(reserveBlock), /idempotency scope of this operation is the source: a key sent for a different source is a new command/);
+assert.match(collapse(reserveBlock), /includes expires_at, so a retry must resend the original expires_at unchanged/);
+assert.match(collapse(reserveBlock), /ALREADY_RESERVED when the existing hold is this principal's own: it creates nothing and never extends the hold/);
+assert.match(collapse(extractInlineResponse(reserveBlock, "422")), /already used for the same source with a different request body/);
+assert.match(collapse(releaseBlock), /scope of this operation is the key alone, not the source: a key reused for a different source is 422/);
+assert.match(collapse(extractInlineResponse(releaseBlock, "422")), /reused for a different source/);
+assert.match(collapse(keyParameter), /for reserve the scope is the source/);
+assert.match(collapse(keyParameter), /for release the scope is the key alone/);
+
+for (const component of ["AllocationReserveRateLimited", "AllocationReleaseRateLimited"]) {
+  const block = extractComponentBlock(inventoryText, "responses", component);
+  assert.match(block, /Retry-After: \{ required: true, schema: \{ type: integer, minimum: 1 \} \}/);
+  for (const header of ["X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"]) {
+    assert.match(block, new RegExp(`${header}: \\{ required: false`), `${component} ${header} is optional`);
+  }
+  assert.match(collapse(block), /same X-Idempotency-Key is still running \(Retry-After: 1\)/, `${component} covers the in-flight case`);
+}
+
+const listDescription = collapse(extractMethodBlock(extractPathBlock(inventoryText, "/v1/inventory/allocations"), "get"));
+assert.match(listDescription, /lists only allocations created by the calling service principal/);
+assert.match(listDescription, /compare quantities as decimals, never as strings/);
+assert.match(parseJson(allocationListSchema).description, /created by the calling service principal/);
+assert.match(parseJson(allocationListSchema).properties.allocated_quantity.description, /Compare as decimals/);
+assert.match(parseJson("schemas/ops/x03b/external-allocation-reserve-line.schema.json").properties.status.description, /not emitted on this route/);
+const releaseErrorComment = parseJson(releaseErrorSchema)["$comment"];
+assert.match(releaseErrorComment, /429 with Retry-After: 1, not 409/);
+assert.match(releaseErrorComment, /except the 422 caused by the X-Idempotency-Key header/);
+assert.doesNotMatch(releaseErrorComment, /still in progress/);
+
+const errorCatalog = read("error-codes/external-allocation-errors.yaml");
+assert.match(errorCatalog, /One code for five causes/);
+assert.match(errorCatalog, /released by the warehouse or by the consumer's own releaseInventoryAllocationV1/);
+assert.doesNotMatch(errorCatalog, /still in progress/);
+assert.match(statusEnumText, /The real gate is on the consumer side/);
+assert.doesNotMatch(statusEnumText, /before the provider emits ISSUED/, "the contract cannot promise the provider will hold ISSUED back");
+assert.match(collapse(notes), /five causes: short stock/);
+assert.match(collapse(notes), /compare quantities as decimals/);
+assert.match(collapse(notes), /\| either \| `429` `RATE_LIMITED` \| [^|]*or a call with the same key is still running/);
+assert.doesNotMatch(collapse(notes), /allocation changed mid-call, or the first attempt/);
+
+assert.match(unreleased, /#### Provider behavior coming with ops-core WP07b phase A \(NOT live yet\)/);
+for (const marker of ["(a) A hold of another principal", "(b) `GET /v1/inventory/allocations` lists only", "(c) A call whose first attempt", "(d) Reserve: the same key reused with a different body"]) {
+  assert.ok(unreleased.includes(marker), `CHANGELOG must record the coming provider change: ${marker}`);
+}
+assert.doesNotMatch(unreleased, /A key accepted before is still accepted/);
+assert.doesNotMatch(unreleased, /does not emit `ISSUED` or enable the release route/);
 
 console.log(`X03B allocation write-surface contract PASS: ${operations.length}/2 operations, ${reserveResponseFiles.length + releaseResponseFiles.length} response payloads, ${releaseErrorCases.length} release error envelopes, ${vectors.length} UUIDv5 vectors, 13 webhook event types, and negative tamper checks.`);

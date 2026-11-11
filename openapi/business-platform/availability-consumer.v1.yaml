@@ -13,7 +13,7 @@ paths:
     post:
       summary: Check product availability
       description: >-
-        Requests an availability check and returns the business-platform availability-check contract.
+        Requests an availability check and returns the provider sellable status of checkAvailabilityV1.
         The operation must not mutate ops-core inventory, sellable status, recall, sale lock, or trace truth.
         The request body is the provider body of checkAvailabilityV1 (openapi/ops-core/availability-sellable.v1.yaml),
         field for field: a bare JSON object, not wrapped in the common envelope.
@@ -27,7 +27,7 @@ paths:
               $ref: "#/components/schemas/AvailabilityCheckRequest"
       responses:
         "200":
-          description: Availability check wrapped in the common envelope.
+          description: Sellable status wrapped in the common envelope, the same body as the provider operation.
           content:
             application/json:
               schema:
@@ -36,13 +36,14 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: "../../schemas/commerce/availability-check.schema.json"
+                        $ref: "../../schemas/ops/sellable-status.schema.json"
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "422": { $ref: "#/components/responses/UnprocessableEntity" }
+        "429": { $ref: "#/components/responses/RateLimited" }
         "500": { $ref: "#/components/responses/InternalServerError" }
 components:
   schemas:
@@ -92,4 +93,18 @@ components:
     NotFound: { description: Resource not found., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    RateLimited:
+      description: RATE_LIMITED; caller must honor Retry-After and the operation retry budget.
+      x-error-code: RATE_LIMITED
+      x-http-status: 429
+      x-retryable: true
+      headers:
+        Retry-After:
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
     InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }

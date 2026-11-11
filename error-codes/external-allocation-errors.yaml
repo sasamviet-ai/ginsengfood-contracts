@@ -1,7 +1,7 @@
 version: v1
 namespace: EXTERNAL_ALLOCATION
 title: External Allocation Write Errors
-description: Error codes of the external allocation write surface (POST /v1/inventory/allocations and POST /v1/inventory/allocations/release). On the wire these are plain tokens in a closed per-operation enum (schemas/ops/x03b/external-allocation-reserve-error.schema.json and external-allocation-release-error.schema.json), not namespaced strings; the namespace only groups this catalog. Codes shared with the read surface (INVALID_REQUEST, UNAUTHORIZED, FORBIDDEN, NOT_FOUND, VALIDATION_FAILED, RATE_LIMITED, REQUEST_TIMEOUT, SERVICE_UNAVAILABLE, INTERNAL_ERROR) keep their standard meaning and are not repeated here.
+description: Error codes of the external allocation write surface (POST /v1/inventory/allocations and POST /v1/inventory/allocations/release). On the wire these are plain tokens in a closed per-operation enum (schemas/ops/x03b/external-allocation-reserve-error.schema.json and external-allocation-release-error.schema.json), not namespaced strings; the namespace only groups this catalog. Codes shared with the read surface (INVALID_REQUEST, UNAUTHORIZED, FORBIDDEN, NOT_FOUND, VALIDATION_FAILED, RATE_LIMITED, REQUEST_TIMEOUT, SERVICE_UNAVAILABLE, INTERNAL_ERROR) keep their standard meaning and are not repeated here, with these write-surface specifics - RATE_LIMITED (429) also answers a call whose first attempt with the same X-Idempotency-Key is still running (Retry-After of 1 second); VALIDATION_FAILED (422) also answers an X-Idempotency-Key reused with a different request body for the same source on reserve, or for a different source on release; FORBIDDEN (403) also answers a key first used by another service principal.
 source_documents:
   - docs/source-map.md
 codes:
@@ -9,13 +9,13 @@ codes:
     httpStatus: 409
     operations: [reserveInventoryAllocationV1]
     message: The requested stock could not be held.
-    description: Reserve only. One code for four causes that the provider deliberately does not disclose - stock really short, lots with stock but blocked (sale lock, recall, quality hold, batch not released), the same source already holding a different warehouse, unit or quantity, or more than 20 lots needed. It is not "out of stock"; call POST /v1/availability/check for the reason.
+    description: Reserve only. One code for five causes that the provider deliberately does not disclose - stock really short, lots with stock but blocked (sale lock, recall, quality hold, batch not released), the same source already holding a different warehouse, unit or quantity, the source held by another service principal, or more than 20 lots needed. It is not "out of stock"; call POST /v1/availability/check for the reason.
     retryable: false
   - code: ALLOCATION_CONFLICT
     httpStatus: 409
     operations: [reserveInventoryAllocationV1, releaseInventoryAllocationV1]
     message: Fixed per cause; the text differs, the code does not.
-    description: Reserve - the hold recorded for this idempotency key is no longer held (expired and released), or the source was already ISSUED by the warehouse. Release - the warehouse already CONFIRMED or ISSUED stock of the source and nothing was released; or the allocation changed while the release was processed; or a release with the same X-Idempotency-Key is still in progress. Do not parse the message. Read GET /v1/inventory/allocations?sourceObjectId= once to learn the state; an ISSUED row means stop.
+    description: Reserve - the hold recorded for this idempotency key is no longer held (expired, or released by the warehouse or by the consumer's own releaseInventoryAllocationV1), or the source was already ISSUED by the warehouse. Release - the warehouse already CONFIRMED or ISSUED stock of the source and nothing was released; or the allocation changed while the release was processed. Do not parse the message. Read GET /v1/inventory/allocations?sourceObjectId= once to learn the state; an ISSUED row means stop.
     retryable: false
   - code: ALLOCATION_NOT_HELD
     httpStatus: 409

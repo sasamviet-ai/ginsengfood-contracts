@@ -31,26 +31,30 @@ source_object_id = UUIDv5(ORDER_SOURCE_NAMESPACE_UUID, "order:" + orderId)
 
 ## 2. Calling the two commands
 
-Example key shapes (not part of the contract): `m3:rsv:<orderId>:<n>` for hold and `m3:rel:<orderId>:<n>`. The contract fixes only the charset and length of `X-Idempotency-Key`: 1 to 200 characters of letters, digits and `: - _ .`. One key per intent; reuse the same key (and the same body) for every retry of that intent, never a new key for the same intent, because a new key for the same source can hold twice.
+Example key shapes (not part of the contract): `m3:rsv:<orderId>:<n>` for hold and `m3:rel:<orderId>:<n>`. The contract fixes only the charset and length of `X-Idempotency-Key`: 1 to 200 characters of letters, digits and `: - _ .`. One key per intent; reuse the same key (and the same body) for every retry of that intent, never a new key for the same intent, because a new key for the same source can hold twice. A key belongs to the service principal that first used it (another principal gets `403`). The scope differs by command: for reserve it is the source (the same key with another source is a new command; the same key and source with a different body is `422`, and the body fingerprint includes `expires_at`, so a retry must resend the original `expires_at` unchanged); for release it is the key alone (the same key with another source is `422`). A repeat reserve with a new key never extends a hold: the lines keep their original `expires_at`.
 
 | Call | Answer | Meaning | What the consumer does |
 | --- | --- | --- | --- |
 | reserve | `201` `RESERVED` | New hold created | Store `allocation_id` of each line. |
-| reserve | `200` `ALREADY_RESERVED` | An equivalent hold already exists; nothing created | Same as `201`. |
-| reserve | `409` `INSUFFICIENT_STOCK` | One code for four causes: short stock, lots blocked, different scope held for this source, more than 20 lots | Do not show "out of stock"; call `POST /v1/availability/check` for the reason. |
-| reserve | `409` `ALLOCATION_CONFLICT` | The hold of this key is no longer held (expired), or the source was already `ISSUED` | Read `GET /v1/inventory/allocations?sourceObjectId=` once. An `ISSUED` row: stop, never reserve it again. No holding row: the hold expired, send a new key if the order is still live. |
+| reserve | `200` `ALREADY_RESERVED` | An equivalent hold of this principal already exists; nothing created, nothing extended | Same as `201`. |
+| reserve | `409` `INSUFFICIENT_STOCK` | One code for five causes: short stock, lots blocked, different scope held for this source, source held by another principal, more than 20 lots | Do not show "out of stock"; call `POST /v1/availability/check` for the reason. |
+| reserve | `409` `ALLOCATION_CONFLICT` | The hold of this key is no longer held (expired, or released by the warehouse or by your own release call), or the source was already `ISSUED` | Read `GET /v1/inventory/allocations?sourceObjectId=` once. An `ISSUED` row: stop, never reserve it again. No holding row: the hold ended (expired, or released by the warehouse or by your own release call), send a new key if the order is still live. |
 | release | `200` `RELEASED` | Every RESERVED line of this principal for the source was released | Order is free of the hold. A replay with the same key returns the same body. |
 | release | `409` `ALLOCATION_NOT_HELD` | Already released, or expired and waiting for the expiry worker | Treat as success: nothing is held. |
-| release | `409` `ALLOCATION_CONFLICT` | The warehouse already confirmed or issued stock of the source (nothing released), or the allocation changed mid-call, or the first attempt with this key is still running | Do not loop. Read `GET /v1/inventory/allocations?sourceObjectId=` once; `CONFIRMED` or `ISSUED` means the warehouse owns it, contact the warehouse. |
+| release | `409` `ALLOCATION_CONFLICT` | The warehouse already confirmed or issued stock of the source (nothing released), or the allocation changed mid-call | Do not loop. Read `GET /v1/inventory/allocations?sourceObjectId=` once; `CONFIRMED` or `ISSUED` means the warehouse owns it, contact the warehouse. |
 | release | `404` `NOT_FOUND` | This principal holds nothing for the source (an unknown source and another principal's source look the same) | Treat as nothing to release; check the id derivation if unexpected. |
-| either | `422` `VALIDATION_FAILED` | Bad or missing key, key reused for another source, bad body field; `details[]` names it | Fix the request; do not retry unchanged. |
-| either | `429` `RATE_LIMITED` | `ExternalAllocationWrite` bucket (5 per second, burst 10) is empty | Wait `Retry-After`, repeat with the same key and body. |
+| reserve | `422` `VALIDATION_FAILED` | Bad, missing or over-long key; the key already used for this source with a different body (`expires_at` included); bad body field; `details[]` names it | Fix the request; do not retry unchanged. |
+| release | `422` `VALIDATION_FAILED` | Bad, missing or over-long key; the key already used for a different source; bad body field; `details[]` names it | Fix the request; do not retry unchanged. |
+| either | `403` `FORBIDDEN` | Missing permission or audience, a token without subject, or a key first used by another service principal | Do not retry; check the credentials and that keys are never shared between principals. |
+| either | `429` `RATE_LIMITED` | The `ExternalAllocationWrite` bucket (5 per second, burst 10) is empty, or a call with the same key is still running (`Retry-After: 1`) | Wait `Retry-After`, repeat with the same key and body. |
 
 The consumer cannot confirm or issue an allocation, and cannot release a `CONFIRMED` one.
 
 ## 3. Status values the consumer must tolerate
 
 `GET /v1/inventory/allocations` returns `status` in `RESERVED`, `CONFIRMED`, `ISSUED`, `RELEASED`. `ISSUED` is new, so a parser written against the three-value schema from 2026-09-21 must accept it and, in general, any value it does not know, without mapping it to another status. `ISSUED` adds no field: the row looks like a `CONFIRMED` one. Expiry, warehouse release and consumer self-release all read `RELEASED`.
+
+The snapshot lists only allocations created by the calling service principal; rows of another principal are not visible. `allocated_quantity` is written without trailing zeros there (`"5"`), while reserve and release lines always carry three decimals (`"5.000"`): compare quantities as decimals, never as strings between the two.
 
 ## 4. Webhooks are a hint, not the source of truth
 

@@ -37,5 +37,5 @@ An allocation is one hold of finished-goods stock on one warehouse lot. One rese
 - Expiry is not distinguishable from an operator release or a consumer self-release through `status` alone; all three read RELEASED.
 - A RESERVED line whose `expires_at` has passed but which the expiry worker has not swept yet cannot be released by the consumer (`409 ALLOCATION_NOT_HELD`); the worker releases it.
 - ISSUED adds no field to `external-inventory-allocation.schema.json`: a consumer reading an ISSUED row sees the same fields as before, with `confirmed_at` set.
-- A consumer that receives `ALLOCATION_CONFLICT` from reserve cannot tell "hold expired" from "already issued" by code: it reads `GET /v1/inventory/allocations?sourceObjectId=` once. An `ISSUED` row means stop; no row in a holding state means the hold expired.
+- A consumer that receives `ALLOCATION_CONFLICT` from reserve cannot tell "hold ended" from "already issued" by code: it reads `GET /v1/inventory/allocations?sourceObjectId=` once. An `ISSUED` row means stop; no row in a holding state means the hold ended (expired, or released by the warehouse or by the consumer's own release call).
 - Consumers must tolerate an unknown status value (see `enums/ops/inventory-allocation-status.yaml`).
