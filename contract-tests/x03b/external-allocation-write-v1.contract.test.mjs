@@ -608,6 +608,14 @@ const unreleased = changelog.slice(changelog.indexOf("## Unreleased"));
 for (const token of ["releaseInventoryAllocationV1", "ISSUED", "ALLOCATION_NOT_HELD", "additive, coordinated", "ExternalAllocationWrite", "X-Idempotency-Key", "UUIDv5"]) {
   assert.ok(unreleased.includes(token), `CHANGELOG Unreleased must mention ${token}`);
 }
+// SEC-14: the quota refusals and the hold window are documented with their stable reasons.
+const inventoryOpenApiText = read(inventoryFile);
+for (const reason of ["HOLD_LIMIT_REACHED", "HOLD_SHARE_LIMIT_REACHED", "REQUESTED_QUANTITY_LIMIT_EXCEEDED", "EXPIRES_AT_LIMIT_EXCEEDED", "SOURCE_OBJECT_ID_REQUIRED"]) {
+  assert.ok(inventoryOpenApiText.includes(reason), `inventory openapi must document ${reason}`);
+  assert.ok(unreleased.includes(reason), `CHANGELOG Unreleased must mention ${reason}`);
+}
+assert.match(parseJson(reserveRequestSchema).properties.expires_at.description, /60 minutes by default/, "expires_at must state the default maximum hold window");
+assert.doesNotMatch(parseJson(reserveRequestSchema).properties.expires_at.description, /at most 24 hours after it/, "expires_at must no longer present 24 hours as the working limit");
 const matrix = read("compatibility/consumer-compatibility-matrix.md");
 assert.match(matrix, /reserveInventoryAllocationV1/);
 assert.match(matrix, /releaseInventoryAllocationV1/);

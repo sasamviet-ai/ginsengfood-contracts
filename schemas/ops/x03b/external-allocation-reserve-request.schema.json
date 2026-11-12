@@ -46,7 +46,7 @@
       "type": "string",
       "format": "date-time",
       "pattern": "Z$",
-      "description": "Optional UTC hold expiry. Must be after trusted server time and at most 24 hours after it; a later value is rejected with 422 VALIDATION_FAILED. Omission defaults the hold to 30 minutes after the request is received. Once the expiry passes, the provider releases the hold on its own: the allocation moves to RELEASED, the held quantity returns to the lot's available quantity, and no goods movement is recorded. Set by OD-ALLOC-LIFECYCLE-01 (2026-09-07), which replaced the earlier statement that omission holds until warehouse operations confirm or release. Expiry is not distinguishable from an operator release through status alone - both read RELEASED."
+      "description": "Optional UTC hold expiry. Must be after trusted server time and no later than the provider's maximum hold window after it (provider configuration, 60 minutes by default, never more than the 24-hour contract ceiling); a later value is rejected with 422 VALIDATION_FAILED (details[].reason EXPIRES_AT_LIMIT_EXCEEDED). Omission defaults the hold to 30 minutes after the request is received. Once the expiry passes, the provider releases the hold on its own: the allocation moves to RELEASED, the held quantity returns to the lot's available quantity, and no goods movement is recorded. Set by OD-ALLOC-LIFECYCLE-01 (2026-09-07), which replaced the earlier statement that omission holds until warehouse operations confirm or release. Expiry is not distinguishable from an operator release through status alone - both read RELEASED."
     }
   },
   "required": [

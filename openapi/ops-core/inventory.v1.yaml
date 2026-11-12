@@ -363,6 +363,10 @@ paths:
             synthesized identifier. A filtered read is still a complete snapshot of that filter, and the
             cursor is bound to it: dropping or changing the filter mid-pagination returns CURSOR_INVALID.
             A syntactically invalid or nil UUID returns VALIDATION_FAILED, never a silently unfiltered page.
+            Consumers must always send it: only allocations created by the calling principal are ever
+            returned, so an unfiltered read has no consumer use case, and a later contract revision makes the
+            parameter required (a request without it then answers 422 VALIDATION_FAILED with
+            details[0] = { field: "sourceObjectId", reason: "SOURCE_OBJECT_ID_REQUIRED" }).
           schema: { type: string, format: uuid }
       responses:
         "200":
@@ -518,6 +522,13 @@ paths:
             ALLOCATION_CONFLICT causes apart, read GET /v1/inventory/allocations?sourceObjectId= once: an
             ISSUED row of your own means stop. Temporary contention is never reported as INSUFFICIENT_STOCK or
             ALLOCATION_CONFLICT; it is 429 RATE_LIMITED.
+            ALLOCATION_CONFLICT is also returned when the service principal has reached one of its
+            configured reservation limits; error.details[0].reason is then HOLD_LIMIT_REACHED (number of
+            active holds; one hold = one source_object_id) or HOLD_SHARE_LIMIT_REACHED (share of the SKU's
+            physical on-hand stock the principal may hold at once). These are quota refusals, not shortages:
+            stock may be intact. Nothing is reserved and the X-Idempotency-Key is not consumed, so the same
+            request may be sent again with the same key after the principal has released holds or holds have
+            expired. The limits themselves are provider configuration agreed out of band and are never echoed.
           x-error-code: INSUFFICIENT_STOCK
           x-http-status: 409
           x-retryable: false
@@ -531,7 +542,9 @@ paths:
           description: >-
             VALIDATION_FAILED for a missing, malformed or over-long X-Idempotency-Key, or one already used for
             the same source with a different request body (details[].field is the header name), a malformed
-            quantity, or a non-conforming UOM code.
+            quantity, a non-conforming UOM code, requested_quantity above the per-request limit
+            (details[].reason REQUESTED_QUANTITY_LIMIT_EXCEEDED), or expires_at later than the maximum hold
+            window (details[].reason EXPIRES_AT_LIMIT_EXCEEDED).
           x-error-code: VALIDATION_FAILED
           x-http-status: 422
           x-retryable: false

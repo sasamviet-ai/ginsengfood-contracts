@@ -4,6 +4,10 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ## Unreleased
 
+### Reserve: per-principal quota refusals and the hold window (SEC-14)
+
+Additive documentation of behaviour the provider now has; no new `error.code`, the closed enum of `external-allocation-reserve-error.schema.json` is unchanged. `reserveInventoryAllocationV1`: quota refusals are `409 ALLOCATION_CONFLICT` with `error.details[0].reason` of `HOLD_LIMIT_REACHED` (active holds of the principal) or `HOLD_SHARE_LIMIT_REACHED` (share of the SKU on-hand stock), not shortages, nothing is reserved and the same key may be retried after holds are released or expire. Limit validation is `422 VALIDATION_FAILED` with `details[].reason` of `REQUESTED_QUANTITY_LIMIT_EXCEEDED` or `EXPIRES_AT_LIMIT_EXCEEDED`. The maximum `expires_at` window is provider configuration, 60 minutes by default (the 24-hour ceiling is unchanged); omission still means 30 minutes. `listInventoryAllocationsV1`: consumers must always send `sourceObjectId`; a later revision makes it required (`422` reason `SOURCE_OBJECT_ID_REQUIRED`), switched on by a provider flag after this contract is published and the pin has moved.
+
 ### Reserve request: source_object_no allows 200 characters (SEC-07b)
 
 `source_object_no` in `external-allocation-reserve-request.schema.json` goes from `maxLength: 100` to `maxLength: 200`, matching what ops-core validates since SEC-07 (longer values answer 422). This only widens what a consumer may send; it is still a display and reconciliation reference, never an identity key.
