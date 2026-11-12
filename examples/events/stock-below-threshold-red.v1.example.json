@@ -1,0 +1,22 @@
+{
+  "eventId": "evt-stock-below-threshold-20261112-002",
+  "eventType": "ops-core.inventory.stock-below-threshold.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-11-12T12:40:00+07:00",
+  "source": "ops-core",
+  "correlationId": "corr-stock-alert-20261112-003",
+  "causationId": "stock-alert-20261112-003",
+  "idempotencyKey": "stock-alert-eval-20261112-003:ops-core.inventory.stock-below-threshold.v1",
+  "data": {
+    "stock_alert_id": "stock-alert-20261112-003",
+    "sku_id": "sku-gf-rice-001",
+    "warehouse_id": "warehouse-main-001",
+    "status": "STOCK_RED_ALERT",
+    "available_stock": { "value": "45", "unit": "hộp" },
+    "red_threshold": { "value": "50", "unit": "hộp" },
+    "stock_ok_reference_quantity": { "value": "300", "unit": "hộp" },
+    "zero_stock_threshold": { "value": "0", "unit": "hộp" },
+    "alert_reason": "Available stock is at or below red threshold.",
+    "source_ledger_entry_id": "ledger-20261112-0071"
+  }
+}

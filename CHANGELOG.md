@@ -19,6 +19,7 @@ Prepared on top of the pin `a7832a49` for the business-platform (M3) review, nex
 
 - `events/ops-core/inventory/stock-below-threshold.v1.json` and `stockout-risk-detected.v1.json` validate `data` with `stock-alert-webhook.schema.json` instead of `stock-alert.schema.json`. The `required` lists are unchanged.
 - `events/ops-core/recall/sale-lock-activated.v1.json`, `stop-sale-required.v1.json` and `sale-lock-released.v1.json`: `data.reason` has `maxLength: 200`. The reason is operator-typed text; on the webhook the sender normalises it (control and invisible formatting characters replaced by one space, white space collapsed, trimmed, cut at 200 characters, `UNSPECIFIED` when nothing printable is left). It is not a code. The full text stays on the REST sale-lock read.
+- `schemas/ops/stock-alert-webhook.schema.json` names the crossed threshold after the status: `STOCK_YELLOW_ALERT` requires `yellow_threshold` and forbids `red_threshold`, `STOCK_RED_ALERT` requires `red_threshold` and forbids `yellow_threshold`. Both properties were already declared by `stock-alert.schema.json`, so no new property appears. A second example, `examples/events/stock-below-threshold-red.v1.example.json`, shows the red case.
 - `docs/webhook-transport.md`: section 4 is the short form of the security profile; the answers table adds `401`, `413` and `3xx`; the key-version row points to the profile. No header, signature or event type changed.
 
 #### Provider behavior coming with ops-core SEC-12 / SEC-13 (NOT live yet)
@@ -29,7 +30,8 @@ This describes the provider after the ops-core change of 12/11/2026, not the pro
 - (b) The sale-lock `reason` is normalised and capped at 200 characters as described above.
 - (c) A body above 65 536 bytes is not sent and goes to dead-letter.
 - (d) The provider's webhook client does not follow redirects (`AllowAutoRedirect` off): a `3xx` is a failed attempt.
-- (e) Outside development the provider refuses to start when the key-version label does not match the grammar; the deployment configures the webhook key version on its own variable, not the one shared by the other four secrets.
+- (e) Outside development the provider refuses to start when the key-version label does not match the grammar; the deployment configures the webhook key version on its own variable (it falls back to the version shared with the other four secrets while unset).
+- (f) `stock-below-threshold` names the crossed threshold after the status. Today the provider sends the red value under `yellow_threshold` for a `STOCK_RED_ALERT` and never sends `red_threshold`; from this change a red alert carries `red_threshold` and a yellow one `yellow_threshold`, never both. Events already queued in the provider's outbox are corrected when they are sent.
 
 ### Allocation write surface: self-release and `ISSUED` (additive, coordinated)
 

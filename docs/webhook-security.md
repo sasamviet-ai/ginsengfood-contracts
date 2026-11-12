@@ -106,8 +106,10 @@ The provider builds `data` from an explicit list of keys per event type. A key t
 | Event | `data` keys sent (optional keys are absent when they have no value, never `null`) | Schema |
 | --- | --- | --- |
 | `ops-core.inventory.inventory-available-changed.v1` | `stock_balance_id`, `sku_id`, `available_quantity`, `last_ledger_entry_id` | `schemas/ops/stock-balance.schema.json` |
-| `ops-core.inventory.stock-below-threshold.v1` | `stock_alert_id`, `sku_id`, `warehouse_id`, `warehouse_location_id` (optional), `status`, `available_stock`, `yellow_threshold`, `stock_ok_reference_quantity` (optional), `zero_stock_threshold`, `alert_reason`, `source_stock_balance_id` (optional), `source_ledger_entry_id` (optional), `demand_id` (optional) | `schemas/ops/stock-alert-webhook.schema.json` |
-| `ops-core.inventory.stockout-risk-detected.v1` | the same as `stock-below-threshold`, with `stockout_risk_threshold` in place of `yellow_threshold` | `schemas/ops/stock-alert-webhook.schema.json` |
+| `ops-core.inventory.stock-below-threshold.v1` | `stock_alert_id`, `sku_id`, `warehouse_id`, `warehouse_location_id` (optional), `status`, `available_stock`, `yellow_threshold` or `red_threshold`, `stock_ok_reference_quantity` (optional), `zero_stock_threshold`, `alert_reason`, `source_stock_balance_id` (optional), `source_ledger_entry_id` (optional), `demand_id` (optional) | `schemas/ops/stock-alert-webhook.schema.json` |
+| `ops-core.inventory.stockout-risk-detected.v1` | the same as `stock-below-threshold`, with `stockout_risk_threshold` in place of `yellow_threshold` or `red_threshold` | `schemas/ops/stock-alert-webhook.schema.json` |
+
+The threshold of `stock-below-threshold` is named after the status: `STOCK_YELLOW_ALERT` carries `yellow_threshold`, `STOCK_RED_ALERT` carries `red_threshold`, exactly one of the two, and its value is the threshold that was crossed. `stockout-risk-detected` carries `stockout_risk_threshold` only.
 
 Never sent on a webhook, because they describe production planning or internal detail and the receiver pulls what it is entitled to: `risk_calculation`, `lead_time_days`, `coverage_days`, `recommended_action`, `guard_block_reasons`, `evidence_refs` and `available_stock_breakdown`. `stock-alert-webhook.schema.json` is closed (`additionalProperties: false`), so a message carrying one of them is invalid. The domain schema `stock-alert.schema.json` and the REST read of stock alerts are not narrowed.
 

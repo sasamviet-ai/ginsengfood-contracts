@@ -47,6 +47,15 @@ function validateSchema(schema, value, schemaFile, location = "$") {
     }
     if (conditionMet && schema.then) validateSchema(schema.then, value, schemaFile, location);
   }
+  if (schema.not) {
+    let matchesNot = true;
+    try {
+      validateSchema(schema.not, value, schemaFile, location);
+    } catch {
+      matchesNot = false;
+    }
+    assert.ok(!matchesNot, `${location} must not match the "not" schema`);
+  }
   if (schema.const !== undefined) assert.deepEqual(value, schema.const, `${location} must equal const`);
   if (schema.enum) assert.ok(schema.enum.includes(value), `${location} must be in enum`);
   if (schema.type) {
@@ -214,17 +223,30 @@ const documented = Object.fromEntries(inventoryRows.map(row => [row[0].replaceAl
 const keysOf = cell => backticked(cell).filter(token => /^[a-z_]+$/.test(token));
 const availableKeys = keysOf(documented["ops-core.inventory.inventory-available-changed.v1"][1]);
 const belowKeys = keysOf(documented["ops-core.inventory.stock-below-threshold.v1"][1]);
-assert.match(documented["ops-core.inventory.stockout-risk-detected.v1"][1], /the same as `stock-below-threshold`, with `stockout_risk_threshold` in place of `yellow_threshold`/);
-const stockoutKeys = [...belowKeys.filter(key => key !== "yellow_threshold"), "stockout_risk_threshold"];
+assert.match(documented["ops-core.inventory.stockout-risk-detected.v1"][1], /the same as `stock-below-threshold`, with `stockout_risk_threshold` in place of `yellow_threshold` or `red_threshold`/);
+assert.ok(belowKeys.includes("yellow_threshold") && belowKeys.includes("red_threshold"), "stock-below-threshold documents both threshold names");
+const stockoutKeys = [...belowKeys.filter(key => key !== "yellow_threshold" && key !== "red_threshold"), "stockout_risk_threshold"];
 assert.deepEqual([...availableKeys].sort(), ["available_quantity", "last_ledger_entry_id", "sku_id", "stock_balance_id"]);
 for (const key of availableKeys) assert.ok(Object.hasOwn(balanceSchema.properties, key), `${key} exists in the stock-balance schema`);
 for (const key of [...belowKeys, ...stockoutKeys]) assert.ok(Object.hasOwn(webhookSchema.properties, key), `${key} exists in the webhook projection`);
 for (const key of [...belowKeys, ...stockoutKeys, ...availableKeys]) assert.ok(!neverSent.includes(key), `${key} is documented as sent and as never sent`);
 assert.deepEqual(
-  [...new Set([...belowKeys, ...stockoutKeys, "red_threshold"])].sort(),
+  [...new Set([...belowKeys, ...stockoutKeys])].sort(),
   Object.keys(webhookSchema.properties).sort(),
-  "documented alert keys plus red_threshold are exactly the projection (red_threshold is declared, not sent today)"
+  "documented alert keys are exactly the projection"
 );
+const thresholdProse = section(security, 8).replace(/\s+/g, " ");
+assert.match(thresholdProse, /`STOCK_YELLOW_ALERT` carries `yellow_threshold`, `STOCK_RED_ALERT` carries `red_threshold`, exactly one of the two/, "threshold is named after the status");
+assert.deepEqual(
+  webhookSchema.allOf,
+  [
+    { if: { properties: { status: { const: "STOCK_RED_ALERT" } }, required: ["status"] }, then: { required: ["red_threshold"], not: { required: ["yellow_threshold"] } } },
+    { if: { properties: { status: { const: "STOCK_YELLOW_ALERT" } }, required: ["status"] }, then: { required: ["yellow_threshold"], not: { required: ["red_threshold"] } } }
+  ],
+  "the closed projection ties the threshold name to the status"
+);
+const statusValues = read("enums/ops/stock-alert-status.yaml");
+for (const status of ["STOCK_YELLOW_ALERT", "STOCK_RED_ALERT"]) assert.ok(statusValues.includes(`value: ${status}`), `${status} is a published status`);
 assert.deepEqual(backticked(section(security, 8).match(/Never sent on a webhook[^\n]*/)[0]).filter(token => /^[a-z_]+$/.test(token)).sort(), [...neverSent].sort(), "never-sent list in the prose");
 
 for (const [eventFile, expectedRequired] of [
@@ -239,6 +261,7 @@ for (const [eventFile, expectedRequired] of [
 // Examples validate, carry none of the seven fields, and each tamper is rejected.
 for (const [exampleFile, eventFile] of [
   ["examples/events/stock-below-threshold.v1.example.json", "events/ops-core/inventory/stock-below-threshold.v1.json"],
+  ["examples/events/stock-below-threshold-red.v1.example.json", "events/ops-core/inventory/stock-below-threshold.v1.json"],
   ["examples/events/stockout-risk-detected.v1.example.json", "events/ops-core/inventory/stockout-risk-detected.v1.json"]
 ]) {
   const example = parseJson(exampleFile);
@@ -263,6 +286,32 @@ for (const [exampleFile, eventFile] of [
   const withoutRequired = clone(example);
   delete withoutRequired.data.warehouse_id;
   rejects(`${exampleFile} - warehouse_id`, () => validateEvent(eventFile, withoutRequired), /warehouse_id required/);
+}
+
+// The threshold is named after the status: each wrong pairing is rejected, each right one passes.
+{
+  const belowEvent = "events/ops-core/inventory/stock-below-threshold.v1.json";
+  const yellowExample = parseJson("examples/events/stock-below-threshold.v1.example.json");
+  const redExample = parseJson("examples/events/stock-below-threshold-red.v1.example.json");
+  assert.equal(yellowExample.data.status, "STOCK_YELLOW_ALERT");
+  assert.equal(redExample.data.status, "STOCK_RED_ALERT");
+  assert.ok(Object.hasOwn(yellowExample.data, "yellow_threshold") && !Object.hasOwn(yellowExample.data, "red_threshold"), "yellow example carries yellow_threshold only");
+  assert.ok(Object.hasOwn(redExample.data, "red_threshold") && !Object.hasOwn(redExample.data, "yellow_threshold"), "red example carries red_threshold only");
+
+  const redUnderYellowName = clone(redExample);
+  redUnderYellowName.data.yellow_threshold = redUnderYellowName.data.red_threshold;
+  delete redUnderYellowName.data.red_threshold;
+  rejects("red alert with yellow_threshold only (the old provider behaviour)", () => validateEvent(belowEvent, redUnderYellowName), /red_threshold required|must not match the "not" schema/);
+  const redWithBoth = clone(redExample);
+  redWithBoth.data.yellow_threshold = redWithBoth.data.red_threshold;
+  rejects("red alert with both thresholds", () => validateEvent(belowEvent, redWithBoth), /must not match the "not" schema/);
+  const yellowWithRedName = clone(yellowExample);
+  yellowWithRedName.data.red_threshold = yellowWithRedName.data.yellow_threshold;
+  delete yellowWithRedName.data.yellow_threshold;
+  rejects("yellow alert with red_threshold only", () => validateEvent(belowEvent, yellowWithRedName), /yellow_threshold required|must not match the "not" schema/);
+  const yellowWithBoth = clone(yellowExample);
+  yellowWithBoth.data.red_threshold = yellowWithBoth.data.yellow_threshold;
+  rejects("yellow alert with both thresholds", () => validateEvent(belowEvent, yellowWithBoth), /must not match the "not" schema/);
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -303,7 +352,7 @@ const entryStart = unreleased.indexOf("### Webhook security profile and inventor
 assert.notEqual(entryStart, -1, "CHANGELOG entry present");
 const entryEnd = unreleased.indexOf("\n### ", entryStart + 1);
 const entry = unreleased.slice(entryStart, entryEnd === -1 ? undefined : entryEnd);
-for (const token of ["docs/webhook-security.md", "stock-alert-webhook.schema.json", "risk_calculation", "NOT live yet", "removes optional properties", "no consumer", "reason", "AllowAutoRedirect", "X-Webhook-Key-Version"]) {
+for (const token of ["docs/webhook-security.md", "stock-alert-webhook.schema.json", "risk_calculation", "NOT live yet", "removes optional properties", "no consumer", "reason", "AllowAutoRedirect", "X-Webhook-Key-Version", "red_threshold", "STOCK_RED_ALERT", "stock-below-threshold-red.v1.example.json"]) {
   assert.ok(entry.includes(token), `CHANGELOG entry must mention ${token}`);
 }
 
