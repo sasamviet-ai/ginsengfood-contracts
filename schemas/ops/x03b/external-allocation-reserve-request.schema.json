@@ -39,7 +39,7 @@
     },
     "source_object_no": {
       "type": "string",
-      "maxLength": 100,
+      "maxLength": 200,
       "description": "Human-readable reference such as ORD-20260905-001/LINE-001. Display and reconciliation only; never an identity key."
     },
     "expires_at": {

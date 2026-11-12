@@ -4,6 +4,10 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ## Unreleased
 
+### Reserve request: source_object_no allows 200 characters (SEC-07b)
+
+`source_object_no` in `external-allocation-reserve-request.schema.json` goes from `maxLength: 100` to `maxLength: 200`, matching what ops-core validates since SEC-07 (longer values answer 422). This only widens what a consumer may send; it is still a display and reconciliation reference, never an identity key.
+
 ### Webhook security profile and inventory payload allowlist (SEC-12, SEC-13)
 
 Prepared on top of the pin `a7832a49` for the business-platform (M3) review, next to the allocation write surface below. Source: ops-core plan rows SEC-12 (M12-082) and SEC-13 (M12-083), security review PL-H K5 (gaps GAP-04, GAP-07, GAP-08, GAP-21). **Classification: narrowing, owner decision, coordinated.** By the letter of `compatibility/breaking-change-policy.md` it removes optional properties from two event schemas, so it counts as breaking; it is published because there is no consumer to break (M3 has no webhook receiver yet and the provider's webhook is not enabled in production), and under `VERSIONING.md` the M3 owner confirms before merge that M3 reads none of the seven fields below. Provider code and this contract are independent of each other in the order they can land: the provider's change is valid against both the pinned and the new schemas, so the provider goes first, then this contract, then the pin moves.
