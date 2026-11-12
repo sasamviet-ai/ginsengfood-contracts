@@ -139,6 +139,7 @@ assert.ok(
   "checks are listed in the order size, signature, skew, deduplication"
 );
 assert.match(section(security, 4).replace(/\s+/g, " "), /at most \*\*two\*\* keys/, "receiver accepts two keys during rotation");
+assert.match(section(security, 4).replace(/\s+/g, " "), /once that variable is set, does not move.*While that variable is unset the provider falls back to the version label shared with those other secrets, and then the label does move with them/, "the label is separate only once its own variable is set");
 
 // Answers table: what the receiver says and what the provider does.
 const answers = new Map(tableRows(section(security, 6)).slice(1).map(row => [row[0], row[2]]));
@@ -180,6 +181,34 @@ assert.equal(Buffer.from(vectorKey, "base64").length, 32, "vector key is 32 byte
 assert.notEqual(sign(vectorKey, vectorTimestamp, vectorEventId, vectorBody.replace("12.5", "12.6")), vectorSignature, "tamper: a changed body changes the signature");
 assert.notEqual(sign(vectorKey, String(Number(vectorTimestamp) + 1), vectorEventId, vectorBody), vectorSignature, "tamper: a changed timestamp changes the signature");
 assert.notEqual(sign(vectorKey, vectorTimestamp, vectorEventId.replace("3f2b", "3f2c"), vectorBody), vectorSignature, "tamper: a changed event id changes the signature");
+
+// Reference receiver: steps 1 to 4 of section 5 executed on the published vector, so the numbers in the prose are
+// behaviour and not only words. The skew window and the body cap are read from the document itself.
+const skewWindow = Number(checksSection.match(/\*\*(\d+) seconds\*\*/)[1]);
+const bodyCap = Number(checksSection.match(/\*\*([\d ]+) bytes \(64 KiB\)\*\*/)[1].replaceAll(" ", ""));
+assert.equal(skewWindow, 300);
+assert.equal(bodyCap, 65536);
+function receive({ now, timestamp, eventId, signature, version, body, keys }) {
+  if (Buffer.byteLength(body, "utf8") > bodyCap) return 413;
+  if (!/^\d+$/.test(timestamp) || !/^[0-9a-f-]{36}$/.test(eventId) || !signature.startsWith("v1=")) return 401;
+  const ordered = [...keys.filter(entry => entry.version === version), ...keys.filter(entry => entry.version !== version)];
+  if (!ordered.some(entry => sign(entry.key, timestamp, eventId, body) === signature)) return 401;
+  return Math.abs(now - Number(timestamp)) > skewWindow ? 401 : 200;
+}
+const goodKey = { version: "v1", key: vectorKey };
+const otherKey = { version: "v2", key: Buffer.alloc(32, 9).toString("base64") };
+const base = { timestamp: vectorTimestamp, eventId: vectorEventId, signature: vectorSignature, version: "v1", body: vectorBody, keys: [goodKey] };
+const at = Number(vectorTimestamp);
+assert.equal(receive({ ...base, now: at }), 200);
+for (const offset of [299, -299, 300, -300]) assert.equal(receive({ ...base, now: at + offset }), 200, `receiver clock ${offset} s off is inside the window`);
+for (const offset of [301, -301, 3600]) assert.equal(receive({ ...base, now: at + offset }), 401, `receiver clock ${offset} s off is outside the window`);
+assert.equal(receive({ ...base, now: at, keys: [otherKey] }), 401, "wrong key");
+assert.equal(receive({ ...base, now: at, version: "v9", keys: [otherKey, goodKey] }), 200, "unknown label: any configured key may verify (rotation with two keys)");
+assert.equal(receive({ ...base, now: at, version: "v2", keys: [otherKey, goodKey] }), 200, "a wrong label is a hint, not a verdict");
+assert.equal(receive({ ...base, now: at, body: vectorBody.replace("12.5", "12.6") }), 401, "changed body");
+assert.equal(receive({ ...base, now: at, timestamp: "abc" }), 401, "malformed timestamp");
+assert.equal(receive({ ...base, now: at, body: `${vectorBody}${" ".repeat(bodyCap)}` }), 413, "oversize body is 413 before anything else");
+assert.equal(receive({ ...base, now: at, body: "\u00e9".repeat(bodyCap / 2 + 1) }), 413, "the cap counts bytes, not characters");
 const vectorEvent = JSON.parse(vectorBody);
 assert.equal(vectorEvent.eventId, vectorEventId, "vector body eventId equals X-Outbox-Event-Id");
 validateEvent("events/ops-core/inventory/inventory-available-changed.v1.json", vectorEvent);
@@ -352,7 +381,11 @@ const entryStart = unreleased.indexOf("### Webhook security profile and inventor
 assert.notEqual(entryStart, -1, "CHANGELOG entry present");
 const entryEnd = unreleased.indexOf("\n### ", entryStart + 1);
 const entry = unreleased.slice(entryStart, entryEnd === -1 ? undefined : entryEnd);
-for (const token of ["docs/webhook-security.md", "stock-alert-webhook.schema.json", "risk_calculation", "NOT live yet", "removes optional properties", "no consumer", "reason", "AllowAutoRedirect", "X-Webhook-Key-Version", "red_threshold", "STOCK_RED_ALERT", "stock-below-threshold-red.v1.example.json"]) {
+const classification = entry.split("\n\n")[1];
+for (const token of ["tightens published event schemas in three ways", "removes seven optional properties", "`maxLength: 200`", "if/then rule", "`yellow_threshold` of a red alert", "needs no `reason` text beyond 200 characters"]) {
+  assert.ok(classification.includes(token), `CHANGELOG classification paragraph must mention ${token}`);
+}
+for (const token of ["docs/webhook-security.md", "stock-alert-webhook.schema.json", "risk_calculation", "NOT live yet", "removes seven optional properties", "no consumer", "reason", "AllowAutoRedirect", "X-Webhook-Key-Version", "red_threshold", "STOCK_RED_ALERT", "stock-below-threshold-red.v1.example.json"]) {
   assert.ok(entry.includes(token), `CHANGELOG entry must mention ${token}`);
 }
 

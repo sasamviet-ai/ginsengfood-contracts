@@ -60,7 +60,7 @@ Raw body of the vector (one line, no trailing newline):
 `X-Webhook-Key-Version` is an opaque label that names which shared key signed the request. The two owners choose it when they exchange a key (for example `v1`, `v2`). Rules:
 
 - Grammar: `^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$`, compared as exact, case-sensitive text. The provider refuses to start outside development with a label that does not match, because the label travels as an HTTP header.
-- The label belongs to the webhook signing key only. It is configured on its own and does not move when any other secret of the provider (database, token signing, evidence encryption, snapshot cursor) is rotated. Do not infer anything about other secrets from it.
+- The label belongs to the webhook signing key only. It has its own deployment variable and, once that variable is set, does not move when any other secret of the provider (database, token signing, evidence encryption, snapshot cursor) is rotated. While that variable is unset the provider falls back to the version label shared with those other secrets, and then the label does move with them: the owners set the variable before the first rotation of the webhook key, and before the webhook is enabled. Do not infer anything about other secrets from it.
 - It is not secret and not proof: choose the key it names first, and accept the request if any configured key verifies. A wrong or unknown label is never a reason to answer `401` on its own.
 
 The receiver holds at most **two** keys at the same time: the current one and the one being retired or introduced. Rotation, in this order, so that no event signed with a key the receiver does not know is ever sent:
