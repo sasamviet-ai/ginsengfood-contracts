@@ -26,8 +26,10 @@ source_object_id = UUIDv5(ORDER_SOURCE_NAMESPACE_UUID, "order:" + orderId)
 | --- | --- |
 | `order:1` | `3cec2522-d110-55a0-8eac-2a898257d3ca` |
 | `order:123456` | `5d65e4a9-b171-599d-ac58-c4308320bf1d` |
+| `order-item:1` | `39070d13-8ab5-5bc6-8f86-69cd65695c47` |
+| `order-item:123456` | `42fbced9-2551-5195-8b83-8c789629ef73` |
 
-**One source holds one scope.** A source id can hold only one SKU, one warehouse, one unit and one quantity: asking again with the same id and a different scope is answered `409 INSUFFICIENT_STOCK`, not a second hold. An order with several lines therefore needs one `EXTERNAL_ORDER_ITEM` source per line, not one `EXTERNAL_ORDER` source per order. For lines, use the same namespace with a name built from the stable M3 order-item id, for example `order-item:<orderItemId>` with the same canonical decimal rule. That line-level name is a proposal for the M3 review and is not fixed by this contract; the contract only requires a stable UUID per line, never one built from a position in the order.
+**One source holds one scope.** A source id can hold only one SKU, one warehouse, one unit and one quantity: asking again with the same id and a different scope is answered `409 INSUFFICIENT_STOCK`, not a second hold. An order with several lines therefore needs one `EXTERNAL_ORDER_ITEM` source per line, not one `EXTERNAL_ORDER` source per order. For lines, use the same namespace with a name built from the stable M3 order-item id, for example `order-item:<orderItemId>` with the same canonical decimal rule. The two `order-item:` vectors above were computed independently by the provider and by M3 on 2026-11-12 and agree; M3 pins them in its own tests. The contract still only requires a stable UUID per line, never one built from a position in the order, so a consumer that keeps its own stable per-line name is conformant; the `order-item:` name is the one both sides use today.
 
 ## 2. Calling the two commands
 

@@ -566,8 +566,9 @@ const namespace = notes.match(/ORDER_SOURCE_NAMESPACE_UUID = `([0-9a-f-]{36})`/)
 assert.ok(namespace, "integration notes must publish ORDER_SOURCE_NAMESPACE_UUID");
 assert.match(namespace, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/, "namespace constant must be a random (v4) UUID");
 assert.match(notes, /not a secret/i, "namespace constant must be declared a published constant, not a secret");
-const vectors = [...notes.matchAll(/^\| `(order:[0-9]+)` \| `([0-9a-f-]{36})` \|$/gm)];
-assert.ok(vectors.length >= 2, "integration notes must publish at least two UUIDv5 test vectors");
+const vectors = [...notes.matchAll(/^\| `(order(?:-item)?:[0-9]+)` \| `([0-9a-f-]{36})` \|$/gm)];
+assert.ok(vectors.length >= 4, "integration notes must publish at least four UUIDv5 test vectors (two order, two order-item)");
+assert.ok(vectors.filter(([, name]) => name.startsWith("order-item:")).length >= 2, "integration notes must publish the order-item vectors");
 for (const [, name, expected] of vectors) {
   assert.equal(uuidV5(namespace, name), expected, `UUIDv5 vector for ${name}`);
 }
