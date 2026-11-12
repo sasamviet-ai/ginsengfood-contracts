@@ -4,6 +4,33 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ## Unreleased
 
+### Webhook security profile and inventory payload allowlist (SEC-12, SEC-13)
+
+Prepared on top of the pin `a7832a49` for the business-platform (M3) review, next to the allocation write surface below. Source: ops-core plan rows SEC-12 (M12-082) and SEC-13 (M12-083), security review PL-H K5 (gaps GAP-04, GAP-07, GAP-08, GAP-21). **Classification: narrowing, owner decision, coordinated.** By the letter of `compatibility/breaking-change-policy.md` it removes optional properties from two event schemas, so it counts as breaking; it is published because there is no consumer to break (M3 has no webhook receiver yet and the provider's webhook is not enabled in production), and under `VERSIONING.md` the M3 owner confirms before merge that M3 reads none of the seven fields below. Provider code and this contract are independent of each other in the order they can land: the provider's change is valid against both the pinned and the new schemas, so the provider goes first, then this contract, then the pin moves.
+
+#### Added
+
+- **`docs/webhook-security.md`** - the security profile of the webhook: the six request headers, the signed string with a published test vector (recomputed by the contract test), the meaning and grammar of `X-Webhook-Key-Version` (opaque label of the webhook signing key only, `^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$`, a hint and never proof), key rotation with at most two keys on the receiver, the receiver's checks in order (64 KiB body cap, signature in constant time over the raw bytes, 300 second clock skew, atomic deduplication on `X-Outbox-Event-Id` kept for at least 24 hours and written only after authentication, answer fast), the answers table (`2xx` delivered, `401` and `413` and other `4xx` not retried, `5xx`/`408`/`429` retried, `3xx` not followed), and the field lists of the payload. Referenced from `docs/webhook-transport.md` and `asyncapi/README.md`.
+- **`schemas/ops/stock-alert-webhook.schema.json`** - closed projection of `stock-alert.schema.json` for the `data` of `stock-below-threshold` and `stockout-risk-detected`: same property definitions, `additionalProperties: false`, and none of `risk_calculation`, `lead_time_days`, `coverage_days`, `recommended_action`, `guard_block_reasons`, `evidence_refs`, `available_stock_breakdown`. The domain schema `stock-alert.schema.json` and the REST read of stock alerts are not changed.
+- **Examples** `examples/events/stock-below-threshold.v1.example.json` and `stockout-risk-detected.v1.example.json`.
+- **`contract-tests/x03b/webhook-security-v1.contract.test.mjs`** (wired into CI): the signature vector, the key-version grammar, the answers table, the documented field lists against the schemas, tamper cases for each of the seven fields, an unknown key and a `null` optional key, and the `reason` cap.
+
+#### Changed
+
+- `events/ops-core/inventory/stock-below-threshold.v1.json` and `stockout-risk-detected.v1.json` validate `data` with `stock-alert-webhook.schema.json` instead of `stock-alert.schema.json`. The `required` lists are unchanged.
+- `events/ops-core/recall/sale-lock-activated.v1.json`, `stop-sale-required.v1.json` and `sale-lock-released.v1.json`: `data.reason` has `maxLength: 200`. The reason is operator-typed text; on the webhook the sender normalises it (control and invisible formatting characters replaced by one space, white space collapsed, trimmed, cut at 200 characters, `UNSPECIFIED` when nothing printable is left). It is not a code. The full text stays on the REST sale-lock read.
+- `docs/webhook-transport.md`: section 4 is the short form of the security profile; the answers table adds `401`, `413` and `3xx`; the key-version row points to the profile. No header, signature or event type changed.
+
+#### Provider behavior coming with ops-core SEC-12 / SEC-13 (NOT live yet)
+
+This describes the provider after the ops-core change of 12/11/2026, not the provider running today. Today the three inventory events send their whole internal `data`, including the seven fields above and `null` for empty optional keys; the sale-lock `reason` goes out as typed; there is no body cap; the webhook client follows redirects (a `307` re-sends the signed body to the `Location`); `X-Webhook-Key-Version` carries whatever the deployment configured, from a version variable shared with four other secrets.
+
+- (a) The three inventory events build `data` from an explicit list of keys (`docs/webhook-security.md` section 8); optional keys without a value are absent, never `null`.
+- (b) The sale-lock `reason` is normalised and capped at 200 characters as described above.
+- (c) A body above 65 536 bytes is not sent and goes to dead-letter.
+- (d) The provider's webhook client does not follow redirects (`AllowAutoRedirect` off): a `3xx` is a failed attempt.
+- (e) Outside development the provider refuses to start when the key-version label does not match the grammar; the deployment configures the webhook key version on its own variable, not the one shared by the other four secrets.
+
 ### Allocation write surface: self-release and `ISSUED` (additive, coordinated)
 
 Prepared on top of the pin `a7832a49` for the business-platform (M3) review. **Classification: additive, coordinated.** Under `compatibility/breaking-change-policy.md` a new enum value and a new operation are non-breaking when consumers must already tolerate unknown values, but `ISSUED` is the first value a consumer can actually receive that the 2026-09-21 schemas did not list, and the release command is the second consumer-driven write. The contract cannot hold the provider back: `ISSUED` appears as soon as the warehouse applies a sales issue document. The gate that can actually be checked is on the consumer side: the business-platform does not read allocations in production until its status parser tolerates `ISSUED` and unknown values and the business-platform owner has confirmed that (`VERSIONING.md`: review by provider and consumer owner before merge). Consumers must tolerate unknown `status` values.

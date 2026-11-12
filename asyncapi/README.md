@@ -15,6 +15,6 @@ Cac file trong thu muc nay chi la contract. Khong dat queue worker, handler impl
 - Placeholder server in AsyncAPI is not real broker configuration.
 - TODO: Source documents do not define real broker, topic, partition, retry, or outbox publication metadata. These AsyncAPI files use `eventType` as placeholder channel address only.
 - Event payload schema lives under `events/`.
-- HTTP webhook transport from ops-core to business-platform (signature, headers, 300 s clock skew, retry, dead-letter, the 13 routed event types) is specified in `docs/webhook-transport.md`. It is the only delivery mechanism that exists; the channel addresses in these files remain placeholders.
+- HTTP webhook transport from ops-core to business-platform (signature, headers, 300 s clock skew, retry, dead-letter, the 13 routed event types) is specified in `docs/webhook-transport.md`; its security profile (key version and rotation, receiver checks and answers, body cap, redirects, payload field lists) is `docs/webhook-security.md`. It is the only delivery mechanism that exists; the channel addresses in these files remain placeholders.
 - Every event uses `eventVersion: "1.0"` and an `eventType` ending with `.v1`.
 - Breaking changes require a new major event version or compatibility note.

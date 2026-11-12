@@ -62,6 +62,10 @@
             "effective_to"
           ],
           "properties": {
+            "reason": {
+              "maxLength": 200,
+              "description": "On the webhook the reason is single-line text of at most 200 characters, normalised by the sender (control and invisible formatting characters replaced by one space, white space collapsed, trimmed, cut at 200 characters, UNSPECIFIED when nothing printable is left). Not a code. See docs/webhook-security.md section 8."
+            },
             "active": {
               "const": false
             }

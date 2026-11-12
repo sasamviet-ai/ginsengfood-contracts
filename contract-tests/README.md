@@ -7,6 +7,7 @@ Current validation:
 - Repository-level contract hygiene/source trace validation is available through `node scripts/validate-contracts.mjs`.
 - Exact X04D metadata parity for the 26 external v1 operations in its inventory (24 plus `reserveInventoryAllocationV1` and `releaseInventoryAllocationV1`) is enforced by `node contract-tests/x04d/external-runtime-v1-security.contract.test.mjs`.
 - The allocation write surface (reserve and release: operation metadata, request/result/error schemas, examples and fixtures, status vocabulary, UUIDv5 order identity vectors, webhook transport spec) is enforced by `node contract-tests/x03b/external-allocation-write-v1.contract.test.mjs`.
+- The webhook security profile (signature test vector, key-version grammar, answers table, the inventory payload field lists and their closed schema, the sale-lock `reason` cap) is enforced by `node contract-tests/x03b/webhook-security-v1.contract.test.mjs`.
 - Existing Postman collections and JSON fixtures remain early contract-test assets.
 - Pact files remain planning-only until the provider/consumer registry and Pact toolchain are approved.
 

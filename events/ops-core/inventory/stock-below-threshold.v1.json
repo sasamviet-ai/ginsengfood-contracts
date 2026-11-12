@@ -50,7 +50,7 @@
     "data": {
       "allOf": [
         {
-          "$ref": "../../../schemas/ops/stock-alert.schema.json"
+          "$ref": "../../../schemas/ops/stock-alert-webhook.schema.json"
         },
         {
           "type": "object",

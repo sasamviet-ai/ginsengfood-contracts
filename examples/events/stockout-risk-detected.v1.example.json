@@ -1,0 +1,24 @@
+{
+  "eventId": "evt-stockout-risk-detected-20261112-001",
+  "eventType": "ops-core.inventory.stockout-risk-detected.v1",
+  "eventVersion": "1.0",
+  "occurredAt": "2026-11-12T11:30:00+07:00",
+  "source": "ops-core",
+  "correlationId": "corr-stock-alert-20261112-002",
+  "causationId": "stock-alert-20261112-002",
+  "idempotencyKey": "stock-alert-eval-20261112-002:ops-core.inventory.stockout-risk-detected.v1",
+  "data": {
+    "stock_alert_id": "stock-alert-20261112-002",
+    "sku_id": "sku-gf-rice-001",
+    "warehouse_id": "warehouse-main-001",
+    "warehouse_location_id": "warehouse-location-a1",
+    "status": "STOCKOUT_RISK",
+    "available_stock": { "value": "20", "unit": "hộp" },
+    "stockout_risk_threshold": { "value": "30", "unit": "hộp" },
+    "stock_ok_reference_quantity": { "value": "300", "unit": "hộp" },
+    "zero_stock_threshold": { "value": "0", "unit": "hộp" },
+    "alert_reason": "Available stock is at stockout-risk floor or below required lead-time coverage.",
+    "source_stock_balance_id": "stock-balance-20261112-001",
+    "source_ledger_entry_id": "ledger-20261112-0057"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/ops/v1/stock-alert-webhook.schema.json",
+  "title": "Stock Alert Webhook Data",
+  "description": "Closed projection of Stock Alert v1 that ops-core sends in `data` of the stock-below-threshold and stockout-risk-detected webhook events. Every property is the same definition as in stock-alert.schema.json; the properties that describe production planning (risk_calculation, lead_time_days, coverage_days, recommended_action, guard_block_reasons, evidence_refs) and the hold breakdown (available_stock_breakdown) are deliberately absent, so a message that carries one is invalid. The REST stock-alert read and the domain schema are not narrowed by this file.",
+  "$comment": "Source: ops-core SEC-12 (M12-082) and PL-H K5 / GAP-07. The webhook is a signal; planning detail stays in ops-core and the receiver pulls what it is entitled to. Optional keys are absent when they have no value, never null. docs/webhook-security.md section 8 is the prose side of this file.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "stock_alert_id": { "$ref": "stock-alert.schema.json#/properties/stock_alert_id" },
+    "sku_id": { "$ref": "stock-alert.schema.json#/properties/sku_id" },
+    "warehouse_id": { "$ref": "stock-alert.schema.json#/properties/warehouse_id" },
+    "warehouse_location_id": { "$ref": "stock-alert.schema.json#/properties/warehouse_location_id" },
+    "status": { "$ref": "stock-alert.schema.json#/properties/status" },
+    "available_stock": { "$ref": "stock-alert.schema.json#/properties/available_stock" },
+    "stock_ok_reference_quantity": { "$ref": "stock-alert.schema.json#/properties/stock_ok_reference_quantity" },
+    "yellow_threshold": { "$ref": "stock-alert.schema.json#/properties/yellow_threshold" },
+    "red_threshold": { "$ref": "stock-alert.schema.json#/properties/red_threshold" },
+    "stockout_risk_threshold": { "$ref": "stock-alert.schema.json#/properties/stockout_risk_threshold" },
+    "zero_stock_threshold": { "$ref": "stock-alert.schema.json#/properties/zero_stock_threshold" },
+    "alert_reason": { "$ref": "stock-alert.schema.json#/properties/alert_reason" },
+    "source_stock_balance_id": { "$ref": "stock-alert.schema.json#/properties/source_stock_balance_id" },
+    "source_ledger_entry_id": { "$ref": "stock-alert.schema.json#/properties/source_ledger_entry_id" },
+    "demand_id": { "$ref": "stock-alert.schema.json#/properties/demand_id" }
+  },
+  "required": ["stock_alert_id"]
+}

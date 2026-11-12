@@ -4,6 +4,8 @@ Status: transport specification for the outbound events that ops-core routes to 
 
 Source of this specification: the ops-core HTTP webhook dispatcher and its delivery route registry, and the M3 handoff package TB-14. If this file and the provider disagree, the provider's runtime is the truth until this file is corrected.
 
+The security rules of the webhook (header semantics, key version and rotation, the receiver's checks and answers, body cap, redirects, the field lists of the payload) are in `docs/webhook-security.md`. This file keeps the transport: what is sent, to which endpoint, which event types, how a failed delivery is retried.
+
 ## 1. What a webhook is, and is not
 
 - The pull model is the source of truth. A webhook only says "something changed, pull again". It must not be used to rebuild stock or sale state from the event stream.
@@ -21,7 +23,7 @@ Source of this specification: the ops-core HTTP webhook dispatcher and its deliv
 | `X-Idempotency-Key` | Same value as `X-Outbox-Event-Id`. |
 | `X-Correlation-Id` | The event's `correlationId`. |
 | `X-Webhook-Timestamp` | Unix time in seconds (UTC) at the moment of **this** attempt. Every retry carries a new value. |
-| `X-Webhook-Key-Version` | The version label of the shared signing key (for example `v1`). A new key is announced as a new version. |
+| `X-Webhook-Key-Version` | The label of the shared signing key that signed the request, for example `v1`. A hint for choosing the key, not proof; grammar and rotation in `webhook-security.md` section 4. |
 | `X-Webhook-Signature` | `v1=<hex>`: lowercase hexadecimal HMAC-SHA256, see section 3. |
 
 Body: one event, shaped by the schema in `events/ops-core/<group>/<name>.v1.json` (the whole body, not just `data`). Envelope fields: `eventId`, `eventType`, `eventVersion` (`"1.0"`), `occurredAt`, `source` (`"ops-core"`), `correlationId`, `data`, and optionally `causationId` and `idempotencyKey`. `data` keys are snake_case.
@@ -42,10 +44,13 @@ The header value is the literal prefix `v1=` followed by the lowercase hexadecim
 
 ## 4. What the receiver checks, in order
 
-1. Recompute the signature and compare it with `X-Webhook-Signature` using a constant-time comparison. Mismatch: answer `401`.
-2. Clock skew: reject when `|receive time - X-Webhook-Timestamp|` exceeds **300 seconds**. Keep the receiver clock on NTP. The sender does not apply this threshold itself, and every retry has a fresh timestamp, so an honest retry is not rejected by it.
-3. Deduplicate on `X-Outbox-Event-Id`: delivery is at-least-once, so process an event id once and answer `2xx` for repeats.
-4. Answer `2xx` quickly and process afterwards. For an event type the receiver does not care about, answer `2xx` and ignore it: a `4xx` sends the event to dead-letter (section 6).
+The normative list, with the answer to give for each failure, is `webhook-security.md` section 5. In short:
+
+1. Body size: read at most 64 KiB (65 536 bytes), `413` beyond it.
+2. Signature: recompute it and compare with `X-Webhook-Signature` using a constant-time comparison. Mismatch: answer `401`.
+3. Clock skew: reject when `|receive time - X-Webhook-Timestamp|` exceeds **300 seconds**. Keep the receiver clock on NTP. The sender does not apply this threshold itself, and every retry has a fresh timestamp, so an honest retry is not rejected by it.
+4. Deduplicate on `X-Outbox-Event-Id`: delivery is at-least-once, so record the id with an atomic insert for at least 24 hours, process an event once and answer `2xx` for repeats.
+5. Answer `2xx` quickly and process afterwards. For an event type the receiver does not care about, answer `2xx` and ignore it: a `4xx` sends the event to dead-letter (section 6).
 
 ## 5. Routed event types (13)
 
@@ -72,14 +77,16 @@ The four recall / sale-lock events are the ones a seller must not miss: they sto
 | Receiver answer | Provider behaviour |
 | --- | --- |
 | `2xx` | Delivered. |
-| `4xx` except `408` and `429` | **Not retried.** The event goes to dead-letter immediately. |
+| `4xx` except `408` and `429` (`401` and `413` included) | **Not retried.** The event goes to dead-letter immediately. |
+| `3xx` | **Not followed**: the client never re-sends the signed body to a `Location`. The attempt counts as failed and is retried like a `5xx`, so a wrong URL ends in dead-letter. |
 | `5xx`, `408`, `429`, no answer within 30 seconds, network error | Retried: up to 5 attempts spaced 30, 60, 90 and 120 seconds apart (about 5 minutes in total); each attempt also makes up to 2 quick transport retries. After the last attempt the event goes to dead-letter. |
 
 - Dead-letter events are not re-sent automatically.
 - Turning the webhook on does not back-fill: events produced before it was enabled that waited more than 24 hours for a configured endpoint are in dead-letter and are not replayed. Pull to catch up.
 - Retry spacing and attempt counts are provider operational parameters, stated here so a receiver can size its dedupe store; they are not a wire guarantee.
+- A body larger than 64 KiB is never sent: the event goes to dead-letter without an attempt. Real bodies are a few kilobytes.
 - A receiver that is down for longer than the retry window loses the push signal, never the data: pull (`GET` snapshots and `POST /v1/availability/check`) is always available.
 
 ## 7. Not specified here
 
-The endpoint URL, the key itself, key rotation timing and the receiver's storage design are deployment matters between the two owners. There is no Kafka or AMQP delivery: `asyncapi/` channel addresses are placeholders.
+The endpoint URL, the key itself, key rotation timing and the receiver's storage design are deployment matters between the two owners; the rotation procedure itself is `webhook-security.md` section 4. There is no Kafka or AMQP delivery: `asyncapi/` channel addresses are placeholders.
