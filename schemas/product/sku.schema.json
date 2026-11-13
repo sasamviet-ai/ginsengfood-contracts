@@ -19,6 +19,16 @@
     "recipe_id": { "type": "string", "minLength": 1, "description": "Linked Recipe record." },
     "bom_id": { "type": "string", "minLength": 1, "description": "Linked BOM record." },
     "activation_id": { "type": "string", "minLength": 1, "description": "Linked Product Activation record." },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC instant (RFC 3339, Z suffix) of the latest change to what this object publishes about the SKU: the SKU master record (names, product group, dietary type, lifecycle_status). A SKU that was never edited after creation carries its creation instant, so the value is never null. NOT covered: a change of the four linked pointers formula_version_id, recipe_id, bom_id and activation_id. Emitted on every SKU object by an ops-core build that carries SKU-M12-03; it is optional in the schema only so that a consumer which validates responses of an older provider keeps working."
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic change marker of this SKU object, an integer that is strictly greater after every change counted by updated_at. Compare it only against an earlier value of the SAME sku_id (equal = unchanged, greater = changed); never between two SKUs, never as a count of changes, and do not assume steps of one or gap-free values. The provider may derive it from the change instant today and move to a stored counter later without a contract change. A value LOWER than the one a consumer stored for the same sku_id means the provider data was restored from a backup: re-read the SKU and replace the stored copy. Optional in the schema for the same reason as updated_at."
+    },
     "source_ref": { "$ref": "../common/source-ref.schema.json" },
     "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }
   },

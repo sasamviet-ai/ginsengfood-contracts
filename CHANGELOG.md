@@ -4,6 +4,15 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ## Unreleased
 
+### SKU read model: `updated_at` and `revision` (SKU-M12-03, additive)
+
+Prepared on top of `e60df94` for the business-platform (M3) review. **Classification: additive.** Two optional properties join `schemas/product/sku.schema.json`, the object returned by `getSkuV1` (and by the SKU list route added in the next changes of this series):
+
+- `updated_at` - UTC date-time of the latest change to what the object publishes (the SKU master record; the trade-item packaging configuration joins it with `sellable_uoms`). Never null: a SKU that was never edited carries its creation instant. Not moved by a change of the recipe, formula, BOM or activation pointers.
+- `revision` - integer, strictly greater after every change counted by `updated_at`. Compare only against an earlier value of the same `sku_id`; not a counter, no gap-free guarantee. The provider derives it from the change instant today and may move to a stored counter later without a contract change.
+
+Neither is in `required`, so a consumer that validates a response of an older provider keeps working; an ops-core build that carries SKU-M12-03 always emits both. Example `examples/api/x03b/sku.response.json`, fixture `contract-tests/x03b/fixtures/sku.response.fixture.json`, and `contract-tests/x03b/sku-catalog-v1.contract.test.mjs` (wired into CI, with its own small schema validator in `contract-tests/x03b/lib/mini-schema.mjs`) pin the shape and eight tamper cases. The `getSkuV1` operation block is untouched.
+
 ### Reserve: per-principal quota refusals and the hold window (SEC-14)
 
 Additive documentation of behaviour the provider now has; no new `error.code`, the closed enum of `external-allocation-reserve-error.schema.json` is unchanged. `reserveInventoryAllocationV1`: quota refusals are `409 ALLOCATION_CONFLICT` with `error.details[0].reason` of `HOLD_LIMIT_REACHED` (active holds of the principal) or `HOLD_SHARE_LIMIT_REACHED` (share of the SKU on-hand stock), not shortages, nothing is reserved and the same key may be retried after holds are released or expire. Limit validation is `422 VALIDATION_FAILED` with `details[].reason` of `REQUESTED_QUANTITY_LIMIT_EXCEEDED` or `EXPIRES_AT_LIMIT_EXCEEDED`. The maximum `expires_at` window is provider configuration, 60 minutes by default (the 24-hour ceiling is unchanged); omission still means 30 minutes. `listInventoryAllocationsV1`: consumers must always send `sourceObjectId`; a later revision makes it required (`422` reason `SOURCE_OBJECT_ID_REQUIRED`), switched on by a provider flag after this contract is published and the pin has moved.

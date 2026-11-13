@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-x03b-sku"
+  },
+  "data": {
+    "sku_id": "20000000-0000-4000-8000-000000000001",
+    "product_id": "20000000-0000-4000-8000-000000000001",
+    "sku_code": "A1/CS/DM/HS",
+    "canonical_name": "Cơm sâm dưỡng lành",
+    "public_name": "Cơm sâm dưỡng lành",
+    "dietary_type": "VEGAN",
+    "product_group": "NUTRITIOUS",
+    "lifecycle_status": "ACTIVE",
+    "formula_version_id": "60000000-0000-4000-8000-000000000001",
+    "recipe_id": "60000000-0000-4000-8000-000000000001",
+    "bom_id": "61000000-0000-4000-8000-000000000001",
+    "activation_id": "62000000-0000-4000-8000-000000000001",
+    "updated_at": "2026-11-10T03:15:00Z",
+    "revision": 1794280500000000,
+    "evidence_refs": []
+  }
+}

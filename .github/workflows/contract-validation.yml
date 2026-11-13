@@ -39,6 +39,8 @@ jobs:
         run: node scripts/validate-contracts.mjs --scope=recipe-formula-v2
       - name: Validate external bulk-read v1 contracts
         run: node contract-tests/x03b/external-bulk-read-v1.contract.test.mjs
+      - name: Validate SKU catalog read model
+        run: node contract-tests/x03b/sku-catalog-v1.contract.test.mjs
       - name: Validate external allocation write v1 contracts
         run: node contract-tests/x03b/external-allocation-write-v1.contract.test.mjs
       - name: Validate webhook security profile
