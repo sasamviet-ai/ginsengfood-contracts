@@ -250,6 +250,54 @@ for (const permission of m3Permissions) {
   assert.ok(principalSection.includes(`\`${permission}\``), `notes list permission ${permission}`);
   assert.ok(declared.permissions.has(permission), `no operation declares permission ${permission}`);
 }
+// Operation <-> permission pairs written in the notes must be the ones the OpenAPI files declare (verifier M15/M16).
+const declaredPermissionOf = new Map();
+const declaredAudienceOf = new Map();
+for (const file of fs.readdirSync(path.join(root, "openapi/ops-core")).filter(name => name.endsWith(".yaml"))) {
+  let current = null;
+  for (const line of read(file).split("\n")) {
+    const op = line.match(/^ {6}operationId: (\w+)$/);
+    if (op) current = op[1];
+    const aud = line.match(/^ {6}x-audience: (\S+)$/);
+    if (aud && current) declaredAudienceOf.set(current, aud[1]);
+    const perm = line.match(/^ {6}x-permission: (\S+)$/);
+    if (perm && current) declaredPermissionOf.set(current, perm[1]);
+  }
+}
+const tableText = principalSection.split("\n").filter(line => line.startsWith("| `ginsengfood-ops-core-external-")).join("\n");
+const pairsInNotes = [...tableText.matchAll(/`(\w+V1)` \(`([A-Z_]+)`\)/g)].map(match => [match[1], match[2]]);
+const expectedPairs = [
+  ["checkAvailabilityV1", "SELLABLE_CHECK"], ["getSellableStatusV1", "SELLABLE_STATUS_VIEW"],
+  ["listInventoryAllocationsV1", "INVENTORY_ALLOCATION_VIEW"], ["listStockBalancesV1", "INVENTORY_BALANCE_VIEW"],
+  ["listWarehousesV1", "WAREHOUSE_VIEW"], ["listWarehouseLocationsV1", "WAREHOUSE_VIEW"], ["listWarehouseReceiptsV1", "WAREHOUSE_RECEIPT_VIEW"],
+  ["getSkuV1", "SKU_CATALOG_VIEW"], ["getSkuOperationalStatusV1", "SELLABLE_STATUS_VIEW"],
+  ["getRecallCaseV1", "RECALL_CASE_VIEW"], ["getSaleLockV1", "RECALL_HOLD_VIEW"],
+  ["reserveInventoryAllocationV1", "INVENTORY_ALLOCATION_CREATE"], ["releaseInventoryAllocationV1", "INVENTORY_ALLOCATION_CREATE"]
+];
+assert.deepEqual(pairsInNotes.map(pair => pair.join(" ")).sort(), expectedPairs.map(pair => pair.join(" ")).sort(), "notes section 6: the operation (permission) pairs drifted");
+for (const [operationId, permission] of expectedPairs) {
+  assert.equal(declaredPermissionOf.get(operationId), permission, `${operationId} declares x-permission ${permission}`);
+}
+// The operations named as outside the ten (403 for the M3 principal) really declare a permission that is not one of the ten.
+for (const [operationId, permission] of [["listInventoryLedgerV1", "INVENTORY_LEDGER_VIEW"], ["listStockAlertsV1", "STOCK_ALERT_VIEW"], ["getPublicSkuV1", "PRODUCT_PUBLIC_VIEW"]]) {
+  assert.equal(declaredPermissionOf.get(operationId), permission, `${operationId} declares x-permission ${permission}`);
+  assert.ok(!m3Permissions.includes(permission), `${permission} is outside the ten`);
+  assert.ok(principalSection.includes(`\`${operationId}\` (\`${permission}\`)`), `notes name ${operationId} (${permission}) as outside the ten`);
+}
+// The audience rows: the operation sits in the row of the audience it declares (verifier M15/M16).
+const audienceRows = Object.fromEntries(principalSection.split("\n").filter(line => line.startsWith("| `ginsengfood-ops-core-external-")).map(line => [line.match(/^\| `([^`]+)`/)[1], line]));
+for (const [operationId] of expectedPairs) {
+  const audience = declaredAudienceOf.get(operationId);
+  assert.ok(audienceRows[audience]?.includes(`\`${operationId}\``), `notes: ${operationId} must be in the row of ${audience}`);
+  for (const other of Object.keys(audienceRows).filter(name => name !== audience)) {
+    assert.ok(!audienceRows[other].includes(`\`${operationId}\``), `notes: ${operationId} must not be in the row of ${other}`);
+  }
+}
+// The ceiling paragraph names exactly the ten permissions and says "ten" (verifier M28).
+const ceilingParagraph = principalSection.split("\n\n").find(paragraph => paragraph.startsWith("The provider caps the permissions"));
+assert.ok(ceilingParagraph, "notes section 6: ceiling paragraph missing");
+assert.match(ceilingParagraph, /at ten, the approved ceiling/);
+assert.deepEqual([...new Set([...ceilingParagraph.slice(0, ceilingParagraph.indexOf("Operations whose")).matchAll(/`([A-Z][A-Z_]+)`/g)].map(match => match[1]))].sort(), [...m3Permissions].sort(), "notes section 6: the ceiling lists exactly the ten permissions");
 for (const phrase of ["no audience, scope or permission parameter", "INVENTORY_ALLOCATION_RELEASE", "403", "ten", "never inferred from a read permission"]) {
   assert.ok(principalSection.includes(phrase), `notes section 6 must say: ${phrase}`);
 }
@@ -273,6 +321,7 @@ const correlationStandard = squash(normalize(fs.readFileSync(path.join(root, "do
 for (const phrase of [
   "## X-Correlation-Id on the external /v1 API",
   "`^[A-Za-z0-9:_.-]{1,128}$`",
+  "1 to 128 characters of `A-Z`, `a-z`, `0-9`, `:`, `_`, `.`, `-`",
   "is not an error",
   "generates a UUID",
   "echoed in the `X-Correlation-Id` response header",

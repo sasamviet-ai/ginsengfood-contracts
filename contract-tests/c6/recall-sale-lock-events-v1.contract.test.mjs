@@ -266,8 +266,10 @@ check(() => assert.deepEqual(
   ["SELLABLE", "NOT_SELLABLE"],
   "enums/ops/sellable-status.yaml: đúng hai giá trị SELLABLE và NOT_SELLABLE được provider v1 phát"));
 check(() => assert.equal(decisionValues.length, 8, "enums/ops/sellable-status.yaml: cả 8 giá trị phải khai emitted_by_v1_provider"));
-check(() => assert.match(decisionEnum, /consumer_rule:[^]*Sell only when `decision` is exactly SELLABLE[^]*fail closed/i,
-  "enums/ops/sellable-status.yaml: thiếu consumer_rule (chỉ SELLABLE được bán; mọi giá trị khác, kể cả giá trị lạ, chặn bán)"));
+const consumerRuleBlock = (decisionEnum.match(/^consumer_rule: >-\n((?:  .*\n)+)/m) ?? [])[1] ?? "";
+check(() => assert.ok(consumerRuleBlock.length > 0, "enums/ops/sellable-status.yaml: thiếu khối consumer_rule"));
+check(() => assert.match(consumerRuleBlock.replace(/\s+/g, " "), /Sell only when `decision` is exactly SELLABLE\. Anything else .* means do not sell: fail closed\./,
+  "enums/ops/sellable-status.yaml: consumer_rule phải nói chỉ đúng SELLABLE được bán, mọi giá trị khác (kể cả lạ) chặn bán — kiểm TRONG khối consumer_rule, không phải ở chỗ khác của tệp"));
 check(() => assert.match(sellableStatus.properties.decision.description,
   /SELLABLE or NOT_SELLABLE[^]*fail(s)? closed/i,
   "schemas/ops/sellable-status.schema.json: mô tả `decision` phải nói provider chỉ phát SELLABLE/NOT_SELLABLE và consumer fail-closed"));

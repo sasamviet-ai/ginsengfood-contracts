@@ -873,6 +873,21 @@ assert.ok(freeTextLine, "notes: the free-text fields bullet is missing");
 const [reserveFieldsText, releaseFieldsText] = freeTextLine.slice(freeTextLine.indexOf("for reserve")).split("; for release");
 for (const field of freeTextFields.reserve) assert.ok(reserveFieldsText.includes(`\`${field}\``), `notes free-text bullet lists ${field} for reserve`);
 for (const field of freeTextFields.release) assert.ok(releaseFieldsText.includes(`\`${field}\``), `notes free-text bullet lists ${field} for release`);
+// Every row of the closed table in the notes carries the status, code, field and reason of x-detail-reasons (verifier M22/M26).
+{
+  const tableRows = reasonSection.split("\n").filter(line => line.startsWith("| reserve") || line.startsWith("| reserve, release"));
+  const rowOf = reason => tableRows.find(line => line.includes(`\`${reason}\``));
+  for (const row of [...stableReasons.reserve, ...stableReasons.release]) {
+    const line = rowOf(row.reason);
+    assert.ok(line, `notes table has a row for ${row.reason}`);
+    const cells = line.split("|").map(cell => cell.trim());
+    assert.equal(cells[2], `\`${row.httpStatus}\` \`${row.code}\``, `notes table: status and code of ${row.reason}`);
+    assert.equal(cells[3], row.field === null ? "omitted" : `\`${row.field}\``, `notes table: field of ${row.reason}`);
+    assert.equal(cells[4], `\`${row.reason}\``, `notes table: reason cell of ${row.reason}`);
+  }
+  assert.match(rowOf("HOLD_SHARE_LIMIT_REACHED"), /Not a shortage/, "notes table: a share refusal is not a shortage");
+  assert.match(rowOf("HOLD_LIMIT_REACHED"), /Nothing reserved, the key stays reusable/, "notes table: a quota refusal reserves nothing");
+}
 for (const marker of ["SOURCE_OBJECT_ID_REQUIRED", "GET /v1/inventory/allocations", "free text", "ALLOCATION_NOT_HELD", "never on the wire", "Vietnamese"]) {
   assert.ok(collapse(reasonSection).includes(marker), `notes table section must mention ${marker}`);
 }
@@ -912,6 +927,16 @@ assert.match(limitsText, /^        consumer_rule: FAIL_CLOSED_ON_EVERY_LIMIT_REF
 const limitsSectionStart = notes.indexOf("## 7. Provider limits: current defaults and what is not guaranteed");
 assert.notEqual(limitsSectionStart, -1, "notes: missing section 7 on provider limits");
 const limitsSection = collapse(notes.slice(limitsSectionStart));
+// The section 7 table carries the very numbers of x-provider-limits (verifier M29).
+{
+  const sevenRows = notes.slice(limitsSectionStart).split("\n").filter(line => line.startsWith("| `Maximum") );
+  const cell = name => sevenRows.find(line => line.startsWith(`| \`${name}\``))?.split("|").map(value => value.trim())[2];
+  assert.equal(cell("MaximumActiveHoldsPerPrincipal"), String(limitsDefaults.max_active_holds_per_principal));
+  assert.equal(cell("MaximumShareOfOnHandPercent"), `${limitsDefaults.max_share_of_on_hand_percent}% and ${limitsDefaults.share_floor_quantity}`);
+  assert.equal(cell("MaximumRequestedQuantityPerLine"), String(limitsDefaults.max_requested_quantity_per_line));
+  assert.equal(cell("MaximumHoldWindowMinutes"), `${limitsDefaults.max_hold_window_minutes} minutes`);
+  assert.match(notes.slice(limitsSectionStart), new RegExp(`An omitted \`expires_at\` still means ${limitsDefaults.default_hold_window_minutes} minutes`));
+}
 for (const phrase of [
   "`ExternalApi:AllocationHoldLimits`",
   "200", "60 minutes", "80%", "50", "1000",
