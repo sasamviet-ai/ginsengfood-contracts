@@ -1,0 +1,175 @@
+openapi: 3.1.0
+info:
+  title: GinsengFood Business Platform Order Channel State API
+  version: 1.0.0
+  description: >
+    DRAFT v1 internal contract (D-m5-036, 2026-11-13). Lets the M5 Facebook
+    Gateway read the minimum state of one official order before sending a
+    customer message that mentions payment or confirmation. Provider: M3
+    business-platform (Order Core, read only). Consumer: M5
+    `OrderStateReader` (real tier). The endpoint never changes order state,
+    never writes, and never returns personal or commercial data (no name,
+    phone, address, amount, line items, notes). M3 returns its raw enum
+    values; mapping them to M5 `PaymentState` is the consumer's rule and is
+    recorded in an M5 decision log, not here. Review owners: provider M3
+    (Phuc), consumer M5 (Tai), per GOVERNANCE.md. Open points are listed in
+    `x-open-points` and must be closed before this contract leaves DRAFT.
+  x-status: DRAFT
+  x-provider: business-platform (M3 Order Core)
+  x-consumers:
+    - M5 facebook-gateway OrderStateReader
+  x-open-points:
+    - Lookup key is order_code (the caller only has the code in orderRef). Switch to order_id only if both sides agree what orderRef carries.
+    - "`order_version` is the optimistic-lock counter of the order (Order.version). Renamed from `version` so it does not clash with the contract version field used elsewhere in this repo."
+    - Flag-off answer is 503 ORDER_CHANNEL_STATE.DISABLED. If M3 keeps the M4 channel gate pattern (flag off refuses like a bad token), 401 is acceptable; M5 treats both as UNKNOWN.
+    - COD order with order_status CONFIRMED and payment_status UNPAID has no M5 PaymentState yet; consumer proposal is WAITING (decided in the M5 decision log).
+    - verification_status is not exposed in v1 (it serves revenue reconciliation, not customer messaging).
+    - Register the three error codes in error-codes/ once names are agreed.
+  x-config:
+    description: Names only. Values live in the deployment secret store, never in this repo.
+    provider:
+      - name: AUTH_M5_ORDER_STATE_ENABLED
+        meaning: Feature flag for this route; default false (fail closed).
+      - name: M5_ORDER_STATE_SERVICE_TOKEN
+        meaning: Shared secret for this route only; must differ from M4_CHANNEL_SERVICE_TOKEN. Blank matches nothing.
+    consumer:
+      - name: ORDER_STATE_READER_MODE
+        meaning: mock or real.
+      - name: M3_ORDER_STATE_BASE_URL
+        meaning: Internal base URL of business-platform including the /api prefix.
+      - name: M3_ORDER_STATE_SERVICE_TOKEN
+        meaning: Same secret as the provider token, read from the M5 secret store.
+      - name: M3_ORDER_STATE_TIMEOUT_MS
+        meaning: Client timeout; proposed 2000. Timeout maps to UNKNOWN.
+  x-nfr:
+    provider_latency_p95_ms: 300
+    network: internal network of the deployment host only; not exposed through the public proxy.
+    consumer_timeout_ms: 2000
+    consumer_on_error: Any network error, timeout, 401, 404, 5xx maps to UNKNOWN (fail closed, no throw).
+servers:
+  - url: https://business-platform.internal.example/api
+    description: Placeholder only. Real base URL comes from M3_ORDER_STATE_BASE_URL.
+tags:
+  - name: Order Channel State Internal
+    description: Service-to-service read for M5. Not a public, staff, or customer API.
+paths:
+  /v1/internal/orders/by-code/{orderCode}/channel-state:
+    get:
+      tags:
+        - Order Channel State Internal
+      summary: Read the channel state of one official order
+      description: >
+        Returns raw order_status, payment_status and payment_method of the
+        official order identified by order_code. Read only. Requires the
+        service token header; a staff or customer JWT never substitutes for
+        it. No pagination, no caching headers required.
+      operationId: getOrderChannelStateV1
+      security:
+        - M5ServiceToken: []
+      parameters:
+        - name: orderCode
+          in: path
+          required: true
+          description: Official order code (Order.order_code, max 32 characters).
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 32
+        - name: X-Correlation-Id
+          in: header
+          required: false
+          description: Optional correlation id propagated from the M5 dispatch for log joining.
+          schema:
+            type: string
+            maxLength: 128
+      responses:
+        "200":
+          description: Order found.
+          content:
+            application/json:
+              schema:
+                $ref: ../../schemas/commerce/order-channel-state.schema.json
+              examples:
+                waitingCod:
+                  $ref: "#/components/examples/WaitingCod"
+                paidConfirming:
+                  $ref: "#/components/examples/PaidConfirming"
+                paidConfirmed:
+                  $ref: "#/components/examples/PaidConfirmed"
+        "401":
+          $ref: "#/components/responses/ServiceTokenInvalid"
+        "404":
+          $ref: "#/components/responses/OrderNotFound"
+        "503":
+          $ref: "#/components/responses/Disabled"
+components:
+  securitySchemes:
+    M5ServiceToken:
+      type: apiKey
+      in: header
+      name: X-M5-Service-Token
+      description: >
+        Dedicated service token for this route, compared in constant time.
+        Not the Authorization header, so the JWT filter never reads it.
+  responses:
+    ServiceTokenInvalid:
+      description: Missing, blank, or wrong service token.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+          example:
+            code: ORDER_CHANNEL_STATE.SERVICE_TOKEN_INVALID
+            message: Service token is missing or invalid.
+            httpStatus: 401
+    OrderNotFound:
+      description: No official order with this order_code.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+          example:
+            code: ORDER_CHANNEL_STATE.ORDER_NOT_FOUND
+            message: Order not found.
+            httpStatus: 404
+    Disabled:
+      description: Route is turned off by AUTH_M5_ORDER_STATE_ENABLED=false.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/common/error.schema.json
+          example:
+            code: ORDER_CHANNEL_STATE.DISABLED
+            message: Order channel state is disabled.
+            httpStatus: 503
+  examples:
+    WaitingCod:
+      summary: COD order waiting for confirmation, not paid
+      value:
+        schema_version: v1
+        order_code: GF-TEST-0001
+        order_status: CONFIRMING
+        payment_status: UNPAID
+        payment_method: COD
+        order_version: 0
+        updated_at: "2026-11-13T09:00:00+07:00"
+    PaidConfirming:
+      summary: Online payment received, order not yet confirmed
+      value:
+        schema_version: v1
+        order_code: GF-TEST-0002
+        order_status: CONFIRMING
+        payment_status: PAID
+        payment_method: ONLINE
+        order_version: 2
+        updated_at: "2026-11-13T09:05:00+07:00"
+    PaidConfirmed:
+      summary: Paid and confirmed
+      value:
+        schema_version: v1
+        order_code: GF-TEST-0003
+        order_status: CONFIRMED
+        payment_status: PAID
+        payment_method: ONLINE
+        order_version: 3
+        updated_at: "2026-11-13T09:10:00+07:00"
