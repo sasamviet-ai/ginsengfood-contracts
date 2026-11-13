@@ -4,6 +4,10 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ## Unreleased
 
+### Warehouse vocabulary: `warehouse_type` and `status` become closed enums (SKU-M12-03)
+
+`schemas/ops/warehouse.schema.json` carried "TODO: define official values" on both fields, and `schemas/ops/x03b/external-warehouse.schema.json` (the `listWarehousesV1` item) had `warehouse_type` as any non-empty string. Both now say: `warehouse_type` is `RAW_MATERIAL` or `FINISHED_GOODS`, `status` is `ACTIVE` or `INACTIVE` (the external schema already had the status enum; the domain schema gains it). These are the values the ops-core database has always enforced (check constraint `ck_op_warehouse_type`, lifecycle `ACTIVE`/`INACTIVE`), so no row the provider can emit becomes invalid. **Classification: narrowing in the letter of `compatibility/breaking-change-policy.md` (a free string becomes an enum), additive in effect**: every existing example and fixture already uses `FINISHED_GOODS`/`ACTIVE`, and a consumer that read the field as an opaque string keeps working; a consumer that wants to branch on the type can now rely on the two values. A new fixture `contract-tests/x03b/fixtures/warehouses.types.response.fixture.json` carries both types and both states, and `external-bulk-read-v1.contract.test.mjs` pins the enums in both schemas and rejects `PACKAGING`, lower case, a near miss (`FINISHED_GOOD`), an empty string, `DELETED` and `null`.
+
 ### `GET /v1/skus` - list SKUs (`listSkusV1`, SKU-M12-03, additive)
 
 A new read operation in `openapi/ops-core/sku.v1.yaml` so the business-platform (M3) can discover a SKU that was created, activated, retired or re-packaged in ops-core without knowing its `sku_id`. **Classification: additive** (new operation, no existing operation block touched; the `getSkuV1` block is byte for byte what it was).

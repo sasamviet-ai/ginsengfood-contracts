@@ -9,8 +9,16 @@
     "warehouse_id": { "type": "string", "format": "uuid" },
     "warehouse_code": { "type": "string", "minLength": 1 },
     "warehouse_name": { "type": "string", "minLength": 1 },
-    "warehouse_type": { "type": "string", "minLength": 1 },
-    "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
+    "warehouse_type": {
+      "type": "string",
+      "enum": ["RAW_MATERIAL", "FINISHED_GOODS"],
+      "description": "Warehouse type, closed set (the ops-core database check constraint): RAW_MATERIAL (raw material warehouse) or FINISHED_GOODS (finished goods warehouse). Upper case, compared byte for byte. Same vocabulary as schemas/ops/warehouse.schema.json."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ACTIVE", "INACTIVE"],
+      "description": "Warehouse lifecycle status, closed set. INACTIVE is a lifecycle state, not a deletion: the warehouse stays in the snapshot."
+    }
   },
   "required": ["warehouse_id", "warehouse_code", "warehouse_name", "warehouse_type", "status"]
 }

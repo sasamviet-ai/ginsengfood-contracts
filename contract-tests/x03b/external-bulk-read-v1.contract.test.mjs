@@ -458,6 +458,36 @@ assert.throws(
   /manifest_sha256/
 );
 
+// Warehouse vocabulary (SKU-M12-03): warehouse_type and status are closed sets, the same in the domain and in the
+// external schema, and a fixture carries both types and both lifecycle states.
+const warehouseDomainSchema = loadSchema("schemas/ops/warehouse.schema.json");
+const warehouseExternalSchema = loadSchema("schemas/ops/x03b/external-warehouse.schema.json");
+for (const { schema } of [warehouseDomainSchema, warehouseExternalSchema]) {
+  assert.deepEqual(schema.properties.warehouse_type.enum, ["RAW_MATERIAL", "FINISHED_GOODS"]);
+  assert.deepEqual(schema.properties.status.enum, ["ACTIVE", "INACTIVE"]);
+  assert.doesNotMatch(JSON.stringify(schema), /TODO/, "the warehouse vocabulary is no longer an open question");
+}
+const warehouseTypes = parseJson("contract-tests/x03b/fixtures/warehouses.types.response.fixture.json");
+validatePayload(warehouseTypes, warehouseOperation);
+assert.deepEqual(warehouseTypes.data.map(item => item.warehouse_type), ["FINISHED_GOODS", "RAW_MATERIAL"]);
+assert.deepEqual(warehouseTypes.data.map(item => item.status), ["INACTIVE", "ACTIVE"]);
+for (const [field, value] of [
+  ["warehouse_type", "PACKAGING"],
+  ["warehouse_type", "finished_goods"],
+  ["warehouse_type", "FINISHED_GOOD"],
+  ["warehouse_type", ""],
+  ["status", "DELETED"],
+  ["status", "active"],
+  ["status", null]
+]) {
+  const tampered = parseJson("examples/api/x03b/warehouses.response.json");
+  tampered.data[0][field] = value;
+  assert.throws(() => validatePayload(tampered, warehouseOperation), /enum|expected string/, `warehouse ${field}=${JSON.stringify(value)} must be rejected`);
+  const domain = { warehouse_id: "40000000-0000-4000-8000-000000000001", warehouse_type: "FINISHED_GOODS", status: "ACTIVE", [field]: value };
+  assert.throws(() => validateSchema(warehouseDomainSchema.schema, domain, warehouseDomainSchema.file), /enum|expected string/);
+}
+validateSchema(warehouseDomainSchema.schema, { warehouse_id: "40000000-0000-4000-8000-000000000001", warehouse_type: "RAW_MATERIAL", status: "INACTIVE" }, warehouseDomainSchema.file);
+
 // listSkusV1: a page boundary that falls inside a tie on updated_at, the empty answer, and order/manifest tampering.
 const skuListOperation = operations.find(operation => operation.operationId === "listSkusV1");
 const skuPageOne = parseJson("contract-tests/x03b/fixtures/skus.two-page.page-1.response.fixture.json");
