@@ -52,6 +52,8 @@ Example key shapes (not part of the contract): `m3:rsv:<orderId>:<n>` for hold a
 
 The consumer cannot confirm or issue an allocation, and cannot release a `CONFIRMED` one.
 
+Send an `X-Correlation-Id` on every call and log it with the answer: the `X-Correlation-Id` rules are in `docs/correlation-audit-standard.md` (at most 128 characters of letters, digits and `: _ . -`; a malformed value is replaced by a generated one, never rejected, and the id in effect is echoed in the response header and body). Cache the access token in memory until its `expires_in` elapses instead of asking for a token per call (10 token requests per minute per IP); never write it to a log or to disk.
+
 ### Retrying a 429
 
 One code, `RATE_LIMITED`, three causes: the bucket is empty, a call with the same key is still running, or temporary contention (the provider's database transaction was rejected because of concurrent activity on the same source or stock and its own retries, 6 attempts in a few hundred milliseconds, ran out). The contention case has the message "The request could not be completed because of concurrent activity. Retry later with the same X-Idempotency-Key." and no `details`; the message is a hint, not part of the contract. Handle all three the same way:

@@ -259,4 +259,28 @@ assert.match(serviceAuthText.replace(/\s+/g, " "), /INVENTORY_ALLOCATION_CREATE 
 const tokenRequestBlock = serviceAuthText.slice(serviceAuthText.indexOf("    ServiceTokenRequest:"), serviceAuthText.indexOf("    ServiceTokenResponse:"));
 assert.deepEqual([...tokenRequestBlock.matchAll(/^        ([a-z_]+):$/gm)].map(match => match[1]), ["client_id", "client_secret"], "token request has exactly client_id and client_secret");
 
+// NM3-32b point 7: the token may be cached in memory (the consumer has 10 token requests per minute per IP), never logged
+// or written to disk; and the X-Correlation-Id grammar the provider enforces is part of the contract, not only of the webhook docs.
+const squash = text => text.replace(/\s+/g, " ");
+const authText = squash(serviceAuthText);
+assert.doesNotMatch(authText, /returned tokens must not be logged or cached/, "service-auth.v1.yaml still forbids caching the token");
+assert.match(authText, /never be written to a log or to disk/);
+assert.match(authText, /may be kept in the consumer's process memory and reused until shortly before its expires_in elapses/);
+assert.match(authText, /Cache-Control: no-store header forbids HTTP-layer caching, not in-memory reuse/);
+assert.match(authText, /10 requests per minute per verified remote IP/);
+assert.match(squash(fs.readFileSync(path.join(root, "openapi/ops-core/README.md"), "utf8")), /access token are never logged or written to disk; the token may be cached in memory until its `expires_in` elapses/);
+const correlationStandard = squash(normalize(fs.readFileSync(path.join(root, "docs/correlation-audit-standard.md"), "utf8")));
+for (const phrase of [
+  "## X-Correlation-Id on the external /v1 API",
+  "`^[A-Za-z0-9:_.-]{1,128}$`",
+  "is not an error",
+  "generates a UUID",
+  "echoed in the `X-Correlation-Id` response header",
+  "must equal the header exactly",
+  "422"
+]) {
+  assert.ok(correlationStandard.includes(phrase), `correlation standard must say: ${phrase}`);
+}
+assert.ok(squash(m3Notes).includes("`X-Correlation-Id` rules are in `docs/correlation-audit-standard.md`"), "notes point to the correlation rule");
+
 console.log("X04D external runtime v1 security metadata PASS: 26/26 operations plus negative tamper checks.");

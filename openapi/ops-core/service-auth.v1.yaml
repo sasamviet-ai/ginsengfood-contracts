@@ -35,7 +35,13 @@ paths:
         Exchanges an approved service principal client_id and client_secret for a bearer token
         used on authorized root /v1 adapters such as POST /v1/availability/check. The request is
         anonymous by necessity, protected by an authentication-sensitive rate limit, and must be
-        sent as application/json. Credentials and returned tokens must not be logged or cached.
+        sent as application/json. The client_secret and the access token must never be written to a log or to
+        disk. The access token may be kept in the consumer's process memory and reused until shortly before its
+        expires_in elapses (the Cache-Control: no-store header forbids HTTP-layer caching, not in-memory reuse);
+        a consumer that asked for a new token on every call would meet the AuthSensitive limit of 10 requests
+        per minute per verified remote IP. The lifetime is provider configuration (15 minutes by default), so
+        read expires_in and never assume it. A 401 on a /v1 operation means the token is no longer valid
+        (expired, or its credential was revoked): drop it and ask for a new one, at most once per call.
 
         The request carries only client_id and client_secret: there is no audience, scope or permission
         parameter. The principal decides what the token can do. The permissions granted to it decide the

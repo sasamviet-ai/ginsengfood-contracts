@@ -80,7 +80,7 @@ API phuc vu ops-core frontend:
 - MISA handoff create/read APIs
 
 High-risk APIs:
-- `POST /v1/service-tokens` (authentication-sensitive rate limit; client secret and access token must never be logged or cached)
+- `POST /v1/service-tokens` (authentication-sensitive rate limit of 10 requests per minute per remote IP; the client secret and the access token are never logged or written to disk; the token may be cached in memory until its `expires_in` elapses)
 - `POST /v1/recall-cases`
 - `POST /v1/sale-locks`
 - `POST /v1/batch-releases`
