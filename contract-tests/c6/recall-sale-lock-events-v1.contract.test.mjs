@@ -254,6 +254,27 @@ for (const file of [
     `${file}: ví dụ/fixture của /check phải mang recall_case_open kiểu boolean`));
 }
 
+// ── 5c. NM3-32b: `decision` có đúng HAI giá trị trên dây ───────────────────────────────────────────
+// OpSellableStatus.Resolve chỉ ghi SELLABLE hoặc NOT_SELLABLE; tìm trong toàn bộ mã provider không có đường nào
+// phát BLOCKED_* hay REVIEW_REQUIRED. Enum 8 giá trị trong enums/ops/sellable-status.yaml là từ vựng dự trữ từ
+// bộ tài liệu thiết kế, nên tệp phải nói rõ giá trị nào được phát và consumer phải làm gì với giá trị còn lại.
+const decisionEnum = readText("enums/ops/sellable-status.yaml");
+const decisionValues = [...decisionEnum.matchAll(/^  - value: (\S+)\n(?:    .*\n)*?    emitted_by_v1_provider: (true|false)\n/gm)]
+  .map(match => [match[1], match[2] === "true"]);
+check(() => assert.deepEqual(
+  decisionValues.filter(([, emitted]) => emitted).map(([value]) => value),
+  ["SELLABLE", "NOT_SELLABLE"],
+  "enums/ops/sellable-status.yaml: đúng hai giá trị SELLABLE và NOT_SELLABLE được provider v1 phát"));
+check(() => assert.equal(decisionValues.length, 8, "enums/ops/sellable-status.yaml: cả 8 giá trị phải khai emitted_by_v1_provider"));
+check(() => assert.match(decisionEnum, /consumer_rule:[^]*Sell only when `decision` is exactly SELLABLE[^]*fail closed/i,
+  "enums/ops/sellable-status.yaml: thiếu consumer_rule (chỉ SELLABLE được bán; mọi giá trị khác, kể cả giá trị lạ, chặn bán)"));
+check(() => assert.match(sellableStatus.properties.decision.description,
+  /SELLABLE or NOT_SELLABLE[^]*fail(s)? closed/i,
+  "schemas/ops/sellable-status.schema.json: mô tả `decision` phải nói provider chỉ phát SELLABLE/NOT_SELLABLE và consumer fail-closed"));
+check(() => assert.match(readText("openapi/ops-core/availability-sellable.v1.yaml"),
+  /data\.decision` is `SELLABLE` or `NOT_SELLABLE` only/,
+  "availability-sellable.v1.yaml: mô tả POST /v1/availability/check phải nêu decision chỉ có hai giá trị"));
+
 // ── 6. Cổng an toàn cho chính test này ────────────────────────────────────────────────────────────
 // Regex hoặc bộ liệt kê hỏng thì test soi 0 thứ và xanh giả. 4 event × (6 envelope + 4 data +
 // 5..6 required) + 14 khẳng định schema/asyncapi ⇒ luôn > 60.

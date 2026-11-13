@@ -1,7 +1,15 @@
 version: v1
 name: sellable-status
 title: Sellable Status
-description: Sellable Gate decision values. Product Activation is not sellable.
+description: >-
+  Sellable Gate decision vocabulary. Product Activation is not sellable. On the wire the v1 provider emits exactly two
+  of these values in `data.decision` (POST /v1/availability/check, GET /v1/sellable-statuses/{id} and the
+  ops-core.sellable.* events): SELLABLE and NOT_SELLABLE. The finer reason is carried by `block_reasons` and the boolean
+  gates, never by a third decision value. The other six names below are reserved vocabulary from the design packs: no
+  provider code path emits them (NM3-32b, checked against ops-core main), and a v1 consumer must not wait for them.
+consumer_rule: >-
+  Sell only when `decision` is exactly SELLABLE. Anything else (NOT_SELLABLE, any reserved name below, an empty value or
+  a value this list does not know) means do not sell: fail closed. Do not map a reserved name to SELLABLE.
 source_documents:
   - docs/documents/2. pack/01-PACK-01-OPERATIONAL-CORE.md
   - docs/documents/2. pack/02-PACK-02-PRODUCT-MASTER-SKU-RECIPE-ACTIVATION.md
@@ -9,28 +17,36 @@ values:
   - value: SELLABLE
     description: Batch/SKU passes released, warehouse, ledger, stock, HSD, QC, trace, recall, and sale-lock checks.
     source: PACK-01 Sellable Gate PASS.
+    emitted_by_v1_provider: true
   - value: NOT_SELLABLE
-    description: Generic not-sellable decision.
+    description: Generic not-sellable decision. Every blocking cause (quality hold, recall hold, sale lock, no stock, trace not ready, and the rest of the 11 block_reasons tokens) is reported through this value plus block_reasons.
     source: PACK-01 Sellable Gate BLOCK.
+    emitted_by_v1_provider: true
   - value: BLOCKED_QUALITY_HOLD
-    description: Not sellable due to quality hold.
+    description: Reserved, never emitted. Not sellable due to quality hold; on the wire this is NOT_SELLABLE with block_reasons containing QUALITY_HOLD.
     source: PACK-01 Hold/QC rules.
+    emitted_by_v1_provider: false
   - value: BLOCKED_RECALL_HOLD
-    description: Not sellable due to recall hold.
+    description: Reserved, never emitted. Not sellable due to recall hold; on the wire this is NOT_SELLABLE with block_reasons containing RECALL_HOLD.
     source: PACK-01 Recall/Hold.
+    emitted_by_v1_provider: false
   - value: BLOCKED_SALE_LOCK
-    description: Not sellable due to active sale lock/stop sale.
+    description: Reserved, never emitted. Not sellable due to active sale lock/stop sale; on the wire this is NOT_SELLABLE with block_reasons containing SALE_LOCK.
     source: PACK-01 Sale Lock.
+    emitted_by_v1_provider: false
   - value: BLOCKED_STOCK_UNAVAILABLE
-    description: Not sellable due to unavailable stock.
+    description: Reserved, never emitted. Not sellable due to unavailable stock; on the wire this is NOT_SELLABLE with block_reasons containing STOCK_NOT_AVAILABLE.
     source: PACK-01 Stock Available requirement.
+    emitted_by_v1_provider: false
   - value: BLOCKED_TRACE_NOT_READY
-    description: Not sellable because trace is not ready.
+    description: Reserved, never emitted. Not sellable because trace is not ready; on the wire this is NOT_SELLABLE with block_reasons containing TRACE_NOT_READY.
     source: PACK-01 Trace Ready requirement.
+    emitted_by_v1_provider: false
   - value: REVIEW_REQUIRED
-    description: Sellable decision needs owner/reviewer action.
+    description: Reserved, never emitted. Sellable decision needs owner/reviewer action; the v1 gate has no such state, it answers SELLABLE or NOT_SELLABLE.
     source: PACK-01 REVIEW_REQUIRED negative path.
+    emitted_by_v1_provider: false
 compatibility:
-  breaking_change: Allowing sellable without all gate conditions is breaking.
+  breaking_change: Allowing sellable without all gate conditions is breaking. Emitting any reserved value on the wire would be a new value for v1 consumers and needs the coordination of an additive enum change (consumers already fail closed on unknown values).
 todos:
-  - Confirm official sellable decision taxonomy in Phase 7.
+  - Confirm official sellable decision taxonomy in Phase 7 (only needed if a later version wants to emit more than SELLABLE and NOT_SELLABLE).
