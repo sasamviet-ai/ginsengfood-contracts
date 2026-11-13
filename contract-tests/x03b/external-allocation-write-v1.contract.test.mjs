@@ -892,6 +892,12 @@ const limitsDefaults = {
   share_floor_quantity: 50,
   max_requested_quantity_per_line: 1000
 };
+// verifier F5: the replay comment must cover the replay of a reserve whose hold is gone (409), not only the original-result case.
+assert.match(
+  collapse(inventoryText.slice(inventoryText.indexOf("  ExternalIdempotentReplay:") - 2200, inventoryText.indexOf("  ExternalIdempotentReplay:")).replace(/^\s*# ?/gm, "")),
+  /a reserve replay whose hold has meanwhile expired or been released: it is 409 ALLOCATION_CONFLICT/,
+  "ExternalIdempotentReplay comment covers the replay after the hold ended"
+);
 const limitsBlock = extractMethodBlock(extractPathBlock(inventoryText, "/v1/inventory/allocations"), "post");
 assert.match(limitsBlock, /^      x-provider-limits:$/m, "reserve declares x-provider-limits");
 const limitsText = limitsBlock.slice(limitsBlock.indexOf("      x-provider-limits:"), limitsBlock.indexOf("      parameters:"));

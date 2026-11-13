@@ -85,7 +85,9 @@ x-retry-policies:
     backoff: FULL_JITTER_BASE_500MS_CAP_5S
   # Write commands (reserve, release). The retry IS a replay: the same X-Idempotency-Key with the same body. The provider
   # answers a replay of a finished call with the original result (reserve: 200 ALREADY_RESERVED, release: the original 200)
-  # and a replay of a call that is still running with 429 + Retry-After: 1, so replaying is always valid. Replay after a lost
+  # and a replay of a call that is still running with 429 + Retry-After: 1, so replaying is always valid. The one exception to
+  # "original result" is a reserve replay whose hold has meanwhile expired or been released: it is 409 ALLOCATION_CONFLICT (see
+  # the 409 of reserve; a new key only if the order is still live), not replayed again automatically. Replay after a lost
   # response, a timeout, 502/503/504, or a 429 (bucket empty, same key still running, temporary contention), honoring
   # Retry-After. Never send a new key for the same intent: a new key for the same source can hold stock twice (reserve) or
   # release twice. max_retries is the recommended ceiling for automatic replays, not a cap the provider enforces (it counts
