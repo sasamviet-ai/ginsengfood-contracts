@@ -10,7 +10,7 @@
     "item_type": {
       "type": "string",
       "enum": ["FINISHED_GOOD"],
-      "description": "Narrowed to FINISHED_GOOD in v1 so the finished-goods-only boundary is structural, not merely enforced in provider code (OD-C24-01B). Widening the scope requires a successor contract."
+      "description": "Narrowed to FINISHED_GOOD in v1 so the finished-goods-only boundary is structural, not merely enforced in provider code (OD-C24-01B). Widening the scope requires a successor contract. FINISHED_GOOD is singular: it is not the same string as the warehouse_type FINISHED_GOODS (plural) of the warehouse registry; item_type names an inventory ITEM, warehouse_type a kind of WAREHOUSE. Both strings stay as they are; compare them byte for byte and never normalise one into the other (docs/m3-allocation-integration-notes.md section 9)."
     },
     "sku_id": { "type": "string", "format": "uuid" },
     "material_id": {

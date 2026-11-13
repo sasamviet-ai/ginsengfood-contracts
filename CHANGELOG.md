@@ -4,6 +4,10 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ## Unreleased
 
+### `item_type` FINISHED_GOOD versus `warehouse_type` FINISHED_GOODS: two strings, noted in both places (NM3-32c g, wording only)
+
+The stock balance, the ledger and the allocations say `item_type` `FINISHED_GOOD` (singular); the warehouse registry says `warehouse_type` `FINISHED_GOODS` (plural). Both are correct and both stay as they are; they name different things (an inventory item, a kind of warehouse). The descriptions of `item_type` in `external-stock-balance.schema.json` and of `warehouse_type` in `external-warehouse.schema.json` and `warehouse.schema.json` now say so and tell the consumer to compare byte for byte and never normalise one into the other, and section 9 of `docs/m3-allocation-integration-notes.md` explains it. No value changes; the clarifications test pins the two enums and the sentences.
+
 ### Quantities can be fractional; whole numbers are not guaranteed (NM3-32c f, C9, wording only)
 
 Stock, holds and the quantity blocks are `numeric(18,3)` columns with no whole-number constraint, so the quantity of a counted unit (`hộp`, `thùng`) can be fractional up to three decimal places (for example `requested_quantity` of `POST /v1/inventory/allocations`, and `available_quantity` / `sellable_quantity` of `POST /v1/availability/check`). The contract already said "at most three decimal places" in the pattern; it now also says it does NOT guarantee a whole number, that the rule KHO-Q1 (a counted unit is whole) is NOT applied by the provider today, that a consumer which treats a fractional quantity as UNKNOWN_BLOCKED fails closed, and that the provider will tell M3 before it applies KHO-Q1. New section 8 of `docs/m3-allocation-integration-notes.md`; descriptions of `external-quantity.schema.json` and of the two quantity fields of `sellable-status.schema.json`. **No pattern changes.** The `m3-review-clarifications-v1` test pins the sentences and the untouched patterns.

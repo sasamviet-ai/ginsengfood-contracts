@@ -115,4 +115,28 @@ const skuSchema = json("schemas/product/sku.schema.json");
   }
 }
 
-console.log("X03B M3 review clarifications PASS: (f1) lifecycle, sku_code and transitions; (f2) quantities.");
+// ---- (g) item_type FINISHED_GOOD (singular) is not warehouse_type FINISHED_GOODS (plural) ---------------------------------------------
+{
+  const stockBalance = json("schemas/ops/x03b/external-stock-balance.schema.json");
+  assert.deepEqual(stockBalance.properties.item_type.enum, ["FINISHED_GOOD"], "item_type stays singular");
+  const externalWarehouse = json("schemas/ops/x03b/external-warehouse.schema.json");
+  const domainWarehouse = json("schemas/ops/warehouse.schema.json");
+  assert.deepEqual(externalWarehouse.properties.warehouse_type.enum, ["RAW_MATERIAL", "FINISHED_GOODS"], "warehouse_type stays plural");
+  assert.deepEqual(domainWarehouse.properties.warehouse_type.enum, ["RAW_MATERIAL", "FINISHED_GOODS"]);
+  const phrases = ["FINISHED_GOOD", "FINISHED_GOODS", "singular", "plural", "not the same string", "byte for byte", "never normalise"];
+  assertPhrases("stock-balance item_type", stockBalance.properties.item_type.description, phrases);
+  assertPhrases("external-warehouse warehouse_type", externalWarehouse.properties.warehouse_type.description, phrases);
+  assertPhrases("warehouse warehouse_type", domainWarehouse.properties.warehouse_type.description, phrases);
+  const allocationNotes = read("docs/m3-allocation-integration-notes.md");
+  const spellings = section(allocationNotes, "## 9. Two spellings that look alike: `item_type` and `warehouse_type`");
+  assertPhrases("allocation notes section 9", spellings, [
+    "`item_type` is `FINISHED_GOOD` (singular)",
+    "`warehouse_type` is `FINISHED_GOODS` (plural)",
+    "different vocabularies",
+    "Both strings stay as they are",
+    "never normalise one into the other",
+    "no change of value"
+  ]);
+}
+
+console.log("X03B M3 review clarifications PASS: (f1) lifecycle, sku_code and transitions; (f2) quantities; (g) item_type versus warehouse_type.");

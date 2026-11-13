@@ -12,7 +12,7 @@
     "warehouse_type": {
       "type": "string",
       "enum": ["RAW_MATERIAL", "FINISHED_GOODS"],
-      "description": "Warehouse type, closed set (the ops-core database check constraint): RAW_MATERIAL (raw material warehouse) or FINISHED_GOODS (finished goods warehouse). Upper case, compared byte for byte. Same vocabulary as schemas/ops/warehouse.schema.json."
+      "description": "Warehouse type, closed set (the ops-core database check constraint): RAW_MATERIAL (raw material warehouse) or FINISHED_GOODS (finished goods warehouse). Upper case, compared byte for byte. Same vocabulary as schemas/ops/warehouse.schema.json. FINISHED_GOODS is plural and is not the same string as the item_type FINISHED_GOOD (singular) of the stock balance, the ledger and the allocations: item_type names an inventory ITEM, warehouse_type a kind of WAREHOUSE. Both strings stay as they are; compare them byte for byte and never normalise one into the other (docs/m3-allocation-integration-notes.md section 9)."
     },
     "status": {
       "type": "string",
