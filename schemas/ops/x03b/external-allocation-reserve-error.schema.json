@@ -14,7 +14,7 @@
       { "httpStatus": 422, "code": "VALIDATION_FAILED", "field": "X-Idempotency-Key", "reason": "IDEMPOTENCY_KEY_REUSED" }
     ],
     "other_reasons_are_free_text": true,
-    "free_text_fields": ["X-Idempotency-Key", "source_object_type", "sku_id", "warehouse_id", "source_object_id", "uom_code", "requested_quantity", "expires_at"]
+    "free_text_fields": ["X-Idempotency-Key", "source_object_type", "sku_id", "warehouse_id", "source_object_id", "source_object_no", "uom_code", "requested_quantity", "expires_at"]
   },
   "$defs": {
     "Detail": {

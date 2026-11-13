@@ -808,6 +808,10 @@ const stableReasons = {
     { httpStatus: 422, code: "VALIDATION_FAILED", field: "X-Idempotency-Key", reason: "IDEMPOTENCY_KEY_REUSED" }
   ]
 };
+const freeTextFields = {
+  reserve: ["X-Idempotency-Key", "source_object_type", "sku_id", "warehouse_id", "source_object_id", "source_object_no", "uom_code", "requested_quantity", "expires_at"],
+  release: ["X-Idempotency-Key", "source_object_type", "source_object_id"]
+};
 const detailRules = {
   reserve: { schema: reserveErrorSchema, withoutDetails: ["InvalidRequest", "Unauthorized", "Forbidden", "NotFound", "InsufficientStock", "RateLimited", "InternalError"] },
   release: { schema: releaseErrorSchema, withoutDetails: ["InvalidRequest", "Unauthorized", "Forbidden", "NotFound", "RequestTimeout", "AllocationConflict", "AllocationNotHeld", "RateLimited", "InternalError", "ServiceUnavailable"] }
@@ -831,6 +835,8 @@ for (const [which, rule] of Object.entries(detailRules)) {
   // The published closed table equals the one in this test.
   assert.deepEqual(schema["x-detail-reasons"].stable, stableReasons[which], `${which}: x-detail-reasons.stable drift`);
   assert.ok(schema["x-detail-reasons"].other_reasons_are_free_text === true, `${which}: other 422 reasons are declared free text`);
+  // Provider evidence: the handlers' Validation(...) calls and ExternalAllocationReserveCommandValidator (source_object_no, runs before idempotency).
+  assert.deepEqual(schema["x-detail-reasons"].free_text_fields, freeTextFields[which], `${which}: x-detail-reasons.free_text_fields drift`);
   // Codes that never carry details reject them.
   for (const definition of rule.withoutDetails) {
     const code = Object.keys(defNameOfCode).find(key => defNameOfCode[key] === definition);
@@ -862,6 +868,11 @@ const reasonSection = notes.slice(reasonStart, notes.indexOf("\n## ", reasonStar
 for (const row of [...stableReasons.reserve, ...stableReasons.release]) {
   assert.ok(reasonSection.includes(`\`${row.reason}\``), `notes table lists ${row.reason}`);
 }
+const freeTextLine = reasonSection.split("\n").find(line => line.includes("The fields that can appear this way:"));
+assert.ok(freeTextLine, "notes: the free-text fields bullet is missing");
+const [reserveFieldsText, releaseFieldsText] = freeTextLine.slice(freeTextLine.indexOf("for reserve")).split("; for release");
+for (const field of freeTextFields.reserve) assert.ok(reserveFieldsText.includes(`\`${field}\``), `notes free-text bullet lists ${field} for reserve`);
+for (const field of freeTextFields.release) assert.ok(releaseFieldsText.includes(`\`${field}\``), `notes free-text bullet lists ${field} for release`);
 for (const marker of ["SOURCE_OBJECT_ID_REQUIRED", "GET /v1/inventory/allocations", "free text", "ALLOCATION_NOT_HELD", "never on the wire", "Vietnamese"]) {
   assert.ok(collapse(reasonSection).includes(marker), `notes table section must mention ${marker}`);
 }
