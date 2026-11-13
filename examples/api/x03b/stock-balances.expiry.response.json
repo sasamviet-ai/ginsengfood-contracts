@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-x03b-stock-balance-expiry"
+  },
+  "data": [
+    {
+      "stock_balance_id": "10000000-0000-4000-8000-000000000011",
+      "item_type": "FINISHED_GOOD",
+      "sku_id": "20000000-0000-4000-8000-000000000001",
+      "batch_id": "30000000-0000-4000-8000-000000000011",
+      "lot_code": "FG-LOT-20261101-001",
+      "expiry_date": "2028-11-01",
+      "warehouse_id": "40000000-0000-4000-8000-000000000001",
+      "warehouse_location_id": "50000000-0000-4000-8000-000000000001",
+      "on_hand_quantity": {
+        "value": "120",
+        "unit": "hộp"
+      },
+      "available_quantity": {
+        "value": "100",
+        "unit": "hộp"
+      },
+      "reserved_quantity": {
+        "value": "20",
+        "unit": "hộp"
+      },
+      "quality_hold_quantity": {
+        "value": "0",
+        "unit": "hộp"
+      },
+      "recall_hold_quantity": {
+        "value": "0",
+        "unit": "hộp"
+      },
+      "sale_lock_quantity": {
+        "value": "0",
+        "unit": "hộp"
+      },
+      "as_of": "2026-11-13T05:00:00Z"
+    },
+    {
+      "stock_balance_id": "10000000-0000-4000-8000-000000000012",
+      "item_type": "FINISHED_GOOD",
+      "sku_id": "20000000-0000-4000-8000-000000000001",
+      "batch_id": "30000000-0000-4000-8000-000000000011",
+      "lot_code": "FG-LOT-20261105-001",
+      "warehouse_id": "40000000-0000-4000-8000-000000000001",
+      "warehouse_location_id": "50000000-0000-4000-8000-000000000001",
+      "on_hand_quantity": {
+        "value": "40",
+        "unit": "hộp"
+      },
+      "available_quantity": {
+        "value": "40",
+        "unit": "hộp"
+      },
+      "reserved_quantity": {
+        "value": "0",
+        "unit": "hộp"
+      },
+      "quality_hold_quantity": {
+        "value": "0",
+        "unit": "hộp"
+      },
+      "recall_hold_quantity": {
+        "value": "0",
+        "unit": "hộp"
+      },
+      "sale_lock_quantity": {
+        "value": "0",
+        "unit": "hộp"
+      },
+      "as_of": "2026-11-13T05:00:00Z"
+    }
+  ],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "inventory.stock-balances",
+    "snapshot_id": "11000000-0000-4000-8000-000000000601",
+    "as_of": "2026-11-13T05:00:00Z",
+    "high_watermark": "10000000-0000-4000-8000-000000000012",
+    "next_cursor": null,
+    "page_item_count": 2,
+    "delivered_item_count": 2,
+    "item_count": 2,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "3dc860455f4b9d8f2d7c2c27de4bb1f8b6a2aa96d3d29aa127310faecac597a7",
+    "delta_supported": false
+  }
+}

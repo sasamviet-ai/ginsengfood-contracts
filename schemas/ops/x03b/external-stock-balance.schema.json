@@ -20,6 +20,11 @@
     },
     "batch_id": { "type": "string", "format": "uuid" },
     "lot_code": { "type": "string", "minLength": 1 },
+    "expiry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "OPTIONAL. Expiry date of the lot: a calendar date YYYY-MM-DD in Vietnam time (UTC+7). The goods are sellable through the END of that day and are expired from 00:00 of the next day, Vietnam time (17:00 UTC on the date itself). Absent (never null, never an empty string) when the provider cannot resolve it for the row, for example the batch is unknown or no valid shelf-life configuration exists; absent means UNKNOWN, not 'does not expire', and a consumer must tolerate the property missing on any row. The value is for display and sorting; this projection never decides sellability, POST /v1/availability/check does."
+    },
     "warehouse_id": { "type": "string", "format": "uuid" },
     "warehouse_location_id": { "type": "string", "format": "uuid" },
     "on_hand_quantity": {
