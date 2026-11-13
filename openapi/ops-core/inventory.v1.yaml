@@ -460,6 +460,21 @@ paths:
       x-write-surface: EXTERNAL_ALLOCATION_RESERVE
       x-runtime-policy: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED"
       x-owner-decision-ref: OWNER-DIRECTIVE-2026-09-05-EXT-ALLOC-RESERVE
+      # Provider configuration, not wire. These are the values the provider uses today when nothing overrides them; they are
+      # published so that a consumer can size itself, not as a promise. The minimum numbers guaranteed to a consumer are not
+      # fixed yet. docs/m3-allocation-integration-notes.md section 7 has the meaning and the consumer rule.
+      x-provider-limits:
+        config_section: ExternalApi:AllocationHoldLimits
+        status: CURRENT_DEFAULTS_NOT_A_GUARANTEE
+        max_active_holds_per_principal: 200
+        max_hold_window_minutes: 60
+        default_hold_window_minutes: 30
+        max_share_of_on_hand_percent: 80
+        share_floor_quantity: 50
+        max_requested_quantity_per_line: 1000
+        guaranteed_minimums: NOT_YET_FIXED
+        guaranteed_minimums_decision: SEC-15 / M3-158, before 2026-11-20
+        consumer_rule: FAIL_CLOSED_ON_EVERY_LIMIT_REFUSAL
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -541,7 +556,9 @@ paths:
             physical on-hand stock the principal may hold at once). These are quota refusals, not shortages:
             stock may be intact. Nothing is reserved and the X-Idempotency-Key is not consumed, so the same
             request may be sent again with the same key after the principal has released holds or holds have
-            expired. The limits themselves are provider configuration agreed out of band and are never echoed.
+            expired. The limits themselves are provider configuration and are never echoed; their current defaults
+            are in x-provider-limits and docs/m3-allocation-integration-notes.md section 7, which also says that the
+            minimum numbers a consumer may rely on are not fixed yet. Fail closed on every limit refusal.
           x-error-code: INSUFFICIENT_STOCK
           x-http-status: 409
           x-retryable: false

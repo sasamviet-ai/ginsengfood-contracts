@@ -868,4 +868,47 @@ for (const marker of ["SOURCE_OBJECT_ID_REQUIRED", "GET /v1/inventory/allocation
 assert.match(collapse(read(inventoryFile)), /closed table of details\[\]\.reason is in docs\/m3-allocation-integration-notes\.md/, "inventory.v1.yaml points to the closed table");
 assert.match(parseJson(releaseErrorSchema).$defs.Error.properties.details.description, /422 VALIDATION_FAILED only/, "release details are documented as 422-only");
 
+// ---------------------------------------------------------------------------------------------------------
+// NM3-32b point 1: the provider's current hold limits are published as defaults of the configuration section
+// ExternalApi:AllocationHoldLimits (description and x- extension, no wire field), with the honest statement that the
+// minimum numbers guaranteed to a consumer are not fixed yet and that the consumer must fail closed.
+// ---------------------------------------------------------------------------------------------------------
+const limitsDefaults = {
+  max_active_holds_per_principal: 200,
+  max_hold_window_minutes: 60,
+  default_hold_window_minutes: 30,
+  max_share_of_on_hand_percent: 80,
+  share_floor_quantity: 50,
+  max_requested_quantity_per_line: 1000
+};
+const limitsBlock = extractMethodBlock(extractPathBlock(inventoryText, "/v1/inventory/allocations"), "post");
+assert.match(limitsBlock, /^      x-provider-limits:$/m, "reserve declares x-provider-limits");
+const limitsText = limitsBlock.slice(limitsBlock.indexOf("      x-provider-limits:"), limitsBlock.indexOf("      parameters:"));
+for (const [key, value] of Object.entries(limitsDefaults)) {
+  assert.match(limitsText, new RegExp(`^        ${key}: ${value}$`, "m"), `x-provider-limits.${key} must be ${value}`);
+}
+assert.match(limitsText, /^        config_section: ExternalApi:AllocationHoldLimits$/m);
+assert.match(limitsText, /^        status: CURRENT_DEFAULTS_NOT_A_GUARANTEE$/m);
+assert.match(limitsText, /^        guaranteed_minimums: NOT_YET_FIXED$/m);
+assert.match(limitsText, /^        guaranteed_minimums_decision: SEC-15 \/ M3-158, before 2026-11-20$/m);
+assert.match(limitsText, /^        consumer_rule: FAIL_CLOSED_ON_EVERY_LIMIT_REFUSAL$/m);
+const limitsSectionStart = notes.indexOf("## 7. Provider limits: current defaults and what is not guaranteed");
+assert.notEqual(limitsSectionStart, -1, "notes: missing section 7 on provider limits");
+const limitsSection = collapse(notes.slice(limitsSectionStart));
+for (const phrase of [
+  "`ExternalApi:AllocationHoldLimits`",
+  "200", "60 minutes", "80%", "50", "1000",
+  "one hold is one `source_object_id`",
+  "never below 30 minutes",
+  "NOT FIXED YET",
+  "SEC-15",
+  "M3-158",
+  "20/11/2026",
+  "fail closed",
+  "may change without a change of this contract",
+  "No wire field"
+]) {
+  assert.ok(limitsSection.includes(phrase), `notes section 7 must say: ${phrase}`);
+}
+
 console.log(`X03B allocation write-surface contract PASS: ${operations.length}/2 operations, ${reserveResponseFiles.length + releaseResponseFiles.length} response payloads, ${releaseErrorCases.length} release error envelopes, ${vectors.length} UUIDv5 vectors, 13 webhook event types, and negative tamper checks.`);
