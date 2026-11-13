@@ -39,6 +39,18 @@ x-retry-policies:
     backoff: FULL_JITTER_BASE_500MS_CAP_5S
 x-pagination-policies:
   ExternalSnapshotCursorV1:
+    description: >-
+      Policy of the full-snapshot cursor shared by the bulk-read lists of this file. "delta" in the keys below
+      (delta_supported, delta_replay_retention_seconds, delta_poll_seconds, delta_poll_jitter_percent,
+      future_tombstone_retention_seconds) names a change feed that returns only what changed since a checkpoint; no list of this
+      contract publishes one, so delta_supported is false and the other delta_* keys describe something that does not exist.
+      GET /v1/skus?updated_since= is NOT a delta feed: it is a filter on the instant a SKU was written, applied to a complete
+      snapshot of that moment; it keeps no checkpoint at the provider, replays nothing and publishes no tombstone (a SKU never
+      disappears: RETIRED stays listed). expired_cursor_recovery means that an expired cursor (410) or a snapshot that changed
+      under a cursor (409) is recovered by reading the whole snapshot again from the first page, never by resuming from a
+      timestamp or a local checkpoint of the cursor; that rule is about CURSORS and is not a ban on updated_since as a filter for a
+      new pull. snapshot_refresh_seconds and full_reconciliation_seconds are the generic cadence of the stock and warehouse
+      feeds; for the SKU list follow the recommendation of listSkusV1 and docs/m3-sku-catalog-integration-notes.md section 1.
     mode: OPAQUE_SCOPE_BOUND_SNAPSHOT_CURSOR
     cursor_version: 1
     cursor_ttl_seconds: 1800
@@ -89,8 +101,15 @@ paths:
         it. The filter is inclusive (updated_at greater than or equal to the value), so the SKUs that share the
         boundary instant, and every SKU inside the margin, come again and the consumer deduplicates by sku_id and
         revision. No margin is a guarantee, so a consumer must also read the whole catalog, without updated_since,
-        at a fixed interval (it is a few dozen SKUs today) and treat that read as the authority. Without
-        updated_since the whole catalog is returned. INACTIVE and RETIRED SKUs are listed: they are lifecycle
+        at a fixed interval and treat that read as the authority.
+
+        Recommended cadence (SHOULD, not a guarantee; the numbers are a recommendation for the SKU list and the provider
+        does not enforce them): pull incrementally every 5 minutes with updated_since = the time of the previous
+        successful pull minus 5 minutes; read the whole catalog, without updated_since, at start-up and at least every
+        24 hours (19 SKUs today, one page, so it is cheap); when a cursor expires (410) or the snapshot changes under it
+        (409), read the whole catalog again from the first page. The x-pagination-policy below and x-delta-supported: false
+        describe the generic snapshot feed: updated_since on this operation is a filter on the write instant of a snapshot,
+        not a delta feed. Without updated_since the whole catalog is returned. INACTIVE and RETIRED SKUs are listed: they are lifecycle
         states, not deletions, and a SKU never disappears from the list. lifecycle_status filters on the value
         the object publishes (ACTIVE_BASELINE is internal and is published, and filtered, as ACTIVE); the
         provider currently publishes only ACTIVE, INACTIVE and RETIRED, so any other value of the closed enum

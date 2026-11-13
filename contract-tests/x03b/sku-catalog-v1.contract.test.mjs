@@ -211,6 +211,69 @@ assert.match(properties.updated_at.description, /outside the application/, "the 
 assert.match(properties.updated_at.description, /must set updated_at itself/, "the schema must say who sets updated_at");
 assert.match(properties.revision.description, /outside the application/, "revision follows updated_at, so it carries the same obligation");
 
+// NM3-32c (d): the snapshot policy talks about "delta" and about recovering an expired cursor without a timestamp, while GET /v1/skus
+// takes updated_since. The pinned values do not change; the text says what they mean and gives the consumer a recommendation with numbers.
+{
+  const flat = text => text.replace(/\s+/g, " ");
+  // The pinned values are untouched.
+  assert.match(skuYaml, /^    delta_supported: false$/m);
+  assert.match(skuYaml, /^    expired_cursor_recovery: FULL_RECONCILE_NO_TIMESTAMP_OR_LOCAL_CHECKPOINT$/m);
+  assert.match(skuYaml, /^    full_reconciliation_seconds: 21600$/m);
+  assert.match(listBlock, /^      x-delta-supported: false$/m);
+
+  const policyStart = skuYaml.indexOf("x-pagination-policies:\n  ExternalSnapshotCursorV1:\n");
+  assert.notEqual(policyStart, -1);
+  const policyBlock = flat(skuYaml.slice(policyStart, skuYaml.indexOf("\npaths:")));
+  for (const phrase of [
+    "description:",
+    '"delta" in the keys below',
+    "no list of this contract publishes one",
+    "GET /v1/skus?updated_since= is NOT a delta feed",
+    "a filter on the instant a SKU was written",
+    "recovered by reading the whole snapshot again from the first page",
+    "is about CURSORS",
+    "not a ban on updated_since as a filter for a new pull",
+    "follow the recommendation of listSkusV1"
+  ]) {
+    assert.ok(policyBlock.includes(phrase), `the pagination policy of sku.v1.yaml must say: ${phrase}`);
+  }
+
+  const operationText = flat(listBlock);
+  for (const phrase of [
+    "Recommended cadence (SHOULD, not a guarantee;",
+    "every 5 minutes",
+    "updated_since = the time of the previous successful pull minus 5 minutes",
+    "at start-up",
+    "at least every 24 hours",
+    "19 SKUs today",
+    "cursor expires (410) or the snapshot changes under it (409)",
+    "x-delta-supported: false",
+    "not a delta feed"
+  ]) {
+    assert.ok(operationText.includes(phrase), `listSkusV1 must say: ${phrase}`);
+  }
+
+  const metaSchema = loadSchema(root, "schemas/ops/x03b/external-snapshot-meta.schema.json").schema;
+  assert.equal(metaSchema.properties.delta_supported.const, false, "delta_supported stays the constant false");
+  assert.match(metaSchema.properties.delta_supported.description, /not a delta feed/);
+  assert.match(metaSchema.properties.delta_supported.description, /updated_since/);
+  assert.match(metaSchema.description, /GET \/v1\/skus/);
+
+  const skuNotes = flat(fs.readFileSync(path.join(root, "docs/m3-sku-catalog-integration-notes.md"), "utf8"));
+  for (const phrase of [
+    "## 1. Reading the catalog",
+    "SHOULD",
+    "every 5 minutes",
+    "5-minute overlap",
+    "at start-up and at least every 24 hours",
+    "19 SKUs",
+    "not a guarantee",
+    "not a delta feed"
+  ]) {
+    assert.ok(skuNotes.includes(phrase), `docs/m3-sku-catalog-integration-notes.md must say: ${phrase}`);
+  }
+}
+
 // Examples and fixtures: every item is a complete SkuV1Response with the three catalog additions.
 const listPayloads = [
   "examples/api/x03b/skus.response.json",
