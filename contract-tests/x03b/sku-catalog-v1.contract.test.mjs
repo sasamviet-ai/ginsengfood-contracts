@@ -204,6 +204,12 @@ assert.match(updatedSinceParameter, /WRITTEN,\s+not\s+the\s+instant\s+it\s+was\s
 assert.match(updatedSinceParameter, /overlap/, "the parameter itself must tell the consumer to overlap");
 assert.match(properties.updated_at.description, /WRITTEN, not the instant it was COMMITTED/, "the schema must say it too");
 
+// F2 (SKU-M12-03 verifier): the marker only moves when the provider sets updated_at, so a change made outside the application
+// (SQL, migration, seed) must set it itself. This is a provider obligation and the contract says so.
+assert.match(properties.updated_at.description, /outside the application/, "the schema must state the provider obligation");
+assert.match(properties.updated_at.description, /must set updated_at itself/, "the schema must say who sets updated_at");
+assert.match(properties.revision.description, /outside the application/, "revision follows updated_at, so it carries the same obligation");
+
 // Examples and fixtures: every item is a complete SkuV1Response with the three catalog additions.
 const listPayloads = [
   "examples/api/x03b/skus.response.json",
