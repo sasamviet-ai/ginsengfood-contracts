@@ -4,7 +4,28 @@
   "title": "External allocation reserve error envelopes",
   "description": "Error envelopes for POST /v1/inventory/allocations. The envelope shape is identical to the bulk-read one so a consumer parses both with the same reader; only the code vocabulary differs, because a write route can fail in ways a snapshot read cannot.",
   "$comment": "Deliberately a separate closed enum instead of widening external-bulk-read-error.schema.json: INSUFFICIENT_STOCK and ALLOCATION_CONFLICT are meaningless on read routes, and a read consumer must not be told to expect them. The provider never forwards internal operational reason codes (SALE_LOCK_ACTIVE, RECALL_IMPACT_ACTIVE, BATCH_NOT_RELEASED, QUALITY_HOLD) — those disclose warehouse state to a consumer that only needs to know whether the hold succeeded.",
+  "x-detail-reasons": {
+    "description": "Closed table of the stable details[].reason tokens of this operation. A stable token is a contract value and never changes wording. Every other reason on a 422 is free text produced by input validation (English for body fields, possibly Vietnamese for X-Idempotency-Key format problems) and is not contractual: handle it by field and HTTP status. details exist on exactly two answers, a 409 ALLOCATION_CONFLICT that is a reservation quota refusal and a 422 VALIDATION_FAILED; no other error code carries them. A null field means the item has no field.",
+    "stable": [
+      { "httpStatus": 409, "code": "ALLOCATION_CONFLICT", "field": null, "reason": "HOLD_LIMIT_REACHED" },
+      { "httpStatus": 409, "code": "ALLOCATION_CONFLICT", "field": "requested_quantity", "reason": "HOLD_SHARE_LIMIT_REACHED" },
+      { "httpStatus": 422, "code": "VALIDATION_FAILED", "field": "requested_quantity", "reason": "REQUESTED_QUANTITY_LIMIT_EXCEEDED" },
+      { "httpStatus": 422, "code": "VALIDATION_FAILED", "field": "expires_at", "reason": "EXPIRES_AT_LIMIT_EXCEEDED" },
+      { "httpStatus": 422, "code": "VALIDATION_FAILED", "field": "X-Idempotency-Key", "reason": "IDEMPOTENCY_KEY_REUSED" }
+    ],
+    "other_reasons_are_free_text": true,
+    "free_text_fields": ["X-Idempotency-Key", "source_object_type", "sku_id", "warehouse_id", "source_object_id", "uom_code", "requested_quantity", "expires_at"]
+  },
   "$defs": {
+    "Detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "field": { "type": "string", "minLength": 1, "description": "The request body field or header that the reason is about. Omitted when the reason is not about one field (HOLD_LIMIT_REACHED)." },
+        "reason": { "type": "string", "minLength": 1, "description": "A stable token from x-detail-reasons.stable, otherwise free text that is not contractual: key on field, never on the text." }
+      },
+      "required": ["reason"]
+    },
     "Error": {
       "type": "object",
       "additionalProperties": false,
@@ -28,7 +49,7 @@
         "message": { "type": "string" },
         "httpStatus": { "type": "integer" },
         "correlationId": { "type": "string", "minLength": 1 },
-        "details": { "type": "array", "items": { "type": "object" } }
+        "details": { "type": "array", "minItems": 1, "description": "Present on exactly two answers: a 409 ALLOCATION_CONFLICT that is a reservation quota refusal (one item, HOLD_LIMIT_REACHED or HOLD_SHARE_LIMIT_REACHED) and a 422 VALIDATION_FAILED (field and reason). No other code carries details. See x-detail-reasons.", "items": { "$ref": "#/$defs/Detail" } }
       },
       "required": ["code", "message", "httpStatus", "correlationId"]
     },
@@ -55,37 +76,37 @@
     "InvalidRequest": {
       "allOf": [
         { "$ref": "#/$defs/BaseEnvelope" },
-        { "properties": { "error": { "properties": { "code": { "const": "INVALID_REQUEST" }, "httpStatus": { "const": 400 } }, "required": ["code", "httpStatus"] } } }
+        { "properties": { "error": { "properties": { "code": { "const": "INVALID_REQUEST" }, "httpStatus": { "const": 400 }, "details": false }, "required": ["code", "httpStatus"] } } }
       ]
     },
     "Unauthorized": {
       "allOf": [
         { "$ref": "#/$defs/BaseEnvelope" },
-        { "properties": { "error": { "properties": { "code": { "const": "UNAUTHORIZED" }, "httpStatus": { "const": 401 } }, "required": ["code", "httpStatus"] } } }
+        { "properties": { "error": { "properties": { "code": { "const": "UNAUTHORIZED" }, "httpStatus": { "const": 401 }, "details": false }, "required": ["code", "httpStatus"] } } }
       ]
     },
     "Forbidden": {
       "allOf": [
         { "$ref": "#/$defs/BaseEnvelope" },
-        { "properties": { "error": { "properties": { "code": { "const": "FORBIDDEN" }, "httpStatus": { "const": 403 } }, "required": ["code", "httpStatus"] } } }
+        { "properties": { "error": { "properties": { "code": { "const": "FORBIDDEN" }, "httpStatus": { "const": 403 }, "details": false }, "required": ["code", "httpStatus"] } } }
       ]
     },
     "NotFound": {
       "allOf": [
         { "$ref": "#/$defs/BaseEnvelope" },
-        { "properties": { "error": { "properties": { "code": { "const": "NOT_FOUND" }, "httpStatus": { "const": 404 } }, "required": ["code", "httpStatus"] } } }
+        { "properties": { "error": { "properties": { "code": { "const": "NOT_FOUND" }, "httpStatus": { "const": 404 }, "details": false }, "required": ["code", "httpStatus"] } } }
       ]
     },
     "InsufficientStock": {
       "allOf": [
         { "$ref": "#/$defs/BaseEnvelope" },
-        { "properties": { "error": { "properties": { "code": { "const": "INSUFFICIENT_STOCK" }, "httpStatus": { "const": 409 } }, "required": ["code", "httpStatus"] } } }
+        { "properties": { "error": { "properties": { "code": { "const": "INSUFFICIENT_STOCK" }, "httpStatus": { "const": 409 }, "details": false }, "required": ["code", "httpStatus"] } } }
       ]
     },
     "AllocationConflict": {
       "allOf": [
         { "$ref": "#/$defs/BaseEnvelope" },
-        { "properties": { "error": { "properties": { "code": { "const": "ALLOCATION_CONFLICT" }, "httpStatus": { "const": 409 } }, "required": ["code", "httpStatus"] } } }
+        { "properties": { "error": { "properties": { "code": { "const": "ALLOCATION_CONFLICT" }, "httpStatus": { "const": 409 }, "details": { "type": "array", "minItems": 1, "maxItems": 1, "items": { "allOf": [ { "$ref": "#/$defs/Detail" }, { "properties": { "reason": { "enum": ["HOLD_LIMIT_REACHED", "HOLD_SHARE_LIMIT_REACHED"] } } } ] } } }, "required": ["code", "httpStatus"] } } }
       ]
     },
     "ValidationFailed": {
@@ -97,13 +118,13 @@
     "RateLimited": {
       "allOf": [
         { "$ref": "#/$defs/BaseEnvelope" },
-        { "properties": { "error": { "properties": { "code": { "const": "RATE_LIMITED" }, "httpStatus": { "const": 429 } }, "required": ["code", "httpStatus"] } } }
+        { "properties": { "error": { "properties": { "code": { "const": "RATE_LIMITED" }, "httpStatus": { "const": 429 }, "details": false }, "required": ["code", "httpStatus"] } } }
       ]
     },
     "InternalError": {
       "allOf": [
         { "$ref": "#/$defs/BaseEnvelope" },
-        { "properties": { "error": { "properties": { "code": { "const": "INTERNAL_ERROR" }, "httpStatus": { "const": 500 } }, "required": ["code", "httpStatus"] } } }
+        { "properties": { "error": { "properties": { "code": { "const": "INTERNAL_ERROR" }, "httpStatus": { "const": 500 }, "details": false }, "required": ["code", "httpStatus"] } } }
       ]
     }
   }

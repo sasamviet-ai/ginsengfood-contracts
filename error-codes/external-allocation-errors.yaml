@@ -15,8 +15,9 @@ codes:
     httpStatus: 409
     operations: [reserveInventoryAllocationV1, releaseInventoryAllocationV1]
     message: Fixed per cause; the text differs, the code does not.
-    description: Reserve - the hold recorded for this idempotency key is no longer held (expired, or released by the warehouse or by the consumer's own releaseInventoryAllocationV1), or the source was already ISSUED by the warehouse for an allocation of the same principal (an ISSUED allocation of another principal is INSUFFICIENT_STOCK, never this code). Release - the warehouse already CONFIRMED or ISSUED stock of the source and nothing was released; or the allocation changed while the release was processed. Temporary contention that outlasts the provider retries is RATE_LIMITED (429), never this code. Do not parse the message. Read GET /v1/inventory/allocations?sourceObjectId= once to learn the state; an ISSUED row means stop.
+    description: Reserve - the hold recorded for this idempotency key is no longer held (expired, or released by the warehouse or by the consumer's own releaseInventoryAllocationV1), or the source was already ISSUED by the warehouse for an allocation of the same principal (an ISSUED allocation of another principal is INSUFFICIENT_STOCK, never this code). Release - the warehouse already CONFIRMED or ISSUED stock of the source and nothing was released; or the allocation changed while the release was processed. Temporary contention that outlasts the provider retries is RATE_LIMITED (429), never this code. Do not parse the message. Read GET /v1/inventory/allocations?sourceObjectId= once to learn the state; an ISSUED row means stop. Reserve also answers this code, with one details item, when the principal reached a reservation quota (details[].reason HOLD_LIMIT_REACHED or HOLD_SHARE_LIMIT_REACHED, closed table in docs/m3-allocation-integration-notes.md); every other cause of this code carries no details.
     retryable: false
+    details_reasons: [HOLD_LIMIT_REACHED, HOLD_SHARE_LIMIT_REACHED]
   - code: ALLOCATION_NOT_HELD
     httpStatus: 409
     operations: [releaseInventoryAllocationV1]

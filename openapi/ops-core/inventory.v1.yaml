@@ -439,7 +439,8 @@ paths:
         is never disclosed, whatever the state of that hold, ISSUED included. A source whose allocation
         of this same principal the warehouse already issued is answered 409 ALLOCATION_CONFLICT whatever
         the key. Retries and rate limits are described by the x-retry-policy and x-rate-limit-policy
-        entries.
+        entries. The closed table of details[].reason is in docs/m3-allocation-integration-notes.md and in
+        x-detail-reasons of the reserve error schema.
       operationId: reserveInventoryAllocationV1
       tags: [inventory]
       security:
@@ -556,7 +557,9 @@ paths:
             the same source with a different request body (details[].field is the header name), a malformed
             quantity, a non-conforming UOM code, requested_quantity above the per-request limit
             (details[].reason REQUESTED_QUANTITY_LIMIT_EXCEEDED), or expires_at later than the maximum hold
-            window (details[].reason EXPIRES_AT_LIMIT_EXCEEDED).
+            window (details[].reason EXPIRES_AT_LIMIT_EXCEEDED). Those two reasons and IDEMPOTENCY_KEY_REUSED
+            are the stable tokens; any other details[].reason is free text and not contractual, handle it by
+            details[].field and do not retry the request unchanged.
           x-error-code: VALIDATION_FAILED
           x-http-status: 422
           x-retryable: false
@@ -597,7 +600,9 @@ paths:
         same key and the same body. The route uses the same permission
         (INVENTORY_ALLOCATION_CREATE) and audience as reserveInventoryAllocationV1; the warehouse
         permission INVENTORY_ALLOCATION_RELEASE is never granted to a service principal.
-        Retries and rate limits are described by the x-retry-policy and x-rate-limit-policy entries.
+        Retries and rate limits are described by the x-retry-policy and x-rate-limit-policy entries. The
+        closed table of details[].reason is in docs/m3-allocation-integration-notes.md and in x-detail-reasons of
+        the release error schema; details exist on 422 only on this route.
       operationId: releaseInventoryAllocationV1
       tags: [inventory]
       security:
@@ -686,8 +691,9 @@ paths:
         "422":
           description: >-
             VALIDATION_FAILED for a missing, malformed or over-long X-Idempotency-Key, or one reused for a
-            different source (details[].field is the header name), or for an unsupported source_object_type
-            or source_object_id.
+            different source (details[].field is the header name, details[].reason IDEMPOTENCY_KEY_REUSED), or
+            for an unsupported source_object_type or source_object_id. Any other details[].reason is free text and
+            not contractual: handle it by details[].field. This is the only release answer that carries details.
           x-error-code: VALIDATION_FAILED
           x-http-status: 422
           x-retryable: false

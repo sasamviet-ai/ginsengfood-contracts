@@ -39,6 +39,8 @@ function resolveRef(ref, schemaFile) {
 }
 
 function validateSchema(schema, value, schemaFile, location = "$") {
+  if (schema === true) return;
+  assert.notEqual(schema, false, `${location} is not allowed here`);
   if (schema.$ref) {
     const resolved = resolveRef(schema.$ref, schemaFile);
     return validateSchema(resolved.schema, value, resolved.file, location);
@@ -717,7 +719,7 @@ assert.match(parseJson(allocationListSchema).properties.allocated_quantity.descr
 assert.match(parseJson("schemas/ops/x03b/external-allocation-reserve-line.schema.json").properties.status.description, /not emitted on this route/);
 const releaseErrorComment = parseJson(releaseErrorSchema)["$comment"];
 assert.match(releaseErrorComment, /429 with Retry-After: 1, not 409/);
-assert.match(releaseErrorComment, /except the 422 caused by the X-Idempotency-Key header/);
+assert.match(releaseErrorComment, /details exist on a 422 VALIDATION_FAILED only, never on 409 ALLOCATION_CONFLICT, 409 ALLOCATION_NOT_HELD/);
 assert.doesNotMatch(releaseErrorComment, /still in progress/);
 
 const errorCatalog = read("error-codes/external-allocation-errors.yaml");
@@ -787,5 +789,83 @@ assert.match(unreleased, /not `ALLOCATION_CONFLICT` \(that code is kept for an `
 assert.match(stateMachine, /an issued allocation of another principal is answered `409 INSUFFICIENT_STOCK`/);
 assert.match(parseJson("schemas/ops/x03b/external-allocation-reserve-line.schema.json").properties.status.description, /an issued allocation of another principal, 409 INSUFFICIENT_STOCK/);
 assert.doesNotMatch(unreleased, /does not emit `ISSUED` or enable the release route/);
+
+// ---------------------------------------------------------------------------------------------------------
+// NM3-32b point 5: closed table of details[].reason. Which errors carry details, with which stable tokens; every
+// other 422 reason is free text. Provider evidence: ExternalAllocationCommandV1Endpoints.MapError and
+// ExternalAllocationReleaseV1Endpoint.MapError (details forwarded only on the 409 quota refusal and on 422).
+// ---------------------------------------------------------------------------------------------------------
+const reserveErrorSchema = "schemas/ops/x03b/external-allocation-reserve-error.schema.json";
+const stableReasons = {
+  reserve: [
+    { httpStatus: 409, code: "ALLOCATION_CONFLICT", field: null, reason: "HOLD_LIMIT_REACHED" },
+    { httpStatus: 409, code: "ALLOCATION_CONFLICT", field: "requested_quantity", reason: "HOLD_SHARE_LIMIT_REACHED" },
+    { httpStatus: 422, code: "VALIDATION_FAILED", field: "requested_quantity", reason: "REQUESTED_QUANTITY_LIMIT_EXCEEDED" },
+    { httpStatus: 422, code: "VALIDATION_FAILED", field: "expires_at", reason: "EXPIRES_AT_LIMIT_EXCEEDED" },
+    { httpStatus: 422, code: "VALIDATION_FAILED", field: "X-Idempotency-Key", reason: "IDEMPOTENCY_KEY_REUSED" }
+  ],
+  release: [
+    { httpStatus: 422, code: "VALIDATION_FAILED", field: "X-Idempotency-Key", reason: "IDEMPOTENCY_KEY_REUSED" }
+  ]
+};
+const detailRules = {
+  reserve: { schema: reserveErrorSchema, withoutDetails: ["InvalidRequest", "Unauthorized", "Forbidden", "NotFound", "InsufficientStock", "RateLimited", "InternalError"] },
+  release: { schema: releaseErrorSchema, withoutDetails: ["InvalidRequest", "Unauthorized", "Forbidden", "NotFound", "RequestTimeout", "AllocationConflict", "AllocationNotHeld", "RateLimited", "InternalError", "ServiceUnavailable"] }
+};
+const envelopeOf = (code, httpStatus, details) => ({
+  schemaVersion: "v1",
+  correlation: { correlationId: "corr-details" },
+  error: { code, message: "Safe external error.", httpStatus, correlationId: "corr-details", ...(details ? { details } : {}) }
+});
+const defNameOfCode = { INVALID_REQUEST: "InvalidRequest", UNAUTHORIZED: "Unauthorized", FORBIDDEN: "Forbidden", NOT_FOUND: "NotFound", INSUFFICIENT_STOCK: "InsufficientStock", ALLOCATION_CONFLICT: "AllocationConflict", ALLOCATION_NOT_HELD: "AllocationNotHeld", VALIDATION_FAILED: "ValidationFailed", RATE_LIMITED: "RateLimited", INTERNAL_ERROR: "InternalError", REQUEST_TIMEOUT: "RequestTimeout", SERVICE_UNAVAILABLE: "ServiceUnavailable" };
+const statusOfCode = { INVALID_REQUEST: 400, UNAUTHORIZED: 401, FORBIDDEN: 403, NOT_FOUND: 404, INSUFFICIENT_STOCK: 409, ALLOCATION_CONFLICT: 409, ALLOCATION_NOT_HELD: 409, VALIDATION_FAILED: 422, RATE_LIMITED: 429, INTERNAL_ERROR: 500, REQUEST_TIMEOUT: 408, SERVICE_UNAVAILABLE: 503 };
+
+for (const [which, rule] of Object.entries(detailRules)) {
+  const schema = parseJson(rule.schema);
+  // Typed details: a closed item shape instead of a free object.
+  assert.equal(schema.$defs.Error.properties.details.items.$ref, "#/$defs/Detail", `${which}: details items are the Detail definition`);
+  assert.equal(schema.$defs.Error.properties.details.minItems, 1, `${which}: details is never an empty array`);
+  assert.equal(schema.$defs.Detail.additionalProperties, false, `${which}: Detail is closed`);
+  assert.deepEqual(schema.$defs.Detail.required, ["reason"], `${which}: Detail requires reason`);
+  assert.deepEqual(Object.keys(schema.$defs.Detail.properties).sort(), ["field", "reason"], `${which}: Detail has field and reason only`);
+  // The published closed table equals the one in this test.
+  assert.deepEqual(schema["x-detail-reasons"].stable, stableReasons[which], `${which}: x-detail-reasons.stable drift`);
+  assert.ok(schema["x-detail-reasons"].other_reasons_are_free_text === true, `${which}: other 422 reasons are declared free text`);
+  // Codes that never carry details reject them.
+  for (const definition of rule.withoutDetails) {
+    const code = Object.keys(defNameOfCode).find(key => defNameOfCode[key] === definition);
+    validateAgainst(rule.schema, envelopeOf(code, statusOfCode[code]), `/$defs/${definition}`);
+    assert.throws(() => validateAgainst(rule.schema, envelopeOf(code, statusOfCode[code], [{ field: "x", reason: "SOMETHING" }]), `/$defs/${definition}`), /not allowed here/, `${which}: ${definition} never carries details`);
+  }
+  // 422: any reason text, but the item shape is closed and the array never empty.
+  validateAgainst(rule.schema, envelopeOf("VALIDATION_FAILED", 422, [{ field: "source_object_id", reason: "source_object_id is required." }]), "/$defs/ValidationFailed");
+  validateAgainst(rule.schema, envelopeOf("VALIDATION_FAILED", 422, [{ reason: "free text without a field" }]), "/$defs/ValidationFailed");
+  assert.throws(() => validateAgainst(rule.schema, envelopeOf("VALIDATION_FAILED", 422, []), "/$defs/ValidationFailed"), /minItems/);
+  assert.throws(() => validateAgainst(rule.schema, envelopeOf("VALIDATION_FAILED", 422, [{ field: "x", reason: "y", stack: "z" }]), "/$defs/ValidationFailed"), /not whitelisted/);
+  for (const row of stableReasons[which].filter(entry => entry.httpStatus === 422)) {
+    validateAgainst(rule.schema, envelopeOf(row.code, 422, [{ field: row.field, reason: row.reason }]), "/$defs/ValidationFailed");
+  }
+}
+// Reserve 409 quota refusal: exactly one detail with one of two stable tokens; a plain 409 carries none.
+const quotaDetails = [{ reason: "HOLD_LIMIT_REACHED" }];
+validateAgainst(reserveErrorSchema, envelopeOf("ALLOCATION_CONFLICT", 409, quotaDetails), "/$defs/AllocationConflict");
+validateAgainst(reserveErrorSchema, envelopeOf("ALLOCATION_CONFLICT", 409, [{ field: "requested_quantity", reason: "HOLD_SHARE_LIMIT_REACHED" }]), "/$defs/AllocationConflict");
+validateAgainst(reserveErrorSchema, envelopeOf("ALLOCATION_CONFLICT", 409), "/$defs/AllocationConflict");
+assert.throws(() => validateAgainst(reserveErrorSchema, envelopeOf("ALLOCATION_CONFLICT", 409, [{ reason: "ALLOCATION_ALREADY_ISSUED" }]), "/$defs/AllocationConflict"), /enum/, "internal markers never reach the wire");
+assert.throws(() => validateAgainst(reserveErrorSchema, envelopeOf("ALLOCATION_CONFLICT", 409, [...quotaDetails, ...quotaDetails]), "/$defs/AllocationConflict"), /maxItems/);
+
+// The notes carry the same table, and say plainly what is free text.
+const reasonHeading = "### The closed table of `details[].reason`";
+const reasonStart = notes.indexOf(reasonHeading);
+assert.notEqual(reasonStart, -1, "notes: missing section 'The closed table of details[].reason'");
+const reasonSection = notes.slice(reasonStart, notes.indexOf("\n## ", reasonStart));
+for (const row of [...stableReasons.reserve, ...stableReasons.release]) {
+  assert.ok(reasonSection.includes(`\`${row.reason}\``), `notes table lists ${row.reason}`);
+}
+for (const marker of ["SOURCE_OBJECT_ID_REQUIRED", "GET /v1/inventory/allocations", "free text", "ALLOCATION_NOT_HELD", "never on the wire", "Vietnamese"]) {
+  assert.ok(collapse(reasonSection).includes(marker), `notes table section must mention ${marker}`);
+}
+assert.match(collapse(read(inventoryFile)), /closed table of details\[\]\.reason is in docs\/m3-allocation-integration-notes\.md/, "inventory.v1.yaml points to the closed table");
+assert.match(parseJson(releaseErrorSchema).$defs.Error.properties.details.description, /422 VALIDATION_FAILED only/, "release details are documented as 422-only");
 
 console.log(`X03B allocation write-surface contract PASS: ${operations.length}/2 operations, ${reserveResponseFiles.length + releaseResponseFiles.length} response payloads, ${releaseErrorCases.length} release error envelopes, ${vectors.length} UUIDv5 vectors, 13 webhook event types, and negative tamper checks.`);

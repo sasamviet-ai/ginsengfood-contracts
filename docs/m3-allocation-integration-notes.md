@@ -63,6 +63,25 @@ One code, `RATE_LIMITED`, three causes: the bucket is empty, a call with the sam
 
 Before the provider change that introduced the contention answer, the same situation was reported as `409 INSUFFICIENT_STOCK` on reserve and `409 ALLOCATION_CONFLICT` on release, which a consumer could only read as "no stock" or "do not retry". Those two `409` answers now mean a real shortage, an issued source, or an ordinary state conflict.
 
+### The closed table of `details[].reason`
+
+`error.details` is an optional array of `{ "field"?, "reason" }` items (`$defs/Detail` in both error schemas; closed, no other key, never an empty array). It appears on exactly two answers of these commands, and on no other: the `409 ALLOCATION_CONFLICT` of a reservation quota refusal, and a `422 VALIDATION_FAILED`. No `409` of the release command carries `details`, and a `429` never does. The stable tokens below are contract values and never change wording; the machine-readable copy is `x-detail-reasons` in `external-allocation-reserve-error.schema.json` and `external-allocation-release-error.schema.json`.
+
+| Command | Status and `code` | `field` | `reason` | Meaning |
+| --- | --- | --- | --- | --- |
+| reserve | `409` `ALLOCATION_CONFLICT` | omitted | `HOLD_LIMIT_REACHED` | The principal already has the maximum number of active holds (one hold = one `source_object_id`; RESERVED and not expired, or CONFIRMED). Nothing reserved, the key stays reusable: send the same request again after holds were released or expired. |
+| reserve | `409` `ALLOCATION_CONFLICT` | `requested_quantity` | `HOLD_SHARE_LIMIT_REACHED` | The hold would take more than the allowed share of the physical stock of that SKU, warehouse and unit. Not a shortage; same handling as above. |
+| reserve | `422` `VALIDATION_FAILED` | `requested_quantity` | `REQUESTED_QUANTITY_LIMIT_EXCEEDED` | `requested_quantity` is above the per-line limit. Send less or split the line; do not retry unchanged. |
+| reserve | `422` `VALIDATION_FAILED` | `expires_at` | `EXPIRES_AT_LIMIT_EXCEEDED` | `expires_at` is later than the maximum hold window. Send an earlier `expires_at` (a changed body needs a new key). |
+| reserve, release | `422` `VALIDATION_FAILED` | `X-Idempotency-Key` | `IDEMPOTENCY_KEY_REUSED` | The key was already used for a different request: reserve, the same source with a different body (`expires_at` included); release, a different source. Use a new key for a new intent. |
+
+Rules:
+
+- Every other `reason` on a `422` is free text from input validation, for example `sku_id is required.` for a body field; the wording for an `X-Idempotency-Key` that is missing, too long or has bad characters may be Vietnamese. It is free text, not contractual, and can change without notice: handle a `422` by `field` and status (fix the request, never retry unchanged), never by matching the text. The fields that can appear this way: for reserve `source_object_type`, `sku_id`, `warehouse_id`, `source_object_id`, `uom_code`, `requested_quantity`, `expires_at` and `X-Idempotency-Key`; for release `source_object_type`, `source_object_id` and `X-Idempotency-Key`.
+- `ALLOCATION_NOT_HELD`, `ALLOCATION_CONFLICT` and `INSUFFICIENT_STOCK` are `error.code` values, not reasons. The provider's internal markers behind some of them (for example "already issued by the warehouse" or "committed by the warehouse") are never on the wire: those answers have no `details`.
+- Outside these two commands, `GET /v1/inventory/allocations` answers `422` with `field` `sourceObjectId` and `reason` `SOURCE_OBJECT_ID_REQUIRED` when a request omits the filter once the provider flag that makes it mandatory is on (off by default; the CHANGELOG says when it is switched on). That answer belongs to the shared read error schema, which this table does not close; always send `sourceObjectId`.
+- The limits behind the quota refusals are never echoed in any answer.
+
 ## 3. Status values the consumer must tolerate
 
 `GET /v1/inventory/allocations` returns `status` in `RESERVED`, `CONFIRMED`, `ISSUED`, `RELEASED`. `ISSUED` is new, so a parser written against the three-value schema from 2026-09-21 must accept it and, in general, any value it does not know, without mapping it to another status. `ISSUED` adds no field: the row looks like a `CONFIRMED` one. Expiry, warehouse release and consumer self-release all read `RELEASED`.

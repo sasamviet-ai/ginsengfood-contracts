@@ -3,8 +3,44 @@
   "$id": "external-allocation-release-error.schema.json",
   "title": "External allocation release error envelopes",
   "description": "Error envelopes for POST /v1/inventory/allocations/release. The envelope shape is identical to the reserve and bulk-read ones so a consumer parses all of them with the same reader; only the code vocabulary differs. Closed enum per operation: ALLOCATION_NOT_HELD exists only here, and INSUFFICIENT_STOCK (a shortage) can never come from a release.",
-  "$comment": "ALLOCATION_NOT_HELD (409) means the source no longer has any hold of this service principal that can be released: it was already released, or its hold expired and the expiry worker has not yet swept it. It is a logical success for a cancelling consumer: nothing is held, nothing was changed, and a retry will not change the answer. ALLOCATION_CONFLICT (409) on this route means the warehouse already CONFIRMED or ISSUED stock of the source and nothing was released (contact the warehouse), or the allocation changed while the release was being processed; the two share one code and differ only in message text, so a consumer that gets it reads GET /v1/inventory/allocations?sourceObjectId= once to learn the current state instead of looping. A release whose first attempt with the same X-Idempotency-Key is still running is 429 with Retry-After: 1, not 409, and so is temporary contention that outlasts the provider's own retries (same code RATE_LIMITED, a different message, retry with the same key and body). A source held by another principal and an unknown source are both 404, with the same message. The provider never forwards internal reason text: the message of each code is a fixed string, except the 422 caused by the X-Idempotency-Key header, whose message and details[].reason wording is not contractual (read details[].field only).",
+  "$comment": "ALLOCATION_NOT_HELD (409) means the source no longer has any hold of this service principal that can be released: it was already released, or its hold expired and the expiry worker has not yet swept it. It is a logical success for a cancelling consumer: nothing is held, nothing was changed, and a retry will not change the answer. ALLOCATION_CONFLICT (409) on this route means the warehouse already CONFIRMED or ISSUED stock of the source and nothing was released (contact the warehouse), or the allocation changed while the release was being processed; the two share one code and differ only in message text, so a consumer that gets it reads GET /v1/inventory/allocations?sourceObjectId= once to learn the current state instead of looping. A release whose first attempt with the same X-Idempotency-Key is still running is 429 with Retry-After: 1, not 409, and so is temporary contention that outlasts the provider's own retries (same code RATE_LIMITED, a different message, retry with the same key and body). A source held by another principal and an unknown source are both 404, with the same message. The provider never forwards internal reason text: the message of each code is a fixed string. details exist on a 422 VALIDATION_FAILED only, never on 409 ALLOCATION_CONFLICT, 409 ALLOCATION_NOT_HELD or any other code, and carry either the one stable token of x-detail-reasons or free text that is not contractual (read details[].field, never the wording).",
+  "x-detail-reasons": {
+    "description": "Closed table of the stable details[].reason tokens of this operation. A stable token is a contract value and never changes wording. Every other reason on a 422 is free text produced by input validation (English for body fields, possibly Vietnamese for X-Idempotency-Key format problems) and is not contractual: handle it by field and HTTP status. No other error code carries details. A null field means the item has no field.",
+    "stable": [
+      {
+        "httpStatus": 422,
+        "code": "VALIDATION_FAILED",
+        "field": "X-Idempotency-Key",
+        "reason": "IDEMPOTENCY_KEY_REUSED"
+      }
+    ],
+    "other_reasons_are_free_text": true,
+    "free_text_fields": [
+      "X-Idempotency-Key",
+      "source_object_type",
+      "source_object_id"
+    ]
+  },
   "$defs": {
+    "Detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The request body field or header that the reason is about. Omitted when the reason is not about one field."
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A stable token from x-detail-reasons.stable (IDEMPOTENCY_KEY_REUSED), otherwise free text that is not contractual: key on field, never on the text."
+        }
+      },
+      "required": [
+        "reason"
+      ]
+    },
     "Error": {
       "type": "object",
       "additionalProperties": false,
@@ -38,23 +74,10 @@
         },
         "details": {
           "type": "array",
-          "description": "Which field or header is wrong and why. Present on 422 only; it names the offending field and a short reason and never carries internal text.",
+          "minItems": 1,
+          "description": "Which field or header is wrong and why. Present on a 422 VALIDATION_FAILED only; the 409 ALLOCATION_CONFLICT and 409 ALLOCATION_NOT_HELD of this route, and every other code, carry none. The one stable reason is IDEMPOTENCY_KEY_REUSED (field X-Idempotency-Key); every other reason is free text and never carries internal text. See x-detail-reasons.",
           "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "field": {
-                "type": "string",
-                "minLength": 1
-              },
-              "reason": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "required": [
-              "reason"
-            ]
+            "$ref": "#/$defs/Detail"
           }
         }
       },
@@ -122,7 +145,8 @@
                 },
                 "httpStatus": {
                   "const": 400
-                }
+                },
+                "details": false
               },
               "required": [
                 "code",
@@ -147,7 +171,8 @@
                 },
                 "httpStatus": {
                   "const": 401
-                }
+                },
+                "details": false
               },
               "required": [
                 "code",
@@ -172,7 +197,8 @@
                 },
                 "httpStatus": {
                   "const": 403
-                }
+                },
+                "details": false
               },
               "required": [
                 "code",
@@ -197,7 +223,8 @@
                 },
                 "httpStatus": {
                   "const": 404
-                }
+                },
+                "details": false
               },
               "required": [
                 "code",
@@ -222,7 +249,8 @@
                 },
                 "httpStatus": {
                   "const": 408
-                }
+                },
+                "details": false
               },
               "required": [
                 "code",
@@ -247,7 +275,8 @@
                 },
                 "httpStatus": {
                   "const": 409
-                }
+                },
+                "details": false
               },
               "required": [
                 "code",
@@ -272,7 +301,8 @@
                 },
                 "httpStatus": {
                   "const": 409
-                }
+                },
+                "details": false
               },
               "required": [
                 "code",
@@ -322,7 +352,8 @@
                 },
                 "httpStatus": {
                   "const": 429
-                }
+                },
+                "details": false
               },
               "required": [
                 "code",
@@ -347,7 +378,8 @@
                 },
                 "httpStatus": {
                   "const": 500
-                }
+                },
+                "details": false
               },
               "required": [
                 "code",
@@ -372,7 +404,8 @@
                 },
                 "httpStatus": {
                   "const": 503
-                }
+                },
+                "details": false
               },
               "required": [
                 "code",
