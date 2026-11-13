@@ -587,7 +587,11 @@ function withoutX04dSecurityMetadata(methodBlock) {
   return methodBlock
     .replace(/\n      security:\n        - ServiceBearer: \[\]/, "")
     .replace(/\n      x-(?:auth-class|audience|token-use|permission|permission-scope|rate-limit-policy|retry-policy|idempotency-disposition|runtime-policy|owner-decision-ref):[^\n]*/g, "")
-    .replace(/\n        "429": \{ \$ref: "#\/components\/responses\/TooManyRequests" \}/, "");
+    .replace(/\n        "429": \{ \$ref: "#\/components\/responses\/TooManyRequests" \}/, "")
+    // NM3-32c (c): the optional X-Correlation-Id request header and the success response header are additive metadata of the rule that
+    // docs/correlation-audit-standard.md already states; correlation-header-v1.contract.test.mjs pins them. Nothing else may change.
+    .replace(/\n        - \$ref: "#\/components\/parameters\/CorrelationId"/, "")
+    .replace(/\n          headers:\n            X-Correlation-Id: \{ \$ref: "#\/components\/headers\/CorrelationId" \}/, "");
 }
 for (const route of ["/v1/skus/{skuId}", "/v1/skus/{skuId}/operational-status"]) {
   assert.equal(

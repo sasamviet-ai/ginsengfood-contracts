@@ -4,6 +4,10 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ## Unreleased
 
+### `X-Correlation-Id` is declared in the OpenAPI (NM3-32c c, metadata only)
+
+`docs/correlation-audit-standard.md` has stated the rule since the NM3-32b round (optional header, `^[A-Za-z0-9:_.-]{1,128}$`, a missing or malformed value is replaced by a generated UUID and is never an error, the id in effect is echoed in the response header and in the body), but no file under `openapi/` declared the header, so a generated client could not see it. Each of the 25 service-bearer operations of `availability-sellable`, `ingredient`, `inventory`, `product-activation`, `product-master`, `recall-sale-lock`, `recipe-formula-bom`, `sku` and `warehouse` (v1) now lists `components.parameters.CorrelationId` (optional header, `maxLength: 128`, the pattern above) and declares `X-Correlation-Id` on its `200`/`201` through `components.headers.CorrelationId`; `service-auth.v1.yaml` does the same for `POST /v1/service-tokens`, whose `200` has no body envelope, so there the id comes back in the header only. `availability-sellable.v1.yaml` had no `parameters` component and gains one, and its parameter text keeps the body/header equality check of `POST /v1/availability/check`. Operator operations are not touched. **No wire change:** the provider already behaves this way for every external operation. `contract-tests/x03b/correlation-header-v1.contract.test.mjs` (wired into CI) pins the 26 declarations and five tamper cases; the `getSkuV1` equivalence check of `external-bulk-read-v1.contract.test.mjs` now also strips these two additive lines before it compares the block with the baseline, and nothing else.
+
 ### CHANGELOG: `warehouse.v1.yaml` did change for the `X-RateLimit-Limit` point (NM3-32c b, wording only)
 
 The entry on `X-RateLimit-Limit` of the shared `429` said `warehouse.v1.yaml` is not changed. It is: the `TooManyRequests` response of `warehouse.v1.yaml` moves from `const: 2` to an integer in `[2, 5]` (5 for `ExternalWarehouseRead`, 2 for `ExternalBulkRead`), the same as in `inventory.v1.yaml`. The sentence is corrected in place; no wire or schema change.

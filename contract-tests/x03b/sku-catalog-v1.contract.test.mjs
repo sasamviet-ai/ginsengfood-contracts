@@ -173,7 +173,8 @@ assert.equal(metadata(listBlock, "x-permission"), "SKU_CATALOG_VIEW");
 // Cursor pagination only: no offset, no page number, and exactly the two agreed filters.
 const parameterRefs = [...listBlock.matchAll(/^        - \$ref: "#\/components\/parameters\/(\w+)"$/gm)].map(match => match[1]);
 const inlineParameters = [...listBlock.matchAll(/^        - name: (\w+)$/gm)].map(match => match[1]);
-assert.deepEqual(parameterRefs, ["Cursor", "Limit"]);
+// NM3-32c (c): CorrelationId is the optional X-Correlation-Id header, not a filter or a paging parameter.
+assert.deepEqual(parameterRefs, ["Cursor", "Limit", "CorrelationId"]);
 assert.deepEqual(inlineParameters, ["lifecycle_status", "updated_since"]);
 assert.doesNotMatch(listBlock, /name: (offset|page|pageNumber|pageSize|skip)\b/i);
 assert.match(skuYaml, /^    Limit:\n      name: limit\n      in: query\n      required: false\n      schema: \{ type: integer, minimum: 1, maximum: 100, default: 50 \}$/m, "limit is 1..100");
