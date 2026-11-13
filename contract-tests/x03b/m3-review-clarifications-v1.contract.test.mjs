@@ -80,4 +80,39 @@ const skuSchema = json("schemas/product/sku.schema.json");
   assertPhrases("sku-lifecycle-status.yaml", lifecycleEnum, ["SKU_RETIRED_TERMINAL", "SKU_CODE_IMMUTABLE", "INACTIVE and ACTIVE can alternate"]);
 }
 
-console.log("X03B M3 review clarifications PASS: (f1) lifecycle, sku_code and transitions.");
+// ---- (f2) C9: quantities can be fractional up to three decimals ------------------------------------------------------------------
+{
+  const allocationNotes = read("docs/m3-allocation-integration-notes.md");
+  const quantities = section(allocationNotes, "## 8. Quantities: whole numbers are not guaranteed");
+  assertPhrases("allocation notes section 8", quantities, [
+    "`numeric(18,3)`",
+    "no whole-number constraint",
+    "fractional, up to three decimal places",
+    "`requested_quantity`",
+    "does NOT guarantee a whole number",
+    "KHO-Q1",
+    "is NOT applied by the provider today",
+    "UNKNOWN_BLOCKED",
+    "tell M3 before"
+  ]);
+
+  const quantity = json("schemas/ops/x03b/external-quantity.schema.json");
+  assert.equal(quantity.properties.value.pattern, "^-?(0|[1-9][0-9]*)(\\.[0-9]{1,3})?$", "the pattern is the contract and is untouched");
+  assertPhrases("external-quantity.schema.json", `${quantity.description} ${quantity.properties.value.description}`, [
+    "at most three decimal places",
+    "NOT guaranteed to be a whole number",
+    "hộp",
+    "thùng",
+    "KHO-Q1",
+    "docs/m3-allocation-integration-notes.md section 8"
+  ]);
+
+  const status = json("schemas/ops/sellable-status.schema.json");
+  const patternOfStatus = "^(?:0|[1-9][0-9]{0,14})(?:\\.[0-9]{1,3})?$";
+  for (const field of ["available_quantity", "sellable_quantity"]) {
+    assert.equal(status.properties[field].pattern, patternOfStatus, `${field} pattern is untouched`);
+    assertPhrases(`sellable-status ${field}`, status.properties[field].description, ["fractional", "up to three decimal places", "not guaranteed to be whole", "docs/m3-allocation-integration-notes.md section 8"]);
+  }
+}
+
+console.log("X03B M3 review clarifications PASS: (f1) lifecycle, sku_code and transitions; (f2) quantities.");
