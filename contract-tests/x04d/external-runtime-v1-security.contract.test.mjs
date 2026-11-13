@@ -277,7 +277,11 @@ for (const phrase of [
   "generates a UUID",
   "echoed in the `X-Correlation-Id` response header",
   "must equal the header exactly",
-  "422"
+  "422",
+  // verifier F2: the 200 answer of the token endpoint is a bare OAuth-style body, it has no envelope and so no correlation block
+  "except the `200` answer of `POST /v1/service-tokens`",
+  "bare OAuth-style body without an envelope",
+  "response header only"
 ]) {
   assert.ok(correlationStandard.includes(phrase), `correlation standard must say: ${phrase}`);
 }
