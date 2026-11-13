@@ -37,7 +37,122 @@ x-retry-policies:
     non_retryable_statuses: [400, 401, 403, 404, 409, 410, 422, 500]
     honor_retry_after: true
     backoff: FULL_JITTER_BASE_500MS_CAP_5S
+x-pagination-policies:
+  ExternalSnapshotCursorV1:
+    mode: OPAQUE_SCOPE_BOUND_SNAPSHOT_CURSOR
+    cursor_version: 1
+    cursor_ttl_seconds: 1800
+    cursor_ttl_mode: ABSOLUTE_NON_SLIDING
+    integrity_protected: true
+    default_limit: 50
+    max_limit: 100
+    page_max_items: 100
+    page_item_count_semantics: EXACT_CURRENT_PAGE_DATA_LENGTH
+    item_count_semantics: EXACT_FULL_SNAPSHOT_TOTAL
+    delivered_item_count_semantics: CUMULATIVE_THROUGH_CURRENT_PAGE
+    complete_requires: DELIVERED_COUNT_EQUALS_ITEM_COUNT_AND_NEXT_CURSOR_NULL
+    manifest_version: 1
+    manifest_algorithm: SHA-256
+    manifest_canonicalization: JCS_RFC8785
+    manifest_document_fields: [manifest_version, resource, snapshot_id, as_of, high_watermark, item_count, items]
+    manifest_items_semantics: COMPLETE_STABLE_SORTED_SNAPSHOT
+    verify_manifest_before_absence_reconcile: true
+    delta_supported: false
+    delta_replay_retention_seconds: 604800
+    delta_poll_seconds: 30
+    delta_poll_jitter_percent: 20
+    future_tombstone_retention_seconds: 7776000
+    snapshot_refresh_seconds: 300
+    full_reconciliation_seconds: 21600
+    full_reconciliation_triggers: [STARTUP, RESUME, CHANGE_FEED_GAP, CURSOR_EXPIRED]
+    gap_reconcile_start_within_seconds: 60
+    cursor_bindings: [operation, resource, filters, sort, scope, principal, snapshot, high_watermark]
+    gap_recovery: FAIL_CLOSED_FULL_RECONCILE
+    expired_cursor_recovery: FULL_RECONCILE_NO_TIMESTAMP_OR_LOCAL_CHECKPOINT
+    absence_reconcile_requires: FULL_SNAPSHOT_COMPLETE_VERIFIED_MANIFEST_COUNT_HASH
 paths:
+  /v1/skus:
+    get:
+      summary: List SKUs
+      description: >-
+        Lists every SKU the caller may read, so a consumer discovers a SKU created, activated, retired or
+        re-packaged in ops-core without knowing its sku_id first. Each item is the same SkuV1Response that
+        getSkuV1 returns for that SKU, including updated_at, revision and sellable_uoms.
+        Pagination is the opaque full-snapshot cursor of the other external list reads (no offset, no page
+        number): the first page has no cursor, the response meta carries next_cursor until complete is true, and
+        the cursor is bound to the exact limit and filter set that issued it. Order is stable, updated_at
+        ascending then sku_id ascending, so SKUs that share an updated_at never swap places between pages or
+        between reads. To read incrementally, pass the largest updated_at already processed as updated_since;
+        the filter is inclusive (updated_at greater than or equal to the value), so the SKUs that share that
+        instant come again and the consumer deduplicates by sku_id and revision. Without updated_since the whole
+        catalog is returned (a few dozen SKUs today). INACTIVE and RETIRED SKUs are listed: they are lifecycle
+        states, not deletions, and a SKU never disappears from the list. lifecycle_status filters on the value
+        the object publishes (ACTIVE_BASELINE is internal and is published, and filtered, as ACTIVE); the
+        provider currently publishes only ACTIVE, INACTIVE and RETIRED, so any other value of the closed enum
+        answers an empty page, not an error. A parameter that is unknown, repeated or malformed (limit outside
+        1..100, lifecycle_status outside the enum, updated_since without a time zone) answers 422 and never
+        widens the result. Same envelope, errors, audience, permission and rate bucket as getSkuV1.
+      operationId: listSkusV1
+      tags: [sku]
+      security:
+        - ServiceBearer: []
+      x-auth-class: SERVICE_BEARER
+      x-token-use: service
+      x-audience: ginsengfood-ops-core-external-bulk-read-v1
+      x-permission: SKU_CATALOG_VIEW
+      x-permission-scope: SERVICE
+      x-rate-limit-policy: ExternalBulkRead
+      x-retry-policy: ExternalBulkReadRetry
+      x-pagination-policy: ExternalSnapshotCursorV1
+      x-delta-supported: false
+      x-stable-sort: "updatedAt ASC, skuId ASC"
+      x-tombstone-policy: RETIRED_LIFECYCLE_NO_TOMBSTONE
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - name: lifecycle_status
+          in: query
+          required: false
+          description: Only SKUs whose published lifecycle_status equals this value. Sent at most once.
+          schema: { type: string, enum: [DRAFT, PENDING_CONFIG, PENDING_EVIDENCE, READY, ACTIVE, INACTIVE, RETIRED, BLOCKED] }
+        - name: updated_since
+          in: query
+          required: false
+          description: >-
+            Only SKUs whose updated_at is greater than or equal to this instant. ISO-8601 date-time WITH a time
+            zone (Z or a numeric offset); a value without one answers 422. Sent at most once.
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: Stable SKU snapshot page; an empty result returns data=[] with complete=true.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "../../schemas/common/envelope.schema.json"
+                  - type: object
+                    required: [schemaVersion, correlation, data, meta]
+                    properties:
+                      data:
+                        type: array
+                        maxItems: 100
+                        items:
+                          $ref: "../../schemas/product/sku.schema.json"
+                      meta:
+                        $ref: "../../schemas/ops/x03b/external-snapshot-meta.schema.json"
+        "400": { $ref: "#/components/responses/CursorInvalid" }
+        "401": { $ref: "#/components/responses/ExternalUnauthorized" }
+        "403": { $ref: "#/components/responses/ExternalForbidden" }
+        "404": { $ref: "#/components/responses/ExternalNotFound" }
+        "408": { $ref: "#/components/responses/RequestTimeout" }
+        "409": { $ref: "#/components/responses/ChangeFeedGap" }
+        "410": { $ref: "#/components/responses/CursorExpired" }
+        "422": { $ref: "#/components/responses/ExternalUnprocessableEntity" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/ExternalInternalServerError" }
+        "502": { $ref: "#/components/responses/BadGateway" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+        "504": { $ref: "#/components/responses/GatewayTimeout" }
   /v1/skus/{skuId}:
     get:
       summary: Get SKU
@@ -169,6 +284,17 @@ components:
       in: path
       required: true
       schema: { type: string, minLength: 1 }
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Opaque server-issued cursor bound to operation, filters, scope, principal, snapshot, and high-watermark. Omit on first page.
+      schema: { type: string, minLength: 1 }
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
   schemas:
     ErrorEnvelope:
       allOf:
@@ -185,6 +311,24 @@ components:
     Conflict: { description: State conflict or idempotency conflict., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     UnprocessableEntity: { description: Validation or guard failure., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
     InternalServerError: { description: Internal server error., content: { application/json: { schema: { $ref: "#/components/schemas/ErrorEnvelope" } } } }
+    CursorInvalid:
+      description: CURSOR_INVALID for malformed, tampered, or wrong-scope cursor.
+      x-error-code: CURSOR_INVALID
+      x-http-status: 400
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/CursorInvalid" } } }
+    ChangeFeedGap:
+      description: CHANGE_FEED_GAP; discard the partial page and start fail-closed full reconciliation.
+      x-error-code: CHANGE_FEED_GAP
+      x-http-status: 409
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/ChangeFeedGap" } } }
+    CursorExpired:
+      description: CURSOR_EXPIRED after the absolute 30-minute TTL; restart full reconciliation.
+      x-error-code: CURSOR_EXPIRED
+      x-http-status: 410
+      x-retryable: false
+      content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/CursorExpired" } } }
     ExternalBadRequest:
       description: Malformed path or query input.
       x-error-code: INVALID_REQUEST

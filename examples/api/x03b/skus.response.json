@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "corr-x03b-skus"
+  },
+  "data": [
+    {
+      "sku_id": "20000000-0000-4000-8000-000000000001",
+      "product_id": "20000000-0000-4000-8000-000000000001",
+      "sku_code": "A1/CS/DM/HS",
+      "canonical_name": "Cơm sâm dưỡng lành",
+      "public_name": "Cơm sâm dưỡng lành",
+      "dietary_type": "VEGAN",
+      "product_group": "NUTRITIOUS",
+      "lifecycle_status": "ACTIVE",
+      "formula_version_id": "60000000-0000-4000-8000-000000000001",
+      "recipe_id": "60000000-0000-4000-8000-000000000001",
+      "bom_id": "61000000-0000-4000-8000-000000000001",
+      "activation_id": "62000000-0000-4000-8000-000000000001",
+      "updated_at": "2026-11-10T03:15:00Z",
+      "revision": 1794280500000000,
+      "sellable_uoms": [
+        {
+          "uom_code": "hộp",
+          "units_per_box": 4
+        },
+        {
+          "uom_code": "thùng",
+          "boxes_per_carton": 6
+        }
+      ],
+      "evidence_refs": []
+    },
+    {
+      "sku_id": "20000000-0000-4000-8000-000000000002",
+      "product_id": "20000000-0000-4000-8000-000000000002",
+      "sku_code": "A2/CS/DM/HS",
+      "canonical_name": "Cơm sâm bồi bổ",
+      "public_name": "Cơm sâm bồi bổ",
+      "dietary_type": "SAVORY",
+      "product_group": "FUNCTIONAL",
+      "lifecycle_status": "ACTIVE",
+      "formula_version_id": "60000000-0000-4000-8000-000000000002",
+      "recipe_id": "60000000-0000-4000-8000-000000000002",
+      "bom_id": "61000000-0000-4000-8000-000000000002",
+      "activation_id": "62000000-0000-4000-8000-000000000002",
+      "updated_at": "2026-11-10T03:15:00Z",
+      "revision": 1794280500000000,
+      "sellable_uoms": [
+        {
+          "uom_code": "hộp",
+          "units_per_box": 4
+        }
+      ],
+      "evidence_refs": []
+    },
+    {
+      "sku_id": "20000000-0000-4000-8000-000000000003",
+      "product_id": "20000000-0000-4000-8000-000000000003",
+      "sku_code": "B2/CS/DM/HS",
+      "canonical_name": "Cơm sâm tiện lợi",
+      "public_name": "Cơm sâm tiện lợi",
+      "dietary_type": "SAVORY",
+      "product_group": "SEASONAL",
+      "lifecycle_status": "INACTIVE",
+      "updated_at": "2026-11-12T08:30:00Z",
+      "revision": 1794472200000000,
+      "sellable_uoms": [],
+      "evidence_refs": []
+    }
+  ],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "skus",
+    "snapshot_id": "11000000-0000-4000-8000-000000000007",
+    "as_of": "2026-11-13T01:00:00Z",
+    "high_watermark": "2026-11-12T08:30:00.0000000+00:00|20000000-0000-4000-8000-000000000003",
+    "next_cursor": null,
+    "page_item_count": 3,
+    "delivered_item_count": 3,
+    "item_count": 3,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "b49a2abc88dc62144e0b9a9c92b5bc9dbe3b6e7f041967d47f0ffbac5d23fbcc",
+    "delta_supported": false
+  }
+}

@@ -139,4 +139,103 @@ const sellableShapes = ["examples/api/x03b/sku.response.json", "contract-tests/x
   .map(relative => parseJson(relative).data.sellable_uoms.map(entry => entry.uom_code).join("+"));
 assert.deepEqual(sellableShapes, ["hộp+thùng", "hộp"]);
 
-console.log("X03B SKU catalog contract PASS: updated_at, revision and sellable_uoms (schema, example, fixture, tamper cases).");
+// 3. GET /v1/skus (listSkusV1): same object as getSkuV1, cursor pagination, two filters, stable order.
+const normalize = text => text.replace(/\r\n?/g, "\n");
+const readText = relative => normalize(fs.readFileSync(path.join(root, relative), "utf8"));
+const skuYaml = readText("openapi/ops-core/sku.v1.yaml");
+
+function pathBlock(text, route) {
+  const lines = text.split("\n");
+  const start = lines.findIndex(line => line === `  ${route}:`);
+  assert.notEqual(start, -1, `missing route ${route}`);
+  let end = lines.length;
+  for (let index = start + 1; index < lines.length; index += 1) {
+    if (/^  \//.test(lines[index]) || /^components:/.test(lines[index])) { end = index; break; }
+  }
+  return lines.slice(start, end).join("\n");
+}
+
+const listBlock = pathBlock(skuYaml, "/v1/skus");
+const getBlock = pathBlock(skuYaml, "/v1/skus/{skuId}");
+assert.match(listBlock, /operationId: listSkusV1\b/);
+assert.match(getBlock, /operationId: getSkuV1\b/);
+assert.doesNotMatch(listBlock, /\n    (post|put|patch|delete):/, "the list route is read only");
+assert.match(listBlock, /\$ref: "\.\.\/\.\.\/schemas\/product\/sku\.schema\.json"/, "items are the SkuV1Response object of getSkuV1");
+
+// Same audience, permission, rate bucket and retry policy as getSkuV1: no new permission (SEC-06 ceiling).
+const metadata = (block, key) => block.match(new RegExp(`^      ${key}: (.+)$`, "m"))?.[1];
+for (const key of ["x-auth-class", "x-token-use", "x-audience", "x-permission", "x-permission-scope", "x-rate-limit-policy", "x-retry-policy"]) {
+  assert.ok(metadata(listBlock, key), `listSkusV1 ${key} missing`);
+  assert.equal(metadata(listBlock, key), metadata(getBlock, key), `listSkusV1 ${key} must equal getSkuV1`);
+}
+assert.equal(metadata(listBlock, "x-permission"), "SKU_CATALOG_VIEW");
+
+// Cursor pagination only: no offset, no page number, and exactly the two agreed filters.
+const parameterRefs = [...listBlock.matchAll(/^        - \$ref: "#\/components\/parameters\/(\w+)"$/gm)].map(match => match[1]);
+const inlineParameters = [...listBlock.matchAll(/^        - name: (\w+)$/gm)].map(match => match[1]);
+assert.deepEqual(parameterRefs, ["Cursor", "Limit"]);
+assert.deepEqual(inlineParameters, ["lifecycle_status", "updated_since"]);
+assert.doesNotMatch(listBlock, /name: (offset|page|pageNumber|pageSize|skip)\b/i);
+assert.match(skuYaml, /^    Limit:\n      name: limit\n      in: query\n      required: false\n      schema: \{ type: integer, minimum: 1, maximum: 100, default: 50 \}$/m, "limit is 1..100");
+assert.match(listBlock, /x-pagination-policy: ExternalSnapshotCursorV1/);
+assert.match(listBlock, /x-stable-sort: "updatedAt ASC, skuId ASC"/);
+
+const lifecycleParameter = listBlock.match(/- name: lifecycle_status\n[\s\S]*?schema: \{ type: string, enum: \[([^\]]+)\] \}/);
+assert.ok(lifecycleParameter, "lifecycle_status parameter must be a closed enum");
+assert.deepEqual(
+  lifecycleParameter[1].split(",").map(value => value.trim()),
+  skuSchema.schema.properties.lifecycle_status.enum,
+  "the lifecycle_status filter takes exactly the values the SKU object can publish"
+);
+assert.match(listBlock, /- name: updated_since\n[\s\S]*?schema: \{ type: string, format: date-time \}/);
+assert.match(listBlock, /inclusive/i, "the updated_since semantics must be stated");
+assert.match(listBlock, /WITH a time\s+zone/, "updated_since must require a time zone");
+assert.match(listBlock, /ACTIVE_BASELINE/, "the published/filtered ACTIVE_BASELINE projection must be stated");
+
+// Examples and fixtures: every item is a complete SkuV1Response with the three catalog additions.
+const listPayloads = [
+  "examples/api/x03b/skus.response.json",
+  "contract-tests/x03b/fixtures/skus.response.fixture.json",
+  "contract-tests/x03b/fixtures/skus.two-page.page-1.response.fixture.json",
+  "contract-tests/x03b/fixtures/skus.two-page.page-2.response.fixture.json"
+].map(relative => ({ relative, payload: parseJson(relative) }));
+for (const { relative, payload } of listPayloads) {
+  assert.equal(payload.meta.resource, "skus", `${relative} resource`);
+  assert.equal(payload.meta.delta_supported, false);
+  for (const item of payload.data) {
+    validateSchema(skuSchema.schema, item, skuSchema.file, `${relative}.data[]`);
+    for (const field of ["updated_at", "revision", "sellable_uoms"]) assert.ok(Object.hasOwn(item, field), `${relative} item ${item.sku_code} must show ${field}`);
+  }
+}
+
+// A tie on updated_at is broken by sku_id, in the full example and across the page boundary of the two-page fixture.
+const full = parseJson("examples/api/x03b/skus.response.json").data;
+const ties = full.filter((item, index) => index > 0 && item.updated_at === full[index - 1].updated_at);
+assert.ok(ties.length >= 1, "the example must contain at least two SKUs sharing updated_at");
+for (let index = 1; index < full.length; index += 1) {
+  const [left, right] = [full[index - 1], full[index]];
+  assert.ok(
+    left.updated_at < right.updated_at || (left.updated_at === right.updated_at && left.sku_id < right.sku_id),
+    "items are ordered by updated_at then sku_id"
+  );
+}
+assert.ok(full.some(item => item.lifecycle_status === "INACTIVE" && item.sellable_uoms.length === 0), "INACTIVE SKUs are listed; one without trade items shows an empty sellable_uoms");
+for (const item of full) assert.ok(["ACTIVE", "INACTIVE", "RETIRED"].includes(item.lifecycle_status), "the provider publishes only three lifecycle values");
+
+const [pageOne, pageTwo] = listPayloads.slice(2).map(entry => entry.payload);
+assert.equal(pageOne.meta.complete, false);
+assert.equal(typeof pageOne.meta.next_cursor, "string");
+assert.equal(pageOne.meta.snapshot_id, pageTwo.meta.snapshot_id);
+assert.equal(pageOne.meta.manifest_sha256, pageTwo.meta.manifest_sha256);
+const boundary = [pageOne.data.at(-1), pageTwo.data[0]];
+assert.equal(boundary[0].updated_at, boundary[1].updated_at, "the page boundary falls inside a tie on updated_at");
+assert.ok(boundary[0].sku_id < boundary[1].sku_id, "the tie is broken by sku_id across the boundary");
+assert.equal(new Set([...pageOne.data, ...pageTwo.data].map(item => item.sku_id)).size, 2, "no SKU repeats or is lost across the boundary");
+
+const emptyList = parseJson("contract-tests/x03b/fixtures/skus.empty.response.fixture.json");
+assert.deepEqual(emptyList.data, []);
+assert.equal(emptyList.meta.complete, true);
+assert.equal(emptyList.meta.item_count, 0);
+assert.equal(emptyList.meta.next_cursor, null);
+
+console.log("X03B SKU catalog contract PASS: updated_at, revision, sellable_uoms and GET /v1/skus (schema, openapi, examples, fixtures, tamper cases).");

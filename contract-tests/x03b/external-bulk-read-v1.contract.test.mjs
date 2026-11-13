@@ -59,8 +59,12 @@ const operations = [
   { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouses", operationId: "listWarehousesV1", permission: "WAREHOUSE_VIEW", schema: "external-warehouse.schema.json", fixture: "warehouses", resource: "warehouses", responseProfile: "warehouse", sort: "warehouseCode ASC, warehouseId ASC", order: [["warehouse_code", "ASC"], ["warehouse_id", "ASC"]], tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_id", "warehouse_code", "warehouse_name", "warehouse_type", "status"] },
   { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-locations", operationId: "listWarehouseLocationsV1", ratePolicy: "ExternalWarehouseRead", permission: "WAREHOUSE_VIEW", schema: "external-warehouse-location.schema.json", fixture: "warehouse-locations", resource: "warehouse-locations", responseProfile: "warehouse", sort: "locationCode ASC, warehouseLocationId ASC", order: [["location_code", "ASC"], ["warehouse_location_id", "ASC"]], tombstone: "INACTIVE_LIFECYCLE_NO_TOMBSTONE", filters: [], fields: ["warehouse_location_id", "warehouse_id", "location_code", "location_name", "location_type", "status"] },
   { file: "openapi/ops-core/warehouse.v1.yaml", route: "/v1/warehouse-receipts", operationId: "listWarehouseReceiptsV1", ratePolicy: "ExternalWarehouseRead", permission: "WAREHOUSE_RECEIPT_VIEW", schema: "external-warehouse-receipt.schema.json", fixture: "warehouse-receipts", resource: "warehouse-receipts", responseProfile: "warehouse", sort: "createdAt DESC, warehouseReceiptId DESC", order: [["created_at", "DESC"], ["warehouse_receipt_id", "DESC"]], tombstone: "STATE_REVISION_NO_TOMBSTONE", filters: ["status", "batchId", "warehouseId", "fromDate", "toDate"], fields: ["warehouse_receipt_id", "warehouse_receipt_no", "status", "batch_id", "warehouse_id", "warehouse_location_id", "received_quantity", "received_at", "confirmed_at", "created_at"] },
+  { file: "openapi/ops-core/sku.v1.yaml", route: "/v1/skus", operationId: "listSkusV1", permission: "SKU_CATALOG_VIEW", schema: "sku.schema.json", schemaPath: "schemas/product/sku.schema.json", fixture: "skus", resource: "skus", responseProfile: "warehouse", sort: "updatedAt ASC, skuId ASC", order: [["updated_at", "ASC"], ["sku_id", "ASC"]], tombstone: "RETIRED_LIFECYCLE_NO_TOMBSTONE", filters: ["lifecycle_status", "updated_since"], fields: ["sku_id", "sku_code", "product_id", "canonical_name", "public_name", "dietary_type", "product_group", "lifecycle_status", "formula_version_id", "recipe_id", "bom_id", "activation_id", "updated_at", "revision", "sellable_uoms", "source_ref", "evidence_refs"] },
   { file: "openapi/ops-core/sku.v1.yaml", route: "/v1/skus/{skuId}/public", operationId: "getPublicSkuV1", permission: "PRODUCT_PUBLIC_VIEW", schema: "external-public-product.schema.json", fixture: "public-sku", responseProfile: "sku", collection: false, fields: ["product_id", "public_name", "public_safe_description", "ingredient_public_summary", "product_positioning", "product_group", "content_version", "dietary_flags", "usage_guidance", "benefit_phrase"] }
 ];
+
+// Item schemas live in schemas/ops/x03b unless the operation says otherwise (listSkusV1 reuses schemas/product/sku.schema.json).
+const itemSchemaPath = operation => operation.schemaPath ?? `schemas/ops/x03b/${operation.schema}`;
 
 const normalizeNewlines = text => text.replace(/\r\n?/g, "\n");
 const read = relative => normalizeNewlines(fs.readFileSync(path.join(root, relative), "utf8"));
@@ -170,7 +174,7 @@ function assertOperationContract(operation, textOverride) {
   assert.match(text, /schemas\/ops\/x03b\/external-bulk-read-error-envelopes\.schema\.json/);
   assert.doesNotMatch(block, /requestBody:|X-Idempotency-Key/i);
   assert.match(block, /"429": \{ \$ref: "#\/components\/responses\/TooManyRequests" \}/);
-  assert.match(block, new RegExp(`schemas/ops/x03b/${operation.schema.replaceAll(".", "\\.")}`));
+  assert.match(block, new RegExp(itemSchemaPath(operation).replaceAll(".", "\\.")));
 
   if (operation.collection !== false) {
     assert.match(block, /\$ref: "#\/components\/parameters\/Cursor"/);
@@ -183,7 +187,7 @@ function assertOperationContract(operation, textOverride) {
     assert.match(block, /"400": \{ \$ref: "#\/components\/responses\/CursorInvalid" \}/);
     assert.match(block, /"409": \{ \$ref: "#\/components\/responses\/ChangeFeedGap" \}/);
     assert.match(block, /"410": \{ \$ref: "#\/components\/responses\/CursorExpired" \}/);
-    const inlineFilters = [...block.matchAll(/^\s{8}- name: ([A-Za-z0-9]+)$/gm)].map(match => match[1]);
+    const inlineFilters = [...block.matchAll(/^\s{8}- name: ([A-Za-z0-9_]+)$/gm)].map(match => match[1]);
     assert.deepEqual(inlineFilters, operation.filters, `${operation.operationId} query filter drift`);
   } else {
     assert.doesNotMatch(block, /components\/parameters\/Cursor/);
@@ -314,7 +318,7 @@ function validatePayload(payload, operation, accumulatedSnapshotItems = payload.
   assert.equal(payload.schemaVersion, "v1");
   const correlationSchema = loadSchema("schemas/common/correlation.schema.json");
   validateSchema(correlationSchema.schema, payload.correlation, correlationSchema.file, "$.correlation");
-  const itemSchema = loadSchema(`schemas/ops/x03b/${operation.schema}`);
+  const itemSchema = loadSchema(itemSchemaPath(operation));
   if (operation.collection === false) {
     assert.deepEqual(Object.keys(payload).sort(), ["correlation", "data", "schemaVersion"].sort());
     validateSchema(itemSchema.schema, payload.data, itemSchema.file, "$.data");
@@ -359,7 +363,7 @@ function validatePayload(payload, operation, accumulatedSnapshotItems = payload.
 
 for (const operation of operations) {
   assertOperationContract(operation);
-  const itemSchema = loadSchema(`schemas/ops/x03b/${operation.schema}`);
+  const itemSchema = loadSchema(itemSchemaPath(operation));
   assert.deepEqual(Object.keys(itemSchema.schema.properties).sort(), [...operation.fields].sort(), `${operation.operationId} whitelist drift`);
   for (const relative of [
     `examples/api/x03b/${operation.fixture}.response.json`,
@@ -453,6 +457,28 @@ assert.throws(
   () => validatePayload(finalPageTamper, warehouseOperation, [...warehousePageOne.data, ...finalPageTamper.data]),
   /manifest_sha256/
 );
+
+// listSkusV1: a page boundary that falls inside a tie on updated_at, the empty answer, and order/manifest tampering.
+const skuListOperation = operations.find(operation => operation.operationId === "listSkusV1");
+const skuPageOne = parseJson("contract-tests/x03b/fixtures/skus.two-page.page-1.response.fixture.json");
+const skuPageTwo = parseJson("contract-tests/x03b/fixtures/skus.two-page.page-2.response.fixture.json");
+const accumulatedSkuItems = [...skuPageOne.data, ...skuPageTwo.data];
+validatePayload(skuPageOne, skuListOperation, skuPageOne.data);
+validatePayload(skuPageTwo, skuListOperation, accumulatedSkuItems);
+assert.throws(() => validatePayload(skuPageTwo, skuListOperation, [...accumulatedSkuItems].reverse()), /stable order/);
+const skuPriorPageTamper = structuredClone(accumulatedSkuItems);
+skuPriorPageTamper[0].public_name = "Tampered prior-page SKU";
+assert.throws(() => validatePayload(skuPageTwo, skuListOperation, skuPriorPageTamper), /manifest_sha256/);
+const skuRevisionTamper = structuredClone(accumulatedSkuItems);
+skuRevisionTamper[0].revision += 1;
+assert.throws(() => validatePayload(skuPageTwo, skuListOperation, skuRevisionTamper), /manifest_sha256/);
+validatePayload(parseJson("contract-tests/x03b/fixtures/skus.empty.response.fixture.json"), skuListOperation);
+const unorderedSkus = parseJson("examples/api/x03b/skus.response.json");
+[unorderedSkus.data[0], unorderedSkus.data[2]] = [unorderedSkus.data[2], unorderedSkus.data[0]];
+assert.throws(() => validatePayload(unorderedSkus, skuListOperation), /stable order/);
+const skuAhead = parseJson("examples/api/x03b/skus.response.json");
+skuAhead.meta.resource = "warehouses";
+assert.throws(() => validatePayload(skuAhead, skuListOperation), /resource/);
 
 const allocation = parseJson("examples/api/x03b/inventory-allocations.response.json");
 allocation.data[0].source_object_id = "order-line-from-position-1";
@@ -584,4 +610,4 @@ for (const profile of Object.values(responseProfiles)) {
   }
 }
 
-console.log(`X03B external bulk-read contract PASS: ${operations.length}/8 operations, one-page/empty/two-page snapshots, and negative tamper checks.`);
+console.log(`X03B external bulk-read contract PASS: ${operations.length} operations, one-page/empty/two-page snapshots, and negative tamper checks.`);

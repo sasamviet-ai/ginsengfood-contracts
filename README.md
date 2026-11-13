@@ -47,7 +47,7 @@ Boundary chung giữa hai hệ thống được chốt tại `docs/ops-core-busi
 ## External API / Checkout Contract Set
 
 - Availability chỉ còn **một phiên bản**: `openapi/ops-core/availability-sellable.v1.yaml`, consumer mirror `openapi/business-platform/availability-consumer.v1.yaml`. Contract v2 riêng đã bị gộp về v1 ngày 09-09-2026 (`OWNER-DIRECTIVE-2026-09-09-AVAILABILITY-V1-ONLY`) — khối số lượng theo UOM nay nằm trong chính v1, kích hoạt bằng `uom_code` trong request.
-- External bulk-read façades cho stock balance, inventory ledger, stock alert, allocation, warehouse, warehouse location, warehouse receipt và public SKU nằm trong các provider contract `inventory.v1.yaml`, `warehouse.v1.yaml` và `sku.v1.yaml`.
+- External bulk-read façades cho stock balance, inventory ledger, stock alert, allocation, warehouse, warehouse location, warehouse receipt, public SKU và danh sách SKU (`GET /v1/skus`) nằm trong các provider contract `inventory.v1.yaml`, `warehouse.v1.yaml` và `sku.v1.yaml`.
 - Request/response/error schemas, examples và dedicated contract validators nằm dưới `schemas/ops/`, `examples/` và `contract-tests/`.
 - Allocation write surface (giữ hàng `reserveInventoryAllocationV1`, tự nhả `releaseInventoryAllocationV1`, trạng thái `ISSUED`): `openapi/ops-core/inventory.v1.yaml`, `enums/ops/inventory-allocation-status.yaml`, `state-machines/ops/allocation-state.md`. Cách M3 đặt `source_object_id` (UUIDv5) và bảng phản hồi: `docs/m3-allocation-integration-notes.md`. Đặc tả webhook ops-core → business-platform: `docs/webhook-transport.md`.
 - Việc contract tồn tại không chứng minh provider runtime, consumer acceptance, sandbox, performance hoặc production cutover đã PASS.

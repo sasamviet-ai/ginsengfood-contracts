@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "v1",
+  "correlation": {
+    "correlationId": "fixture-x03b-skus-empty"
+  },
+  "data": [],
+  "meta": {
+    "cursor_version": 1,
+    "resource": "skus",
+    "snapshot_id": "11000000-0000-4000-8000-000000000407",
+    "as_of": "2026-11-13T03:00:00Z",
+    "high_watermark": "EMPTY",
+    "next_cursor": null,
+    "page_item_count": 0,
+    "delivered_item_count": 0,
+    "item_count": 0,
+    "complete": true,
+    "manifest_version": 1,
+    "manifest_algorithm": "SHA-256",
+    "manifest_canonicalization": "JCS_RFC8785",
+    "manifest_sha256": "2d3eba76d8b9e3a7f3923e980f9428cf68a271e9cb7cd6c06bebadc0e8e14545",
+    "delta_supported": false
+  }
+}
