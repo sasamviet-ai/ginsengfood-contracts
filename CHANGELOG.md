@@ -4,6 +4,10 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ## Unreleased
 
+### SKU read model: `sellable_uoms` (SKU-M12-03, additive)
+
+One more optional property on `schemas/product/sku.schema.json`: `sellable_uoms`, the units the SKU can be sold in, taken from its ACTIVE trade items. A BOX trade item gives `{ "uom_code": "hộp", "units_per_box": <positive integer> }`, a CARTON trade item gives `{ "uom_code": "thùng", "boxes_per_carton": <positive integer> }`; `hộp` first, at most one of each. An empty array means no ACTIVE BOX or CARTON trade item yet; the property is never omitted and never null. Only `hộp` and `thùng` exist: the inner pack (`gói`), the jar (`lọ`) and the pot (`hũ`) are not sellable units here. The codes are the `ref_uom` codes of ops-core in Unicode NFC, compared byte for byte (a decomposed spelling is rejected). The entry says the unit is configured and active, not that stock exists; `POST /v1/availability/check` still decides whether a quantity may be committed. New schema `schemas/product/sku-sellable-uom.schema.json` (a `oneOf` that ties each code to its own factor and forbids the other), listed in `schemas/ops-core/provider-schema-index.v1.yaml`; `updated_at` now also moves with the trade-item packaging configuration. Examples and fixtures show both shapes (`hộp` + `thùng`, and `hộp` only); `sku-catalog-v1.contract.test.mjs` adds 18 unit-level and 5 envelope-level tamper cases.
+
 ### SKU read model: `updated_at` and `revision` (SKU-M12-03, additive)
 
 Prepared on top of `e60df94` for the business-platform (M3) review. **Classification: additive.** Two optional properties join `schemas/product/sku.schema.json`, the object returned by `getSkuV1` (and by the SKU list route added in the next changes of this series):

@@ -18,6 +18,12 @@
     "activation_id": "62000000-0000-4000-8000-000000000002",
     "updated_at": "2026-11-10T03:15:00Z",
     "revision": 1794280500000000,
+    "sellable_uoms": [
+      {
+        "uom_code": "hộp",
+        "units_per_box": 4
+      }
+    ],
     "evidence_refs": []
   }
 }

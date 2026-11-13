@@ -60,4 +60,83 @@ for (const relative of ["examples/api/x03b/sku.response.json", "contract-tests/x
   assert.throws(() => validateSkuEnvelope(unknownField), /not whitelisted/);
 }
 
-console.log("X03B SKU catalog contract PASS: updated_at and revision (schema, example, fixture, 8 tamper cases).");
+// 2. sellable_uoms: from the ACTIVE trade items; exactly the two codes hộp and thùng, each with its own factor.
+const uomSchema = loadSchema(root, "schemas/product/sku-sellable-uom.schema.json");
+assert.deepEqual(uomSchema.schema.properties.uom_code.enum, ["hộp", "thùng"], "only hộp and thùng are sellable units");
+assert.deepEqual(Object.keys(uomSchema.schema.properties).sort(), ["boxes_per_carton", "units_per_box", "uom_code"]);
+assert.equal(uomSchema.schema.additionalProperties, false);
+assert.equal(properties.sellable_uoms.type, "array");
+assert.equal(properties.sellable_uoms.items.$ref, "sku-sellable-uom.schema.json");
+assert.equal(properties.sellable_uoms.maxItems, 2);
+assert.equal(properties.sellable_uoms.uniqueItems, true);
+assert.ok(!skuSchema.schema.required.includes("sellable_uoms"), "additive change: not required");
+assert.match(properties.sellable_uoms.description, /empty array/i);
+assert.match(properties.sellable_uoms.description, /never omitted and never null/);
+// The code points are fixed: a decomposed (NFD) spelling is a different string.
+assert.equal([...uomSchema.schema.properties.uom_code.enum[0]].length, 3, "hộp is 3 code points in NFC");
+assert.equal([...uomSchema.schema.properties.uom_code.enum[1]].length, 5, "thùng is 5 code points in NFC");
+assert.equal(uomSchema.schema.properties.uom_code.enum[0], "hộp".normalize("NFC"));
+assert.equal(uomSchema.schema.properties.uom_code.enum[1], "thùng".normalize("NFC"));
+
+const validateUom = value => validateSchema(uomSchema.schema, value, uomSchema.file, "$.uom");
+validateUom({ uom_code: "hộp", units_per_box: 4 });
+validateUom({ uom_code: "thùng", boxes_per_carton: 6 });
+for (const [label, value] of [
+  ["inner pack is not a sellable unit", { uom_code: "gói", units_per_box: 1 }],
+  ["jar is not a sellable unit", { uom_code: "lọ", units_per_box: 1 }],
+  ["pot is not a sellable unit", { uom_code: "hũ", units_per_box: 1 }],
+  ["English spelling", { uom_code: "BOX", units_per_box: 4 }],
+  ["upper case", { uom_code: "HỘP", units_per_box: 4 }],
+  ["no diacritics", { uom_code: "hop", units_per_box: 4 }],
+  ["decomposed (NFD) hộp", { uom_code: "hộp".normalize("NFD"), units_per_box: 4 }],
+  ["decomposed (NFD) thùng", { uom_code: "thùng".normalize("NFD"), boxes_per_carton: 6 }],
+  ["box without its factor", { uom_code: "hộp" }],
+  ["carton without its factor", { uom_code: "thùng" }],
+  ["box carrying the carton factor", { uom_code: "hộp", boxes_per_carton: 6 }],
+  ["carton carrying the box factor", { uom_code: "thùng", units_per_box: 4 }],
+  ["both factors", { uom_code: "hộp", units_per_box: 4, boxes_per_carton: 6 }],
+  ["zero factor", { uom_code: "hộp", units_per_box: 0 }],
+  ["fractional factor", { uom_code: "thùng", boxes_per_carton: 2.5 }],
+  ["string factor", { uom_code: "hộp", units_per_box: "4" }],
+  ["extra field", { uom_code: "hộp", units_per_box: 4, gtin: "x" }],
+  ["missing uom_code", { units_per_box: 4 }]
+]) {
+  assert.throws(() => validateUom(value), undefined, `${label} must be rejected`);
+}
+
+for (const relative of ["examples/api/x03b/sku.response.json", "contract-tests/x03b/fixtures/sku.response.fixture.json"]) {
+  const payload = parseJson(relative);
+  assert.ok(Array.isArray(payload.data.sellable_uoms), `${relative} must show sellable_uoms`);
+  assert.ok(payload.data.sellable_uoms.length >= 1, `${relative} must show at least one unit`);
+
+  const tooMany = structuredClone(payload);
+  tooMany.data.sellable_uoms = [
+    { uom_code: "hộp", units_per_box: 4 },
+    { uom_code: "thùng", boxes_per_carton: 6 },
+    { uom_code: "hộp", units_per_box: 5 }
+  ];
+  assert.throws(() => validateSkuEnvelope(tooMany), /maxItems/);
+
+  const duplicate = structuredClone(payload);
+  duplicate.data.sellable_uoms = [{ uom_code: "hộp", units_per_box: 4 }, { uom_code: "hộp", units_per_box: 4 }];
+  assert.throws(() => validateSkuEnvelope(duplicate), /uniqueItems/);
+
+  const innerPack = structuredClone(payload);
+  innerPack.data.sellable_uoms = [{ uom_code: "gói", units_per_box: 1 }];
+  assert.throws(() => validateSkuEnvelope(innerPack), /oneOf/);
+
+  const notArray = structuredClone(payload);
+  notArray.data.sellable_uoms = null;
+  assert.throws(() => validateSkuEnvelope(notArray), /expected array, got null/);
+
+  const empty = structuredClone(payload);
+  empty.data.sellable_uoms = [];
+  validateSkuEnvelope(empty);
+}
+
+// The two shipped examples cover both shapes between them: a SKU sold as box and carton, and one sold as box only.
+const sellableShapes = ["examples/api/x03b/sku.response.json", "contract-tests/x03b/fixtures/sku.response.fixture.json"]
+  .map(relative => parseJson(relative).data.sellable_uoms.map(entry => entry.uom_code).join("+"));
+assert.deepEqual(sellableShapes, ["hộp+thùng", "hộp"]);
+
+console.log("X03B SKU catalog contract PASS: updated_at, revision and sellable_uoms (schema, example, fixture, tamper cases).");
