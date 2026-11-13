@@ -226,6 +226,34 @@ check(() => assert.match(
   + "Test này đỏ khi ai đó thêm RECALL_CASE_OPEN (hoặc token thứ 12 bất kỳ) vào từ vựng chặn — "
   + "hãy đọc lại vì sao owner từ chối, đừng sửa assertion cho xanh"));
 
+// ── 5b. NM3-32b: recall_case_open luôn có trên MỌI lần đọc REST ───────────────────────────────────
+// Provider khai `RecallCaseOpen` là bool không-null, không có luật bỏ-khi-rỗng, và test hợp đồng của provider
+// ghim đúng tập thuộc tính của `data`: trường này LUÔN có mặt (true hoặc false) ở POST /v1/availability/check,
+// GET /v1/sellable-statuses/{id} và GET /v1/skus/{skuId}/operational-status. Consumer coi thiếu trường là
+// UNKNOWN_BLOCKED (fail-closed) nên hợp đồng nói "bắt buộc" ở hai chỗ M3 gọi: /check và GET sellable-statuses
+// (cùng bản mirror của consumer). Chữ của getSkuOperationalStatusV1 trong sku.v1.yaml bị test X03B đóng băng nên
+// ở đó chỉ ghi trong mô tả schema. Schema gốc sellable-status.schema.json KHÔNG đổi (giữ ranh giới ở §5 và các
+// event sku-became-* vốn không mang trường này).
+const requiredOnRestRead = /data:\n\s+allOf:\n\s+- \$ref: "\.\.\/\.\.\/schemas\/ops\/sellable-status\.schema\.json"\n\s+- type: object\n\s+required: \[recall_case_open\]\n/g;
+for (const [file, expected] of [
+  ["openapi/ops-core/availability-sellable.v1.yaml", 2],
+  ["openapi/business-platform/availability-consumer.v1.yaml", 1],
+]) {
+  check(() => assert.equal(
+    [...readText(file).matchAll(requiredOnRestRead)].length,
+    expected,
+    `${file}: ${expected} phản hồi 200 trả sellable-status phải bắt buộc recall_case_open (allOf + required)`));
+}
+for (const file of [
+  "examples/api/availability-check.response.json",
+  "contract-tests/fixtures/availability-check.v1.fixture.json",
+]) {
+  check(() => assert.equal(
+    typeof readJson(file).data.recall_case_open,
+    "boolean",
+    `${file}: ví dụ/fixture của /check phải mang recall_case_open kiểu boolean`));
+}
+
 // ── 6. Cổng an toàn cho chính test này ────────────────────────────────────────────────────────────
 // Regex hoặc bộ liệt kê hỏng thì test soi 0 thứ và xanh giả. 4 event × (6 envelope + 4 data +
 // 5..6 required) + 14 khẳng định schema/asyncapi ⇒ luôn > 60.

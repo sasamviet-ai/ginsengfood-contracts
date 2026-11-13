@@ -18,6 +18,7 @@
     "recall_hold": false,
     "sale_lock": false,
     "trace_ready": true,
+    "recall_case_open": false,
     "block_reasons": []
   }
 }

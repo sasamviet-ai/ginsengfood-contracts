@@ -36,7 +36,14 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: "../../schemas/ops/sellable-status.schema.json"
+                        allOf:
+                          - $ref: "../../schemas/ops/sellable-status.schema.json"
+                          - type: object
+                            required: [recall_case_open]
+                            description: >-
+                              The provider always emits recall_case_open on this read (true or false, never absent or null),
+                              so a consumer may require it. The shared schema keeps it optional because the
+                              ops-core.sellable.sku-became-* events do not carry it.
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
