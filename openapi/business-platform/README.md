@@ -19,6 +19,7 @@ Thu muc nay chua OpenAPI v1 contracts do `ginsengfood-business-platform` expose 
 | `ads-measurement.v1.yaml` | Ads Measurement | Raw funnel, verified revenue link, ROAS, scale gate. |
 | `mc-ai-live.v1.yaml` | MC AI Live | Live plan, host cue, risk cue, private handoff cue. |
 | `ivr-order-confirmation.v1.yaml` | IVR Order Confirmation | IVR chi cho official order confirmation. |
+| `order-channel-state.v1.yaml` | Order Channel State (DRAFT) | M5 doc trang thai don toi thieu (order/payment status, payment method) theo order_code truoc khi gui tin; chi doc, khong PII, token dich vu rieng. |
 | `notification.v1.yaml` | Notification | Reserved cancellation notice handoff sau core order cancellation. |
 
 ## Co The Duoc ops-core Goi

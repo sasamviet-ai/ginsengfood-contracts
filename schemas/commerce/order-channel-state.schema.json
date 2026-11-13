@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/commerce/v1/order-channel-state.schema.json",
+  "title": "Order Channel State",
+  "description": "DRAFT v1 minimal read of one official order for M5 channel messaging (D-m5-036). Raw M3 enum values only; no personal or commercial data.",
+  "$comment": "Enums mirror business-platform order/domain/enums OrderStatus, PaymentStatus, PaymentMethod at toandeptrai cbc17826a (2026-11-13). additionalProperties=false is the PII guard: any extra field is a contract violation.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "v1",
+      "description": "Contract version."
+    },
+    "order_code": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "description": "Official order code (Order.order_code)."
+    },
+    "order_status": {
+      "type": "string",
+      "enum": ["CONFIRMING", "CONFIRMED", "PACKED", "SHIPPING", "DELIVERED", "FAILED", "CANCELLED", "EXPIRED"],
+      "description": "Raw Order.order_status."
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": ["UNPAID", "PENDING", "PAID", "FAILED", "EXPIRED", "REFUND_REVIEW", "PARTIALLY_REFUNDED", "REFUNDED"],
+      "description": "Raw Order.payment_status."
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": ["COD", "ONLINE"],
+      "description": "Raw Order.payment_method_snapshot."
+    },
+    "order_version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Optimistic-lock counter of the order (Order.version); grows on every state change."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Order.updated_at, ISO 8601 with offset."
+    }
+  },
+  "required": ["schema_version", "order_code", "order_status", "payment_status", "payment_method", "order_version", "updated_at"]
+}
