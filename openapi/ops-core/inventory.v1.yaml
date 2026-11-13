@@ -476,7 +476,9 @@ paths:
       x-owner-decision-ref: OWNER-DIRECTIVE-2026-09-05-EXT-ALLOC-RESERVE
       # Provider configuration, not wire. These are the values the provider uses today when nothing overrides them; they are
       # published so that a consumer can size itself, not as a promise. The minimum numbers guaranteed to a consumer are not
-      # fixed yet. docs/m3-allocation-integration-notes.md section 7 has the meaning and the consumer rule.
+      # fixed yet. docs/m3-allocation-integration-notes.md section 7 has the meaning and the consumer rule, and the table of
+      # which statuses (RESERVED, CONFIRMED, RELEASED, ISSUED, expired RESERVED) count against the hold-number cap and the
+      # on-hand share cap, and when they stop counting.
       x-provider-limits:
         config_section: ExternalApi:AllocationHoldLimits
         status: CURRENT_DEFAULTS_NOT_A_GUARANTEE

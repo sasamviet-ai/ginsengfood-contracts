@@ -133,6 +133,20 @@ The refusals of "The closed table of `details[].reason`" come from limits that a
 
 The provider refuses to start with a nonsensical value, so the configured hold window is never below 30 minutes (the default window it must not undercut) and never above 24 hours. That is a rule about the provider's own configuration, and what follows from it is a current default of the provider, not a guarantee to the consumer: with the values of this table a hold of up to 30 minutes is not refused for its window, and a longer `expires_at` is accepted only while the configured maximum is at least that long, but no window is promised until the numbers of the next paragraph are fixed. A deployment sets these per environment, so the live value of an environment can differ from the default in this table.
 
+### Which holds count against which limit
+
+The first row of the table says one hold is one `source_object_id`. The behavior CHOSEN for SEC-14c (the provider change that follows the NM3-32c review, applied after the cutover) counts statuses as follows. The hold-number cap `HOLD_LIMIT_REACHED` counts distinct pairs of `source_object_type` and `source_object_id`, so M3, which sends `EXTERNAL_ORDER_ITEM`, has one hold per order line (one hold is one order line, not one order).
+
+| Status of the allocation | Counts toward the hold-number cap (`HOLD_LIMIT_REACHED`) | Counts toward the on-hand share cap (80%, floor of 50) and every quantity sum | Stops counting when |
+| --- | --- | --- | --- |
+| RESERVED, not past `expires_at` | yes | yes | the warehouse confirms it (CONFIRMED), the consumer or the warehouse releases it, or `expires_at` passes |
+| RESERVED, past `expires_at` | no | no | it is treated as released: the quantity is back in the available quantity |
+| CONFIRMED | no after SEC-14c (today: yes) | yes | the warehouse issues it (ISSUED) or releases it; CONFIRMED never expires on its own |
+| ISSUED | no | no (the stock left the held quantity) | terminal |
+| RELEASED | no | no | terminal |
+
+In words: after SEC-14c the hold-number cap counts only RESERVED and not past its `expires_at`. CONFIRMED (the warehouse accepted the order and started picking, so it does not expire) is subject only to the on-hand share cap and to every quantity sum, never to the hold-number cap. RELEASED, ISSUED and expired RESERVED count nowhere. **Today, in a build without SEC-14c, CONFIRMED still counts toward the hold-number cap**; the behavior of the table takes effect when the build that carries SEC-14c is deployed, and until then the cap of 200 is also spent by confirmed holds. Publishing this changes no wire field, no status code and no operation.
+
 **The numbers a consumer may rely on are NOT FIXED YET.** The values above are reasonable defaults to run with, not approved numbers. The minimum numbers the provider guarantees to a consumer will be fixed through SEC-15 / M3-158 (the M3 and ops-core owners) before 20/11/2026. Until then each value may change without a change of this contract, and a consumer that hard-codes a window or a line size above what its environment is configured with gets `422` on every reserve. Publishing the defaults gives a consumer the sizes to plan with; it does not promise them.
 
 Consumer rule: **fail closed on every limit refusal.** `HOLD_LIMIT_REACHED`, `HOLD_SHARE_LIMIT_REACHED`, `REQUESTED_QUANTITY_LIMIT_EXCEEDED` and `EXPIRES_AT_LIMIT_EXCEEDED` all mean that nothing was reserved and the line is not covered by a hold: do not sell the line as if it were held, do not report out of stock (stock may be intact), and do not mint a new key to try again. A quota `409` may be sent again with the same key and body once holds were released or expired; a `422` needs a smaller `requested_quantity` or an earlier `expires_at`.

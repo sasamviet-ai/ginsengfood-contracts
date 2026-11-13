@@ -954,6 +954,44 @@ for (const phrase of [
 ]) {
   assert.ok(limitsSection.includes(phrase), `notes section 7 must say: ${phrase}`);
 }
+// NM3-32c (e): which statuses count against which limit, and when they stop counting (question C11 of the M3 review).
+{
+  const heading = "### Which holds count against which limit";
+  const start = notes.indexOf(heading);
+  assert.notEqual(start, -1, "notes section 7 must have the table of counted statuses");
+  const nextSection = notes.indexOf("\n## ", start);
+  const section = collapse(notes.slice(start, nextSection === -1 ? undefined : nextSection));
+  for (const phrase of [
+    "SEC-14c",
+    "RESERVED and not past its `expires_at`",
+    "CONFIRMED",
+    "RELEASED",
+    "ISSUED",
+    "expired RESERVED",
+    "distinct pairs of `source_object_type` and `source_object_id`",
+    "`EXTERNAL_ORDER_ITEM`",
+    "one hold is one order line",
+    "80%",
+    "floor of 50",
+    "Today, in a build without SEC-14c, CONFIRMED still counts toward the hold-number cap",
+    "takes effect when the build that carries SEC-14c is deployed",
+    "changes no wire field"
+  ]) {
+    assert.ok(section.includes(phrase), `which-holds-count section must say: ${phrase}`);
+  }
+  // The table rows: only RESERVED (not expired) counts toward the number cap after SEC-14c.
+  const tableRows = notes.slice(start, nextSection === -1 ? undefined : nextSection).split("\n").filter(line => /^\| (RESERVED|CONFIRMED|ISSUED|RELEASED)/.test(line));
+  assert.equal(tableRows.length, 5, "five rows: RESERVED, RESERVED past expiry, CONFIRMED, ISSUED, RELEASED");
+  const cells = line => line.split("|").map(value => value.trim());
+  const byLabel = Object.fromEntries(tableRows.map(row => [cells(row)[1], cells(row)]));
+  assert.match(byLabel["RESERVED, not past `expires_at`"][2], /^yes/);
+  assert.match(byLabel["RESERVED, past `expires_at`"][2], /^no/);
+  assert.match(byLabel["CONFIRMED"][2], /^no after SEC-14c/);
+  assert.match(byLabel["CONFIRMED"][3], /^yes/, "CONFIRMED stays in the on-hand share cap and every quantity sum");
+  assert.match(byLabel["ISSUED"][2], /^no/);
+  assert.match(byLabel["RELEASED"][2], /^no/);
+}
+
 // NM3-32c (a): "a hold of up to 30 minutes is never refused" read as a guarantee while the next paragraph says nothing is guaranteed.
 assert.doesNotMatch(limitsSection, /a hold of up to 30 minutes is never refused/, "the window sentence must not promise that a hold is never refused");
 
