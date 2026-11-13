@@ -78,7 +78,7 @@ Rotating in any other order, or a rotation interrupted half way, makes the recei
 3. **Signature.** Recompute over the raw bytes (section 3) with the key chosen as in section 4, and compare with `X-Webhook-Signature` using a constant-time comparison. No match: `401`. Nothing from the body is trusted, parsed or logged before this passes.
 4. **Clock skew.** Reject when the absolute difference between the receiver's clock (UTC) and `X-Webhook-Timestamp` is more than **300 seconds**: `401`, because a stale timestamp cannot be told from a replay. The provider does not apply this window itself and signs a fresh timestamp on every attempt, so an honest retry is never rejected by it. Keep the receiver clock on NTP.
 5. **Deduplication.** Delivery is at-least-once. Record `X-Outbox-Event-Id` with an **atomic** insert-if-absent on a unique key (one statement; check-then-insert is not atomic and lets two concurrent deliveries both through). Keep each id for **at least 24 hours**. A repeat gets `2xx` and is not processed again. Record only after steps 3 and 4 passed, so that a caller without the key cannot fill the store.
-6. **Answer fast, work later.** Answer `2xx` as soon as the event is recorded (the provider gives up on a request after 30 seconds) and process afterwards. An event type the receiver does not care about is answered `2xx` and ignored, never `4xx`.
+6. **Answer fast, work later.** Answer `2xx` as soon as the event is recorded (the provider gives up on a request after 30 seconds) and process afterwards. An event type the receiver does not care about is answered `2xx` and ignored, never `4xx`. This covers a type it does not know and a body whose `eventType` is missing or does not look like `ops-core.<group>.<name>.v<N>`: once the signature has passed, answer `2xx`, ignore the event and raise an alert on your side, because the provider only signs and sends the 13 `eventType` values of `docs/webhook-transport.md`: a signed body with any other value is a provider defect, not something to reject. Answering `4xx` (a `400` for instance) makes the provider dead-letter that delivery at once, with no retry (section 6).
 
 The receiver must not write the body, the signature or the key to a log. Treat every text field of `data` as untrusted display text.
 
@@ -89,7 +89,7 @@ The receiver must not write the body, the signature or the key to a log. Treat e
 | `2xx` | Accepted: first delivery, repeat, or ignored type | Delivered. |
 | `401` | Signature wrong, header missing or malformed, timestamp outside 300 s | **Not retried.** Dead-letter immediately. |
 | `413` | Body larger than 64 KiB | **Not retried.** Dead-letter immediately. |
-| Any other `4xx` except `408` and `429` | The receiver rejects the event | **Not retried.** Dead-letter immediately. |
+| Any other `4xx` except `408` and `429` | The receiver rejects the event (a `400` for an unexpected `eventType` falls in this row) | **Not retried.** Dead-letter immediately. |
 | `408`, `429`, `5xx`, no answer within 30 s, network error | Temporary failure on the receiver side | Retried as in `webhook-transport.md` section 6, then dead-letter. |
 | `3xx` | The endpoint moved | **Not followed** (section 7). Counts as a failed attempt; the same answer comes every time, so fix the configured URL. |
 

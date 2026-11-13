@@ -389,4 +389,20 @@ for (const token of ["docs/webhook-security.md", "stock-alert-webhook.schema.jso
   assert.ok(entry.includes(token), `CHANGELOG entry must mention ${token}`);
 }
 
+// NM3-32b minor point: what the receiver does with a signed body whose eventType is missing, unknown or malformed.
+{
+  const security = read("docs/webhook-security.md").replace(/\s+/g, " ");
+  for (const phrase of [
+    "once the signature has passed, answer `2xx`, ignore the event and raise an alert on your side",
+    "missing or does not look like `ops-core.<group>.<name>.v<N>`",
+    "the provider only signs and sends the 13 `eventType` values of `docs/webhook-transport.md`",
+    "a provider defect",
+    "a `400` for an unexpected `eventType` falls in this row",
+    "dead-letter that delivery at once"
+  ]) {
+    assert.ok(security.includes(phrase), `docs/webhook-security.md must say: ${phrase}`);
+  }
+  assert.ok(read("docs/webhook-transport.md").replace(/\s+/g, " ").includes("or a body whose `eventType` is missing or malformed (a signed body that is not one of the 13 types is a provider defect: answer `2xx`, alert, see `webhook-security.md` section 5)"), "docs/webhook-transport.md points to the rule");
+}
+
 console.log("Webhook security profile contract PASS: 6 headers, signature vector, key-version grammar, answers table, 3 inventory events, 7 never-sent fields with tamper cases, 3 sale-lock reason caps.");

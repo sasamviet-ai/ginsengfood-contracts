@@ -50,7 +50,7 @@ The normative list, with the answer to give for each failure, is `webhook-securi
 2. Signature: recompute it and compare with `X-Webhook-Signature` using a constant-time comparison. Mismatch: answer `401`.
 3. Clock skew: reject when `|receive time - X-Webhook-Timestamp|` exceeds **300 seconds**. Keep the receiver clock on NTP. The sender does not apply this threshold itself, and every retry has a fresh timestamp, so an honest retry is not rejected by it.
 4. Deduplicate on `X-Outbox-Event-Id`: delivery is at-least-once, so record the id with an atomic insert for at least 24 hours, process an event once and answer `2xx` for repeats.
-5. Answer `2xx` quickly and process afterwards. For an event type the receiver does not care about, answer `2xx` and ignore it: a `4xx` sends the event to dead-letter (section 6).
+5. Answer `2xx` quickly and process afterwards. For an event type the receiver does not care about, or a body whose `eventType` is missing or malformed (a signed body that is not one of the 13 types is a provider defect: answer `2xx`, alert, see `webhook-security.md` section 5), answer `2xx` and ignore it: a `4xx` sends the event to dead-letter (section 6).
 
 ## 5. Routed event types (13)
 
