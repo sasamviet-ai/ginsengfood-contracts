@@ -192,6 +192,18 @@ assert.match(listBlock, /inclusive/i, "the updated_since semantics must be state
 assert.match(listBlock, /WITH a time\s+zone/, "updated_since must require a time zone");
 assert.match(listBlock, /ACTIVE_BASELINE/, "the published/filtered ACTIVE_BASELINE projection must be stated");
 
+// F1 (SKU-M12-03 verifier): updated_at is the instant of the WRITE, not of the COMMIT, so a transaction that starts early and
+// commits late carries an updated_at older than a value the consumer already stored. The contract must tell the consumer to
+// overlap the boundary and to read the whole catalog periodically.
+assert.match(listBlock, /WRITTEN,\s+not\s+the\s+instant\s+it\s+was\s+COMMITTED/, "list description must say updated_at is the write instant");
+assert.match(listBlock, /safety margin/, "list description must tell the consumer to overlap the boundary");
+assert.match(listBlock, /5 minutes/, "list description must give a concrete overlap");
+assert.match(listBlock, /whole catalog[\s\S]*fixed\s+interval/, "list description must ask for a periodic full read");
+const updatedSinceParameter = listBlock.match(/- name: updated_since\n([\s\S]*?)\n      responses:/)[1];
+assert.match(updatedSinceParameter, /WRITTEN,\s+not\s+the\s+instant\s+it\s+was\s+COMMITTED/, "the parameter itself must warn about the write instant");
+assert.match(updatedSinceParameter, /overlap/, "the parameter itself must tell the consumer to overlap");
+assert.match(properties.updated_at.description, /WRITTEN, not the instant it was COMMITTED/, "the schema must say it too");
+
 // Examples and fixtures: every item is a complete SkuV1Response with the three catalog additions.
 const listPayloads = [
   "examples/api/x03b/skus.response.json",

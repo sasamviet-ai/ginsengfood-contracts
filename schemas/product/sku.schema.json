@@ -22,7 +22,7 @@
     "updated_at": {
       "type": "string",
       "format": "date-time",
-      "description": "UTC instant (RFC 3339, Z suffix) of the latest change to what this object publishes about the SKU: the SKU master record (names, product group, dietary type, lifecycle_status) or the packaging configuration of its trade items (the input of sellable_uoms). A SKU that was never edited after creation carries its creation instant, so the value is never null. NOT covered: a change of the four linked pointers formula_version_id, recipe_id, bom_id and activation_id. Emitted on every SKU object by an ops-core build that carries SKU-M12-03; it is optional in the schema only so that a consumer which validates responses of an older provider keeps working."
+      "description": "UTC instant (RFC 3339, Z suffix) of the latest change to what this object publishes about the SKU: the SKU master record (names, product group, dietary type, lifecycle_status) or the packaging configuration of its trade items (the input of sellable_uoms). A SKU that was never edited after creation carries its creation instant, so the value is never null. It is the instant the change was WRITTEN, not the instant it was COMMITTED: a transaction that commits late can show an updated_at older than a value a consumer already stored, so a consumer that tracks it must overlap its reads (see updated_since of GET /v1/skus). NOT covered: a change of the four linked pointers formula_version_id, recipe_id, bom_id and activation_id. Emitted on every SKU object by an ops-core build that carries SKU-M12-03; it is optional in the schema only so that a consumer which validates responses of an older provider keeps working."
     },
     "revision": {
       "type": "integer",

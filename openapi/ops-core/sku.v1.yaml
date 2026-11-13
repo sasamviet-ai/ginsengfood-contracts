@@ -82,10 +82,15 @@ paths:
         number): the first page has no cursor, the response meta carries next_cursor until complete is true, and
         the cursor is bound to the exact limit and filter set that issued it. Order is stable, updated_at
         ascending then sku_id ascending, so SKUs that share an updated_at never swap places between pages or
-        between reads. To read incrementally, pass the largest updated_at already processed as updated_since;
-        the filter is inclusive (updated_at greater than or equal to the value), so the SKUs that share that
-        instant come again and the consumer deduplicates by sku_id and revision. Without updated_since the whole
-        catalog is returned (a few dozen SKUs today). INACTIVE and RETIRED SKUs are listed: they are lifecycle
+        between reads. To read incrementally, pass updated_since = the largest updated_at already processed minus
+        a safety margin, for example 5 minutes. updated_at is the instant the change was WRITTEN, not the instant
+        it was COMMITTED: a transaction that started earlier and commits later carries an updated_at older than a
+        value the consumer has already stored, and a read that starts exactly at that value would never return
+        it. The filter is inclusive (updated_at greater than or equal to the value), so the SKUs that share the
+        boundary instant, and every SKU inside the margin, come again and the consumer deduplicates by sku_id and
+        revision. No margin is a guarantee, so a consumer must also read the whole catalog, without updated_since,
+        at a fixed interval (it is a few dozen SKUs today) and treat that read as the authority. Without
+        updated_since the whole catalog is returned. INACTIVE and RETIRED SKUs are listed: they are lifecycle
         states, not deletions, and a SKU never disappears from the list. lifecycle_status filters on the value
         the object publishes (ACTIVE_BASELINE is internal and is published, and filtered, as ACTIVE); the
         provider currently publishes only ACTIVE, INACTIVE and RETIRED, so any other value of the closed enum
@@ -120,7 +125,9 @@ paths:
           required: false
           description: >-
             Only SKUs whose updated_at is greater than or equal to this instant. ISO-8601 date-time WITH a time
-            zone (Z or a numeric offset); a value without one answers 422. Sent at most once.
+            zone (Z or a numeric offset); a value without one answers 422. Sent at most once. updated_at is the
+            instant the change was WRITTEN, not the instant it was COMMITTED, so overlap the boundary (for example
+            5 minutes before the largest updated_at already processed) and re-read the whole catalog periodically.
           schema: { type: string, format: date-time }
       responses:
         "200":
