@@ -92,7 +92,7 @@ High-risk APIs:
 - `POST /v1/admin/operational/misa-handoffs/{misaHandoffId}/sync`
 
 Boundary notes:
-- `/v1/service-tokens` is the M2M authentication bootstrap for approved root `/v1/*` consumers; it is not an internal user/admin login and does not issue refresh tokens.
+- `/v1/service-tokens` is the M2M authentication bootstrap for approved root `/v1/*` consumers; it is not an internal user/admin login and does not issue refresh tokens. The request has no audience or scope parameter: the permissions granted to the principal decide the audiences of the token (see `service-auth.v1.yaml` and `docs/m3-allocation-integration-notes.md` section 6).
 - business-platform may check sellable/availability but must not mutate ops-core truth.
 - Inventory Ledger is append-only and has no direct consumer mutation API in Phase 4.
 - Sale Lock / Recall wins over Product Activation, channels, quote/order, and field actions.

@@ -218,4 +218,45 @@ for (const operationId of ["reserveInventoryAllocationV1", "releaseInventoryAllo
   }
 }
 
+// NM3-32b point 6: what the M3 service principal needs, written down next to the metadata that proves it. The token
+// request has no audience or scope parameter, so the principal's grants decide the audiences; the notes list the three
+// audiences and the ten approved permissions, and every one of them must still exist in the operation metadata above.
+const m3Audiences = [
+  "ginsengfood-ops-core-external-availability-v1",
+  "ginsengfood-ops-core-external-bulk-read-v1",
+  "ginsengfood-ops-core-external-allocation-v1"
+];
+const m3Permissions = [
+  "SELLABLE_CHECK", "SELLABLE_STATUS_VIEW", "SKU_CATALOG_VIEW", "RECALL_CASE_VIEW", "RECALL_HOLD_VIEW",
+  "INVENTORY_ALLOCATION_CREATE", "INVENTORY_ALLOCATION_VIEW", "INVENTORY_BALANCE_VIEW", "WAREHOUSE_VIEW", "WAREHOUSE_RECEIPT_VIEW"
+];
+// The 26-row table above is the X04D inventory; the list route of allocations is an X03B operation, so the
+// cross-check reads the declared x-audience and x-permission of every OpenAPI file instead.
+const declared = { audiences: new Set(), permissions: new Set() };
+for (const file of fs.readdirSync(path.join(root, "openapi/ops-core")).filter(name => name.endsWith(".yaml"))) {
+  const text = read(file);
+  for (const match of text.matchAll(/^ {6}x-audience: (\S+)$/gm)) declared.audiences.add(match[1]);
+  for (const match of text.matchAll(/^ {6}x-permission: (\S+)$/gm)) declared.permissions.add(match[1]);
+}
+const m3Notes = normalize(fs.readFileSync(path.join(root, "docs/m3-allocation-integration-notes.md"), "utf8"));
+const principalStart = m3Notes.indexOf("## 6. The service principal of M3: audiences and permissions");
+assert.notEqual(principalStart, -1, "notes: missing section 6 on the M3 service principal");
+const principalSection = m3Notes.slice(principalStart, m3Notes.indexOf("\n## ", principalStart + 5) === -1 ? undefined : m3Notes.indexOf("\n## ", principalStart + 5));
+for (const audience of m3Audiences) {
+  assert.ok(principalSection.includes(`\`${audience}\``), `notes list audience ${audience}`);
+  assert.ok(declared.audiences.has(audience), `no operation declares audience ${audience}`);
+}
+for (const permission of m3Permissions) {
+  assert.ok(principalSection.includes(`\`${permission}\``), `notes list permission ${permission}`);
+  assert.ok(declared.permissions.has(permission), `no operation declares permission ${permission}`);
+}
+for (const phrase of ["no audience, scope or permission parameter", "INVENTORY_ALLOCATION_RELEASE", "403", "ten", "never inferred from a read permission"]) {
+  assert.ok(principalSection.includes(phrase), `notes section 6 must say: ${phrase}`);
+}
+const serviceAuthText = read("service-auth.v1.yaml");
+assert.match(serviceAuthText.replace(/\s+/g, " "), /carries only client_id and client_secret: there is no audience, scope or permission parameter/);
+assert.match(serviceAuthText.replace(/\s+/g, " "), /INVENTORY_ALLOCATION_CREATE is the only permission that adds the allocation audience/);
+const tokenRequestBlock = serviceAuthText.slice(serviceAuthText.indexOf("    ServiceTokenRequest:"), serviceAuthText.indexOf("    ServiceTokenResponse:"));
+assert.deepEqual([...tokenRequestBlock.matchAll(/^        ([a-z_]+):$/gm)].map(match => match[1]), ["client_id", "client_secret"], "token request has exactly client_id and client_secret");
+
 console.log("X04D external runtime v1 security metadata PASS: 26/26 operations plus negative tamper checks.");

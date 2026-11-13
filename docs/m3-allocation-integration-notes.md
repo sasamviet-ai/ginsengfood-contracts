@@ -99,3 +99,21 @@ The pull model (reading `GET` snapshots and `POST /v1/availability/check` before
 3. M3 cancellation flow calls release, treats `ALLOCATION_NOT_HELD` and `404` as done, and routes `ALLOCATION_CONFLICT` to the warehouse instead of re-reserving.
 4. M3 never builds a new idempotency key for a retry of the same intent, and treats every `429` on these two commands as retry-with-the-same-key-and-body, never as out of stock.
 5. M3 pins a contracts revision that contains these files.
+
+## 6. The service principal of M3: audiences and permissions
+
+`POST /v1/service-tokens` carries only `client_id` and `client_secret`: there is no audience, scope or permission parameter. The principal decides. The permissions granted to it decide which audiences (`aud`) the token carries, and every operation requires its own audience (`x-audience`) and its own permission (`x-permission`). A call whose token lacks either is `403 FORBIDDEN`, however right the rest of the request is. A principal and its credentials belong to one ops-core environment: credentials of one environment mean nothing in another, and an idempotency key belongs to the principal that first used it (another principal gets `403`).
+
+M3 calls operations of three audiences, so its one principal per environment must hold at least one permission for each:
+
+| Audience (`aud`) | The token carries it when the principal holds | Operations behind it (permission) |
+| --- | --- | --- |
+| `ginsengfood-ops-core-external-availability-v1` | `SELLABLE_CHECK` or `SELLABLE_STATUS_VIEW` | `checkAvailabilityV1` (`SELLABLE_CHECK`), `getSellableStatusV1` (`SELLABLE_STATUS_VIEW`) |
+| `ginsengfood-ops-core-external-bulk-read-v1` | any one of `SKU_CATALOG_VIEW`, `RECALL_CASE_VIEW`, `RECALL_HOLD_VIEW`, `INVENTORY_BALANCE_VIEW`, `INVENTORY_ALLOCATION_VIEW`, `WAREHOUSE_VIEW`, `WAREHOUSE_RECEIPT_VIEW`, `SELLABLE_STATUS_VIEW` | `listInventoryAllocationsV1` (`INVENTORY_ALLOCATION_VIEW`), `listStockBalancesV1` (`INVENTORY_BALANCE_VIEW`), `listWarehousesV1` and `listWarehouseLocationsV1` (`WAREHOUSE_VIEW`), `listWarehouseReceiptsV1` (`WAREHOUSE_RECEIPT_VIEW`), `getSkuV1` (`SKU_CATALOG_VIEW`), `getSkuOperationalStatusV1` (`SELLABLE_STATUS_VIEW`), `getRecallCaseV1` (`RECALL_CASE_VIEW`), `getSaleLockV1` (`RECALL_HOLD_VIEW`) |
+| `ginsengfood-ops-core-external-allocation-v1` | `INVENTORY_ALLOCATION_CREATE` only | `reserveInventoryAllocationV1` and `releaseInventoryAllocationV1` (both `INVENTORY_ALLOCATION_CREATE`) |
+
+Two things that are easy to get wrong. The allocation audience is never inferred from a read permission: it is separate on purpose, so a token that can read stock cannot hold it. And listing allocations is a read: `listInventoryAllocationsV1` needs `INVENTORY_ALLOCATION_VIEW` and the bulk-read audience, not the allocation audience, so a principal that only holds `INVENTORY_ALLOCATION_CREATE` can reserve and release but cannot read its own holds back. The warehouse permission `INVENTORY_ALLOCATION_RELEASE` is never granted to a service principal; release uses `INVENTORY_ALLOCATION_CREATE`.
+
+The provider caps the permissions of the M3 sales principal at ten, the approved ceiling (a grant outside it is refused and never reaches the token): `SELLABLE_CHECK`, `SELLABLE_STATUS_VIEW`, `SKU_CATALOG_VIEW`, `RECALL_CASE_VIEW`, `RECALL_HOLD_VIEW`, `INVENTORY_ALLOCATION_CREATE`, `INVENTORY_ALLOCATION_VIEW`, `INVENTORY_BALANCE_VIEW`, `WAREHOUSE_VIEW`, `WAREHOUSE_RECEIPT_VIEW`. Operations whose permission is outside the ten answer `403` to this principal, for example `listInventoryLedgerV1` (`INVENTORY_LEDGER_VIEW`), `listStockAlertsV1` (`STOCK_ALERT_VIEW`), `getPublicSkuV1` (`PRODUCT_PUBLIC_VIEW`), the recipe, formula, BOM and activation reads, and every operator operation.
+
+Open point: the ten is today's default. Whether `SELLABLE_STATUS_VIEW` and `WAREHOUSE_RECEIPT_VIEW` stay in it is not decided, and provider configuration can narrow the ceiling to eight. Until it is decided, M3 must not depend on `getSellableStatusV1`, `getSkuOperationalStatusV1` or `listWarehouseReceiptsV1`; `checkAvailabilityV1` and every call of the three groups above that use the other eight permissions are not affected.

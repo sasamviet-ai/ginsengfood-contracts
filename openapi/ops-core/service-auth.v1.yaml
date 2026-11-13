@@ -36,6 +36,16 @@ paths:
         used on authorized root /v1 adapters such as POST /v1/availability/check. The request is
         anonymous by necessity, protected by an authentication-sensitive rate limit, and must be
         sent as application/json. Credentials and returned tokens must not be logged or cached.
+
+        The request carries only client_id and client_secret: there is no audience, scope or permission
+        parameter. The principal decides what the token can do. The permissions granted to it decide the
+        audiences (aud) the token carries, and every operation requires its own x-audience and its own
+        x-permission, answering 403 FORBIDDEN when either is missing. SELLABLE_CHECK or SELLABLE_STATUS_VIEW
+        adds the availability audience; any permission of the snapshot reads (for example SKU_CATALOG_VIEW,
+        INVENTORY_BALANCE_VIEW, INVENTORY_ALLOCATION_VIEW, WAREHOUSE_VIEW) adds the bulk-read audience;
+        INVENTORY_ALLOCATION_CREATE is the only permission that adds the allocation audience, so a token
+        that can read stock cannot hold it. The three audiences and the ten permissions of the M3 sales
+        principal are listed in docs/m3-allocation-integration-notes.md, section 6.
       operationId: issueServiceTokenV1
       tags: [service-auth]
       security: []
