@@ -83,13 +83,25 @@ x-retry-policies:
     non_retryable_statuses: [400, 401, 403, 404, 409, 410, 422, 500]
     honor_retry_after: true
     backoff: FULL_JITTER_BASE_500MS_CAP_5S
-  # Write commands: no automatic retry loop. After a lost response, a timeout, 429 or 503, repeat the call with the SAME
-  # X-Idempotency-Key and the SAME body, honoring Retry-After. A new key for the same source can hold stock twice (reserve).
-  ExternalManualReplayOnly:
-    max_retries: 0
-    total_budget_seconds: 0
-    replay: MANUAL_SAME_IDEMPOTENCY_KEY_AND_PAYLOAD_ONLY
+  # Write commands (reserve, release). The retry IS a replay: the same X-Idempotency-Key with the same body. The provider
+  # answers a replay of a finished call with the original result (reserve: 200 ALREADY_RESERVED, release: the original 200)
+  # and a replay of a call that is still running with 429 + Retry-After: 1, so replaying is always valid. Replay after a lost
+  # response, a timeout, 502/503/504, or a 429 (bucket empty, same key still running, temporary contention), honoring
+  # Retry-After. Never send a new key for the same intent: a new key for the same source can hold stock twice (reserve) or
+  # release twice. max_retries is the recommended ceiling for automatic replays, not a cap the provider enforces (it counts
+  # none), but each replay draws a token from the ExternalAllocationWrite bucket. A 409 or 422 is not replayed automatically;
+  # a reserve quota refusal (HOLD_LIMIT_REACHED, HOLD_SHARE_LIMIT_REACHED) may be sent again with the same key once the
+  # principal has released holds or holds have expired. When the budget runs out the outcome is UNKNOWN, neither held nor
+  # refused: keep the same key and body and reconcile with GET /v1/inventory/allocations?sourceObjectId=.
+  ExternalIdempotentReplay:
+    max_retries: 5
+    provider_enforces_cap: false
+    replay: SAME_IDEMPOTENCY_KEY_AND_PAYLOAD_ONLY
+    retryable_statuses: [408, 429, 502, 503, 504]
+    non_retryable_statuses: [400, 401, 403, 404, 409, 422, 500]
     honor_retry_after: true
+    backoff: GROWING_PAUSE_WITH_JITTER
+    after_budget: OUTCOME_UNKNOWN_KEEP_SAME_KEY_AND_BODY
 x-pagination-policies:
   ExternalSnapshotCursorV1:
     mode: OPAQUE_SCOPE_BOUND_SNAPSHOT_CURSOR
@@ -441,7 +453,7 @@ paths:
       # (5 rps / burst 10 / fleet 25) and shared with releaseInventoryAllocationV1. It no longer
       # shares the availability-check bucket.
       x-rate-limit-policy: ExternalAllocationWrite
-      x-retry-policy: ExternalManualReplayOnly
+      x-retry-policy: ExternalIdempotentReplay
       x-idempotency: REQUIRED
       x-idempotency-disposition: IDEMPOTENCY_KEY_REQUIRED
       x-write-surface: EXTERNAL_ALLOCATION_RESERVE
@@ -596,7 +608,7 @@ paths:
       x-permission: INVENTORY_ALLOCATION_CREATE
       x-permission-scope: SERVICE
       x-rate-limit-policy: ExternalAllocationWrite
-      x-retry-policy: ExternalManualReplayOnly
+      x-retry-policy: ExternalIdempotentReplay
       x-idempotency: REQUIRED
       x-idempotency-disposition: IDEMPOTENCY_KEY_REQUIRED
       x-write-surface: EXTERNAL_ALLOCATION_RELEASE

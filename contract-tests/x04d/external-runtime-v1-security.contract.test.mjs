@@ -30,8 +30,8 @@ const operations = [
   { file: "recall-sale-lock.v1.yaml", operationId: "createRecallCaseV1", authClass: "OPERATOR_BEARER", audience: "ginsengfood-ops-core-external-operator-v1", tokenUse: "ABSENT", permission: "RECALL_CASE_CREATE", scope: "ADMIN_OPERATIONAL", rate: "ExternalOperatorHighRisk", retry: "ExternalManualReplayOnly", idempotency: "IDEMPOTENCY_KEY_REQUIRED", runtime: "CURRENT_SOURCE_AUTH_PARITY; RATE_POLICY_NOT_IMPLEMENTED", securityScheme: "OperatorBearer" },
   { file: "recall-sale-lock.v1.yaml", operationId: "createSaleLockV1", authClass: "OPERATOR_BEARER", audience: "ginsengfood-ops-core-external-operator-v1", tokenUse: "ABSENT", permission: "RECALL_SALE_LOCK_APPLY", scope: "ADMIN_OPERATIONAL", rate: "ExternalOperatorHighRisk", retry: "ExternalManualReplayOnly", idempotency: "IDEMPOTENCY_KEY_REQUIRED", runtime: "CURRENT_SOURCE_AUTH_PARITY; RATE_POLICY_NOT_IMPLEMENTED", securityScheme: "OperatorBearer" },
   // Allocation write surface (inventory.v1.yaml): own audience and bucket, required idempotency key, replay-only retry.
-  { file: "inventory.v1.yaml", operationId: "reserveInventoryAllocationV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-allocation-v1", tokenUse: "service", permission: "INVENTORY_ALLOCATION_CREATE", scope: "SERVICE", rate: "ExternalAllocationWrite", retry: "ExternalManualReplayOnly", idempotency: "IDEMPOTENCY_KEY_REQUIRED", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer", ownerDecision: "OWNER-DIRECTIVE-2026-09-05-EXT-ALLOC-RESERVE" },
-  { file: "inventory.v1.yaml", operationId: "releaseInventoryAllocationV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-allocation-v1", tokenUse: "service", permission: "INVENTORY_ALLOCATION_CREATE", scope: "SERVICE", rate: "ExternalAllocationWrite", retry: "ExternalManualReplayOnly", idempotency: "IDEMPOTENCY_KEY_REQUIRED", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer", ownerDecision: "OD-M3-REPLY-01" },
+  { file: "inventory.v1.yaml", operationId: "reserveInventoryAllocationV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-allocation-v1", tokenUse: "service", permission: "INVENTORY_ALLOCATION_CREATE", scope: "SERVICE", rate: "ExternalAllocationWrite", retry: "ExternalIdempotentReplay", idempotency: "IDEMPOTENCY_KEY_REQUIRED", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer", ownerDecision: "OWNER-DIRECTIVE-2026-09-05-EXT-ALLOC-RESERVE" },
+  { file: "inventory.v1.yaml", operationId: "releaseInventoryAllocationV1", authClass: "SERVICE_BEARER", audience: "ginsengfood-ops-core-external-allocation-v1", tokenUse: "service", permission: "INVENTORY_ALLOCATION_CREATE", scope: "SERVICE", rate: "ExternalAllocationWrite", retry: "ExternalIdempotentReplay", idempotency: "IDEMPOTENCY_KEY_REQUIRED", runtime: "CURRENT_SOURCE_AUTH_AND_RATE_PARITY; FLEET_ENV_BINDING_REQUIRED", securityScheme: "ServiceBearer", ownerDecision: "OD-M3-REPLY-01" },
   { file: "service-auth.v1.yaml", operationId: "issueServiceTokenV1", authClass: "ANONYMOUS_BOOTSTRAP", audience: "NONE", tokenUse: "NONE", permission: "NONE", scope: "NONE", rate: "AuthSensitive", retry: "AuthSensitiveNoRetry", idempotency: "NOT_APPLICABLE_CONFIDENTIAL_CLIENT_EXCHANGE", runtime: "CURRENT_SOURCE_ROUTE_REQUIRES_EXACT_PARITY; AUTH_SENSITIVE_RATE_POLICY_MATCHED", securityScheme: null }
 ];
 
@@ -50,6 +50,8 @@ const retryPolicyTokens = {
   ExternalBulkReadRetry: ["max_retries: 2", "total_budget_seconds: 30", "retryable_statuses: [408, 429, 502, 503, 504]", "honor_retry_after: true", "backoff: FULL_JITTER_BASE_500MS_CAP_5S"],
   ExternalOperatorReadRetry: ["max_retries: 1", "total_budget_seconds: 20", "retryable_statuses: [408, 429, 502, 503, 504]", "honor_retry_after: true", "backoff: FULL_JITTER"],
   ExternalManualReplayOnly: ["max_retries: 0", "total_budget_seconds: 0", "replay: MANUAL_SAME_IDEMPOTENCY_KEY_AND_PAYLOAD_ONLY", "honor_retry_after: true"],
+  // NM3-32b: reserve and release. Replaying the same key and body is valid and expected; 429 + Retry-After is retried.
+  ExternalIdempotentReplay: ["max_retries: 5", "replay: SAME_IDEMPOTENCY_KEY_AND_PAYLOAD_ONLY", "retryable_statuses: [408, 429, 502, 503, 504]", "non_retryable_statuses: [400, 401, 403, 404, 409, 422, 500]", "honor_retry_after: true", "backoff: GROWING_PAUSE_WITH_JITTER", "provider_enforces_cap: false", "after_budget: OUTCOME_UNKNOWN_KEEP_SAME_KEY_AND_BODY"],
   AuthSensitiveNoRetry: ["max_retries: 0", "total_budget_seconds: 0", "honor_retry_after: true"]
 };
 
@@ -206,7 +208,7 @@ for (const operationId of ["reserveInventoryAllocationV1", "releaseInventoryAllo
     ["x-rate-limit-policy: ExternalAllocationWrite", "x-rate-limit-policy: ExternalAvailabilityCheck", /x-rate-limit-policy drift/],
     ["x-audience: ginsengfood-ops-core-external-allocation-v1", "x-audience: ginsengfood-ops-core-external-bulk-read-v1", /x-audience drift/],
     ["x-idempotency-disposition: IDEMPOTENCY_KEY_REQUIRED", "x-idempotency-disposition: NOT_APPLICABLE_READ_ONLY", /x-idempotency-disposition drift/],
-    ["x-retry-policy: ExternalManualReplayOnly", "x-retry-policy: ExternalBulkReadRetry", /x-retry-policy drift/]
+    ["x-retry-policy: ExternalIdempotentReplay", "x-retry-policy: ExternalBulkReadRetry", /x-retry-policy drift/]
   ]) {
     assert.ok(writeBlock.includes(needle), `${operationId} tamper setup failed for ${needle}`);
     assert.throws(

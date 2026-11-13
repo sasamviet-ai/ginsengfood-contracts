@@ -58,7 +58,7 @@ One code, `RATE_LIMITED`, three causes: the bucket is empty, a call with the sam
 
 1. It is not "out of stock" and nothing changed: the transaction did not commit, so the idempotency key is reusable. Never show a customer an out-of-stock message for a `429`.
 2. Wait at least `Retry-After` seconds (1), then send the same call with the same `X-Idempotency-Key` and the same body (`expires_at` included). A new key for the same intent can open a second hold on reserve, or a second release.
-3. Retry up to about 5 times in total, with a growing pause and some jitter so competing callers do not retry in step.
+3. Retry up to about 5 times in total, with a growing pause and some jitter so competing callers do not retry in step. This is `max_retries: 5` of `x-retry-policies.ExternalIdempotentReplay` in `inventory.v1.yaml`: a recommended ceiling, not a cap the provider enforces. Replaying the same key and the same body is always valid, also after a lost response or a timeout, and the same rule applies to release.
 4. If it is still `429` after that, treat the outcome as UNKNOWN: neither held nor refused. Do not report out of stock, do not mint a new key; keep the intent open, repeat later with the same key and body, or resolve it by reading `GET /v1/inventory/allocations?sourceObjectId=` once (your own rows only).
 
 Before the provider change that introduced the contention answer, the same situation was reported as `409 INSUFFICIENT_STOCK` on reserve and `409 ALLOCATION_CONFLICT` on release, which a consumer could only read as "no stock" or "do not retry". Those two `409` answers now mean a real shortage, an issued source, or an ordinary state conflict.
