@@ -948,10 +948,14 @@ for (const phrase of [
   "20/11/2026",
   "fail closed",
   "may change without a change of this contract",
-  "No wire field"
+  "No wire field",
+  // NM3-32c (a): the window sentence must read as a current default, never as a promise.
+  "a current default of the provider, not a guarantee",
 ]) {
   assert.ok(limitsSection.includes(phrase), `notes section 7 must say: ${phrase}`);
 }
+// NM3-32c (a): "a hold of up to 30 minutes is never refused" read as a guarantee while the next paragraph says nothing is guaranteed.
+assert.doesNotMatch(limitsSection, /a hold of up to 30 minutes is never refused/, "the window sentence must not promise that a hold is never refused");
 
 // ---------------------------------------------------------------------------------------------------------
 // NM3-32b minor point: the shared TooManyRequests of inventory.v1.yaml serves operations of two read policies. The provider

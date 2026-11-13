@@ -4,6 +4,10 @@ Changelog này ghi lại thay đổi của contract repo `ginsengfood-contracts`
 
 ## Unreleased
 
+### Provider limits: the 30-minute window sentence no longer reads as a guarantee (NM3-32c a, wording only)
+
+`docs/m3-allocation-integration-notes.md` section 7 said "a hold of up to 30 minutes is never refused for its window" two lines before it said that no number is guaranteed yet. The first sentence now says what it means: the provider validates its own configuration so the window is never below 30 minutes, and with the current defaults a hold of up to 30 minutes is not refused for its window, which is a current default of the provider and not a guarantee. The guaranteed minimums stay `NOT_YET_FIXED` (SEC-15 / M3-158, before 2026-11-20). No wire change.
+
 ### Clarifications from the M3 review of the ops-core contract (NM3-32b)
 
 Prepared on top of the `m12-noi-m3` branch after the business-platform (M3) consumer review `NM3-32b` of 13/11/2026. **Classification: clarification, no wire change.** Every item below documents or tightens on paper what the provider code already does (checked against ops-core `main`); no field, status code or `error.code` is added, removed or retyped, and no provider change is required. Each item is its own commit.
