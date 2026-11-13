@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "properties": {
     "cursor_version": { "type": "integer", "const": 1 },
-    "resource": { "type": "string", "enum": ["inventory.stock-balances", "inventory.ledger", "inventory.stock-alerts", "inventory.allocations", "warehouses", "warehouse-locations", "warehouse-receipts"] },
+    "resource": { "type": "string", "enum": ["inventory.stock-balances", "inventory.ledger", "inventory.stock-alerts", "inventory.allocations", "warehouses", "warehouse-locations", "warehouse-receipts", "skus"] },
     "snapshot_id": { "type": "string", "format": "uuid" },
     "as_of": { "type": "string", "format": "date-time" },
     "high_watermark": { "type": "string", "minLength": 1 },

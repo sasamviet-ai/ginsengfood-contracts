@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/product/v1/sku-sellable-uom.schema.json",
+  "title": "SKU sellable unit of measure",
+  "description": "One unit a SKU can be sold in, taken from the SKU's ACTIVE trade item of that packaging level. A BOX trade item gives { uom_code: \"hộp\", units_per_box } (units_per_box inner packs in one box); a CARTON trade item gives { uom_code: \"thùng\", boxes_per_carton } (boxes_per_carton boxes in one carton). Exactly two uom_code values exist in this contract; the inner pack (gói), jar (lọ) and pot (hũ) are never sellable units here. The entry says the unit is configured and active in ops-core, nothing about stock: whether a quantity may be committed is still decided by POST /v1/availability/check.",
+  "$comment": "Source: ops-core plan row SKU-M12-03 agreed with the business-platform (M3-4, 13/11/2026). uom_code values are the ref_uom codes of ops-core, compared byte for byte in Unicode NFC: \"hộp\" is U+0068 U+1ED9 U+0070 (3 code points) and \"thùng\" is U+0074 U+0068 U+00F9 U+006E U+0067 (5 code points); a decomposed (NFD) spelling is a different string and is not accepted.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "uom_code": {
+      "type": "string",
+      "enum": ["hộp", "thùng"],
+      "description": "Unit code, NFC, case-sensitive: \"hộp\" (box) or \"thùng\" (carton). The same codes are the unit of POST /v1/availability/check and of the stock quantities."
+    },
+    "units_per_box": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Present only when uom_code is \"hộp\": number of inner packs (gói) in one box, from the BOX trade item."
+    },
+    "boxes_per_carton": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Present only when uom_code is \"thùng\": number of boxes in one carton, from the CARTON trade item."
+    }
+  },
+  "required": ["uom_code"],
+  "oneOf": [
+    {
+      "properties": {
+        "uom_code": { "const": "hộp" },
+        "units_per_box": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["uom_code", "units_per_box"],
+      "additionalProperties": false
+    },
+    {
+      "properties": {
+        "uom_code": { "const": "thùng" },
+        "boxes_per_carton": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["uom_code", "boxes_per_carton"],
+      "additionalProperties": false
+    }
+  ]
+}

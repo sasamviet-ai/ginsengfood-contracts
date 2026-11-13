@@ -3,15 +3,23 @@
   "$id": "schemas/ops/v1/warehouse.schema.json",
   "title": "Warehouse",
   "description": "Warehouse v1 contract. Warehouse must be a registry entry, not hardcoded; MISA mapping is reserved through integration contracts.",
-  "$comment": "Sources: PACK-01 placeholder registry control. TODO: official warehouse type/status values are not specified.",
+  "$comment": "Sources: PACK-01 placeholder registry control; warehouse_type and status values fixed from the ops-core database check constraints ck_op_warehouse_type and the ACTIVE/INACTIVE lifecycle (SKU-M12-03, agreed with the business-platform M3-4, 13/11/2026). The same two vocabularies are published on the external projection schemas/ops/x03b/external-warehouse.schema.json.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "warehouse_id": { "type": "string", "minLength": 1, "description": "Warehouse identifier." },
     "warehouse_code": { "type": "string", "minLength": 1, "description": "Warehouse code." },
     "warehouse_name": { "type": "string", "minLength": 1, "description": "Warehouse name." },
-    "warehouse_type": { "type": "string", "description": "Warehouse type. TODO: define official values." },
-    "status": { "type": "string", "description": "Warehouse status. TODO: define official values." },
+    "warehouse_type": {
+      "type": "string",
+      "enum": ["RAW_MATERIAL", "FINISHED_GOODS"],
+      "description": "Warehouse type, closed set: RAW_MATERIAL (raw material warehouse) or FINISHED_GOODS (finished goods warehouse). Upper case, compared byte for byte. A new type is a contract change, not a data change."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ACTIVE", "INACTIVE"],
+      "description": "Warehouse lifecycle status, closed set. INACTIVE is a lifecycle state, not a deletion: the warehouse stays in the registry and in the snapshot."
+    },
     "misa_mapping_code": { "type": "string", "minLength": 1, "description": "MISA mapping code when configured." },
     "source_ref": { "$ref": "../common/source-ref.schema.json" },
     "evidence_refs": { "type": "array", "items": { "$ref": "../common/evidence-ref.schema.json" } }

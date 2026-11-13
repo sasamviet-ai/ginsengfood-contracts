@@ -35,6 +35,7 @@ provider_surfaces:
     domain_schema_paths:
       - ../product/product.schema.json
       - ../product/sku.schema.json
+      - ../product/sku-sellable-uom.schema.json
       - ../product/ingredient.schema.json
       - ../product/product-activation.schema.json
     notes: Product activation is not sellable status.
