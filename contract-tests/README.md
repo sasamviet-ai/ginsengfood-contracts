@@ -6,6 +6,7 @@ Current validation:
 
 - Repository-level contract hygiene/source trace validation is available through `node scripts/validate-contracts.mjs`.
 - Exact X04D metadata parity for the 26 external v1 operations in its inventory (24 plus `reserveInventoryAllocationV1` and `releaseInventoryAllocationV1`) is enforced by `node contract-tests/x04d/external-runtime-v1-security.contract.test.mjs`.
+- The wording clarifications that answer the M3 review (NM3-32c: SKU lifecycle and `sku_code`, quantities, `item_type` versus `warehouse_type`) are pinned by `node contract-tests/x03b/m3-review-clarifications-v1.contract.test.mjs`; they change no value.
 - The optional `X-Correlation-Id` request header and the success response header of the 25 service-bearer operations and of `POST /v1/service-tokens` are enforced by `node contract-tests/x03b/correlation-header-v1.contract.test.mjs`.
 - The SKU catalog read model (`SkuV1Response`: `updated_at`, `revision`, `sellable_uoms`, and the `GET /v1/skus` list route) is enforced by `node contract-tests/x03b/sku-catalog-v1.contract.test.mjs`; the list route's snapshot behaviour is also covered by `external-bulk-read-v1.contract.test.mjs`.
 - The optional `expiry_date` of the external stock-balance projection is enforced by `node contract-tests/x03b/stock-balance-expiry-v1.contract.test.mjs` (kept separate so it can be dropped on its own).

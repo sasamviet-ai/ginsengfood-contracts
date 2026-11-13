@@ -14,7 +14,7 @@
     "public_name": { "type": "string", "minLength": 1, "description": "Public product name for the SKU." },
     "dietary_type": { "type": "string", "enum": ["VEGAN", "SAVORY"], "description": "Dietary grouping from the operational SKU catalog: Vegan / Man. TODO: confirm exact English label for Man." },
     "product_group": { "type": "string", "minLength": 1, "description": "Catalog product group." },
-    "lifecycle_status": { "type": "string", "enum": ["DRAFT", "PENDING_CONFIG", "PENDING_EVIDENCE", "READY", "ACTIVE", "INACTIVE", "RETIRED", "BLOCKED"], "description": "Closed SKU lifecycle enum governed by enums/product/sku-lifecycle-status.yaml." },
+    "lifecycle_status": { "type": "string", "enum": ["DRAFT", "PENDING_CONFIG", "PENDING_EVIDENCE", "READY", "ACTIVE", "INACTIVE", "RETIRED", "BLOCKED"], "description": "Closed SKU lifecycle enum governed by enums/product/sku-lifecycle-status.yaml. ops-core stores four states (ACTIVE_BASELINE, ACTIVE, INACTIVE, RETIRED) and publishes ACTIVE (stored ACTIVE or ACTIVE_BASELINE), INACTIVE and RETIRED only; the other five values have never been published. INACTIVE and ACTIVE can alternate; RETIRED is final. See docs/m3-sku-catalog-integration-notes.md section 2." },
     "formula_version_id": { "type": "string", "minLength": 1, "description": "Linked current Formula Version, usually G1 for operational production." },
     "recipe_id": { "type": "string", "minLength": 1, "description": "Linked Recipe record." },
     "bom_id": { "type": "string", "minLength": 1, "description": "Linked BOM record." },

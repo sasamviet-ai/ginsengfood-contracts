@@ -113,7 +113,10 @@ paths:
         states, not deletions, and a SKU never disappears from the list. lifecycle_status filters on the value
         the object publishes (ACTIVE_BASELINE is internal and is published, and filtered, as ACTIVE); the
         provider currently publishes only ACTIVE, INACTIVE and RETIRED, so any other value of the closed enum
-        answers an empty page, not an error. A parameter that is unknown, repeated or malformed (limit outside
+        answers an empty page, not an error. GET /v1/skus never hides a SKU by its status; it filters only when
+        lifecycle_status is sent. The database stores four states (ACTIVE_BASELINE, ACTIVE, INACTIVE and RETIRED), so the four
+        stored states are the whole story; DRAFT, PENDING_READINESS and BLOCKED seen in the ops-core code are statuses of the
+        product activation, not of the SKU lifecycle (docs/m3-sku-catalog-integration-notes.md sections 2 and 3). A parameter that is unknown, repeated or malformed (limit outside
         1..100, lifecycle_status outside the enum, updated_since without a time zone) answers 422 and never
         widens the result. Same envelope, errors, audience, permission and rate bucket as getSkuV1.
       operationId: listSkusV1

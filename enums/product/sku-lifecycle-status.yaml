@@ -29,6 +29,13 @@ values:
   - value: BLOCKED
     description: SKU is blocked by missing config, evidence, owner review, or guard condition.
     source: PACK-02 guard behavior.
+ops_core_provider_behavior:
+  note: What ops-core stores and publishes today, from the code and the database. Wording only; the values above are unchanged. See docs/m3-sku-catalog-integration-notes.md sections 2 and 3.
+  stored_values: [ACTIVE_BASELINE, ACTIVE, INACTIVE, RETIRED]
+  published_values: [ACTIVE, INACTIVE, RETIRED]
+  never_published_values: [DRAFT, PENDING_CONFIG, PENDING_EVIDENCE, READY, BLOCKED]
+  transitions: INACTIVE and ACTIVE can alternate; RETIRED is final (database trigger SKU_RETIRED_TERMINAL).
+  sku_code: Immutable on a sku_id (database trigger SKU_CODE_IMMUTABLE, unique index); changed only by a deliberate migration that M3 is told about before.
 compatibility:
   breaking_change: Removing or renaming lifecycle values is breaking for product consumers.
 todos:

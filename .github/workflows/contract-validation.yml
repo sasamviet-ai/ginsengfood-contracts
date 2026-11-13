@@ -39,6 +39,8 @@ jobs:
         run: node scripts/validate-contracts.mjs --scope=recipe-formula-v2
       - name: Validate external bulk-read v1 contracts
         run: node contract-tests/x03b/external-bulk-read-v1.contract.test.mjs
+      - name: Validate M3 review clarifications
+        run: node contract-tests/x03b/m3-review-clarifications-v1.contract.test.mjs
       - name: Validate X-Correlation-Id header on service-bearer operations
         run: node contract-tests/x03b/correlation-header-v1.contract.test.mjs
       - name: Validate SKU catalog read model
