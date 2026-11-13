@@ -844,7 +844,7 @@ components:
       x-retryable: true
       headers:
         Retry-After: { required: true, schema: { type: integer, minimum: 1 } }
-        X-RateLimit-Limit: { required: true, schema: { type: integer, const: 2 } }
+        X-RateLimit-Limit: { required: true, description: "sustained_rps_per_principal of the x-rate-limit-policy of the operation: 5 for ExternalWarehouseRead (listStockBalancesV1, listInventoryAllocationsV1), 2 for ExternalBulkRead (listInventoryLedgerV1, listStockAlertsV1)", schema: { type: integer, enum: [2, 5] } }
         X-RateLimit-Remaining: { required: true, schema: { type: integer, minimum: 0 } }
         X-RateLimit-Reset: { required: true, schema: { type: integer, minimum: 1 } }
       content: { application/json: { schema: { $ref: "../../schemas/ops/x03b/external-bulk-read-error-envelopes.schema.json#/$defs/RateLimited" } } }

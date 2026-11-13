@@ -911,4 +911,31 @@ for (const phrase of [
   assert.ok(limitsSection.includes(phrase), `notes section 7 must say: ${phrase}`);
 }
 
+// ---------------------------------------------------------------------------------------------------------
+// NM3-32b minor point: the shared TooManyRequests of inventory.v1.yaml serves operations of two read policies. The provider
+// sends X-RateLimit-Limit = sustained_rps_per_principal of the policy of the operation (ExternalRateLimitPolicy.
+// TryApplyRejectionHeaders), so the header cannot be the constant 2.
+// ---------------------------------------------------------------------------------------------------------
+{
+  const sharedBlock = extractComponentBlock(inventoryText, "responses", "TooManyRequests");
+  assert.doesNotMatch(sharedBlock, /X-RateLimit-Limit: \{[^}]*const: 2/, "X-RateLimit-Limit must not be the constant 2");
+  const policyRps = new Map();
+  for (const policy of ["ExternalWarehouseRead", "ExternalBulkRead"]) {
+    policyRps.set(policy, Number(extractRootCatalogEntry(inventoryText, "x-rate-limit-policies", policy).match(/sustained_rps_per_principal: (\d+)/)[1]));
+  }
+  const usedRates = new Set();
+  const pathsText = inventoryText.slice(inventoryText.indexOf("\npaths:"), inventoryText.indexOf("\ncomponents:"));
+  for (const operationText of pathsText.split(/\n    (?=get:|post:)/).slice(1)) {
+    if (!operationText.includes('"429": { $ref: "#/components/responses/TooManyRequests" }')) continue;
+    const policy = operationText.match(/x-rate-limit-policy: (\w+)/)[1];
+    assert.ok(policyRps.has(policy), `unexpected policy ${policy} behind TooManyRequests`);
+    usedRates.add(policyRps.get(policy));
+  }
+  assert.deepEqual([...usedRates].sort(), [2, 5], "TooManyRequests serves a 2 rps and a 5 rps policy");
+  const limitHeader = sharedBlock.match(/X-RateLimit-Limit: \{ required: true, description: "([^"]*)", schema: \{ type: integer, enum: \[([^\]]*)\] \} \}/);
+  assert.ok(limitHeader, "X-RateLimit-Limit declares a description and an integer enum");
+  assert.deepEqual(limitHeader[2].split(",").map(value => Number(value.trim())).sort(), [2, 5], "X-RateLimit-Limit enum equals the sustained rates in use");
+  assert.match(limitHeader[1], /sustained_rps_per_principal of the x-rate-limit-policy of the operation/);
+}
+
 console.log(`X03B allocation write-surface contract PASS: ${operations.length}/2 operations, ${reserveResponseFiles.length + releaseResponseFiles.length} response payloads, ${releaseErrorCases.length} release error envelopes, ${vectors.length} UUIDv5 vectors, 13 webhook event types, and negative tamper checks.`);
