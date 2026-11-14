@@ -896,8 +896,9 @@ assert.match(parseJson(releaseErrorSchema).$defs.Error.properties.details.descri
 
 // ---------------------------------------------------------------------------------------------------------
 // NM3-32b point 1: the provider's current hold limits are published as defaults of the configuration section
-// ExternalApi:AllocationHoldLimits (description and x- extension, no wire field), with the honest statement that the
-// minimum numbers guaranteed to a consumer are not fixed yet and that the consumer must fail closed.
+// ExternalApi:AllocationHoldLimits (description and x- extension, no wire field), and the consumer must fail closed.
+// SEC-15 / M3-158 (14/11/2026): the minimum numbers guaranteed to a consumer are fixed and equal the current defaults
+// (the omitted-expires_at default window of 30 minutes is not one of them).
 // ---------------------------------------------------------------------------------------------------------
 const limitsDefaults = {
   max_active_holds_per_principal: 200,
@@ -920,11 +921,28 @@ for (const [key, value] of Object.entries(limitsDefaults)) {
   assert.match(limitsText, new RegExp(`^        ${key}: ${value}$`, "m"), `x-provider-limits.${key} must be ${value}`);
 }
 assert.match(limitsText, /^        config_section: ExternalApi:AllocationHoldLimits$/m);
-assert.match(limitsText, /^        status: CURRENT_DEFAULTS_NOT_A_GUARANTEE$/m);
-assert.match(limitsText, /^        guaranteed_minimums: NOT_YET_FIXED$/m);
-assert.match(limitsText, /^        guaranteed_minimums_decision: SEC-15 \/ M3-158, before 2026-11-20$/m);
+assert.match(limitsText, /^        status: CURRENT_DEFAULTS$/m);
+assert.doesNotMatch(limitsText, /NOT_YET_FIXED|NOT_A_GUARANTEE/, "the guaranteed minimums are fixed (SEC-15 / M3-158)");
+const guaranteedMinimums = Object.fromEntries(Object.entries(limitsDefaults).filter(([key]) => key !== "default_hold_window_minutes"));
+{
+  assert.match(limitsText, /^        guaranteed_minimums:$/m, "x-provider-limits.guaranteed_minimums is a block");
+  const start = limitsText.indexOf("        guaranteed_minimums:\n") + "        guaranteed_minimums:\n".length;
+  const blockLines = [];
+  for (const line of limitsText.slice(start).split("\n")) {
+    if (!line.startsWith("          ")) break;
+    blockLines.push(line);
+  }
+  const block = Object.fromEntries(blockLines.map(line => line.trim().split(": ")));
+  assert.deepEqual(Object.keys(block).sort(), Object.keys(guaranteedMinimums).sort(), "guaranteed_minimums keys");
+  for (const [key, value] of Object.entries(guaranteedMinimums)) {
+    assert.equal(block[key], String(value), `guaranteed_minimums.${key} must be ${value}`);
+  }
+}
+assert.match(limitsText, /^        guaranteed_minimums_decision: SEC-15 \/ M3-158, fixed 2026-11-14$/m);
+assert.match(limitsText, /^        guaranteed_minimums_change_rule: LOWERING_IS_A_CONTRACT_CHANGE_ANNOUNCED_BEFORE_DEPLOY$/m);
 assert.match(limitsText, /^        consumer_rule: FAIL_CLOSED_ON_EVERY_LIMIT_REFUSAL$/m);
-const limitsSectionStart = notes.indexOf("## 7. Provider limits: current defaults and what is not guaranteed");
+assert.doesNotMatch(collapse(inventoryText), /minimum numbers a consumer may rely on are not fixed yet/, "409 description no longer says not fixed");
+const limitsSectionStart = notes.indexOf("## 7. Provider limits: current defaults and guaranteed minimums");
 assert.notEqual(limitsSectionStart, -1, "notes: missing section 7 on provider limits");
 const limitsSection = collapse(notes.slice(limitsSectionStart));
 // The section 7 table carries the very numbers of x-provider-limits (verifier M29).
@@ -942,10 +960,11 @@ for (const phrase of [
   "200", "60 minutes", "80%", "50", "1000",
   "one hold is one `source_object_id`",
   "never below 30 minutes",
-  "NOT FIXED YET",
-  "SEC-15",
-  "M3-158",
-  "20/11/2026",
+  "FIXED (14/11/2026, SEC-15 / M3-158",
+  "configured at or above each minimum",
+  "Going below a minimum is a contract change that the provider announces to the consumer before it deploys it",
+  "a provider defect",
+  "The 30-minute window used when `expires_at` is omitted is a current default, not one of these minimums",
   "fail closed",
   "may change without a change of this contract",
   "No wire field",
@@ -953,6 +972,17 @@ for (const phrase of [
   "a current default of the provider, not a guarantee",
 ]) {
   assert.ok(limitsSection.includes(phrase), `notes section 7 must say: ${phrase}`);
+}
+assert.ok(!limitsSection.includes("NOT FIXED YET"), "notes section 7 no longer says the minimums are not fixed");
+// The guaranteed-minimum table carries the very numbers of x-provider-limits.guaranteed_minimums.
+{
+  const rows = notes.slice(limitsSectionStart).split("\n").filter(line => /^\| (Active holds|Hold window|Share of on-hand|Quantity per reserve)/.test(line));
+  assert.equal(rows.length, 4, "four guaranteed-minimum rows");
+  const value = label => rows.find(line => line.startsWith(`| ${label}`)).split("|").map(cell => cell.trim())[2];
+  assert.equal(value("Active holds per principal"), String(guaranteedMinimums.max_active_holds_per_principal));
+  assert.equal(value("Hold window"), `${guaranteedMinimums.max_hold_window_minutes} minutes`);
+  assert.equal(value("Share of on-hand stock"), `${guaranteedMinimums.max_share_of_on_hand_percent}% and ${guaranteedMinimums.share_floor_quantity}`);
+  assert.equal(value("Quantity per reserve call"), String(guaranteedMinimums.max_requested_quantity_per_line));
 }
 // NM3-32c (e): which statuses count against which limit, and when they stop counting (question C11 of the M3 review).
 {

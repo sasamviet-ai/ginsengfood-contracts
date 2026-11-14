@@ -120,7 +120,7 @@ The provider caps the permissions of the M3 sales principal at ten, the approved
 
 Open point: the ten is today's default. Whether `SELLABLE_STATUS_VIEW` and `WAREHOUSE_RECEIPT_VIEW` stay in it is not decided, and provider configuration can narrow the ceiling to eight. Until it is decided, M3 must not depend on `getSellableStatusV1`, `getSkuOperationalStatusV1` or `listWarehouseReceiptsV1`; `checkAvailabilityV1` and every call of the three groups above that use the other eight permissions are not affected.
 
-## 7. Provider limits: current defaults and what is not guaranteed
+## 7. Provider limits: current defaults and guaranteed minimums
 
 The refusals of "The closed table of `details[].reason`" come from limits that are provider configuration (section `ExternalApi:AllocationHoldLimits`), not from the wire: no request or response field carries them and no answer echoes them. No wire field and no status code is added by publishing them here. They are active as soon as the reserve route is, with no flag. These are the values the provider uses today when nothing overrides them (`x-provider-limits` in `inventory.v1.yaml` carries the same numbers):
 
@@ -131,7 +131,7 @@ The refusals of "The closed table of `details[].reason`" come from limits that a
 | `MaximumRequestedQuantityPerLine` | 1000 | `requested_quantity` of one reserve call, that is one line or one order. | `422` `VALIDATION_FAILED`, `REQUESTED_QUANTITY_LIMIT_EXCEEDED` |
 | `MaximumHoldWindowMinutes` | 60 minutes | How far ahead `expires_at` may be, counted from the moment the provider receives the call. An omitted `expires_at` still means 30 minutes; the contract ceiling stays 24 hours. | `422` `VALIDATION_FAILED`, `EXPIRES_AT_LIMIT_EXCEEDED` |
 
-The provider refuses to start with a nonsensical value, so the configured hold window is never below 30 minutes (the default window it must not undercut) and never above 24 hours. That is a rule about the provider's own configuration, and what follows from it is a current default of the provider, not a guarantee to the consumer: with the values of this table a hold of up to 30 minutes is not refused for its window, and a longer `expires_at` is accepted only while the configured maximum is at least that long, but no window is promised until the numbers of the next paragraph are fixed. A deployment sets these per environment, so the live value of an environment can differ from the default in this table.
+The provider refuses to start with a nonsensical value, so the configured hold window is never below 30 minutes (the default window it must not undercut) and never above 24 hours. That is a rule about the provider's own configuration. What a consumer may rely on is the guaranteed minimum given below: a hold whose `expires_at` is at most 60 minutes after the provider receives the call is not refused for its window in any deployment a consumer is connected to. A longer `expires_at` is accepted only while the configured maximum of that environment is at least that long, which is a current default of the provider, not a guarantee. A deployment sets these per environment, so the live value of an environment can differ from the default in this table, but never below its guaranteed minimum.
 
 ### Which holds count against which limit
 
@@ -147,7 +147,16 @@ The first row of the table says one hold is one `source_object_id`. The behavior
 
 In words: after SEC-14c the hold-number cap counts only RESERVED and not past its `expires_at`. CONFIRMED (the warehouse accepted the order and started picking, so it does not expire) is subject only to the on-hand share cap and to every quantity sum, never to the hold-number cap. RELEASED, ISSUED and expired RESERVED count nowhere. **Today, in a build without SEC-14c, CONFIRMED still counts toward the hold-number cap**; the behavior of the table takes effect when the build that carries SEC-14c is deployed, and until then the cap of 200 is also spent by confirmed holds. Publishing this changes no wire field, no status code and no operation.
 
-**The numbers a consumer may rely on are NOT FIXED YET.** The values above are reasonable defaults to run with, not approved numbers. The minimum numbers the provider guarantees to a consumer will be fixed through SEC-15 / M3-158 (the M3 and ops-core owners) before 20/11/2026. Until then each value may change without a change of this contract, and a consumer that hard-codes a window or a line size above what its environment is configured with gets `422` on every reserve. Publishing the defaults gives a consumer the sizes to plan with; it does not promise them.
+**The numbers a consumer may rely on are FIXED (14/11/2026, SEC-15 / M3-158, the M3 and ops-core owners).** They are the current defaults of the table, now guaranteed as minimums (`guaranteed_minimums` in `x-provider-limits`):
+
+| Guaranteed minimum | Value | What the consumer may rely on |
+| --- | --- | --- |
+| Active holds per principal | 200 | At least 200 holds of one principal at once (one hold is one `source_object_id`) before `HOLD_LIMIT_REACHED`. |
+| Hold window | 60 minutes | An `expires_at` up to 60 minutes after the provider receives the call is never refused for its window. |
+| Share of on-hand stock | 80% and 50 | At least the larger of 80% of the physical on-hand stock and 50 units of one SKU in one warehouse and one unit before `HOLD_SHARE_LIMIT_REACHED`. |
+| Quantity per reserve call | 1000 | A `requested_quantity` up to 1000 is never refused for its size. |
+
+Every deployment a consumer is connected to is configured at or above each minimum. A value above its minimum may change without a change of this contract (a deployment may raise it). Going below a minimum is a contract change that the provider announces to the consumer before it deploys it, never a silent configuration change; a deployment found below a minimum is a provider defect. The guarantee covers the minimums only: a consumer that relies on more (a window above 60 minutes, a line above 1000) depends on the configuration of its environment and gets `422` when that is lower. The 30-minute window used when `expires_at` is omitted is a current default, not one of these minimums.
 
 Consumer rule: **fail closed on every limit refusal.** `HOLD_LIMIT_REACHED`, `HOLD_SHARE_LIMIT_REACHED`, `REQUESTED_QUANTITY_LIMIT_EXCEEDED` and `EXPIRES_AT_LIMIT_EXCEEDED` all mean that nothing was reserved and the line is not covered by a hold: do not sell the line as if it were held, do not report out of stock (stock may be intact), and do not mint a new key to try again. A quota `409` may be sent again with the same key and body once holds were released or expired; a `422` needs a smaller `requested_quantity` or an earlier `expires_at`.
 
