@@ -942,6 +942,11 @@ assert.match(limitsText, /^        guaranteed_minimums_decision: SEC-15 \/ M3-15
 assert.match(limitsText, /^        guaranteed_minimums_change_rule: LOWERING_IS_A_CONTRACT_CHANGE_ANNOUNCED_BEFORE_DEPLOY$/m);
 assert.match(limitsText, /^        consumer_rule: FAIL_CLOSED_ON_EVERY_LIMIT_REFUSAL$/m);
 assert.doesNotMatch(collapse(inventoryText), /minimum numbers a consumer may rely on are not fixed yet/, "409 description no longer says not fixed");
+assert.match(
+  collapse(inventoryText),
+  /which also gives the minimum numbers a consumer may rely on \(guaranteed_minimums, fixed 2026-11-14\)\. Fail closed on every limit refusal\./,
+  "409 description points to the fixed guaranteed minimums"
+);
 const limitsSectionStart = notes.indexOf("## 7. Provider limits: current defaults and guaranteed minimums");
 assert.notEqual(limitsSectionStart, -1, "notes: missing section 7 on provider limits");
 const limitsSection = collapse(notes.slice(limitsSectionStart));
@@ -965,6 +970,9 @@ for (const phrase of [
   "Going below a minimum is a contract change that the provider announces to the consumer before it deploys it",
   "a provider defect",
   "The 30-minute window used when `expires_at` is omitted is a current default, not one of these minimums",
+  // The window sentence before the counted-status table repeats the guaranteed window: it must say the same number.
+  `a hold whose \`expires_at\` is at most ${guaranteedMinimums.max_hold_window_minutes} minutes after the provider receives the call is not refused for its window in any deployment a consumer is connected to`,
+  "but never below its guaranteed minimum",
   "fail closed",
   "may change without a change of this contract",
   "No wire field",
