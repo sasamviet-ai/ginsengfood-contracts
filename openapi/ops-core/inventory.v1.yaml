@@ -87,7 +87,8 @@ x-retry-policies:
   # answers a replay of a finished call with the original result (reserve: 200 ALREADY_RESERVED, release: the original 200)
   # and a replay of a call that is still running with 429 + Retry-After: 1, so replaying is always valid. The one exception to
   # "original result" is a reserve replay whose hold has meanwhile expired or been released: it is 409 ALLOCATION_CONFLICT (see
-  # the 409 of reserve; a new key only if the order is still live), not replayed again automatically. Replay after a lost
+  # the 409 of reserve; a new key only if the order is still live), not replayed again automatically. A replay of a reserve whose
+  # hold a later call with a new key extended still returns the original result, original expires_at included. Replay after a lost
   # response, a timeout, 502/503/504, or a 429 (bucket empty, same key still running, temporary contention), honoring
   # Retry-After. Never send a new key for the same intent: a new key for the same source can hold stock twice (reserve) or
   # release twice. max_retries is the recommended ceiling for automatic replays, not a cap the provider enforces (it counts
@@ -435,7 +436,8 @@ paths:
         The hold does not write a ledger entry, does not move goods, and does not confirm or release
         the allocation. Confirming and issuing belong to warehouse operations; the consumer can end its
         own RESERVED hold only through releaseInventoryAllocationV1, and a hold it does not release
-        expires on its own (default 30 minutes, at most 24 hours; expires_at is a request field).
+        expires on its own (default 30 minutes; at most the provider's maximum hold window, 26 hours by
+        default and never more than 48 hours; expires_at is a request field).
         X-Idempotency-Key is required: a network retry without it would hold stock twice for the same
         order line, so after a lost response repeat the call with the same key and the same body. The
         idempotency scope of this operation is the source: a key sent for a different source is a new
@@ -448,9 +450,18 @@ paths:
         retries ran out (temporary contention): that is neither out of stock nor a change of state, the key
         stays reusable, so wait Retry-After and repeat with the same key and the same body. A repeat call for the same source object with a new key and the same
         scope and quantity is answered with reservation_status=ALREADY_RESERVED when the existing hold is
-        this principal's own: it creates nothing and never extends the hold (the lines keep their
-        original expires_at). A source held by another principal is 409 INSUFFICIENT_STOCK and the holder
-        is never disclosed, whatever the state of that hold, ISSUED included. A source whose allocation
+        this principal's own: it creates nothing. When that call carries an expires_at later than the
+        current expiry of the hold's RESERVED lines, it extends them to it and the answer carries the new
+        expires_at; an earlier or equal expires_at, or none, changes nothing, so a hold is never shortened.
+        There is no limit on the number of extensions; each call, an extension included, is held to the
+        maximum hold window counted from its own receipt, otherwise 422 VALIDATION_FAILED with
+        details[].reason EXPIRES_AT_LIMIT_EXCEEDED and the hold stays as it was. A replay of the original
+        key still returns the original answer, original expires_at included. A hold already past its
+        expires_at that the provider's expiry worker has not released yet is never extended or revived: the
+        repeat call is 409 ALLOCATION_CONFLICT without details. Once the worker released it, a reserve for
+        the same source with a new key is a first reserve again and, when it holds, places a new hold with a
+        new requested_at. A source held by another principal is
+        409 INSUFFICIENT_STOCK and the holder is never disclosed, whatever the state of that hold, ISSUED included. A source whose allocation
         of this same principal the warehouse already issued is answered 409 ALLOCATION_CONFLICT whatever
         the key. Retries and rate limits are described by the x-retry-policy and x-rate-limit-policy
         entries. The closed table of details[].reason is in docs/m3-allocation-integration-notes.md and in
@@ -481,11 +492,16 @@ paths:
       # consumer before it is deployed. docs/m3-allocation-integration-notes.md section 7 has the meaning and the consumer
       # rule, and the table of which statuses (RESERVED, CONFIRMED, RELEASED, ISSUED, expired RESERVED) count against the
       # hold-number cap and the on-hand share cap, and when they stop counting.
+      # max_hold_window_minutes is counted from the moment the provider receives each call, an extension included.
+      # max_hold_window_config_ceiling_minutes is the highest window the provider's own configuration accepts (it refuses to
+      # start above it). The current defaults of the hold-number cap (200 -> 4800) and of the hold window (60 minutes -> 26
+      # hours) changed on 2026-11-16 (M12-QT-005 (4)); guaranteed_minimums did not change.
       x-provider-limits:
         config_section: ExternalApi:AllocationHoldLimits
         status: CURRENT_DEFAULTS
-        max_active_holds_per_principal: 200
-        max_hold_window_minutes: 60
+        max_active_holds_per_principal: 4800
+        max_hold_window_minutes: 1560
+        max_hold_window_config_ceiling_minutes: 2880
         default_hold_window_minutes: 30
         max_share_of_on_hand_percent: 80
         share_floor_quantity: 50
@@ -498,6 +514,7 @@ paths:
           max_requested_quantity_per_line: 1000
         guaranteed_minimums_decision: SEC-15 / M3-158, fixed 2026-11-14
         guaranteed_minimums_change_rule: LOWERING_IS_A_CONTRACT_CHANGE_ANNOUNCED_BEFORE_DEPLOY
+        current_defaults_decision: M12-QT-005 (4) / D-m12-076, 2026-11-16
         consumer_rule: FAIL_CLOSED_ON_EVERY_LIMIT_REFUSAL
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
@@ -512,7 +529,10 @@ paths:
         "200":
           headers:
             X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
-          description: An equivalent hold of this service principal already existed; nothing was created.
+          description: >-
+            An equivalent hold of this service principal already existed; nothing was created. When the
+            request's expires_at was later than the hold's, its RESERVED lines now expire at that time (never
+            earlier).
           content:
             application/json:
               schema:
@@ -577,7 +597,12 @@ paths:
             key). An ISSUED allocation created by another principal is not visible to the caller and is
             answered INSUFFICIENT_STOCK, never ALLOCATION_CONFLICT. Neither reserves anything. To tell the
             ALLOCATION_CONFLICT causes apart, read GET /v1/inventory/allocations?sourceObjectId= once: an
-            ISSUED row of your own means stop. Temporary contention is never reported as INSUFFICIENT_STOCK or
+            ISSUED row of your own means stop. ALLOCATION_CONFLICT is also the answer, without details, to a
+            repeat call with a new key for the same source and scope whose hold of this principal has passed its
+            expires_at but has not been released yet by the provider's expiry worker: an expired hold is never
+            extended or revived. Wait about a minute (the worker runs about once a minute today; provider
+            configuration, not a contract value) and reserve again with a new key; that call is answered like a
+            first reserve and, when it holds, places a new hold with a new requested_at. Temporary contention is never reported as INSUFFICIENT_STOCK or
             ALLOCATION_CONFLICT; it is 429 RATE_LIMITED.
             ALLOCATION_CONFLICT is also returned when the service principal has reached one of its
             configured reservation limits; error.details[0].reason is then HOLD_LIMIT_REACHED (number of
@@ -603,7 +628,9 @@ paths:
             the same source with a different request body (details[].field is the header name), a malformed
             quantity, a non-conforming UOM code, requested_quantity above the per-request limit
             (details[].reason REQUESTED_QUANTITY_LIMIT_EXCEEDED), or expires_at later than the maximum hold
-            window (details[].reason EXPIRES_AT_LIMIT_EXCEEDED). Those two reasons and IDEMPOTENCY_KEY_REUSED
+            window counted from the call (details[].reason EXPIRES_AT_LIMIT_EXCEEDED; on a repeat call an existing
+            hold stays as it was).
+            Those two reasons and IDEMPOTENCY_KEY_REUSED
             are the stable tokens; any other details[].reason is free text and not contractual, handle it by
             details[].field and do not retry the request unchanged.
           x-error-code: VALIDATION_FAILED

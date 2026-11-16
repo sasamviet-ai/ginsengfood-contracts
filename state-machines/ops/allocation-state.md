@@ -10,7 +10,8 @@ An allocation is one hold of finished-goods stock on one warehouse lot. One rese
 
 | From | To | Actor | Guard |
 | --- | --- | --- | --- |
-| (none) | RESERVED | Consumer, `POST /v1/inventory/allocations` | Full-fill only, sellability guard passed, hold expiry at most 24 hours ahead (default 30 minutes). |
+| (none) | RESERVED | Consumer, `POST /v1/inventory/allocations` | Full-fill only, sellability guard passed, hold expiry at most the provider's maximum hold window ahead (provider configuration: 26 hours by default, never more than 48 hours; 30 minutes when `expires_at` is omitted). |
+| RESERVED | RESERVED | Consumer, `POST /v1/inventory/allocations` repeated for the same source and scope with a new idempotency key and a later `expires_at` | Only `expires_at` moves, and only later: never shortened, with no limit on the number of extensions. Each call is held to the maximum hold window counted from its receipt, otherwise `422` `EXPIRES_AT_LIMIT_EXCEEDED` and nothing changes. A line already past its `expires_at` is never extended or revived (`409` `ALLOCATION_CONFLICT`, no `details`); once it is released, a new reserve places a new hold with a new `requested_at`. M12-QT-005 (4), 2026-11-16. |
 | RESERVED | CONFIRMED | Warehouse | Warehouse starts picking the order. The consumer has no command for this transition. |
 | CONFIRMED | ISSUED | Warehouse | A sales issue document linked to exactly this allocation is applied. Terminal. |
 | RESERVED | RELEASED | Consumer, `POST /v1/inventory/allocations/release` | Only lines created by the calling service principal, and only while the hold has not expired. |
@@ -35,7 +36,7 @@ An allocation is one hold of finished-goods stock on one warehouse lot. One rese
 
 - Expiry applies to RESERVED only. CONFIRMED never expires on its own, and expiry always ends in RELEASED.
 - Expiry is not distinguishable from an operator release or a consumer self-release through `status` alone; all three read RELEASED.
-- A RESERVED line whose `expires_at` has passed but which the expiry worker has not swept yet cannot be released by the consumer (`409 ALLOCATION_NOT_HELD`); the worker releases it.
+- A RESERVED line whose `expires_at` has passed but which the expiry worker has not swept yet cannot be released by the consumer (`409 ALLOCATION_NOT_HELD`); the worker releases it. A repeat reserve for it is `409 ALLOCATION_CONFLICT` without `details`, never an extension: reserve again with a new key once the worker released it, which places a new hold with a new `requested_at`.
 - ISSUED adds no field to `external-inventory-allocation.schema.json`: a consumer reading an ISSUED row sees the same fields as before, with `confirmed_at` set.
 - A consumer that receives `ALLOCATION_CONFLICT` from reserve cannot tell "hold ended" from "already issued" by code: it reads `GET /v1/inventory/allocations?sourceObjectId=` once. An `ISSUED` row means stop; no row in a holding state means the hold ended (expired, or released by the warehouse or by the consumer's own release call).
 - Consumers must tolerate an unknown status value (see `enums/ops/inventory-allocation-status.yaml`).

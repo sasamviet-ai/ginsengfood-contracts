@@ -616,8 +616,32 @@ for (const reason of ["HOLD_LIMIT_REACHED", "HOLD_SHARE_LIMIT_REACHED", "REQUEST
   assert.ok(inventoryOpenApiText.includes(reason), `inventory openapi must document ${reason}`);
   assert.ok(unreleased.includes(reason), `CHANGELOG Unreleased must mention ${reason}`);
 }
-assert.match(parseJson(reserveRequestSchema).properties.expires_at.description, /60 minutes by default/, "expires_at must state the default maximum hold window");
-assert.doesNotMatch(parseJson(reserveRequestSchema).properties.expires_at.description, /at most 24 hours after it/, "expires_at must no longer present 24 hours as the working limit");
+// M12-QT-005 (4) / D-m12-076 (16/11/2026), as built in ops-core main (ExternalAllocationHoldLimits, ExternalAllocationHoldLimitPolicy.
+// CheckRequest, ReserveExternalInventoryAllocationHandler.AnswerRepeatCallAsync, ExternalAllocationReservationExpired): the maximum hold
+// window of each call is 26 hours by default and never more than 48 hours, counted from the receipt of that call, an extension
+// included; a repeat call with a new key and a later expires_at extends the hold, never shortens it, with no limit on the number of
+// extensions; a hold already past its expires_at is never extended or revived (409 without details); once released, a new reserve
+// is a new hold with a new requested_at. D-lead-051: the provider has NO total ceiling on an extension, so the contract states none.
+const noTotalCeiling = /total ceiling|extension_total_ceiling|48 hours after the moment|plus the maximum hold window|plus that window/;
+{
+  const expiresAtDescription = parseJson(reserveRequestSchema).properties.expires_at.description.replace(/\s+/g, " ");
+  assert.match(expiresAtDescription, /\(provider configuration, 26 hours by default, never more than 48 hours\)/, "expires_at must state the default maximum hold window and its ceiling");
+  assert.doesNotMatch(expiresAtDescription, /at most 24 hours after it/, "expires_at must no longer present 24 hours as the working limit");
+  assert.doesNotMatch(expiresAtDescription, /24-hour|24 hours|60 minutes by default/, "expires_at must no longer state the 24-hour ceiling or the 60-minute default");
+  for (const sentence of [
+    /A repeat call for the same source and the same scope \(SKU, warehouse, unit, quantity\) with a new X-Idempotency-Key and a later expires_at extends the hold: its RESERVED lines move to the new expires_at and the 200 ALREADY_RESERVED answer carries it\./,
+    /An earlier or equal expires_at, or none, changes nothing: a hold is never shortened\./,
+    /There is no limit on the number of extensions\./,
+    /Each call, an extension included, is held to the maximum hold window counted from its own receipt; a later expires_at is rejected with 422 VALIDATION_FAILED \(details\[\]\.reason EXPIRES_AT_LIMIT_EXCEEDED\) and the hold stays as it was\./,
+    /The original X-Idempotency-Key replays the original answer, original expires_at included\./,
+    /A hold already past its expires_at is never extended or revived: until the provider's expiry worker releases it, a repeat call with a new X-Idempotency-Key is 409 ALLOCATION_CONFLICT without details\./,
+    /Once it is released, a reserve for the same source with a new X-Idempotency-Key is a first reserve again: when it holds, it places a new hold with a new requested_at\./,
+    /Omission defaults the hold to 30 minutes after the request is received\./
+  ]) {
+    assert.match(expiresAtDescription, sentence, `expires_at must say: ${sentence.source}`);
+  }
+  assert.doesNotMatch(expiresAtDescription, noTotalCeiling, "expires_at: the provider has no total ceiling on an extension (D-lead-051)");
+}
 const matrix = read("compatibility/consumer-compatibility-matrix.md");
 assert.match(matrix, /reserveInventoryAllocationV1/);
 assert.match(matrix, /releaseInventoryAllocationV1/);
@@ -695,7 +719,35 @@ for (const [name, block] of [["reserve", reserveBlock], ["release", releaseBlock
 }
 assert.match(collapse(reserveBlock), /idempotency scope of this operation is the source: a key sent for a different source is a new command/);
 assert.match(collapse(reserveBlock), /includes expires_at, so a retry must resend the original expires_at unchanged/);
-assert.match(collapse(reserveBlock), /ALREADY_RESERVED when the existing hold is this principal's own: it creates nothing and never extends the hold/);
+// M12-QT-005 (4) / D-m12-076 / D-m12-077: a repeat call with a later expires_at extends the hold, never shortens it, no limit on the number of extensions.
+assert.doesNotMatch(collapse(reserveBlock), /never extends the hold|keep their original expires_at/, "a repeat call with a later expires_at extends the hold (D-m12-076)");
+for (const sentence of [
+  /ALREADY_RESERVED when the existing hold is this principal's own: it creates nothing\. When that call carries an expires_at later than the current expiry of the hold's RESERVED lines, it extends them to it and the answer carries the new expires_at; an earlier or equal expires_at, or none, changes nothing, so a hold is never shortened\./,
+  /There is no limit on the number of extensions; each call, an extension included, is held to the maximum hold window counted from its own receipt, otherwise 422 VALIDATION_FAILED with details\[\]\.reason EXPIRES_AT_LIMIT_EXCEEDED and the hold stays as it was\./,
+  /A replay of the original key still returns the original answer, original expires_at included\./,
+  /A hold already past its expires_at that the provider's expiry worker has not released yet is never extended or revived: the repeat call is 409 ALLOCATION_CONFLICT without details\./,
+  /Once the worker released it, a reserve for the same source with a new key is a first reserve again and, when it holds, places a new hold with a new requested_at\./,
+  /expires on its own \(default 30 minutes; at most the provider's maximum hold window, 26 hours by default and never more than 48 hours; expires_at is a request field\)/
+]) {
+  assert.match(collapse(reserveBlock), sentence, `reserve description must say: ${sentence.source}`);
+}
+assert.doesNotMatch(collapse(reserveBlock), /at most 24 hours/, "the 24-hour contract ceiling is gone");
+assert.doesNotMatch(collapse(reserveBlock), noTotalCeiling, "reserve: the provider has no total ceiling on an extension (D-lead-051)");
+assert.match(
+  collapse(extractInlineResponse(reserveBlock, "200")),
+  /An equivalent hold of this service principal already existed; nothing was created\. When the request's expires_at was later than the hold's, its RESERVED lines now expire at that time \(never earlier\)\./,
+  "200 ALREADY_RESERVED says it may carry an extended expiry"
+);
+assert.match(
+  reserve409,
+  /ALLOCATION_CONFLICT is also the answer, without details, to a repeat call with a new key for the same source and scope whose hold of this principal has passed its expires_at but has not been released yet by the provider's expiry worker: an expired hold is never extended or revived\. Wait about a minute .* and reserve again with a new key; that call is answered like a first reserve and, when it holds, places a new hold with a new requested_at\./,
+  "409 covers the expired hold that the worker has not released yet"
+);
+assert.match(
+  collapse(extractInlineResponse(reserveBlock, "422")),
+  /expires_at later than the maximum hold window counted from the call \(details\[\]\.reason EXPIRES_AT_LIMIT_EXCEEDED; on a repeat call an existing hold stays as it was\)/,
+  "422: the window counts from each call, an existing hold is untouched"
+);
 assert.match(collapse(extractInlineResponse(reserveBlock, "422")), /already used for the same source with a different request body/);
 assert.match(collapse(releaseBlock), /scope of this operation is the key alone, not the source: a key reused for a different source is 422/);
 assert.match(collapse(extractInlineResponse(releaseBlock, "422")), /reused for a different source/);
@@ -859,6 +911,16 @@ validateAgainst(reserveErrorSchema, envelopeOf("ALLOCATION_CONFLICT", 409, [{ fi
 validateAgainst(reserveErrorSchema, envelopeOf("ALLOCATION_CONFLICT", 409), "/$defs/AllocationConflict");
 assert.throws(() => validateAgainst(reserveErrorSchema, envelopeOf("ALLOCATION_CONFLICT", 409, [{ reason: "ALLOCATION_ALREADY_ISSUED" }]), "/$defs/AllocationConflict"), /enum/, "internal markers never reach the wire");
 assert.throws(() => validateAgainst(reserveErrorSchema, envelopeOf("ALLOCATION_CONFLICT", 409, [...quotaDetails, ...quotaDetails]), "/$defs/AllocationConflict"), /maxItems/);
+// M12-QT-005 (4) / D-m12-076: the 409 ALLOCATION_CONFLICT of a hold past its expires_at carries no details; no reason token is
+// added for it in this round, so the provider's internal marker can never reach the wire.
+assert.throws(() => validateAgainst(reserveErrorSchema, envelopeOf("ALLOCATION_CONFLICT", 409, [{ field: "expires_at", reason: "RESERVATION_EXPIRED" }]), "/$defs/AllocationConflict"), /enum/, "an expired hold has no details token");
+assert.ok(!read(reserveErrorSchema).includes("RESERVATION_EXPIRED"), "no RESERVATION_EXPIRED token in the reserve error schema");
+assert.ok(!read(inventoryFile).includes("RESERVATION_EXPIRED"), "no RESERVATION_EXPIRED token in inventory.v1.yaml");
+assert.match(
+  parseJson(reserveErrorSchema).$defs.Error.properties.details.description,
+  /No other code carries details, and neither does the 409 ALLOCATION_CONFLICT of a hold that is past its expires_at \(it has no stable reason token\)\./,
+  "reserve details: the expired-hold 409 carries none"
+);
 
 // The notes carry the same table, and say plainly what is free text.
 const reasonHeading = "### The closed table of `details[].reason`";
@@ -900,10 +962,22 @@ assert.match(parseJson(releaseErrorSchema).$defs.Error.properties.details.descri
 // SEC-15 / M3-158 (14/11/2026): the minimum numbers guaranteed to a consumer are fixed and equal the current defaults
 // (the omitted-expires_at default window of 30 minutes is not one of them).
 // ---------------------------------------------------------------------------------------------------------
+// M12-QT-005 (4) / D-m12-076 (16/11/2026): the current defaults of the hold-number cap and the hold window moved to 4800 and
+// 1560 minutes (26 hours), with a configuration ceiling of 2880 minutes (48 hours). The guaranteed minimums below do NOT move.
 const limitsDefaults = {
+  max_active_holds_per_principal: 4800,
+  max_hold_window_minutes: 1560,
+  max_hold_window_config_ceiling_minutes: 2880,
+  default_hold_window_minutes: 30,
+  max_share_of_on_hand_percent: 80,
+  share_floor_quantity: 50,
+  max_requested_quantity_per_line: 1000
+};
+// SEC-15 / M3-158 (14/11/2026): the minimum numbers a consumer may rely on. A literal on purpose: they are no longer equal to the
+// current defaults and must not follow them.
+const guaranteedMinimums = {
   max_active_holds_per_principal: 200,
   max_hold_window_minutes: 60,
-  default_hold_window_minutes: 30,
   max_share_of_on_hand_percent: 80,
   share_floor_quantity: 50,
   max_requested_quantity_per_line: 1000
@@ -923,7 +997,12 @@ for (const [key, value] of Object.entries(limitsDefaults)) {
 assert.match(limitsText, /^        config_section: ExternalApi:AllocationHoldLimits$/m);
 assert.match(limitsText, /^        status: CURRENT_DEFAULTS$/m);
 assert.doesNotMatch(limitsText, /NOT_YET_FIXED|NOT_A_GUARANTEE/, "the guaranteed minimums are fixed (SEC-15 / M3-158)");
-const guaranteedMinimums = Object.fromEntries(Object.entries(limitsDefaults).filter(([key]) => key !== "default_hold_window_minutes"));
+assert.match(limitsText, /^        current_defaults_decision: M12-QT-005 \(4\) \/ D-m12-076, 2026-11-16$/m, "x-provider-limits names the decision behind the current defaults");
+assert.match(
+  collapse(limitsBlock.replace(/^\s*# ?/gm, "")),
+  /max_hold_window_minutes is counted from the moment the provider receives each call, an extension included\./,
+  "x-provider-limits comment: the window counts from each call"
+);
 {
   assert.match(limitsText, /^        guaranteed_minimums:$/m, "x-provider-limits.guaranteed_minimums is a block");
   const start = limitsText.indexOf("        guaranteed_minimums:\n") + "        guaranteed_minimums:\n".length;
@@ -957,7 +1036,12 @@ const limitsSection = collapse(notes.slice(limitsSectionStart));
   assert.equal(cell("MaximumActiveHoldsPerPrincipal"), String(limitsDefaults.max_active_holds_per_principal));
   assert.equal(cell("MaximumShareOfOnHandPercent"), `${limitsDefaults.max_share_of_on_hand_percent}% and ${limitsDefaults.share_floor_quantity}`);
   assert.equal(cell("MaximumRequestedQuantityPerLine"), String(limitsDefaults.max_requested_quantity_per_line));
-  assert.equal(cell("MaximumHoldWindowMinutes"), `${limitsDefaults.max_hold_window_minutes} minutes`);
+  assert.equal(cell("MaximumHoldWindowMinutes"), `${limitsDefaults.max_hold_window_minutes} minutes (${limitsDefaults.max_hold_window_minutes / 60} hours)`);
+  // The current defaults never undercut a guaranteed minimum, and the window default stays inside the configuration ceiling.
+  for (const [key, minimum] of Object.entries(guaranteedMinimums)) {
+    assert.ok(limitsDefaults[key] >= minimum, `current default ${key} (${limitsDefaults[key]}) is below its guaranteed minimum ${minimum}`);
+  }
+  assert.ok(limitsDefaults.max_hold_window_minutes <= limitsDefaults.max_hold_window_config_ceiling_minutes, "the default hold window is within the configuration ceiling");
   assert.match(notes.slice(limitsSectionStart), new RegExp(`An omitted \`expires_at\` still means ${limitsDefaults.default_hold_window_minutes} minutes`));
 }
 for (const phrase of [
@@ -978,9 +1062,24 @@ for (const phrase of [
   "No wire field",
   // NM3-32c (a): the window sentence must read as a current default, never as a promise.
   "a current default of the provider, not a guarantee",
+  // M12-QT-005 (4) / D-m12-076 / D-m12-077: the configuration ceiling and the new defaults' origin.
+  "never above 48 hours (2880 minutes, `max_hold_window_config_ceiling_minutes`)",
+  "counted from the moment the provider receives the call; this applies to every call, an extension included",
+  "The current defaults of the hold-number cap and of the hold window changed on 16/11/2026 (M12-QT-005 (4))",
+  "from 60 minutes to 26 hours",
+  "from 200 to 4800",
+  "the guaranteed minimums below do not change",
+  "M3's 24-hour order hold relies on the current default of 26 hours, not on a guarantee",
+  "One exception: an extension refused with `EXPIRES_AT_LIMIT_EXCEEDED` leaves the existing hold as it was",
 ]) {
   assert.ok(limitsSection.includes(phrase), `notes section 7 must say: ${phrase}`);
 }
+for (const stale of ["never above 24 hours", "the contract ceiling stays 24 hours", "the cap of 200 is also spent"]) {
+  assert.ok(!limitsSection.includes(stale), `notes section 7 must no longer say: ${stale}`);
+}
+assert.doesNotMatch(collapse(notes), noTotalCeiling, "notes: the provider has no total ceiling on an extension (D-lead-051)");
+// D-lead-051: the 60-minute guarantee sentence is back to its SEC-15 wording; the extension clause existed only for the total ceiling.
+assert.ok(!limitsSection.includes("for a repeat call that extends a hold"), "notes section 7: no extension clause on the guaranteed window");
 assert.ok(!limitsSection.includes("NOT FIXED YET"), "notes section 7 no longer says the minimums are not fixed");
 // The guaranteed-minimum table carries the very numbers of x-provider-limits.guaranteed_minimums.
 {
@@ -989,6 +1088,11 @@ assert.ok(!limitsSection.includes("NOT FIXED YET"), "notes section 7 no longer s
   const value = label => rows.find(line => line.startsWith(`| ${label}`)).split("|").map(cell => cell.trim())[2];
   assert.equal(value("Active holds per principal"), String(guaranteedMinimums.max_active_holds_per_principal));
   assert.equal(value("Hold window"), `${guaranteedMinimums.max_hold_window_minutes} minutes`);
+  assert.equal(
+    rows.find(line => line.startsWith("| Hold window")).split("|").map(cell => cell.trim())[3],
+    `An \`expires_at\` up to ${guaranteedMinimums.max_hold_window_minutes} minutes after the provider receives the call is never refused for its window.`,
+    "the guaranteed window row keeps its SEC-15 wording (D-lead-051)"
+  );
   assert.equal(value("Share of on-hand stock"), `${guaranteedMinimums.max_share_of_on_hand_percent}% and ${guaranteedMinimums.share_floor_quantity}`);
   assert.equal(value("Quantity per reserve call"), String(guaranteedMinimums.max_requested_quantity_per_line));
 }
@@ -1058,6 +1162,63 @@ assert.doesNotMatch(limitsSection, /a hold of up to 30 minutes is never refused/
   assert.ok(limitHeader, "X-RateLimit-Limit declares a description and an integer enum");
   assert.deepEqual(limitHeader[2].split(",").map(value => Number(value.trim())).sort(), [2, 5], "X-RateLimit-Limit enum equals the sustained rates in use");
   assert.match(limitHeader[1], /sustained_rps_per_principal of the x-rate-limit-policy of the operation/);
+}
+
+// ---------------------------------------------------------------------------------------------------------
+// M12-QT-005 (4) / D-m12-076 / D-m12-077 (16/11/2026): hold extension with a later expires_at (no total ceiling), and the 409 of an expired
+// hold, in every place that states the repeat-call rule (notes, state machine, error catalog, result and line schemas, the
+// replay comment, CHANGELOG).
+// ---------------------------------------------------------------------------------------------------------
+{
+  const notesText = collapse(notes);
+  assert.doesNotMatch(notesText, /never extends a hold|nothing created, nothing extended/, "notes: a repeat call with a later expires_at extends the hold");
+  for (const phrase of [
+    "A repeat reserve for the same source and scope with a new key and a later `expires_at` extends the hold: its RESERVED lines move to the new `expires_at`, and an earlier or equal `expires_at`, or none, changes nothing, so a hold is never shortened.",
+    "There is no limit on the number of extensions.",
+    "Each call, an extension included, is held to the maximum hold window counted from its own receipt (section 7); a later `expires_at` is `422` `EXPIRES_AT_LIMIT_EXCEEDED` and the hold stays as it was.",
+    "The original key keeps replaying the original answer, with the original `expires_at`.",
+    "A hold already past its `expires_at` is never extended or revived: until the expiry worker releases it, a repeat call with a new key is `409` `ALLOCATION_CONFLICT` without `details`.",
+    "Once it is released, a reserve for the same source with a new key is a first reserve again: when it holds, it places a new hold with a new `requested_at`."
+  ]) {
+    assert.ok(notesText.includes(phrase), `notes section 2 must say: ${phrase}`);
+  }
+  const callRows = notes.split("\n").filter(line => line.startsWith("| reserve |"));
+  const alreadyReservedRow = callRows.find(line => line.includes("`200` `ALREADY_RESERVED`"));
+  assert.match(alreadyReservedRow, /A later `expires_at` sent with a new key extended its RESERVED lines to that value \(never shortened\)/, "notes table: ALREADY_RESERVED may carry an extension");
+  assert.match(alreadyReservedRow, /keep the `expires_at` of this answer as the hold's expiry/, "notes table: the consumer keeps the answered expiry");
+  const conflictRow = callRows.find(line => line.startsWith("| reserve | `409` `ALLOCATION_CONFLICT` | The hold of this key"));
+  assert.ok(conflictRow, "notes table: the reserve ALLOCATION_CONFLICT row");
+  assert.match(conflictRow, /or \(new key, same source and scope\) your hold is past its `expires_at` and the expiry worker has not released it yet; no `details` in any of these cases/, "notes table: the expired-hold cause");
+  assert.match(conflictRow, /A `RESERVED` row past its `expires_at`: the hold expired and is waiting for the expiry worker; wait about a minute and reserve again with a new key\./, "notes table: what to do with an expired hold");
+  const expiresRow = notes.split("\n").find(line => line.startsWith("| reserve | `422` `VALIDATION_FAILED` | `expires_at` | `EXPIRES_AT_LIMIT_EXCEEDED` |"));
+  assert.match(expiresRow, /`expires_at` is later than the maximum hold window after the call, an extension included \(an existing hold then stays as it was\)\. Send an earlier `expires_at`\./, "notes reason table: the window counts from each call");
+
+  assert.doesNotMatch(stateMachine, /at most 24 hours ahead/, "state machine: the 24-hour ceiling is gone");
+  assert.ok(stateMachine.includes("hold expiry at most the provider's maximum hold window ahead (provider configuration: 26 hours by default, never more than 48 hours; 30 minutes when `expires_at` is omitted)"), "state machine: the creation guard states the window");
+  const extendRow = stateMachine.split("\n").find(line => line.startsWith("| RESERVED | RESERVED |"));
+  assert.ok(extendRow, "state machine: RESERVED -> RESERVED (extension) row");
+  assert.match(extendRow, /Only `expires_at` moves, and only later: never shortened, with no limit on the number of extensions\. Each call is held to the maximum hold window counted from its receipt, otherwise `422` `EXPIRES_AT_LIMIT_EXCEEDED` and nothing changes\. A line already past its `expires_at` is never extended or revived \(`409` `ALLOCATION_CONFLICT`, no `details`\); once it is released, a new reserve places a new hold with a new `requested_at`\./, "state machine: extension guard");
+  assert.doesNotMatch(stateMachine, noTotalCeiling, "state machine: the provider has no total ceiling on an extension (D-lead-051)");
+
+  assert.match(collapse(errorCatalog), /or a repeat call with a new key for the same source and scope finds the hold of this principal past its expires_at and not yet released by the expiry worker \(an expired hold is never extended or revived; wait about a minute and reserve with a new key\)/, "error catalog: the expired-hold cause");
+
+  assert.match(parseJson(reserveResultSchema).$comment, /when its expires_at was later than the hold's, the call extended the RESERVED lines to it \(never shortened\) and the lines carry the new expires_at/, "result schema: ALREADY_RESERVED may extend");
+  const lineSchema = parseJson("schemas/ops/x03b/external-allocation-reserve-line.schema.json");
+  assert.match(lineSchema.properties.expires_at.description, /On a 200 ALREADY_RESERVED answer it is the current expiry, after any extension made by that call; a replay of the original idempotency key returns the original value\./, "line schema: expires_at after an extension");
+  assert.ok(!Object.hasOwn(lineSchema.properties.requested_at, "description"), "line schema: requested_at keeps its original shape (no total ceiling to anchor, D-lead-051)");
+  for (const file of [inventoryFile, reserveRequestSchema, reserveResultSchema, reserveErrorSchema, "schemas/ops/x03b/external-allocation-reserve-line.schema.json", "error-codes/external-allocation-errors.yaml", "state-machines/ops/allocation-state.md", "docs/m3-allocation-integration-notes.md"]) {
+    assert.doesNotMatch(collapse(read(file)), noTotalCeiling, `${file}: the provider has no total ceiling on an extension (D-lead-051)`);
+  }
+
+  const replayComment = collapse(inventoryText.slice(inventoryText.indexOf("  # Write commands (reserve, release)."), inventoryText.indexOf("  ExternalIdempotentReplay:")).replace(/^\s*# ?/gm, ""));
+  assert.match(replayComment, /A replay of a reserve whose hold a later call with a new key extended still returns the original result, original expires_at included\./, "replay comment: a replay is not refreshed by an extension");
+
+  assert.match(unreleased, /### Reserve: 26-hour default hold window, extension with a later `expires_at`, `409` for an expired hold \(M12-QT-005 \(4\), D-m12-076\)/, "CHANGELOG records the change");
+  const entry = unreleased.slice(unreleased.indexOf("### Reserve: 26-hour default hold window"), unreleased.indexOf("\n### ", unreleased.indexOf("### Reserve: 26-hour default hold window") + 5));
+  assert.doesNotMatch(entry, noTotalCeiling, "CHANGELOG: the provider has no total ceiling on an extension (D-lead-051)");
+  for (const token of ["1560", "2880", "4800", "EXPIRES_AT_LIMIT_EXCEEDED", "ALLOCATION_CONFLICT", "guaranteed minimums", "`RESERVATION_EXPIRED`", "new `requested_at`", "no limit on the number of extensions"]) {
+    assert.ok(entry.includes(token), `CHANGELOG entry must mention ${token}`);
+  }
 }
 
 console.log(`X03B allocation write-surface contract PASS: ${operations.length}/2 operations, ${reserveResponseFiles.length + releaseResponseFiles.length} response payloads, ${releaseErrorCases.length} release error envelopes, ${vectors.length} UUIDv5 vectors, 13 webhook event types, and negative tamper checks.`);

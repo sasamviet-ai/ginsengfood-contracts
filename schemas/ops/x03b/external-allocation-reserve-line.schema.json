@@ -37,7 +37,7 @@
       "description": "A freshly created hold is always RESERVED. CONFIRMED and ISSUED are reached only by warehouse operations; the sales platform cannot drive those transitions. RELEASED is reached by warehouse release, by hold expiry, or by the consumer itself through POST /v1/inventory/allocations/release. Lines of an ALREADY_RESERVED answer repeat the state of the existing hold, so they can be CONFIRMED; ISSUED is accepted by this schema only so that every allocation projection shares one status vocabulary; it is not emitted on this route, because a source whose allocation of the same principal was already issued is answered 409 ALLOCATION_CONFLICT (and an issued allocation of another principal, 409 INSUFFICIENT_STOCK). See enums/ops/inventory-allocation-status.yaml."
     },
     "requested_at": { "type": "string", "format": "date-time" },
-    "expires_at": { "type": "string", "format": "date-time" }
+    "expires_at": { "type": "string", "format": "date-time", "description": "When the hold of this line expires. On a 200 ALREADY_RESERVED answer it is the current expiry, after any extension made by that call; a replay of the original idempotency key returns the original value." }
   },
   "required": [
     "allocation_id",
