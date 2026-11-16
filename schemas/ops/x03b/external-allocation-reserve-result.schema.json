@@ -3,7 +3,7 @@
   "$id": "external-allocation-reserve-result.schema.json",
   "title": "External inventory allocation reserve result",
   "description": "Outcome of a synchronous finished-goods reservation. Stock is held against one or more lots; no ledger entry is written and no goods leave the warehouse.",
-  "$comment": "OWNER-DIRECTIVE-2026-09-05-EXT-ALLOC-RESERVE (option A). reservation_status RESERVED means this call created the hold; ALREADY_RESERVED means an equivalent hold already existed for the same source object and this call created nothing; when its expires_at was later than the hold's, the call extended the RESERVED lines to it (never shortened) and the lines carry the new expires_at (M12-QT-005 (4)). Both mean stock is held. A shortage is not represented here — it is a 409 error envelope.",
+  "$comment": "OWNER-DIRECTIVE-2026-09-05-EXT-ALLOC-RESERVE (option A). reservation_status RESERVED means this call created the hold; ALREADY_RESERVED means an equivalent hold already existed for the same source object and this call created nothing; when its expires_at was later than the hold's, the call extended the RESERVED lines to it, or to the hold's requested_at plus the provider's maximum total hold (48 hours by default, QT-CHUNG-016) when that comes first (never shortened), and the lines carry the new expires_at (M12-QT-005 (4)). Both mean stock is held. A shortage is not represented here — it is a 409 error envelope.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

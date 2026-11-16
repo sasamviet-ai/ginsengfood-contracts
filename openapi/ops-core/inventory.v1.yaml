@@ -437,7 +437,8 @@ paths:
         the allocation. Confirming and issuing belong to warehouse operations; the consumer can end its
         own RESERVED hold only through releaseInventoryAllocationV1, and a hold it does not release
         expires on its own (default 30 minutes; at most the provider's maximum hold window, 26 hours by
-        default and never more than 48 hours; expires_at is a request field).
+        default and never more than 48 hours; expires_at is a request field; an extension never moves it
+        past the hold's requested_at plus the maximum total hold, 48 hours by default).
         X-Idempotency-Key is required: a network retry without it would hold stock twice for the same
         order line, so after a lost response repeat the call with the same key and the same body. The
         idempotency scope of this operation is the source: a key sent for a different source is a new
@@ -453,9 +454,14 @@ paths:
         this principal's own: it creates nothing. When that call carries an expires_at later than the
         current expiry of the hold's RESERVED lines, it extends them to it and the answer carries the new
         expires_at; an earlier or equal expires_at, or none, changes nothing, so a hold is never shortened.
-        There is no limit on the number of extensions; each call, an extension included, is held to the
+        Extensions are limited in total, not in number: each call, an extension included, is held to the
         maximum hold window counted from its own receipt, otherwise 422 VALIDATION_FAILED with
-        details[].reason EXPIRES_AT_LIMIT_EXCEEDED and the hold stays as it was. A replay of the original
+        details[].reason EXPIRES_AT_LIMIT_EXCEEDED and the hold stays as it was. An extension never moves
+        expires_at past the hold's requested_at plus the provider's maximum total hold (48 hours by default,
+        never more than 48 hours): a later expires_at is cut to that moment and the 200 ALREADY_RESERVED
+        answer carries the cut expires_at, so the consumer reads allocations[].expires_at of the answer; a
+        hold already at that moment is not moved, and the expiry worker releases it there (QT-CHUNG-016).
+        A replay of the original
         key still returns the original answer, original expires_at included. A hold already past its
         expires_at that the provider's expiry worker has not released yet is never extended or revived: the
         repeat call is 409 ALLOCATION_CONFLICT without details. Once the worker released it, a reserve for
@@ -496,12 +502,17 @@ paths:
       # max_hold_window_config_ceiling_minutes is the highest window the provider's own configuration accepts (it refuses to
       # start above it). The current defaults of the hold-number cap (200 -> 4800) and of the hold window (60 minutes -> 26
       # hours) changed on 2026-11-16 (M12-QT-005 (4)); guaranteed_minimums did not change.
+      # max_total_hold_minutes is the total time one hold may live, counted from its requested_at (the call that created
+      # it), extensions included: an extension past it is cut to it, never refused for it (QT-CHUNG-016). The provider
+      # accepts it between max_hold_window_minutes and 2880 (48 hours) and refuses to start outside that range. It is a
+      # current default, not one of guaranteed_minimums.
       x-provider-limits:
         config_section: ExternalApi:AllocationHoldLimits
         status: CURRENT_DEFAULTS
         max_active_holds_per_principal: 4800
         max_hold_window_minutes: 1560
         max_hold_window_config_ceiling_minutes: 2880
+        max_total_hold_minutes: 2880
         default_hold_window_minutes: 30
         max_share_of_on_hand_percent: 80
         share_floor_quantity: 50
@@ -515,6 +526,7 @@ paths:
         guaranteed_minimums_decision: SEC-15 / M3-158, fixed 2026-11-14
         guaranteed_minimums_change_rule: LOWERING_IS_A_CONTRACT_CHANGE_ANNOUNCED_BEFORE_DEPLOY
         current_defaults_decision: M12-QT-005 (4) / D-m12-076, 2026-11-16
+        max_total_hold_decision: QT-CHUNG-016, 2026-11-16
         consumer_rule: FAIL_CLOSED_ON_EVERY_LIMIT_REFUSAL
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
@@ -531,8 +543,9 @@ paths:
             X-Correlation-Id: { $ref: "#/components/headers/CorrelationId" }
           description: >-
             An equivalent hold of this service principal already existed; nothing was created. When the
-            request's expires_at was later than the hold's, its RESERVED lines now expire at that time (never
-            earlier).
+            request's expires_at was later than the hold's, its RESERVED lines now expire at that time, or at
+            the hold's requested_at plus the maximum total hold (48 hours by default) when that comes first; a
+            hold is never shortened.
           content:
             application/json:
               schema:
