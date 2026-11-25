@@ -1,0 +1,43 @@
+{
+  "contract": "openapi/business-platform/order-channel-state.v1.yaml",
+  "operationId": "getOrderChannelStateV1",
+  "status": "DRAFT",
+  "note": "Fake order codes only. The four 200 cases are the ones the M5 consumer must call on .60 before Done (waiting, paid, confirmed, not found).",
+  "cases": [
+    {
+      "name": "waiting_cod",
+      "request": { "method": "GET", "path": "/api/v1/internal/orders/by-code/GF-TEST-0001/channel-state", "headers": { "X-M5-Service-Token": "<from secret store>" } },
+      "response": { "status": 200, "body": { "schema_version": "v1", "order_code": "GF-TEST-0001", "order_status": "CONFIRMING", "payment_status": "UNPAID", "payment_method": "COD", "order_version": 0, "updated_at": "2026-11-13T09:00:00+07:00" } }
+    },
+    {
+      "name": "paid_confirming",
+      "request": { "method": "GET", "path": "/api/v1/internal/orders/by-code/GF-TEST-0002/channel-state", "headers": { "X-M5-Service-Token": "<from secret store>" } },
+      "response": { "status": 200, "body": { "schema_version": "v1", "order_code": "GF-TEST-0002", "order_status": "CONFIRMING", "payment_status": "PAID", "payment_method": "ONLINE", "order_version": 2, "updated_at": "2026-11-13T09:05:00+07:00" } }
+    },
+    {
+      "name": "paid_confirmed",
+      "request": { "method": "GET", "path": "/api/v1/internal/orders/by-code/GF-TEST-0003/channel-state", "headers": { "X-M5-Service-Token": "<from secret store>" } },
+      "response": { "status": 200, "body": { "schema_version": "v1", "order_code": "GF-TEST-0003", "order_status": "CONFIRMED", "payment_status": "PAID", "payment_method": "ONLINE", "order_version": 3, "updated_at": "2026-11-13T09:10:00+07:00" } }
+    },
+    {
+      "name": "cod_confirmed_unpaid_open_point",
+      "request": { "method": "GET", "path": "/api/v1/internal/orders/by-code/GF-TEST-0004/channel-state", "headers": { "X-M5-Service-Token": "<from secret store>" } },
+      "response": { "status": 200, "body": { "schema_version": "v1", "order_code": "GF-TEST-0004", "order_status": "CONFIRMED", "payment_status": "UNPAID", "payment_method": "COD", "order_version": 1, "updated_at": "2026-11-13T09:15:00+07:00" } }
+    },
+    {
+      "name": "not_found",
+      "request": { "method": "GET", "path": "/api/v1/internal/orders/by-code/GF-TEST-9999/channel-state", "headers": { "X-M5-Service-Token": "<from secret store>" } },
+      "response": { "status": 404, "body": { "code": "ORDER_CHANNEL_STATE.ORDER_NOT_FOUND", "message": "Order not found.", "httpStatus": 404 } }
+    },
+    {
+      "name": "token_invalid",
+      "request": { "method": "GET", "path": "/api/v1/internal/orders/by-code/GF-TEST-0001/channel-state", "headers": {} },
+      "response": { "status": 401, "body": { "code": "ORDER_CHANNEL_STATE.SERVICE_TOKEN_INVALID", "message": "Service token is missing or invalid.", "httpStatus": 401 } }
+    },
+    {
+      "name": "disabled",
+      "request": { "method": "GET", "path": "/api/v1/internal/orders/by-code/GF-TEST-0001/channel-state", "headers": { "X-M5-Service-Token": "<from secret store>" } },
+      "response": { "status": 503, "body": { "code": "ORDER_CHANNEL_STATE.DISABLED", "message": "Order channel state is disabled.", "httpStatus": 503 } }
+    }
+  ]
+}
